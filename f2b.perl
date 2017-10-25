@@ -39,8 +39,14 @@ while (<STDIN>){
               $f2b{$name}{$bytes}++;
               #print "$name\n";
             }
+          }else{
+            print STDERR "malformated tree at nn=$nn, of=$of, len=$len $hash\n";
+            exit (-1);
           }
         }
+      }else{
+        print STDERR "problem reading at nn=$nn, of=$of, len=$len, got $rl\n";
+        exit (-1);
       }
     }
   }
