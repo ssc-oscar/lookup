@@ -10,6 +10,7 @@ my $lines = 0;
 my $trees = 0;
 my %f2b = ();
 my $fbasei ="/data/All.blobs/tree_";
+my $outN = $ARGV[0];
 
 while (<STDIN>){
   chop();
@@ -29,7 +30,7 @@ while (<STDIN>){
         my $to = decompress ($codeC);
         while ($to =~ s/^([0-7]+) (.+?)\0(.{20})//s) {
           $lines ++;
-          print STDERR "$lines lines and $trees trees done\n" if (!($lines%1000000));
+          print STDERR "$lines lines and $trees trees done\n" if (!($lines%100000000));
           my ($mode, $name, $bytes) = (oct($1),$2,$3);
           if ($mode == 0100644 && ! defined $f2b{$name}{$bytes}){
             $f2b{$name}{$bytes}++;
@@ -47,9 +48,9 @@ while (<STDIN>){
 
 print STDERR "writing\n";
 my %out;
-tie %out, "TokyoCabinet::HDB", "/fast1/All.sha1c/f2b.tch", TokyoCabinet::HDB::OWRITER |  TokyoCabinet::HDB::OCREAT,
+tie %out, "TokyoCabinet::HDB", "/fast1/All.sha1c/f2b$outN.tch", TokyoCabinet::HDB::OWRITER |  TokyoCabinet::HDB::OCREAT,
   16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
-  or die "cant open /fast1/All.sha1c/f2b.tch\n";
+  or die "cant open /fast1/All.sha1c/f2b$outN.tch\n";
 while (my ($k, $v) = each %f2b){
   $out{$k} = join ".", sort keys %{$v};
   #my $b = unpack "H*", $k;
