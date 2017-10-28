@@ -11,6 +11,9 @@ my $trees = 0;
 my %f2b = ();
 my $fbasei ="/data/All.blobs/tree_";
 my $outN = $ARGV[0];
+$fbasei = $ARGV[1] if defined $ARGV[1];
+my $outp = "/fast1/All.sha1c/";
+$outp = $ARGV[2] if defined $ARGV[2];
 
 while (<STDIN>){
   chop();
@@ -48,9 +51,9 @@ while (<STDIN>){
 
 print STDERR "writing\n";
 my %out;
-tie %out, "TokyoCabinet::HDB", "/fast1/All.sha1c/f2b$outN.tch", TokyoCabinet::HDB::OWRITER |  TokyoCabinet::HDB::OCREAT,
+tie %out, "TokyoCabinet::HDB", "$outp/f2b$outN.tch", TokyoCabinet::HDB::OWRITER |  TokyoCabinet::HDB::OCREAT,
   16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
-  or die "cant open /fast1/All.sha1c/f2b$outN.tch\n";
+  or die "cant open $outp/f2b$outN.tch\n";
 while (my ($k, $v) = each %f2b){
   $out{$k} = join ".", sort keys %{$v};
   #my $b = unpack "H*", $k;

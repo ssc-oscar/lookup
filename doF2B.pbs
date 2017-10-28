@@ -1,0 +1,9 @@
+#PBS -N doF2B.sh-11
+#PBS -A UT-TENN0241
+#PBS -l feature=beacon
+#PBS -l partition=beacon
+#PBS -l nodes=1:ppn=16,walltime=23:00:00
+#PBS -j oe
+#PBS -S /bin/bash
+cd /lustre/medusa/audris/All.blobs
+/nics/b/home/audris/lookup/doF2B.sh 11
