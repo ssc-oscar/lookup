@@ -17,7 +17,7 @@ tie %in, "TokyoCabinet::HDB", "$outN.tch", TokyoCabinet::HDB::OREADER,
   16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
   or die "cant open $outN.tch\n";
 
-my $line = 0;
+my $lines = 0;
 while (my ($k, $v) = each %in){
   print STDERR "$lines done\n" if (!(($lines++)%100000000));
   my $lC = length($k);
@@ -34,6 +34,7 @@ while (my ($k, $v) = each %in){
   }
   $out{$k} = $v1;
 }
+print "$lines done\n";
 untie %in;
 untie %out;
 
