@@ -33,15 +33,20 @@ while (<STDIN>){
 }
 
 my %res;
+my $lines = 0;
 for my $k (0..($j-1)){
   while (my ($k, $v) = each %{$in{$k}}){
+    print STDERR "$lines done\n" if (!(($lines++)%100000000));
     get ($k, $v, \%{$res{$k}});
   }
 }
-
+print STDERR "writing\n";
+$lines = 0;
 while (my ($k, $v) = each %res){
+  $lines++;
   $out{$k} = join "", sort keys %{$v};  
 }
+print STDERR "done $lines\n";
 
 untie %out;
 for my $k (0..($j-1)){
