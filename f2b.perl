@@ -33,10 +33,13 @@ while (<STDIN>){
         my $to = decompress ($codeC);
         while ($to =~ s/^([0-7]+) (.+?)\0(.{20})//s) {
           $lines ++;
-          print STDERR "$lines lines and $trees trees done\n" if (!($lines%100000000));
+          if (!($lines%100000000)){
+            print STDERR "$lines lines and $trees trees done\n";
+            #goto DONE;
+          }
           my ($mode, $name, $bytes) = (oct($1),$2,$3);
           if ($mode == 0100644 && ! defined $f2b{$name}{$bytes}){
-            $f2b{$name}{$bytes}++;
+            $f2b{$name}{$bytes} = 1;
             #print "$name\n";
           }
         }
@@ -48,6 +51,7 @@ while (<STDIN>){
   }
 }
 
+DONE: 
 
 print STDERR "writing\n";
 my %out;
@@ -55,9 +59,9 @@ tie %out, "TokyoCabinet::HDB", "$outp/f2b$outN.tch", TokyoCabinet::HDB::OWRITER 
   16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
   or die "cant open $outp/f2b$outN.tch\n";
 while (my ($k, $v) = each %f2b){
-  $out{$k} = join ".", sort keys %{$v};
+  $out{$k} = join "", sort keys %{$v};
   #my $b = unpack "H*", $k;
-  #print "$b\;".(join ".", sort keys %{$v})."\n";
+  #print "$b\;".(join "", sort keys %{$v})."\n";
 }
 untie %out;
 
