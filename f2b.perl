@@ -58,6 +58,7 @@ my %out;
 tie %out, "TokyoCabinet::HDB", "$outp/f2b$outN.tch", TokyoCabinet::HDB::OWRITER |  TokyoCabinet::HDB::OCREAT,
   16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
   or die "cant open $outp/f2b$outN.tch\n";
+
 while (my ($k, $v) = each %f2b){
   $out{$k} = join "", sort keys %{$v};
   #my $b = unpack "H*", $k;

@@ -12,12 +12,12 @@ tie %out, "TokyoCabinet::HDB", "$outN.1.tch", TokyoCabinet::HDB::OWRITER |  Toky
   16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
   or die "cant open $outN.1.tch\n";
 
-my %out1;
-tie %out1, "TokyoCabinet::HDB", "$outN.tch", TokyoCabinet::HDB::OREADER,
+my %in;
+tie %in, "TokyoCabinet::HDB", "$outN.tch", TokyoCabinet::HDB::OREADER,
   16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
   or die "cant open $outN.tch\n";
 
-while (my ($k, $v) = each %out1){
+while (my ($k, $v) = each %in){
   my $lC = length($k);
   my $l = length($v);
   my $v1 = substr($v, 0, 20);
@@ -30,8 +30,8 @@ while (my ($k, $v) = each %out1){
       $v1 .= substr($v, $i*21, 20);
     }
   }
-  $out1{$k} = $v1;
+  $out{$k} = $v1;
 }
-untie %out1;
+untie %in;
 untie %out;
 
