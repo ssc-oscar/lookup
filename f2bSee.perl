@@ -30,13 +30,15 @@ sub safeDecomp {
 
 
 my $offset = 0;
-while (my ($codeC, $vs) = each %clones){
-	my $lC = length($codeC);
-	my $l = length($vs);
-	print "$lC\;$l\;$codeC";
-        for my $i (0..($l/20-1)){
-          print ";".(unpack "H*", substr($vs, $i*20, 20));
-        }
-        print "\n";
-}
+while (<STDIN>){
+  chop ();
+  my $k = $_;
+  my $vs = $clones{$k};
+  my $l = length($vs);
+  print "$k;$l";
+  for my $i (0..($l/20-1)){
+    print ";".(unpack "H*", substr($vs, $i*20, 20));
+  }
+  print "\n";
+} 
 untie %clones;
