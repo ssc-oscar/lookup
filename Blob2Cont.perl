@@ -1,3 +1,5 @@
+#!/usr/bin/perl -I /home/audris/lib64/perl5
+
 use strict;
 use warnings;
 use Error qw(:try);
@@ -15,7 +17,7 @@ sub fromHex {
 
 my $sections = 128;
 
-my $fbase="All.sha1o/blob_";
+my $fbase="All.sha1c/blob_";
 my $fbasei ="/data/All.blobs/blob_";
 
 my (%fhos);
@@ -32,9 +34,12 @@ my $sec = $ARGV[0];
     open A, "tac $fbasei$sec.idx | " or die ($!);
     while (<A>){
       chop ();
-      my ($nn, $of, $len, $hash, $h1) = split (/\;/, $_, -1);
-      if (length ($hash) !=40){
-        $hash = $h1; #hash is on the next column in the beginning
+      my @x = split (/\;/, $_, -1);
+      my $of = $x[1];
+      my $len = $x[2];
+      my $hash = $x[3];
+      if ($#x>4){
+        $hash = $x[4]; #hash is on the next column in the beginning
       }
       my $h = fromHex ($hash);
 
