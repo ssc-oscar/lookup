@@ -16,11 +16,6 @@ if(!tie(%clones, "TokyoCabinet::HDB", "$fname",
         print STDERR "tie error for $fname\n";
 }
 
-my %store;
-my $fstore = "$ARGV[1]";
-tie %store, "TokyoCabinet::HDB", "$fstore", TokyoCabinet::HDB::OWRITER | TokyoCabinet::HDB::OCREAT, 
-   6777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
-   or die "cant open $fstore\n";
 
 my $sections = 128;
 my $parts = 2;
@@ -61,13 +56,11 @@ while (<STDIN>){
   }
   for my $sec (keys %list){
     for my $hb (keys %{$list{$sec}}){
-      my $v = getBlob ($hb);
-      $store{$hb} = $v;
+      print "$sec;".(toHex($hb))."\n";
     }
   }
 } 
 untie %clones;
-untie %store;
 
 sub toHex { 
 	return unpack "H*", $_[0]; 
@@ -75,21 +68,6 @@ sub toHex {
 sub fromHex { 
 	return pack "H*", $_[0]; 
 } 
-
-sub getBlob {
-  my ($bB) = $_[0];
-  my $sec = hex(unpack "H*", substr($bB, 0, 1)) % $sections;
-  if (! defined $fhosc{$sec}{$bB}){
-     print STDERR "no blob ".(toHex($bB))." in $sec\n";
-     return "";
-  }
-  my ($off, $len) = unpack ("w w", $fhosc{$sec}{$bB});
-  my $f = $fhob{$sec};
-  seek ($f, $off, 0);
-  my $codeC = "";
-  my $rl = read ($f, $codeC, $len);
-  return ($codeC);
-}
 
 for my $sec (0 .. ($sections-1)){
 	untie %{$fhosc{$sec}};

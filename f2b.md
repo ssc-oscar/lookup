@@ -46,4 +46,21 @@ The blobs can then be used (via seeBlob.perl)
 to grep for import strings, package names or anyhing else on the 
 much smaller dataset.
 
+To store the extracted blobs: 
+```
+echo setup.py | ./f2bStore /fast1/All.sha1c/f2b.tch setup.py.tch
+```
+
+In addition to extracting data, the blob shas can be extracted:
+e.g., 
+```
+echo setup.py | ./f2bPrep.perl /fast1/All.sha1c/f2b.tch > setup.py.prep
+```
+
+Once that is done, the following loop can be excecuted in parallel:
+```
+for i in {0..127}
+do grep "^$i;" setup.py.prep | cut -d\; -f2 | extrBlobs.perl $i destination
+done
+```
 
