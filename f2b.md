@@ -50,6 +50,8 @@ To store the extracted blobs:
 ```
 echo setup.py | ./f2bStore /fast1/All.sha1c/f2b.tch setup.py.tch
 ```
+This takes a bit long time, especially for more common files such as pcakage.json. A
+more iterative approch is as follows:
 
 In addition to extracting data, the blob shas can be extracted:
 e.g., 
@@ -60,7 +62,14 @@ echo setup.py | ./f2bPrep.perl /fast1/All.sha1c/f2b.tch > setup.py.prep
 Once that is done, the following loop can be excecuted in parallel:
 ```
 for i in {0..127}
-do grep "^$i;" setup.py.prep | cut -d\; -f2 | extrBlobs.perl $i destination
+do grep "^$i;" setup.py.prep | cut -d\; -f2 | extrBlobs.perl $i /fast1/All.sha1c/setup.py
+done
+```
+
+tosee what was stored:
+```
+for i in {0..127}
+do ./catTC.perl /fast1/All.sha1c/setup.py.$i.tch
 done
 ```
 
