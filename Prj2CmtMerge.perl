@@ -21,51 +21,82 @@ tie %p2c, "TokyoCabinet::HDB", "$pre/${fbase}commit.tch", TokyoCabinet::HDB::ORE
      or die "cant open $pre/${fbase}commit.tch\n";
 
 
-open B, '>:raw', "/data/play/prj2cmt/Prj2Cmt.merge";
+open B, '>:raw', "/data/c2fbp/Prj2Cmt.merge";
+open A, "<$ARGV[0]";
+binmode(A); 
+
 
 my $lines = 0;
 procBin ($ARGV[0]);
 
 sub procBin {
-  my $fname = $_[0];
-  print "processing $fname\n";  
-  open A, "<$fname";
-  binmode(A); 
+  print "processing $ARGV[0]\n";  
   until (eof(A))
   {
     my $buffer;
     my $nread = read (A, $buffer, 2, 0);
     my $lk = unpack 'S', $buffer;
     my $prj = "EMPTY";
-    if ($lk == 0){
-      $lk = length($prj);
-    }else{
+    if ($lk > 0){
       $nread = read (A, $buffer, $lk, 0); 
       $prj = $buffer;
+      $prj =~ s/\.git$//;
     }
+    $lk = length($prj);
+
     $nread = read (A, $buffer, 4, 0);
     my $ns = unpack 'L', $buffer;
+    my $found = 0;
     if (defined $p2c{$prj}){
-      my $v0 = $p2c{$prj};
-      my $l0 = length($v0)/20;
-      my $fst = substr ($v0, 0, 20);
-      my $lst = substr ($v0, 20*($l0-1), 20);
-      my %sa = ();
-      my %sb = ();
-      for my $i (0..($ns-1)){
-         $nread = read (A, $buffer, 20, 0);
-         $sa{$buffer}++ if ( ($buffer cmp $fst) < 0);
-         $sb{$buffer}++ if ( ($buffer cmp $lst) > 0);
+      if (defined $p2c{"$prj.git"}){
+        collect ($prj, merge ($p2c{$prj}, $p2c{"$prj.git"}), $ns);
+      }else{
+        collect ($prj, $p2c{$prj}, $ns);
       }
-      out ($prj, ((join "", sort keys %sa).$v0.(join "", sort keys %sb)));
     }else{
-      $nread = read (A, $buffer, 20*$ns, 0);
-      out ($prj, $buffer);
+      if (defined $p2c{"$prj.git"}){
+        collect ($prj, $p2c{"$prj.git"}, $ns);
+      }else{
+        $nread = read (A, $buffer, 20*$ns, 0);
+        out ($prj, $buffer);
+      }
     }
     $lines ++;
     print STDERR "$lines done\n" if (!($lines%5000000)); 
   }
-}  
+}
+
+sub merge {
+  my ($v0, $v1) = @_;
+  my $ns0 = length($v0)/20;
+  my $ns1 = length($v1)/20;
+  my %sa = ();
+  for my $i (0..($ns0-1)){
+    $sa{(substr ($v0, 20*$i, 20))}++;
+  }
+  for my $i (0..($ns1-1)){
+    $sa{(substr ($v1, 20*$i, 20))}++;
+  }
+  return join '', (sort keys %sa);
+}
+
+
+sub collect {
+  my ($prj, $v0, $ns) = @_;
+  
+  my $l0 = length($v0)/20;
+  my $fst = substr ($v0, 0, 20);
+  my $lst = substr ($v0, 20*($l0-1), 20);
+  my %sa = ();
+  my %sb = ();
+  for my $i (0..($ns-1)){
+    my $buffer;
+    my $nread = read (A, $buffer, 20, 0);
+    $sa{$buffer}++ if ( ($buffer cmp $fst) < 0);
+    $sb{$buffer}++ if ( ($buffer cmp $lst) > 0);
+  }
+  out ($prj, ((join "", sort keys %sa).$v0.(join "", sort keys %sb)));
+}
 
 untie %p2c;
 
