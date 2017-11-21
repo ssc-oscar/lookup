@@ -14,23 +14,26 @@ sub fromHex {
 } 
 
 my %p2c;
-my $fbase="All.sha1c/project_";
-my $pre = "/fast1";
-tie %p2c, "TokyoCabinet::HDB", "$pre/${fbase}commit.tch", TokyoCabinet::HDB::OREADER,   
+tie %p2c, "TokyoCabinet::HDB", "$ARGV[0]", TokyoCabinet::HDB::OREADER,   
         16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
-     or die "cant open $pre/${fbase}commit.tch\n";
+     or die "cant open $ARGV[0]\n";
 
 
-open B, '>:raw', "/data/c2fbp/Prj2Cmt.merge";
-open A, "<$ARGV[0]";
+open B, '>:raw', "$ARGV[2]";
+open A, "<$ARGV[1]";
 binmode(A); 
 
 
 my $lines = 0;
-procBin ($ARGV[0]);
-
+my %touched;
+procBin ($ARGV[1]);
+while (my ($k, $v) = each %p2c){
+  if (!defined ($touched{$k})){
+    out ($k, $v);
+  }
+}
 sub procBin {
-  print "processing $ARGV[0]\n";  
+  print "processing $ARGV[1]\n";  
   until (eof(A))
   {
     my $buffer;
@@ -48,7 +51,9 @@ sub procBin {
     my $ns = unpack 'L', $buffer;
     my $found = 0;
     if (defined $p2c{$prj}){
+      $touched{$prj}++;
       if (defined $p2c{"$prj.git"}){
+        $touched{"$prj.git"}++;
         collect ($prj, merge ($p2c{$prj}, $p2c{"$prj.git"}), $ns);
       }else{
         collect ($prj, $p2c{$prj}, $ns);
@@ -65,6 +70,7 @@ sub procBin {
     print STDERR "$lines done\n" if (!($lines%5000000)); 
   }
 }
+
 
 sub merge {
   my ($v0, $v1) = @_;
