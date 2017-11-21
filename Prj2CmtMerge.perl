@@ -91,17 +91,16 @@ sub collect {
   my ($prj, $v0, $ns) = @_;
   
   my $l0 = length($v0)/20;
-  my $fst = substr ($v0, 0, 20);
-  my $lst = substr ($v0, 20*($l0-1), 20);
   my %sa = ();
-  my %sb = ();
+  for my $i (0..($l0-1)){
+    $sa{substr ($v0, 20*$i, 20)}++;    
+  }
   for my $i (0..($ns-1)){
     my $buffer;
     my $nread = read (A, $buffer, 20, 0);
-    $sa{$buffer}++ if ( ($buffer cmp $fst) < 0);
-    $sb{$buffer}++ if ( ($buffer cmp $lst) > 0);
+    $sa{$buffer}++ if ( !defined ($sa{$buffer}));
   }
-  out ($prj, ((join "", sort keys %sa).$v0.(join "", sort keys %sb)));
+  out ($prj, (join "", sort keys %sa));
 }
 
 untie %p2c;
