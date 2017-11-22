@@ -37,7 +37,7 @@ print STDERR "$lines done\n";
 
 sub output {
   my $n = $_[0];
-  open A, '>:raw', "/data/play/prj2cmt/Prj2Cmt$n.bin"; 
+  open A, '>:raw', "$n"; 
   while (my ($k, $v) = each %c2p1){
     my @shas = sort keys %{$v};
     my $nshas = $#shas+1;
