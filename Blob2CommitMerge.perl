@@ -13,15 +13,14 @@ sub fromHex {
         return pack "H*", $_[0]; 
 } 
 
-my %c2b;
-tie %c2b, "TokyoCabinet::HDB", "$ARGV[1]", TokyoCabinet::HDB::OWRITER | TokyoCabinet::HDB::OCREAT,   
+my %b2c;
+tie %b2c, "TokyoCabinet::HDB", "$ARGV[1]", TokyoCabinet::HDB::OWRITER | TokyoCabinet::HDB::OCREAT,   
         16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
      or die "cant open $ARGV[1]\n";
 
 
 
-my %c2b1;
-
+my %b2c1;
 
 my $lines = 0;
 procBin ($ARGV[0]);
@@ -44,7 +43,7 @@ sub procBin {
     for my $i (1..$n){
        $nread = read (A, $buffer, 20, 0);
        my $b = substr ($buffer, 0, 20);
-       $c2b1{$cmt}{$b}++;
+       $b2c1{$cmt}{$b}++;
     }
     $lines ++;
     print STDERR "$lines done\n" if (!($lines%5000000)); 
@@ -57,15 +56,15 @@ while (<STDIN>){
   my ($c, $bb) = split(/\;/, $_, -1);
   my $cmt = fromHex ($c);
   my $b = fromHex ($bb);
-  $c2b1{$cmt}{$b}++;
+  $b2c1{$b}{$cmt}++;
   $lines ++;
   print STDERR "$lines read\n" if (!($lines%5000000));
 }
 
-while (my ($k, $v) = each %c2b1){
+while (my ($k, $v) = each %b2c1){
   my $vv = join "", (sort keys %{$v});
-  $c2b{$k} = $vv;
+  $b2c{$k} = $vv;
 }
 
-untie %c2b;
+untie %b2c;
 
