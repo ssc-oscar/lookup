@@ -1,3 +1,4 @@
+#!/usr/bin/perl -I /home/audris/lib64/perl5
 use strict;
 use warnings;
 use Error qw(:try);
@@ -37,7 +38,7 @@ print STDERR "$lines done\n";
 
 sub output {
   my $n = $_[0];
-  open A, '>:raw', "/data/play/prj2cmt/Prj2Cmt$n.bin"; 
+  open A, '>:raw', "/data/Prj2Cmt$n.bin"; 
   while (my ($k, $v) = each %c2p1){
     my @shas = sort keys %{$v};
     my $nshas = $#shas+1;
