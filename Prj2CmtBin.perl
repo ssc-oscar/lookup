@@ -26,6 +26,7 @@ while (<STDIN>){
     next;
   }
   my $sha = fromHex ($hsha);
+  $p =~ s/\.git$//;
   $p =~ s/^github.com_//;
   $p =~ s/^bitbucket.org_/bb_/;
   $c2p1{$p}{$sha}++;
