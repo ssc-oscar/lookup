@@ -54,19 +54,19 @@ sub procBin {
     my $found = 0;
     if (defined $p2c{$prj}){
       $touched{$prj}++;
-      if (defined $p2c{"$prj.git"}){
-        $touched{"$prj.git"}++;
-        collect ($prj, merge ($p2c{$prj}, $p2c{"$prj.git"}), $ns);
-      }else{
+      #if (defined $p2c{"$prj.git"}){
+      #  $touched{"$prj.git"}++;
+      #  collect ($prj, merge ($p2c{$prj}, $p2c{"$prj.git"}), $ns);
+      #}else{
         collect ($prj, $p2c{$prj}, $ns);
-      }
+      #}
     }else{
-      if (defined $p2c{"$prj.git"}){
-        collect ($prj, $p2c{"$prj.git"}, $ns);
-      }else{
+      #if (defined $p2c{"$prj.git"}){
+      #  collect ($prj, $p2c{"$prj.git"}, $ns);
+      #}else{
         $nread = read (A, $buffer, 20*$ns, 0);
         out ($prj, $buffer);
-      }
+      #}
     }
     $lines ++;
     print STDERR "$lines done\n" if (!($lines%5000000)); 
