@@ -13,6 +13,11 @@ sub fromHex {
         return pack "H*", $_[0]; 
 } 
 
+my %b2c;
+tie %b2c, "TokyoCabinet::HDB", "$ARGV[0]", TokyoCabinet::HDB::OWRITER | TokyoCabinet::HDB::OCREAT,   
+        16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
+     or die "cant open $ARGV[0]\n";
+
 my %b2c1;
 my $lines = 0;
 while (<STDIN>){
@@ -25,21 +30,16 @@ while (<STDIN>){
   print STDERR "$lines read\n" if (!($lines%100000000));
 }
 
-$fname = $ARGV[0];
-output ($n);
+output ();
+
+untie %b2c;
 
 sub output {
-  my $n = $_[0];
-  open A, '>:raw', "$n"; 
   while (my ($k, $v) = each %b2c1){
     my @shas = sort keys %{$v};
-    my $nshas = $#shas+1;
-    my $nsha = pack "L", $nshas;
-    print A $k;
-    print A $nsha;
-    print A "".(join '', @shas);
+    my $v1 = join '', @shas;
+    $b2c{$k} = $v1;
   }
 }
-
 
 
