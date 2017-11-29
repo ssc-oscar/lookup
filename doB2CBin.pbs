@@ -1,0 +1,12 @@
+#PBS -N doB2Cbin-NNN
+#PBS -A UT-TENN0241
+#PBS -l feature=beacon
+#PBS -l partition=beacon
+#PBS -l nodes=1:ppn=1,walltime=24:00:00
+#PBS -j oe
+#PBS -S /bin/bash
+cd /lustre/haven/user/audris/c2fbp
+LD_LIBRARY_PATH=$HOME/lib:$HOME/lib64:$LD_LIBRARY_PATH
+cloneDir=/lustre/haven/user/audris/c2fbp
+cloneDir1=/lustre/haven/user/audris/c2fbp
+gunzip -c $cloneDir/c2fbp.NNN.gz | perl -I ~/lib/perl5 /nics/b/home/audris/lookup/Blob2CmtBin.perl $cloneDir1/Blob2Cmt.NNN.tch

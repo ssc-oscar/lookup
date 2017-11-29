@@ -1,0 +1,10 @@
+#PBS -N doB2C-XXX
+#PBS -A UT-TENN0241
+#PBS -l feature=beacon
+#PBS -l partition=beacon
+#PBS -l nodes=1:ppn=1,walltime=23:00:00
+#PBS -j oe
+#PBS -S /bin/bash
+export LD_LIBRARY_PATH=$HOME/lib:$HOME/lib64:$LD_LIBRARY_PATH
+cd /lustre/haven/user/audris/All.blobs
+perl -I $HOME/lib/perl5 $HOME/lookup/Blob2Cont.perl XXX 2> Blob2Cont.XXX.err

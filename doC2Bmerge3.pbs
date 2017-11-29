@@ -1,0 +1,23 @@
+#PBS -N doB2Cmerge3-NNN.MMM
+#PBS -A UT-TENN0241
+#PBS -l feature=beacon
+#PBS -l partition=beacon
+#PBS -l nodes=1:ppn=1,walltime=24:00:00
+#PBS -j oe
+#PBS -S /bin/bash
+cd /lustre/haven/user/audris/c2fbp
+LD_LIBRARY_PATH=$HOME/lib:$HOME/lib64:$LD_LIBRARY_PATH
+cloneDir=/lustre/haven/user/audris/c2fbp
+cloneDir1=/lustre/haven/user/audris/c2fbp
+i=NNN 
+k=MMM 
+j=$(echo NNN+8|bc)
+j1=$(echo NNN+15|bc)
+i1=$(echo NNN+7|bc)
+[[ $j -lt 10 ]] && j="0$j"
+[[ $j1 -lt 10 ]] && j1="0$j1"
+[[ $i1 -lt 10 ]] && i1="0$i1"
+cp -p $cloneDir1/Cmt2Blob.{$i-$i1,$j-$j1}.$k.tch /tmp
+perl -I ~/lib/perl5 /nics/b/home/audris/lookup/Blob2CmtMergeTC.perl /tmp/Cmt2Blob.{$i-$i1,$j-$j1,$i-$j1}.$k.tch 
+cp -p /tmp/Cmt2Blob.$i-$j1.$k.tch $cloneDir1/
+rm /tmp/Cmt2Blob.{$i-$i1,$j-$j1,$i-$j1}.$k.tch
