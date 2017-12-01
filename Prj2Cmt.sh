@@ -121,6 +121,7 @@ gunzip -c c2fbp.0[0-9].gz c2fbp.1[0-9].gz | /da3_data/lookup/Prj2CmtBin.perl  Pr
 /da3_data/lookup/lookup/Prj2CmtPack.perl Prj2CmtMerge.bin /fast1/All.sha1c/Prj2Cmt.0-9.tch
 
 #do the merges until  /fast1/All.sha1c/project_commit.tch is produces
+store in da4:/data/basemaps/Prj2Cmt.tch
 
 ##################################
 #now do Commit to project

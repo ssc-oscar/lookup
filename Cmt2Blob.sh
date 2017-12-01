@@ -1,16 +1,30 @@
 #Do fresh
 
-for i in {000..80}; do for j in {0..15}; do sed "s/NNN/$i/g;s/MMM/$j/g" doC2Bin.pbs | qsub; done; done
-for i in {000..78..02}; do for j in {0..15}; do sed "s/NNN/$i/g;s/MMM/$j/g" doC2merge.pbs | qsub; done; done
-for i in {000..76..04}; do for j in {0..15}; do sed "s/NNN/$i/g;s/MMM/$j/g" doC2merge1.pbs | qsub; done; done
-for i in {000..72..08}; do for j in {0..15}; do sed "s/NNN/$i/g;s/MMM/$j/g" doC2merge2.pbs | qsub; done; done
-for i in {000..64..16}; do for j in {0..15}; do sed "s/NNN/$i/g;s/MMM/$j/g" doC2merge3.pbs | qsub; done; done
-for i in {000..32..32}; do for j in {0..15}; do sed "s/NNN/$i/g;s/MMM/$j/g" doC2merge4.pbs | qsub; done; done
+for i in {00..80}; do for j in {0..15}; do sed "s/NNN/$i/g;s/MMM/$j/g" doC2Bin.pbs | qsub; done; done
+for i in {00..78..02}; do for j in {0..15}; do sed "s/NNN/$i/g;s/MMM/$j/g" doC2merge.pbs | qsub; done; done
+for i in {00..76..04}; do for j in {0..15}; do sed "s/NNN/$i/g;s/MMM/$j/g" doC2merge1.pbs | qsub; done; done
+for i in {00..72..08}; do for j in {0..15}; do sed "s/NNN/$i/g;s/MMM/$j/g" doC2merge2.pbs | qsub; done; done
+for i in {00..64..16}; do for j in {0..15}; do sed "s/NNN/$i/g;s/MMM/$j/g" doC2merge3.pbs | qsub; done; done
+for i in {00..32..32}; do for j in {0..15}; do sed "s/NNN/$i/g;s/MMM/$j/g" doC2merge4.pbs | qsub; done; done
 for j in {0..15}; do sed "s/NNN/$i/g;s/MMM/$j/g" doC2BmergeS.pbs | qsub; done
 for j in {0..15}; do sed "s/NNN/$i/g;s/MMM/$j/g" doC2BmergeS1.pbs | qsub; done
 for j in {0..15}; do sed "s/NNN/$i/g;s/MMM/$j/g" doC2BmergeS2.pbs | qsub; done
-#resupt is Cmt2Blob.00-80.{0..15}.tch
+Result is Cmt2Blob.00-80.{0..15}.tch
 
+#now invert
+for k in {0..15}
+do ./Cmt2BlobInvrt.perl /fast1/All.sha1c/Cmt2Blob.00-80.$k.tch Blob2Cmt.00-80.$k
+done
+
+#now merge inverted
+for k in {0..15}
+do ./Cmt2BlobMergeTC.perl Blob2Cmt.00-80.{0,1,0-1}.$k
+   ./Cmt2BlobMergeTC.perl Blob2Cmt.00-80.{2,3,2-3}.$k
+   ...
+done
+...
+
+result in Blob2Cmt.$k.tch
 
 
 
@@ -19,8 +33,16 @@ mv /fast1/All.sha1c/commit_blob.tch /fast1/All.sha1c/commit_blob.tch.old
 ./exportObj.perl /fast1/All.sha1c/commit_blob.tch.old | gzip > /data/All.blobs/commit_blob.bin
 gunzip -c /da0_data/c2fbp/c2fbp.{7[4-9],8[0-9]}.gz | cut -d\; -f1,3 | uniq | perl -I ~/lib64/perl5 Cmt2BlobMerge.perl /data/All.blobs/commit_blob.bin /data/commit_blob.tch
 mv /data/commit_blob.tch /fast1/All.sha1c/
+#use Cmt2Blob.00-80.{0..15}.tch as produced above instead 
 
 #use old /fast1/All.sha1c/blob_commit.tch 
 ./exportObj1.perl /fast1/All.sha1c/blob_commit.tch | gzip > /data/All.blobs/blob_commit.bin
+# this takes 700G of ram and takese several weeks: avoid
 gunzip -c /da0_data/c2fbp/c2fbp.{7[4-9],8[0-9]}.gz | cut -d\; -f1,3 | uniq | perl -I ~/lib64/perl5 Blob2CmtMerge.perl /data/blob_commit.bin /data/blob_commit.tch
 mv /data/blob_commit.tch /fast1/All.sha1c/
+
+The alternative is iteratively merge 80 chunks produced 
+by doB2CBin.pbs 
+via Blob2CmtMergeTC.perl
+see doB2Cmerge.pbs
+also takes very long time, use split invert/merge as shown above
