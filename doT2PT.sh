@@ -17,8 +17,7 @@ for l in {0..15}
 do i=$(($fr+$l))
    if [[ -f $cloneDir/tree_$i.bin ]] 
    then 
-     (cp $cloneDir/tree_$i.{idx,bin} .; echo $i | perl -I $HOME/lib/perl5 $HOME/lookup/n2t.perl $i $tt/tree_ $tt; cp -p n2t$i.tch $cloneDir/; rm tree_$i.{idx,bin} n2t$i.tch) &
-     #(echo $i | perl -I $HOME/lib/perl5 $HOME/lookup/f2b.perl $i $tt/tree_ $tt) &
+     (cp $cloneDir/tree_$i.{idx,bin} .; echo $i | perl -I $HOME/lib/perl5 $HOME/lookup/t2pt.perl $i $tt/tree_ $tt; cp -p t2pt$i.tch $cloneDir/; rm tree_$i.{idx,bin} t2pt$i.tch) &
      pid=$!
      echo "pid for $fr.$l is $pid" $(date +"%s")
      echo "$pid" >> pids.$fr

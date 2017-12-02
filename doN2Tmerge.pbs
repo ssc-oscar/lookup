@@ -1,0 +1,21 @@
+#PBS -N doN2Tmerge-NNN
+#PBS -A UT-TENN0241
+#PBS -l feature=beacon
+#PBS -l partition=beacon
+#PBS -l nodes=1:ppn=1,walltime=24:00:00
+#PBS -j oe
+#PBS -S /bin/bash
+cd /lustre/haven/user/audris/All.blobs
+LD_LIBRARY_PATH=$HOME/lib:$HOME/lib64:$LD_LIBRARY_PATH
+cloneDir=/lustre/haven/user/audris/All.blobs
+cloneDir1=/lustre/haven/user/audris/All.blobs
+i=NNN 
+j=$(echo NNN+7|bc)
+cd /tmp
+seq $i $j | while read k
+do cp -p $cloneDir/n2t$k.tch .
+done
+seq $i $j | while read k
+do echo n2t$k.tch
+done | perl -I ~/lib/perl5 /nics/b/home/audris/lookup/f2bMerge.perl n2t$i-$j.tch
+cp -p n2t$i-$j.tch $cloneDir/

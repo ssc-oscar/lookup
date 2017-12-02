@@ -1,0 +1,21 @@
+#PBS -N doT2C-NNN
+#PBS -A UT-TENN0241
+#PBS -l feature=beacon
+#PBS -l partition=beacon
+#PBS -l nodes=1:ppn=1,walltime=24:00:00
+#PBS -j oe
+#PBS -S /bin/bash
+cd /lustre/haven/user/audris/All.blobs
+LD_LIBRARY_PATH=$HOME/lib:$HOME/lib64:$LD_LIBRARY_PATH
+cloneDir=/lustre/haven/user/audris/All.sha1c
+cloneDir1=/lustre/haven/user/audris/All.sha1c
+i=NNN 
+j=$(echo NNN+15|bc)
+cd /tmp
+seq $i $j | while read k
+do cp -p $cloneDir/commit_$k.tch .
+done
+seq $i $j | while read k
+do echo commit_$k.tch
+done | perl -I ~/lib/perl5 /nics/b/home/audris/lookup/t2c.perl t2c$i-$j.tch
+cp -p t2c$i-$j.tch $cloneDir/
