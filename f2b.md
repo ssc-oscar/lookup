@@ -48,7 +48,7 @@ much smaller dataset.
 
 To store the extracted blobs: 
 ```
-echo setup.py | ./f2bStore /fast1/All.sha1c/f2b.tch setup.py.tch
+echo setup.py | ./f2bStore.perl /fast1/All.sha1c/f2b.tch setup.py.tch
 ```
 This takes a bit long time, especially for more common files such as pcakage.json. A
 more iterative approch is as follows:
