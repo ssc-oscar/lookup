@@ -1,4 +1,4 @@
-#/usr/bin/perl -I /home/audris/lib64/perl5
+#!/usr/bin/perl -I/home/audris/lib64/perl5
 
 use strict;
 use warnings;
@@ -24,25 +24,25 @@ sub get {
 }
 
 my %in;
+my %res;
+my $lines = 0;
+
 my $j  = 0;
 while (<STDIN>){
   chop();
   my $fname = $_;
-  tie %{$in{$j}}, "TokyoCabinet::HDB", "$fname", TokyoCabinet::HDB::OREADER,
+  print STDERR "processing $fname\n";
+  tie %$in, "TokyoCabinet::HDB", "$fname", TokyoCabinet::HDB::OREADER,
      16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
      or die "cant open $fname\n";
-  $j++;
-}
-
-my %res;
-my $lines = 0;
-for my $k (0..($j-1)){
-  while (my ($k, $v) = each %{$in{$k}}){
+  while (my ($k, $v) = each %in){
     print STDERR "$lines done\n" if (!(($lines++)%100000000));
     get ($k, $v, \%{$res{$k}});
   }
+  untie %in;
 }
-print STDERR "writing\n";
+
+print STDERR "writing $lines\n";
 $lines = 0;
 while (my ($k, $v) = each %res){
   $lines++;
@@ -51,7 +51,4 @@ while (my ($k, $v) = each %res){
 print STDERR "done $lines\n";
 
 untie %out;
-for my $k (0..($j-1)){
-  untie %{$in{$k}}
-}
 
