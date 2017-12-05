@@ -29,19 +29,23 @@ if (defined $ARGV[2]){
 }
 my %c2p;
 my $lines = 0;
+my $nc = 0;
 while (my ($prj, $v) = each %p2c){
+  $prj =~ s/\;/SEMICOLON/g;
   my $ns = length($v)/20;
   for my $i (0..($ns-1)){
     my $c = substr ($v, 20*$i, 20);
     if ($nsec > 1){
       my $sec = (unpack "C", substr ($c, 0, 1))%$nsec;
-      $c2p{$c}{$prj}++ if $sec == $doSec;
+      $nc ++ if !defined $c2p{$c};
+      $c2p{$c}{$prj} ++ if $sec == $doSec;
     }else{
-      $c2p{$c}{$prj}++;
+      $c2p{$c}{$prj} ++;
+      $nc ++ if !defined $c2p{$c};
     }
   }
   $lines ++;
-  print STDERR "$lines done\n" if (!($lines%500000)); 
+  print STDERR "$lines done $nc\n" if (!($lines%10000000)); 
   #last if $lines > 100000; 
 }  
 untie %p2c;
@@ -63,7 +67,11 @@ sub safeComp {
   }
 }
 
+print STDERR "writing $lines\n";
+$lines = 0;
 while (my ($c, $v) = each %c2p){
+  $lines ++;
+  print STDERR "$lines done out of $nc\n" if (!($lines%1000000));
   my $ps = join ';', keys %{$v};
   my $psC = safeComp ($ps);
   $c2p1{$c} = $psC;
