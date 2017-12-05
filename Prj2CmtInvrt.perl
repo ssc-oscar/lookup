@@ -22,8 +22,11 @@ tie %p2c, "TokyoCabinet::HDB", $ARGV[0], TokyoCabinet::HDB::OREADER,
 
 
 my $nsec = 1;
-$nsec = $ARGV[2] if defined $ARGV[2];
-
+my $doSec = 0;
+if (defined $ARGV[2]){
+  $nsec = $ARGV[2]+0;
+  $doSec = $ARGV[3]+0;
+}
 my %c2p;
 my $lines = 0;
 while (my ($prj, $v) = each %p2c){
@@ -32,6 +35,7 @@ while (my ($prj, $v) = each %p2c){
     my $c = substr ($v, 20*$i, 20);
     if ($nsec > 1){
       my $sec = (unpack "C", substr ($c, 0, 1))%$nsec;
+      $c2p{$c}{$prj}++ if $sec == $doSec;
     }else{
       $c2p{$c}{$prj}++;
     }
