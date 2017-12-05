@@ -41,7 +41,7 @@ while (<STDIN>){
             #goto DONE;
           }
           my ($mode, $name, $bytes) = (oct($1),$2,$3);
-          if ($mode == 040000 && ! defined $f2b{$bytes}{$h}){
+          if ($mode == 0100644 && ! defined $f2b{$bytes}{$h}){
             $f2b{$bytes}{$h} = 1;
             #print "$name\n";
           }
@@ -58,9 +58,9 @@ DONE:
 
 print STDERR "writing\n";
 my %out;
-tie %out, "TokyoCabinet::HDB", "$outp/t2pt$outN.tch", TokyoCabinet::HDB::OWRITER |  TokyoCabinet::HDB::OCREAT,
+tie %out, "TokyoCabinet::HDB", "$outp/b2pt$outN.tch", TokyoCabinet::HDB::OWRITER |  TokyoCabinet::HDB::OCREAT,
   16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
-  or die "cant open $outp/t2pt$outN.tch\n";
+  or die "cant open $outp/b2pt$outN.tch\n";
 
 while (my ($k, $v) = each %f2b){
   $out{$k} = join "", sort keys %{$v};

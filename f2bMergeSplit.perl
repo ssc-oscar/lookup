@@ -9,11 +9,20 @@ use Time::Local;
 
 
 my $outN = $ARGV[0];
-my %out;
-tie %out, "TokyoCabinet::HDB", "$outN.tch", TokyoCabinet::HDB::OWRITER |  TokyoCabinet::HDB::OCREAT,
-  16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
-  or die "cant open $outN.tch\n";
 
+
+my %out;
+my $sec;
+my %in;
+my %res;
+my $lines = 0;
+
+
+for $sec (0..15){
+  tie %{$out{$sec}}, "TokyoCabinet::HDB", "$outN.$sec.tch", TokyoCabinet::HDB::OWRITER |  TokyoCabinet::HDB::OCREAT,
+    16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
+    or die "cant open $outN.$sec.tch\n";
+}
 
 sub get {
   my ($k, $v, $res) = @_;
@@ -23,9 +32,6 @@ sub get {
   }
 }
 
-my %in;
-my %res;
-my $lines = 0;
 
 my $j  = 0;
 while (<STDIN>){
@@ -46,9 +52,13 @@ print STDERR "writing $lines\n";
 $lines = 0;
 while (my ($k, $v) = each %res){
   $lines++;
-  $out{$k} = join "", sort keys %{$v};  
+  my $s = (unpack "C", substr ($k, 0, 1))%16;
+  $out{$s}{$k} = join "", sort keys %{$v};  
 }
 print STDERR "done $lines\n";
 
-untie %out;
+for $sec (0..15){
+  untie %{$out{$sec}};
+}
+
 

@@ -1,15 +1,13 @@
 #Do fresh
 
 for i in {00..80}; do for j in {0..15}; do sed "s/NNN/$i/g;s/MMM/$j/g" doC2Bin.pbs | qsub; done; done
-for i in {00..78..02}; do for j in {0..15}; do sed "s/NNN/$i/g;s/MMM/$j/g" doC2merge.pbs | qsub; done; done
-for i in {00..76..04}; do for j in {0..15}; do sed "s/NNN/$i/g;s/MMM/$j/g" doC2merge1.pbs | qsub; done; done
-for i in {00..72..08}; do for j in {0..15}; do sed "s/NNN/$i/g;s/MMM/$j/g" doC2merge2.pbs | qsub; done; done
-for i in {00..64..16}; do for j in {0..15}; do sed "s/NNN/$i/g;s/MMM/$j/g" doC2merge3.pbs | qsub; done; done
-for i in {00..32..32}; do for j in {0..15}; do sed "s/NNN/$i/g;s/MMM/$j/g" doC2merge4.pbs | qsub; done; done
-for j in {0..15}; do sed "s/NNN/$i/g;s/MMM/$j/g" doC2BmergeS.pbs | qsub; done
-for j in {0..15}; do sed "s/NNN/$i/g;s/MMM/$j/g" doC2BmergeS1.pbs | qsub; done
-for j in {0..15}; do sed "s/NNN/$i/g;s/MMM/$j/g" doC2BmergeS2.pbs | qsub; done
+faster simply:
+for k in {0..15}
+do ls -f Cmt2Blob.[0-8][0-9].$k | f2bMerge.perl Cmt2Blob.$k
+   scp -p Cmt2Blob.$k.tch da4:/data/basemaps/
+done   
 Result is Cmt2Blob.00-80.{0..15}.tch
+
 
 #now invert
 for k in {0..15}
@@ -18,14 +16,23 @@ done
 
 #now merge inverted
 for k in {0..15}
-do ./Cmt2BlobMergeTC.perl Blob2Cmt.00-80.{0,1,0-1}.$k
-   ./Cmt2BlobMergeTC.perl Blob2Cmt.00-80.{2,3,2-3}.$k
-   ...
+do ls -f Blob2Cmt.00-80.{[0-9],1[0-5]}.$k.tch | f2bMerge.perl Blob2Cmt.$k
+   scp -p Blob2Cmt.$k.tch da4:/data/basemaps/
 done
-...
 
-result in Blob2Cmt.$k.tch
 
+
+#older
+
+# too slow to mess with iterative small ram merges
+for i in {00..78..02}; do for j in {0..15}; do sed "s/NNN/$i/g;s/MMM/$j/g" doC2merge.pbs | qsub; done; done
+for i in {00..76..04}; do for j in {0..15}; do sed "s/NNN/$i/g;s/MMM/$j/g" doC2merge1.pbs | qsub; done; done
+for i in {00..72..08}; do for j in {0..15}; do sed "s/NNN/$i/g;s/MMM/$j/g" doC2merge2.pbs | qsub; done; done
+for i in {00..64..16}; do for j in {0..15}; do sed "s/NNN/$i/g;s/MMM/$j/g" doC2merge3.pbs | qsub; done; done
+for i in {00..32..32}; do for j in {0..15}; do sed "s/NNN/$i/g;s/MMM/$j/g" doC2merge4.pbs | qsub; done; done
+for j in {0..15}; do sed "s/NNN/$i/g;s/MMM/$j/g" doC2BmergeS.pbs | qsub; done
+for j in {0..15}; do sed "s/NNN/$i/g;s/MMM/$j/g" doC2BmergeS1.pbs | qsub; done
+for j in {0..15}; do sed "s/NNN/$i/g;s/MMM/$j/g" doC2BmergeS2.pbs | qsub; done
 
 
 #use the result of old Cmt2Blob.perl in commit_blob.tch
