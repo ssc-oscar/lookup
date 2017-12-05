@@ -32,7 +32,7 @@ while (<STDIN>){
   chop();
   my $fname = $_;
   print STDERR "processing $fname\n";
-  tie %$in, "TokyoCabinet::HDB", "$fname", TokyoCabinet::HDB::OREADER,
+  tie %in, "TokyoCabinet::HDB", "$fname", TokyoCabinet::HDB::OREADER,
      16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
      or die "cant open $fname\n";
   while (my ($k, $v) = each %in){
