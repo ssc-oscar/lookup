@@ -20,13 +20,21 @@ tie %p2c, "TokyoCabinet::HDB", $ARGV[0], TokyoCabinet::HDB::OREADER,
         16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
      or die "cant open $ARGV[0]\n";
 
+
+my $nsec = 1;
+$nsec = $ARGV[2] if defined $ARGV[2];
+
 my %c2p;
 my $lines = 0;
 while (my ($prj, $v) = each %p2c){
   my $ns = length($v)/20;
   for my $i (0..($ns-1)){
     my $c = substr ($v, 20*$i, 20);
-    $c2p{$c}{$prj}++;
+    if ($nsec > 1){
+      my $sec = (unpack "C", substr ($c, 0, 1))%$nsec;
+    }else{
+      $c2p{$c}{$prj}++;
+    }
   }
   $lines ++;
   print STDERR "$lines done\n" if (!($lines%500000)); 
