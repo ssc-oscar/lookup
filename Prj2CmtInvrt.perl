@@ -50,11 +50,6 @@ while (my ($prj, $v) = each %p2c){
 }  
 untie %p2c;
 
-my %c2p1;
-tie %c2p1, "TokyoCabinet::HDB", $ARGV[1], TokyoCabinet::HDB::OWRITER | TokyoCabinet::HDB::OCREAT,   
-        16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
-     or die "cant open $ARGV[1]\n";
-
 sub safeComp {
   my $code = $_[0];
   try {
@@ -69,16 +64,42 @@ sub safeComp {
 
 print STDERR "writing $lines\n";
 $lines = 0;
-while (my ($c, $v) = each %c2p){
-  $lines ++;
-  print STDERR "$lines done out of $nc\n" if (!($lines%1000000));
-  my $ps = join ';', keys %{$v};
-  my $psC = safeComp ($ps);
-  $c2p1{$c} = $psC;
+
+#outputTC ($ARGV[1]);
+outputBin ($ARGV[1]);
+
+
+sub outputTC {
+  my $n = $_[0];
+  my %c2p1;
+  tie %c2p1, "TokyoCabinet::HDB", $n, TokyoCabinet::HDB::OWRITER | TokyoCabinet::HDB::OCREAT,
+     16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
+     or die "cant open $n\n";
+  while (my ($c, $v) = each %c2p){
+    $lines ++;
+    print STDERR "$lines done out of $nc\n" if (!($lines%100000000));
+    my $ps = join ';', sort keys %{$v};
+    my $psC = safeComp ($ps);
+    $c2p1{$c} = $psC;
+  }
+  untie %c2p1;
 }
 
-untie %c2p1;
-
+sub outputBin {
+  my $n = $_[0];
+  open A, '>:raw', "$n"; 
+  while (my ($k, $v) = each %c2p){
+    $lines ++;
+    print STDERR "$lines done out of $nc\n" if (!($lines%100000000));
+    my @ps = sort keys %{$v};
+    my $prj = safeComp(join ';', @ps);
+    my $lprj = length ($prj);
+    my $nprj = pack "L", $lprj;
+    print A $k;
+    print A $nprj;
+    print A $prj;
+  }
+}
 
 
 
