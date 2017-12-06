@@ -1,4 +1,4 @@
-#PBS -N doN2Tmerge-NNN
+#PBS -N doT2PTone-NNN
 #PBS -A UT-TENN0241
 #PBS -l feature=beacon
 #PBS -l partition=beacon
@@ -9,13 +9,10 @@ cd /lustre/haven/user/audris/All.blobs
 LD_LIBRARY_PATH=$HOME/lib:$HOME/lib64:$LD_LIBRARY_PATH
 cloneDir=/lustre/haven/user/audris/All.blobs
 cloneDir1=/lustre/haven/user/audris/All.blobs
-i=NNN 
-j=$(echo NNN+7|bc)
 cd /tmp
-seq $i $j | while read k
-do cp -p $cloneDir/n2t$k.tch .
-done
-seq $i $j | while read k
-do echo n2t$k.tch
-done | perl -I ~/lib/perl5 /nics/b/home/audris/lookup/f2bMerge.perl n2t$i-$j
-cp -p n2t$i-$j.tch $cloneDir/
+i=NNN 
+rm  *
+cp -p $cloneDir/tree_$i.{bin,idx} .
+echo $i | perl -I ~/lib/perl5 /nics/b/home/audris/lookup/t2pt.perl $i /tmp/tree_ /tmp
+cp -p t2pt$i.tch $cloneDir/
+rm t2pt$i.tch tree_$i.{bin,idx}
