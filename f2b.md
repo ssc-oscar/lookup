@@ -73,3 +73,41 @@ do ./catTC.perl /fast1/All.sha1c/setup.py.$i.tch
 done
 ```
 
+
+# various other maps
+## blob to file name
+```
+time ./Prj2CmtInvrt.perl /fast1/All.sha1c/f2b.tch b2n0.bin 2 0
+time ./Prj2CmtInvrt.perl /fast1/All.sha1c/f2b.tch b2n1.bin 2 1
+./Cmt2PrjPack.perl b2n0.bin  b2n0.tch
+./Cmt2PrjPack.perl b2n1.bin  b2n1.tch
+```
+
+## tree name to tree
+```
+seq 0 16 112 | while read i; do sed "s/NNN/$i/g" doN2T.pbs | qsub; done
+seq 0 8 120 | while read i; do sed "s/NNN/$i/g" doN2Tmerge.pbs | qsub; done
+```
+
+finalize on da3:
+```
+ls -f n2t*-*.tch | perl -I ~/lib/perl5 /nics/b/home/audris/lookup/f2bMerge.perl n2t
+```
+
+## tree to tree name
+```
+time ./Prj2CmtInvrt.perl /fast1/All.sha1c/n2t.tch t2n0 2 0
+time ./Prj2CmtInvrt.perl /fast1/All.sha1c/n2t.tch t2n1 2 1
+```
+
+
+#tree to tree parent
+```
+seq 0 16 112 | while read i; do sed "s/NNN/$i/g" doT2PT.pbs | qsub; done
+```
+
+#blob to tree parent (this uses  too much ram on beacon)
+```
+seq 0 127 | while read i; do sed "s/NNN/$i/g" doB2PTone.pbs | qsub; done
+```
+
