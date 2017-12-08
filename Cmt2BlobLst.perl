@@ -43,8 +43,8 @@ untie %p2c;
 
 sub list {
   my ($c, $v) = @_;
-  my $ns = length($v);
-  $ns = $ns/20 if ($ns >= 20 && ($ns%20) == 0);
+  my $ns = length($v)/20;
+  #$ns = $ns/20 if ($ns >= 20 && ($ns%20) == 0);
   my $c1 = toHex($c);
   print "$c1;$ns";
   if ($detail){
