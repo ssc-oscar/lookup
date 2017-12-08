@@ -17,8 +17,10 @@ my %in;
 my %res;
 my $lines = 0;
 
+my $nParts = 16;
+$nParts = $ARGV[1]+0 if defined $ARGV[1];
 
-for $sec (0..15){
+for $sec (0..($nParts-1)){
   tie %{$out{$sec}}, "TokyoCabinet::HDB", "$outN.$sec.tch", TokyoCabinet::HDB::OWRITER |  TokyoCabinet::HDB::OCREAT,
     16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
     or die "cant open $outN.$sec.tch\n";
@@ -52,12 +54,12 @@ print STDERR "writing $lines\n";
 $lines = 0;
 while (my ($k, $v) = each %res){
   $lines++;
-  my $s = (unpack "C", substr ($k, 0, 1))%16;
+  my $s = (unpack "C", substr ($k, 0, 1))%$nParts;
   $out{$s}{$k} = join "", sort keys %{$v};  
 }
 print STDERR "done $lines\n";
 
-for $sec (0..15){
+for $sec (0..($nParts-1)){
   untie %{$out{$sec}};
 }
 
