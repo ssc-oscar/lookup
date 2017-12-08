@@ -26,7 +26,8 @@ my %b2c1;
 my $lines = 0;
 while (<STDIN>){
   chop();
-  my ($c, $bb) = split(/\;/, $_, -1);
+  my ($c, $f, $bb, $p) = split(/\;/, $_, -1);
+  next if length ($c) != 40 || length ($bb) != 40;
   my $cmt = fromHex ($c);
   my $b = fromHex ($bb);
   $b2c1{$cmt}{$b}++;

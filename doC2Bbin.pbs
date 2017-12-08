@@ -9,4 +9,7 @@ cd /lustre/haven/user/audris/c2fbp
 LD_LIBRARY_PATH=$HOME/lib:$HOME/lib64:$LD_LIBRARY_PATH
 cloneDir=/lustre/haven/user/audris/c2fbp
 cloneDir1=/lustre/haven/user/audris/c2fbp
-gunzip -c $cloneDir/c2fbp.NNN.gz | perl -I ~/lib/perl5 /nics/b/home/audris/lookup/Cmt2BlobBin.perl $cloneDir1/Cmt2Blob.NNN
+cd /tmp
+gunzip -c $cloneDir/c2fbp.NNN.gz | perl -I ~/lib/perl5 /nics/b/home/audris/lookup/Cmt2BlobBin.perl Cmt2Blob.NNN
+cp -p Cmt2Blob.NNN.*.tch $cloneDir
+rm Cmt2Blob.NNN.*.tch 
