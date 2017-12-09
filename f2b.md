@@ -104,10 +104,24 @@ time ./Prj2CmtInvrt.perl /fast1/All.sha1c/n2t.tch t2n1 2 1
 #tree to tree parent
 ```
 seq 0 16 112 | while read i; do sed "s/NNN/$i/g" doT2PT.pbs | qsub; done
+for l in {0..15}
+do i=$(($l*8)); j=$(($i+7)); 
+   time seq $i $j | while read k; do echo /fast1/t2pt$k.tch done | ./f2bMergeSplit.perl t2pt$i-$j 8
+done
 ```
 
 #blob to tree parent (this uses  too much ram on beacon)
 ```
 seq 0 127 | while read i; do sed "s/NNN/$i/g" doB2PTone.pbs | qsub; done
+#croaks on beacon, too much ram in a single file
+seq 0 3 127 | while read i; do
+    echo $i | ./b2pt.perl $i /data/All.blobs/tree_ /data/c2fbp;
+done &
+seq 1 3 127 | while read i; do
+    echo $i | ./b2pt.perl $i /data/All.blobs/tree_ /data/c2fbp;
+done &
+seq 2 3 127 | while read i; do
+    echo $i | ./b2pt.perl $i /data/All.blobs/tree_ /data/c2fbp;
+done &
 ```
 
