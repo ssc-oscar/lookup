@@ -1,4 +1,4 @@
-#PBS -N doP2BBin-NNN
+#PBS -N doP2CBin-NNN
 #PBS -A UT-TENN0241
 #PBS -l feature=beacon
 #PBS -l partition=beacon
@@ -11,6 +11,6 @@ cloneDir=/lustre/haven/user/audris/c2fbp
 cloneDir1=/lustre/haven/user/audris/c2fbp
 cd /tmp
 gunzip -c $cloneDir/c2fbp.NNN.gz | \
- perl -I ~/lib/perl5 /nics/b/home/audris/lookup/Prj2CmtBin.perl Prj2Cmt.NNN.tch
+ perl -I ~/lib/perl5 /nics/b/home/audris/lookup/Prj2CmtBin.perl /tmp/Prj2Cmt.NNN.tch
 cp -p Prj2Cmt.NNN.tch $cloneDir
 rm Prj2Cmt.NNN.tch
