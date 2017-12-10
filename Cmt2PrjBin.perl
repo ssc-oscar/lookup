@@ -29,6 +29,7 @@ my (%c2p1);
 my $lines = 0;
 my $f0 = "";
 my $cnn = 0;
+my $nc = 0;
 while (<STDIN>){
   chop();
   $lines ++;
@@ -40,12 +41,14 @@ while (<STDIN>){
   my $sha = fromHex ($hsha);
   $p =~ s/^github.com_//;
   $p =~ s/^bitbucket.org_/bb_/;
+  $p =~ s/;/SEMICOLON/g;
+  $nc ++ if !defined $c2p1{$sha};
   $c2p1{$sha}{$p}++;
   print STDERR "$lines done\n" if (!($lines%100000000));
 }
 
-print STDERR "$lines dump\n";
-output ($ARGV[0]);
+print STDERR "$lines $nc dump\n";
+outputTC ($ARGV[0]);
 print STDERR "$lines done\n";
 
 sub output {
@@ -60,4 +63,20 @@ sub output {
     print A $nprj;
     print A $prj;
   }
+}
+
+sub outputTC {
+  my $n = $_[0];
+  my %c2p;
+  tie %c2p, "TokyoCabinet::HDB", $n, TokyoCabinet::HDB::OWRITER | TokyoCabinet::HDB::OCREAT,
+     16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
+     or die "cant open $n\n";
+  while (my ($c, $v) = each %c2p1){
+    $lines ++;
+    print STDERR "$lines done out of $nc\n" if (!($lines%100000000));
+    my $ps = join ';', sort keys %{$v};
+    my $psC = safeComp ($ps);
+    $c2p{$c} = $psC;
+  }
+  untie %c2p;
 }
