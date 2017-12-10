@@ -2,6 +2,7 @@
 use strict;
 use warnings;
 use Error qw(:try);
+use TokyoCabinet;
 
 sub toHex { 
         return unpack "H*", $_[0]; 
