@@ -69,7 +69,7 @@ sub outputTC {
     print STDERR "$lines done out of $nc\n" if (!($lines%100000000));
     my $ps = join '', sort keys %{$v};
     #my $psC = safeComp ($ps);
-    $c2p{$c} = $psC;
+    $c2p{$c} = $ps;
   }
   untie %c2p;
 }
