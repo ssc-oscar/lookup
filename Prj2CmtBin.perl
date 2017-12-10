@@ -3,6 +3,7 @@ use strict;
 use warnings;
 use Error qw(:try);
 use TokyoCabinet;
+use Compress::LZF;
 
 sub toHex { 
         return unpack "H*", $_[0]; 
@@ -31,16 +32,17 @@ while (<STDIN>){
   $p =~ s/\.git$//;
   $p =~ s/^github.com_//;
   $p =~ s/^bitbucket.org_/bb_/;
-  $p =~ s/;/SEMICOLON/g;
+  $p =~ s/\;/SEMICOLON/g;
   $p = "EMPTY" if $p eq "";
-  $c2p1{$p}{$sha}++;
   $nc++ if !defined $c2p1{$p}; 
+  $c2p1{$p}{$sha}++;
   print STDERR "$lines done $nc projects\n" if (!($lines%100000000));
 }
 
-print STDERR "$lines and $nc dump\n";
+print STDERR "read $lines and dumping $nc projects\n";
+$lines = 0;
 outputTC ($nn);
-print STDERR "$lines done\n";
+print STDERR "dumped $lines\n";
 
 sub output {
   my $n = $_[0];
@@ -73,4 +75,16 @@ sub outputTC {
     $c2p{$c} = $ps;
   }
   untie %c2p;
+}
+
+sub safeComp {
+  my $code = $_[0];
+  try {
+    my $codeC = compress ($code);
+    return $codeC;
+  } catch Error with {
+    my $ex = shift;
+    print STDERR "Error: $ex\n$code\n";
+    return "";
+  }
 }

@@ -40,17 +40,20 @@ while (<STDIN>){
     next;
   }
   my $sha = fromHex ($hsha);
+  $p =~ s/\.git$//;
   $p =~ s/^github.com_//;
   $p =~ s/^bitbucket.org_/bb_/;
-  $p =~ s/;/SEMICOLON/g;
+  $p =~ s/\;/SEMICOLON/g;
+  $p = "EMPTY" if $p eq "";
   $nc ++ if !defined $c2p1{$sha};
   $c2p1{$sha}{$p}++;
   print STDERR "$lines done\n" if (!($lines%100000000));
 }
 
-print STDERR "$lines $nc dump\n";
+print STDERR "read $lines dumping $nc commits\n";
+$lines = 0;
 outputTC ($ARGV[0]);
-print STDERR "$lines done\n";
+print STDERR "dumped $lines\n";
 
 sub output {
   my $n = $_[0];
