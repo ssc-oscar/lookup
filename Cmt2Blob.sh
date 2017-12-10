@@ -6,12 +6,12 @@ for i in {00..80}; do sed "s/NNN/$i/g;" doC2Bbin.pbs | qsub; done
 for k in {00..64..16}; do for i in {0..15}; do sed "s/NNN/$k/g;s/MMM/$i/g" doB2Cmerge.pbs | qsub; done; done
 for k in {00..64..16}; do for i in {0..15}; do sed "s/NNN/$k/g;s/MMM/$i/g" doC2Bmerge.pbs | qsub; done; done
 
-#merge on da4 (preferably)
+#merge each uses about 44GB RAM 20 min
 for i in {0..15}
-do (for k in {00..64..16}; do echo Blob2Cmt.$k-$(($k+15)).$i.tch; done echo Blob2Cmt.80.$i.tch) | ./f2bMerge.perl Blob2Cmt.$i.tch
+do time (for k in {00..64..16}; do echo /fast1/Blob2Cmt.$k-$(($k+15)).$i.tch; done; echo /fast1/Blob2Cmt.80.$i.tch) | ./f2bMerge.perl Blob2Cmt.$i
 done
 for i in {0..15}
-do (for k in {00..64..16}; do echo Cmt2Blob.$k-$(($k+15)).$i.tch; done echo Cmt2Blob.80.$i.tch) | ./f2bMerge.perl Cmt2Blob.$i.tch
+do (for k in {00..64..16}; do echo /fast1/Cmt2Blob.$k-$(($k+15)).$i.tch; done; echo /fast1/Cmt2Blob.80.$i.tch) | ./f2bMerge.perl Cmt2Blob.$i
 done
 
 #!done!
