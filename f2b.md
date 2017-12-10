@@ -108,6 +108,12 @@ for l in {0..15}
 do i=$(($l*8)); j=$(($i+7)); 
    time seq $i $j | while read k; do echo /fast1/t2pt$k.tch done | ./f2bMergeSplit.perl t2pt$i-$j 8
 done
+#now merge
+for k in {0..8}; do 
+  for i in 0-7 8-15 16-23 24-31 32-39 40-47 48-55 56-63 64-71 72-79 80-87 88-95 96-103 104-111 112-119 120-127; 
+  do echo /fast1/t2pt$i.$k.tch; 
+  done | ./f2bMerge.perl t2pt0-127.$k
+done
 ```
 
 #blob to tree parent (this uses  too much ram on beacon)
