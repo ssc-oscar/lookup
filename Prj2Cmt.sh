@@ -3,39 +3,10 @@
 ##################################
 
 #on beacon
-cat doP2CBin.pbs 
-#PBS -N doP2BBin-NNN
-#PBS -A UT-TENN0241
-#PBS -l feature=beacon
-#PBS -l partition=beacon
-#PBS -l nodes=1:ppn=1,walltime=24:00:00
-#PBS -j oe
-#PBS -S /bin/bash
-cd /lustre/haven/user/audris/c2fbp
-LD_LIBRARY_PATH=$HOME/lib:$HOME/lib64:$LD_LIBRARY_PATH
-cloneDir=/lustre/haven/user/audris/c2fbp
-cloneDir1=/lustre/haven/user/audris/c2fbp
-gunzip -c $cloneDir/c2fbp.NNN.gz | perl -I ~/lib/perl5 /nics/b/home/audris/lookup/Prj2CmtBin.perl $cloneDir1/Prj2Cmt.NNN.bin
-
 
 #produce for each c2fbp.NNN.gz
 for i in {00..80}; do sed "s/NNN/$i/g" | doP2CBin.pbs |qsub; done
 
-cat doP2Cpack.pbs
-#PBS -N doP2Pack-NNN
-#PBS -A UT-TENN0241
-#PBS -l feature=beacon
-#PBS -l partition=beacon
-#PBS -l nodes=1:ppn=1,walltime=24:00:00
-#PBS -j oe
-#PBS -S /bin/bash
-cd /lustre/haven/user/audris/c2fbp
-LD_LIBRARY_PATH=$HOME/lib:$HOME/lib64:$LD_LIBRARY_PATH
-cloneDir=/lustre/haven/user/audris/c2fbp
-cloneDir1=/lustre/haven/user/audris/c2fbp
-[[ -f $cloneDir1/Prj2Cmt.NNN.tch ]] && rm $cloneDir1/Prj2Cmt.NNN.tch
-[[ -f $cloneDir1/Prj2Cmt.NNN.merge ]] && mv $cloneDir1/Prj2Cmt.NNN.merge $cloneDir1/Prj2Cmt.NNN.bin
-perl -I ~/lib/perl5 /nics/b/home/audris/lookup/Prj2CmtPack.perl $cloneDir1/Prj2Cmt.NNN.bin $cloneDir1/Prj2Cmt.NNN.tch
 
 # now pack every other into tch
 for i in 00 02 04 06 08; do sed "s/NNN/$i/g" | doP2Cpack.pbs |qsub; done
