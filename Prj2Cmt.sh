@@ -4,10 +4,31 @@
 
 #on beacon
 
-#produce for each c2fbp.NNN.gz
+#Produce for each c2fbp.NNN.gz
 for i in {00..80}; do sed "s/NNN/$i/g" | doP2CBin.pbs |qsub; done
+#Premerge
+for k in {00..72..8}; do k1=$(echo $k+7|bc); [[ $k1 -lt 10 ]] && k1="0$k1"; time for i in $(eval echo "{$k..$k1}"); do ls -f /fast1/Prj2Cmt.$i.tch; done | ./f2bMergeSplit.perl Prj2Cmt.$k-$k1 8; done
+echo /fast1/Prj2Cmt.80.tch | ./f2bMergeSplit.perl /fast1/Prj2Cmt.80 8
+#Merge
+for k in {0..7}; do 
+  for i in 00-07 08-15 16-23 24-31 32-39 40-47 48-55 56-63 64-71 72-79 80
+  do echo /fast1/Prj2Cmt.$i.$k.tch; 
+  done | ./f2bMerge.perl Prj2Cmt.$k
+done
+
+#invert may be faster than merge Cmt2Prj
+for i in {0..8}
+do time for k in {0..7}; do echo /fast1/Prj2Cmt.$k.tch
+   done | ./Prj2CmtInvert.perl Cmt2PrjI.$i.tch 8 $i
+done
+#
+##################################################
+#Results in Prj2Cmt.[0-7].tch and Cmt2Prj.[0-7].tch
+##################################################
 
 
+#the below no longer relevant
+for i in {00..80}; do sed "s/NNN/$i/g" | doC2Pbin.pbs |qsub; done
 # now pack every other into tch
 for i in 00 02 04 06 08; do sed "s/NNN/$i/g" | doP2Cpack.pbs |qsub; done
 seq 10 2 78; do sed "s/NNN/$i/g" | doP2Cpack.pbs |qsub; done
