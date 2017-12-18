@@ -108,8 +108,13 @@ for l in {0..15}
 do i=$(($l*8)); j=$(($i+7)); 
    time seq $i $j | while read k; do echo /fast1/t2pt$k.tch done | ./f2bMergeSplit.perl t2pt$i-$j 8
 done
-#now merge (on da3)
-for k in {0..8}; do 
+#now merge (on da3 - may need da4)
+for k in {0..7}; do 
+  for i in 0-7 8-15 16-23 24-31 32-39 40-47 48-55 56-63 64-71 72-79 80-87 88-95 96-103 104-111 112-119 120-127; 
+  do cp -p t2pt$i.$k.tch /fast1/ 
+  done 
+done
+for k in {0..7}; do 
   for i in 0-7 8-15 16-23 24-31 32-39 40-47 48-55 56-63 64-71 72-79 80-87 88-95 96-103 104-111 112-119 120-127; 
   do echo /fast1/t2pt$i.$k.tch; 
   done | ./f2bMerge.perl t2pt0-127.$k
@@ -119,7 +124,7 @@ done
 #blob to tree parent (this uses  too much ram on beacon)
 ```
 seq 0 127 | while read i; do sed "s/NNN/$i/g" doB2PTone.pbs | qsub; done
-#croaks on beacon, too much ram in a single file (works on dad2)
+#croaks on beacon, too much ram in a single file (works as two parallel processes on dad2)
 seq 0 3 127 | while read i; do
     [[ -f /data/c2fbp/b2pt$i.tch ]] || time echo $i | ./b2pt.perl $i /store/All.blobs/tree_ /data/c2fbp;
 done &
