@@ -39,7 +39,7 @@ while (<STDIN>){
   chop ();
   my $c1 = $_;
   my $c = fromHex($c1);
-  list ($c, $p2c{$c});
+  list ($c, $p2c{$c}) if defined $p2c{$c};
 }
 untie %p2c;
 
