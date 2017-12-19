@@ -23,7 +23,7 @@ Merges all into a single file which I copy to
 /fast1/All.sha1c/f2b.tch
 
 
-Note very small number of distinct filenames: 40M
+Note very small number of distinct filenames: 404M
 
 
 To use the data (get the blobs)
