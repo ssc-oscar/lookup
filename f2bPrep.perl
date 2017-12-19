@@ -17,6 +17,7 @@ if(!tie(%clones, "TokyoCabinet::HDB", "$fname",
 }
 
 
+# Need to run on da4 or make sure that All.sha1o/sha1.blob_ and All.blobs/blob_$sec.bin are there
 my $sections = 128;
 my $parts = 2;
 my $fbasec="All.sha1o/sha1.blob_";
