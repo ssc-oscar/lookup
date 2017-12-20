@@ -1,3 +1,4 @@
+#!/usr/bin/perl -I /home/audris/lib64/erl5
 use strict;
 use warnings;
 use Compress::LZF;
