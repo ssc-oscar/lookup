@@ -66,7 +66,7 @@ do grep "^$i;" setup.py.prep | cut -d\; -f2 | extrBlobs.perl $i /fast1/All.sha1c
 done
 ```
 
-tosee what was stored:
+to see what was stored:
 ```
 for i in {0..127}
 do ./catTC.perl /fast1/All.sha1c/setup.py.$i.tch
@@ -75,6 +75,17 @@ done
 
 
 # various other maps
+
+## Cmt to File
+
+```
+for i in {00..79..4}; do sed "s/NNN/$i/g" doC2Fbin.pbs|qsub; done
+ls -f Cmt2File.[0-9][0-9]-[0-9][0-9].tch Cmt2File.80.tch | ./f2nMergeSplit.perl Cmt2File 1
+scp -p Cmt2File.0.tch da4:/data/basemaps
+
+```
+
+
 ## blob to file name
 ```
 time ./Prj2CmtInvrt.perl /fast1/All.sha1c/f2b.tch b2n0.bin 2 0
@@ -134,5 +145,10 @@ done &
 seq 2 3 127 | while read i; do
     [[ -f /data/c2fbp/b2pt$i.tch ]] || time echo $i | ./b2pt.perl $i /store/All.blobs/tree_ /data/c2fbp;
 done &
+
+ls -f /fast1/b2pt{[0-9],1[0-5]}.tch | /da3_data/lookup/f2bMergeSplit.perl b2pt.00-15 8
+ls -f /fast1/b2pt{1[6-9],2[0-9]}.tch | /da3_data/lookup/f2bMergeSplit.perl b2pt.16-29 8
+
+
 ```
 
