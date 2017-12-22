@@ -76,6 +76,9 @@ while (my ($a, $v) = each %a2c){
       for my $f (@fs){
         $a2f{$a}{$f}++;
       }
+    }else{
+		 my $c1 = toHex($c);
+       print STDERR "$c1\n";
     }
   } 
 }
