@@ -94,6 +94,27 @@ time ./Prj2CmtInvrt.perl /fast1/All.sha1c/f2b.tch b2n1.bin 2 1
 ./Cmt2PrjPack.perl b2n1.bin  b2n1.tch
 ```
 
+# Update commit to commit content map
+```
+for i in {0..127}; do ./Cmt2ContUpdt.perl $i
+```
+
+
+# Author to commit map
+```
+#full creation (7hr)
+./Auth2Cmt.perl /data/basemaps/Auth2Cmt.tch
+#incremental update 
+./Auth2CmtUpdt.perl /data/basemaps/Auth2Cmt.tch
+```
+# Commit to filename map
+```
+# Full
+gunzip -c /da0_data/c2fbp/c2fbp.[0-8][0-9].gz | ./Cmt2FileBin.perl /da0_data/c2fbp/Cmt2File.tch &
+# Update
+
+```
+
 ## tree name to tree
 ```
 seq 0 16 112 | while read i; do sed "s/NNN/$i/g" doN2T.pbs | qsub; done
