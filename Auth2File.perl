@@ -67,12 +67,15 @@ tie %c2f, "TokyoCabinet::HDB", "$fbase/Cmt2File.tch", TokyoCabinet::HDB::OREADER
 
 my %a2f;
 while (my ($a, $v) = each %a2c){
+	$a2f{$a}{"."}++;
   my $ns = length ($v)/20;
   for my $i (0..($ns-1)){
 	 my $c = substr ($v, $i*20, 20);
-    my @fs = split(/\;/, safeDecomp($c2f{$c}, $a), -1);
-    for my $f (@fs){
-      $a2f{$a}{$f}++;
+    if (defined $c2f{$c}){
+      my @fs = split(/\;/, safeDecomp($c2f{$c}, $a), -1);
+      for my $f (@fs){
+        $a2f{$a}{$f}++;
+      }
     }
   } 
 }
@@ -85,7 +88,8 @@ tie %a2f1, "TokyoCabinet::HDB", "$ARGV[0]", TokyoCabinet::HDB::OWRITER | TokyoCa
         16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
      or die "cant open $ARGV[0]\n";
 while (my ($a, $v) = each %a2f){
-  my $v1 = safeComp(join ";", sort keys %{$v}, $a);
+  delete %{$v{"."}};
+  my $v1 = safeComp (join ";", sort keys %{$v}, $a);
   $a2f1{$a}=$v1;
 }
 untie %a2f1;
