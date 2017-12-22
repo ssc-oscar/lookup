@@ -54,14 +54,14 @@ my %map;
 my $fbase="/data/All.blobs/commit_";
 for my $s (0..127){
   print STDERR "reading $s\n";
-  open A, "$fbase$s.idx";
+  open A, "tac $fbase$s.idx|";
   open FD, "$fbase$s.bin";
   binmode(FD);
   while (<A>){
     chop();
     my ($nn, $of, $len, $hash) = split (/\;/, $_, -1);
     my $h = fromHex ($hash);
-    #seek (FD, $of, 0);
+    seek (FD, $of, 0);
     my $codeC = "";
     my $rl = read (FD, $codeC, $len);
     my ($tree, $parent, $auth, $cmtr, $ta, $tc, @rest) = extrCmt ($codeC, $hash);
