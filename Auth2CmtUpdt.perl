@@ -98,7 +98,7 @@ while (my ($a, $v) = each %map){
   $fhoa{$a}=$v1;
   $countA++;
 }
-print "$count commits added for $counta Authors\n";
+print "$count commits added for $countA authors\n";
 untie %fhoa;
 
 
