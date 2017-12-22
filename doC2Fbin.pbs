@@ -1,0 +1,22 @@
+#PBS -N dC2Fbin-NNN
+#PBS -A ACF-UTK0011
+#PBS -l feature=beacon
+#PBS -l partition=beacon
+#PBS -l nodes=1:ppn=1,walltime=24:00:00
+#PBS -j oe
+#PBS -S /bin/bash
+cd /tmp
+LD_LIBRARY_PATH=$HOME/lib:$HOME/lib64:$LD_LIBRARY_PATH
+cloneDir=/lustre/haven/user/audris/c2fbp
+cloneDir1=/lustre/haven/user/audris/c2fbp
+cd /tmp
+#rm -rf *
+i=NNN 
+j=$(($i+3))
+[[ $j -lt 10 ]] && j="0$j"
+#cp -p $cloneDir/tree_$i.{bin,idx} .
+for i in $(eval echo "{$i..$j}")
+do gunzip -c $cloneDir/c2fbp.$i.gz 
+done | perl -I ~/lib/perl5 /nics/b/home/audris/lookup/Cmt2FileBin.perl Cmt2File.$i.tch
+cp -p Cmt2File.$i.tch $cloneDir/
+rm Cmt2File.$i.tch
