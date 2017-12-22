@@ -91,7 +91,7 @@ tie %a2f1, "TokyoCabinet::HDB", "$ARGV[0]", TokyoCabinet::HDB::OWRITER | TokyoCa
         16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
      or die "cant open $ARGV[0]\n";
 while (my ($a, $v) = each %a2f){
-  delete %{$v{"."}};
+  delete $v ->{"."};
   my $v1 = safeComp (join ";", sort keys %{$v}, $a);
   $a2f1{$a}=$v1;
 }
