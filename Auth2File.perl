@@ -55,7 +55,7 @@ sub safeComp {
   }
 }
 
-my $fbase="/data/All.sha1c/";
+my $fbase="/fast1/All.sha1c/";
 my %a2c;
 tie %a2c, "TokyoCabinet::HDB", "$fbase/Auth2Cmt.tch", TokyoCabinet::HDB::OREADER,   
         16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
