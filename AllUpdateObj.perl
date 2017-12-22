@@ -21,7 +21,7 @@ my $parts = 2;
 my $type = $ARGV[0];
 
 my $fbase="All.sha1/sha1.${type}_";
-my $fbasei ="/data/All.blobs/${tree}_";
+my $fbasei ="/data/All.blobs/${type}_";
 
 my (%size, %cnt, %fhob, %fhoi, %fhov, %fhos);
 for my $sec (0 .. ($sections-1)){
