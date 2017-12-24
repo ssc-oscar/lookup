@@ -1,3 +1,4 @@
+#!/usr/bin/perl -I /home/audris/lib64/perl5
 use strict;
 use warnings;
 use Error qw(:try);
@@ -41,8 +42,9 @@ while (<STDIN>){
   }
   my $sha = fromHex ($hsha);
   $p =~ s/\.git$//;
-  $p =~ s/^github.com_//;
+  $p =~ s/.*github.com_//;
   $p =~ s/^bitbucket.org_/bb_/;
+  $p =~ s|/*$||;
   $p =~ s/\;/SEMICOLON/g;
   $p = "EMPTY" if $p eq "";
   $nc ++ if !defined $c2p1{$sha};

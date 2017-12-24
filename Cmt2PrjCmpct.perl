@@ -64,9 +64,10 @@ sub list {
   my @ps = split(/\;/, $v1, -1);
   my %tmp; 
   for my $p (@ps){
-    $p =~ s/^github.com_//;
+    $p =~ s/.*github.com_//;
     $p =~ s/^bitbucket.org_/bb_/;
     $p =~ s/\.git$//;
+    $p =~ s|/*$||;
     $tmp{$p}++;
   }
   $v1 = safeComp (join ';', keys %tmp);
