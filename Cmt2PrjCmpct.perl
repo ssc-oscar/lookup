@@ -39,9 +39,6 @@ sub safeComp {
 
 
 
-my $detail = 0;
-$detail = $ARGV[1];
-
 my %p2c;
 tie %p2c, "TokyoCabinet::HDB", "$ARGV[0]", TokyoCabinet::HDB::OREADER,   
         16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
