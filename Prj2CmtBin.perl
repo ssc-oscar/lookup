@@ -29,9 +29,10 @@ while (<STDIN>){
     next;
   }
   my $sha = fromHex ($hsha);
-  $p =~ s/\.git$//;
-  $p =~ s/^github.com_//;
+  $p =~ s/.*github.com_//;
   $p =~ s/^bitbucket.org_/bb_/;
+  $p =~ s/\.git$//;
+  $p =~ s|/*$||;
   $p =~ s/\;/SEMICOLON/g;
   $p = "EMPTY" if $p eq "";
   $nc++ if !defined $c2p1{$p}; 
