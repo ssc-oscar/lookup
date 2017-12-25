@@ -39,8 +39,8 @@ while (<STDIN>){
       my ($nn, $of, $len, $hash) = split (/\;/, $_, -1);
       my $th = pack "H*", $hash;
       #now check if it has been processed
-      if ($hash eq  $last_hash){
-         if ($nn ne $last_nn || $of ne $last_of || $len ne $last_nn){
+      if ($hash eq $last_hash){
+         if ($nn ne $last_nn || $of ne $last_of || $len ne $last_len){
             print STDERR "mismatch $nn, $of, $len, $hash vs $last_nn, $last_of, $last_len, $last_hash\n";
          }
 			last;
