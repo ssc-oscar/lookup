@@ -41,7 +41,7 @@ if ( -f "$fbasei$sec.idx"){
     }
     my $h = fromHex ($hash);
     if (defined $fhoso{$sec}{$h}){
-       print STDERR "done $nn\n";
+       print "done/updated $nn\n";
        last;
     }
     $nn ++;
