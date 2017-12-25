@@ -49,7 +49,7 @@ while (<STDIN>){
      or die "cant open $fname\n";
   while (my ($k, $v) = each %in){
     print STDERR "$lines done\n" if (!(($lines++)%100000000));
-    my $sec =  (unpack "C", substr ($k, 0, 1))%$nParts
+    my $sec =  (unpack "C", substr ($k, 0, 1))%$nParts;
     next if $doPart >= 0 && $sec != $doPart;
     get ($k, $v, \%{$res{$k}});
   }
