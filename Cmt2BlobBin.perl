@@ -1,3 +1,5 @@
+#!/bin/perl -I /home/audris/lib64/perl5
+
 use strict;
 use warnings;
 use Error qw(:try);
@@ -15,11 +17,15 @@ sub fromHex {
 
 my %b2c;
 my $sec;
+my $nsec = 16;
+$nsec = $ARGV[1] if defined $ARGV[1];
 
-for $sec (0..15){
-  tie %{$b2c{$sec}}, "TokyoCabinet::HDB", "$ARGV[0].$sec.tch", TokyoCabinet::HDB::OWRITER | TokyoCabinet::HDB::OCREAT,   
+for $sec (0..($nsec -1)){
+  my $fname = "$ARGV[0].$sec.tch";
+  $fname=$ARGV[0] if $nsec == 1;
+  tie %{$b2c{$sec}}, "TokyoCabinet::HDB", $fname, TokyoCabinet::HDB::OWRITER | TokyoCabinet::HDB::OCREAT,   
         16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
-     or die "cant open $ARGV[0].$sec.tch\n";
+     or die "cant open $fname\n";
 }
 
 my %b2c1;
@@ -45,7 +51,7 @@ sub output {
   while (my ($k, $v) = each %b2c1){
     my @shas = sort keys %{$v};
     my $v1 = join '', @shas;
-    my $sec = (unpack "C", substr ($k, 0, 1))%16;
+    my $sec = (unpack "C", substr ($k, 0, 1))%$nsec;
     $b2c{$sec}{$k} = $v1;
   }
 }
