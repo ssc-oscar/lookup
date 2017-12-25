@@ -26,7 +26,7 @@ while (<STDIN>){
     open A, "tail -1 $fbaseio$sec.idx|" or die ($!);
     my $str = <A>;
     chop ($str);
-    my ($last_nn, $last_of, $last_len, $last_hash) = split (/\;/, $_, -1);    
+    my ($last_nn, $last_of, $last_len, $last_hash) = split (/\;/, $str, -1);    
     open A, "tac $fbasei$sec.idx|" or die ($!);
     my $bof = 0;
     while (<A>){
