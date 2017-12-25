@@ -17,7 +17,7 @@ my $outN = $ARGV[0];
 my $type = "file";
 my $cnst = 0100644;
 if (defined $ARGV[1]){
-  $type = $ARGV[1] 
+	$type = $ARGV[1];
   $cnst = 040000 if $type eq "tree"; 
 }
 
