@@ -18,7 +18,7 @@ my $type = "file";
 my $cnst = 0100644;
 if (defined $ARGV[1]){
   $type = $ARGV[1];
-  $cnst = 040000 if $type eq "tree"; 
+  $cnst = 040000 if $type eq "tree" || "t2pt"; 
 }
 
 while (<STDIN>){
@@ -59,8 +59,10 @@ while (<STDIN>){
             #goto DONE;
           }
           my ($mode, $name, $bytes) = (oct($1),$2,$3);
-          if ($mode == $cnst && ! defined $f2b{$name}{$bytes}){
-            $f2b{$name}{$bytes} = 1;
+          my ($key, $val) = ($name, $bytes);
+          ($key, $val) = ($bytes, $h) if $type eq "t2pt" || $type eq "b2pt";
+          if ($mode == $cnst && ! defined $f2b{$key}{$val}){
+            $f2b{$key}{$val} = 1;
             #print "$name\n";
           }
         }
