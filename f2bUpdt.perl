@@ -14,7 +14,12 @@ my %f2b = ();
 my $fbasei ="/data/All.blobs/tree_";
 my $fbaseio ="/data/All.blobs.old/tree_";
 my $outN = $ARGV[0];
-
+my $type = "file";
+my $cnst = 0100644;
+if (defined $ARGV[1]){
+  $type = $ARGV[1] 
+  $cnst = 040000 if $type eq "tree"; 
+}
 
 while (<STDIN>){
   chop();
@@ -54,7 +59,7 @@ while (<STDIN>){
             #goto DONE;
           }
           my ($mode, $name, $bytes) = (oct($1),$2,$3);
-          if ($mode == 0100644 && ! defined $f2b{$name}{$bytes}){
+          if ($mode == $cnst && ! defined $f2b{$name}{$bytes}){
             $f2b{$name}{$bytes} = 1;
             #print "$name\n";
           }
