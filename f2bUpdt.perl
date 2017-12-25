@@ -40,7 +40,6 @@ while (<STDIN>){
          }
 			last;
       }
-      $count ++;
       $bof -= $len;
       my $codeC = "";
       seek (FD, $bof, 2);
