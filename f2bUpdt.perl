@@ -37,7 +37,7 @@ while (<STDIN>){
     while (<A>){
       chop ();
       my ($nn, $of, $len, $hash) = split (/\;/, $_, -1);
-      my $th = pack "H*", $hash;
+      my $h = pack "H*", $hash;
       #now check if it has been processed
       if ($hash eq $last_hash){
          if ($nn ne $last_nn || $of ne $last_of || $len ne $last_len){
