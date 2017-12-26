@@ -5,27 +5,36 @@
 #on beacon
 
 #Produce for each c2fbp.NNN.gz
-for i in {00..80}; do sed "s/NNN/$i/g" | doP2CBin.pbs |qsub; done
+for i in {00..81}; do sed "s/NNN/$i/g" | doP2CBin.pbs |qsub; done
+for i in {00..81}; do sed "s/NNN/$i/g" | doC2POne.pbs |qsub; done
 #Premerge
-for k in {00..72..8}; do k1=$(echo $k+7|bc); [[ $k1 -lt 10 ]] && k1="0$k1"; time for i in $(eval echo "{$k..$k1}"); do ls -f /fast1/Prj2Cmt.$i.tch; done | ./f2bMergeSplit.perl Prj2Cmt.$k-$k1 8; done
-echo /fast1/Prj2Cmt.80.tch | ./f2bMergeSplit.perl /fast1/Prj2Cmt.80 8
+for i in {0..8}; do ls -f /fast1/Prj2Cmt.${i}[0-9].tch | ./f2bMergeSplit.perl Prj2Cmt.${i}0-${i}9.tch 8; done
+for i in {0..8}; do ls -f /fast1/Cmt2Prj.${i}[0-9].tch | ./f2nMergeSplit.perl Cmt2Prj.${i}0-${i}9.tch 8; done
 #Merge
 for k in {0..7}; do 
   for i in 00-09 10-19 20-29 30-39 40-49 50-59 60-69 70-79 80-89
   do echo /fast1/Prj2Cmt.$i.$k.tch; 
   done | ./f2bMerge.perl Prj2Cmt.$k
 done
-
 for k in {0..7}; do 
-  for i in 00-07 08-15 16-23 24-31 32-39 40-47 48-55 56-63 64-71 72-79 80
-  do echo /fast1/Prj2Cmt.$i.$k.tch; 
-  done | ./f2bMerge.perl Prj2Cmt.$k
+  for i in 00-09 10-19 20-29 30-39 40-49 50-59 60-69 70-79 80-89
+  do echo /fast1/Cmt2Prj.$i.$k.tch; 
+  done | ./f2nMerge.perl Cmt2Prj.$k
 done
+
+
+#Collect into one
+for i in {0..7}; do ls -f Prj2Cmt.$i.tch;
+done | ./Blob2CmtMergeTCDisjoint.perl Prj2Cmt.tch
+for i in {0..7}; do ls -f Cmt2Prj.$i.tch;
+done | ./Blob2CmtMergeTCDisjoint.perl Cmt2Prj.tch
+
+
 
 #invert may be faster than merge Cmt2Prj
 for i in {0..8}
 do time for k in {0..7}; do echo /fast1/Prj2Cmt.$k.tch
-   done | ./Prj2CmtInvert.perl Cmt2PrjI.$i.tch 8 $i
+   done | ./Prj2CmtInvrt.perl Cmt2PrjI.$i.tch 8 $i
 done
 #
 ##################################################

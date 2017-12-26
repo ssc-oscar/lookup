@@ -73,14 +73,27 @@ do ./catTC.perl /fast1/All.sha1c/setup.py.$i.tch
 done
 ```
 
+# Get all javascrip blobs
+```
+#first inspect file names by numbers of blobs
+gunzip -c /data/basemaps/f2b.s | sed 's|;[0-9]*$||'| grep '\.js' | awk -F. '{print $NF}' | lsort 100G | uniq -c | lsort 10G -rn | less
+#now get most common
+gunzip -c /data/basemaps/f2b.s | sed 's|;[0-9]*$||'| grep -E '\.(js|json|js[pxmtfi2]|jsonpack|jsonp||jsproj|j2)$' | ./f2bSee.perl /fast1/All.sha1c/f2b.tch  1 | lsort 200G -u | gzip > javascript.blobs
+#map to commits and projects
+gunzip -c javascript.blobs | ./Cmt2BlobShow.perl /fast1/All.sha1c/Blob2Cmt.tch 1 | gzip > javascript.commits
+gunzip -c javascript.commits | perl -ane 'chop(); s/^[^;]*;[^;]*;//;s/;/\n/g;print' | lsort 200G -u |gzip >javascript.commits.s
+gunzip -c javascript.commits.s | ./Cmt2PrjShow.perl /fast1/All.sha1c/Cmt2Prj.tch 1 | gzip > javascript.projects
+```
+
+
 
 # various other maps
 
 ## Cmt to File
 
 ```
-for i in {00..79..4}; do sed "s/NNN/$i/g" doC2Fbin.pbs|qsub; done
-ls -f Cmt2File.[0-9][0-9]-[0-9][0-9].tch Cmt2File.80.tch | ./f2nMergeSplit.perl Cmt2File 1
+for i in {00..80}; do sed "s/NNN/$i/g" doC2Fbin.pbs|qsub; done
+ls -f Cmt2File.*.tch | ./f2nMergeSplit.perl Cmt2File 1
 scp -p Cmt2File.0.tch da4:/data/basemaps
 
 ```
@@ -128,7 +141,7 @@ ls -f n2t*-*.tch | perl -I ~/lib/perl5 /nics/b/home/audris/lookup/f2bMerge.perl 
 
 ## tree to tree name
 ```
-time ./Prj2CmtInvrt.perl /fast1/All.sha1c/n2t.tch t2n0 2 0
+ls -f /fast1/All.sha1c/n2t.tch |./Prj2CmtInvrt.perl /fast1/All.sha1c/n2t.tch t2n0 2 0
 time ./Prj2CmtInvrt.perl /fast1/All.sha1c/n2t.tch t2n1 2 1
 ```
 
