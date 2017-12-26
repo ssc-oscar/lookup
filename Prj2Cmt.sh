@@ -11,6 +11,12 @@ for k in {00..72..8}; do k1=$(echo $k+7|bc); [[ $k1 -lt 10 ]] && k1="0$k1"; time
 echo /fast1/Prj2Cmt.80.tch | ./f2bMergeSplit.perl /fast1/Prj2Cmt.80 8
 #Merge
 for k in {0..7}; do 
+  for i in 00-09 10-19 20-29 30-39 40-49 50-59 60-69 70-79 80-89
+  do echo /fast1/Prj2Cmt.$i.$k.tch; 
+  done | ./f2bMerge.perl Prj2Cmt.$k
+done
+
+for k in {0..7}; do 
   for i in 00-07 08-15 16-23 24-31 32-39 40-47 48-55 56-63 64-71 72-79 80
   do echo /fast1/Prj2Cmt.$i.$k.tch; 
   done | ./f2bMerge.perl Prj2Cmt.$k
