@@ -155,7 +155,7 @@ sub getTR {
 sub compare {
   my ($map, $stuff) = @_;
   while (my ($k, $v) = each %{$map}){
-     #print "$k;$v\n";
+     print "$k;$v\n";
      if ($k eq "/$v"){
         if (defined $did{$k}){           
         }else{
@@ -185,7 +185,7 @@ sub  dump_newrecords {
        #return;
      }
    }
-   printf "f1:".$f1."\n";
+   printf "f1:".$f1." t1:$t1\n";
    popSeg ($f1, \%map);
  }
  my @stuff = ($c1h, $p1, $t1);
