@@ -242,7 +242,7 @@ sub  dump_newrecords {
    popSeg ($f1, \%map);
  }
  my @stuff = ($c1h, $p1, $t1);
- getTRP (getTO(getCS($parenT)), "", \%mapP, \@stuff);
+ getTRP (getTO(getCS($parent)), "", \%mapP, \@stuff);
  getTR (getTO($t1), "", \%map, \@stuff);
  compare (\%map, \@stuff);
  %did = ();
