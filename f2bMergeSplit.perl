@@ -25,9 +25,11 @@ $doPart = $ARGV[2]+0 if defined $ARGV[2];
 
 for $sec (0..($nParts-1)){
   next if $doPart >= 0 && $sec != $doPart;
-  tie %{$out{$sec}}, "TokyoCabinet::HDB", "$outN.$sec.tch", TokyoCabinet::HDB::OWRITER |  TokyoCabinet::HDB::OCREAT,
+  my $fname = "$outN.$sec.tch";
+  $fname = "$outN" if ($nParts == 1);
+  tie %{$out{$sec}}, "TokyoCabinet::HDB", "$fname", TokyoCabinet::HDB::OWRITER |  TokyoCabinet::HDB::OCREAT,
     16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
-    or die "cant open $outN.$sec.tch\n";
+    or die "cant open $fname\n";
 }
 
 sub get {
