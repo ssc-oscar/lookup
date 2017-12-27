@@ -67,7 +67,7 @@ while(<STDIN>){
   }
 }
 #print "here:$prev;$fs\n";
-dump_newrecords($prev, $fs);
+dump_newrecords($prev, $fs, $parent);
 
 #open(my $Curstatus, '>>', '/da4_data/play/newc2fbpPieces/Curstatus1');
 #print $Curstatus "One piece process finished\n";
