@@ -209,7 +209,9 @@ sub compare {
      if ($k eq "/$v"){
         if (defined $did{$k}){           
         }else{
-           print "$stuff->[0];$k;;$stuff->[1]\n";
+           if (defined $didP{$k}){
+             print "deleted: $stuff->[0];$k;;$stuff->[1]\n";
+           }
            print STDERR "$.;no $k;$stuff->[0];;;$stuff->[1]\n";
         }
      }
