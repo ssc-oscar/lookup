@@ -144,7 +144,7 @@ sub getTR {
             #print "got tree: $prefix $bH\n";
             getTR (getTO($bH), "$prefix/$nO", $map, $stuff);
          }else{
-            $did{"$prefix/$nO"}++;
+            $did{"$prefix/$nO"}{$bH}++;
             print "$stuff->[0];$prefix/$nO;$bH;$stuff->[1]\n";
          }
       }
@@ -157,8 +157,9 @@ sub compare {
   while (my ($k, $v) = each %{$map}){
      #print "$k;$v\n";
      if ($k eq "/$v"){
-        if (defined $did{$k}){
+        if (defined $did{$k}){           
         }else{
+           print "$stuff->[0];$k;;$stuff->[1]\n";
            print STDERR "$.;no $k;$stuff->[0];;;$stuff->[1]\n";
         }
      }
@@ -184,12 +185,12 @@ sub  dump_newrecords {
        #return;
      }
    }
-   #printf "f1:".$f1."\n";
+   printf "f1:".$f1."\n";
    popSeg ($f1, \%map);
  }
  my @stuff = ($c1h, $p1, $t1);
  getTR (getTO($t1), "", \%map, \@stuff);
- compare(\%map, \@stuff);
+ compare (\%map, \@stuff);
  %did = ();
 }
 
