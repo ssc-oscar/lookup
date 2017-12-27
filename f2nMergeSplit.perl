@@ -18,9 +18,12 @@ my %res;
 my $lines = 0;
 
 my $nParts = 16;
+my $doPart = -1;
 $nParts = $ARGV[1]+0 if defined $ARGV[1];
+$doPart = $ARGV[2]+0 if defined $ARGV[2];
 
 for $sec (0..($nParts-1)){
+  next if $doPart >= 0 && $sec != $doPart;
   tie %{$out{$sec}}, "TokyoCabinet::HDB", "$outN.$sec.tch", TokyoCabinet::HDB::OWRITER |  TokyoCabinet::HDB::OCREAT,
     16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
     or die "cant open $outN.$sec.tch\n";
@@ -62,6 +65,7 @@ while (my ($k, $v) = each %res){
 print STDERR "done $lines\n";
 
 for $sec (0..($nParts-1)){
+  next if $doPart >= 0 && $sec != $doPart;
   untie %{$out{$sec}};
 }
 
