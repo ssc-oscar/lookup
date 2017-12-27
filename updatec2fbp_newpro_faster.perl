@@ -26,10 +26,14 @@ my $pre = "/fast1/All.sha1c";
 my $sections = 128;
 # need to update the tree_$sec.tch first ... for new data. like update0 and update1...
 my (%fhos);
+my (%fhoc);
 for my $sec (0 .. ($sections-1)){
   tie %{$fhos{$sec}}, "TokyoCabinet::HDB", "$pre/tree_$sec.tch", TokyoCabinet::HDB::OREADER,  
         16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
      or die "cant open $pre/tree_$sec.tch\n";
+  tie %{$fhoc{$sec}}, "TokyoCabinet::HDB", "$pre/commit_$sec.tch", TokyoCabinet::HDB::OREADER,  
+        16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
+     or die "cant open $pre/commit_$sec.tch\n";
 }
 
 
@@ -50,7 +54,7 @@ while(<STDIN>){
   my $rev_pac = fromHex($rev);
   my $k = "$prj;$rev;$tree";
   if ($prev ne $k && $prev ne ""){
-    dump_newrecords($prev,$fs);
+    dump_newrecords($prev, $fs, $parent);
     $fs = $f;
     $prev = $k;
   }else{
@@ -111,6 +115,26 @@ sub popSeg {
   #$map ->{$f1}{f} = 1;
 }
 
+sub getCT {
+  my $c = $_[0];
+  my $sec = hex (substr($c, 0, 2)) % $sections;
+  my $cB = fromHex ($c);
+  my $codeC = $fhoc{$sec}{$cB};
+  my $code = safeDecomp ($codeC, $c);
+
+  my ($tree, $parent, $auth, $cmtr, $ta, $tc) = ("","","","","","");
+  my ($pre, @rest) = split(/\n\n/, $code, -1);
+  for my $l (split(/\n/, $pre, -1)){
+     #print "$l\n";
+     $tree = $1 if ($l =~ m/^tree (.*)$/);
+     $parent .= ":$1" if ($l =~ m/^parent (.*)$/);
+     ($auth, $ta) = ($1, $2) if ($l =~ m/^author (.*)\s([0-9]+\s[\+\-]+\d+)$/);
+     ($cmtr, $tc) = ($1, $2) if ($l =~ m/^author (.*)\s([0-9]+\s[\+\-]+\d+)$/);
+  }
+  $parent =~ s/^:// if defined $parent;
+  return ($tree);
+}
+
 sub getTO {
   my $t1 = $_[0];
   my $sec = hex (substr($t1, 0, 2)) % $sections;
@@ -125,7 +149,33 @@ sub getTO {
 
 
 my %did = ();
+my %didP = ();
 
+sub getTRP {
+  my ($to, $prefix, $map, $stuff) = @_;
+  if (length ($to) == 0){
+    print STDERR "no tree $stuff->[2];cmt=$stuff->[0];$prefix/;prj=$stuff->[1]\n";
+    return;
+  }
+  #print "getTR:$prefix\n";
+  while ($to) {
+    if ($to =~ s/^([0-7]+) (.+?)\0(.{20})//s) {
+      my ($mode, $name, $bytes) = (oct($1),$2,$3);
+      my $nO = $name;
+      my $bH = toHex ($bytes);
+      #print "$prefix/$name\n";
+      if (defined $map->{"$prefix/$nO"}){
+         if ($mode == 040000){
+            #print "got tree: $prefix $bH\n";
+            getTRP (getTO($bH), "$prefix/$nO", $map, $stuff);
+         }else{
+            $didP{"$prefix/$nO"}{$bH}++;
+            print "P $stuff->[0];$prefix/$nO;$bH;$stuff->[1]\n";
+         }
+      }
+    }    
+  }
+}
 sub getTR {
   my ($to, $prefix, $map, $stuff) = @_;
   if (length ($to) == 0){
@@ -155,7 +205,7 @@ sub getTR {
 sub compare {
   my ($map, $stuff) = @_;
   while (my ($k, $v) = each %{$map}){
-     print "$k;$v\n";
+     #print "$k;$v\n";
      if ($k eq "/$v"){
         if (defined $did{$k}){           
         }else{
@@ -167,12 +217,13 @@ sub compare {
 }
    
 sub  dump_newrecords {
- my ($p1, $c1h, $t1) = split (/\;/, $_[0], -1);
+ my ($p1, $c1h, $t1, $parent) = split (/\;/, $_[0], -1);
  my $c1 = fromHex ($c1h);
  my $t2 = $t1;
  my @fs = sort split(/\;/, $_[1], -1);
 
  my %map = ();
+ my %mapP = ();
  for my $f1 (@fs){ 
    if ($f1 =~ /=>/){
      if ($f1 =~ /{/){
@@ -185,10 +236,11 @@ sub  dump_newrecords {
        #return;
      }
    }
-   printf "f1:".$f1." t1:$t1\n";
+   #printf "f1:".$f1." t1:$t1\n";
    popSeg ($f1, \%map);
  }
  my @stuff = ($c1h, $p1, $t1);
+ getTRP (getTO(getCS($parenT)), "", \%mapP, \@stuff);
  getTR (getTO($t1), "", \%map, \@stuff);
  compare (\%map, \@stuff);
  %did = ();
