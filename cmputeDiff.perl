@@ -96,18 +96,20 @@ sub separate1 {
 sub separate {
   my ($m, $mP) = @_;
   my (%uM, %uP);
+  my @vs;
   while (my ($k, $v) = each %{$m}){
 	 if (!defined $mP->{$k}){
       $uM{$k} = $v; 
     }else{
 		my (%a, %b) = separate1 ($m->{$k}, $mP->{$k});
-		my @vs = keys %a;
-		print "uM: @vs\n";
+		@vs = keys %a;
+		print "uM: @vs\n" if $#vs >= 0;
 		@vs = keys %b;
-		print "uP: @vs\n";
+		print "uP: @vs\n" if $#vs >= 0;
     }
   } 
-  #print "".(keys %uM)."\n";
+  @vs = keys %uM;
+  print "uM:@vs\n"  if $#vs >= 0;
   while (my ($k, $v) = each %{$mP}){
 	 if (!defined $mP->{$k}){
       $uP{$k} = $v; 
@@ -115,7 +117,8 @@ sub separate {
 		#separate1 ($m->{$k}, $mP->{$k});
     }
   } 
-  #print "".(keys %uP)."\n";
+  @vs = keys %uP;
+  print "uP:@vs\n"  if $#vs >= 0;
 }
 
 sub getTR {
@@ -128,7 +131,7 @@ sub getTR {
       my ($mode, $name, $bytes) = (oct($1),$2,$3);
       my $nO = $name;
       my $bH = toHex ($bytes);
-      #print "$mode $prefix/$name $bH\n";
+      print "$mode $prefix/$name $bH\n";
       $map->{"$prefix"}{$nO}{$bH}++;
       if ($mode == 040000){
         #print "got tree: $prefix $bH\n";
