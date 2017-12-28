@@ -90,9 +90,9 @@ sub separate1 {
       $uP{$k}++; 
     }
   }
-  my @vs = keys %a;
+  my @vs = keys %uM;
   print "uMC: @vs\n" if $#vs >= 0;
-  @vs = keys %b;
+  @vs = keys %uP;
   print "uPC: @vs\n" if $#vs >= 0;
 
   return (%uM, %uP);
