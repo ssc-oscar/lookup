@@ -157,8 +157,8 @@ my %didP = ();
 sub getTRP {
   my ($to, $prefix, $map, $stuff) = @_;
   if (length ($to) == 0){
-    print STDERR "no tree $stuff->[2];cmt=$stuff->[0];$prefix/;prj=$stuff->[1]\n";
-    return;
+    #print STDERR "$.;Pno tree $stuff->[2];cmt=$stuff->[0];$prefix/;prj=$stuff->[1]\n";
+    return "";
   }
   #print "getTRP:$prefix\n";
   while ($to) {
@@ -248,7 +248,8 @@ sub  dump_newrecords {
  }
  my @stuff = ($c1h, $p1, $t1);
  if (defined $parent && $parent ne ""){
-	 my $pT = getCT($parent);
+	 my $pT = getCT ($parent);
+    print "pT:$pT\n";
     getTRP (getTO($pT), "", \%map, \@stuff) if $pT ne "";
  }
  getTR (getTO($t1), "", \%map, \@stuff);
