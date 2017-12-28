@@ -220,6 +220,7 @@ sub compare {
    
 sub  dump_newrecords {
  my ($p1, $c1h, $t1, $parent) = split (/\;/, $_[0], -1);
+ print "$t1\;$parent\n";
  my $c1 = fromHex ($c1h);
  my $t2 = $t1;
  my @fs = sort split(/\;/, $_[1], -1);
