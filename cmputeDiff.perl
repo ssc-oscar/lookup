@@ -92,8 +92,8 @@ while(<STDIN>){
     my @vs = keys %{$v};
     for my $v0 (@vs){
 		my @bs = ();
-      if (defined $mapP{$v0}){
-		  @bs = keys %{$mapP{$v0}};
+      if (defined $map1{$v0}){
+		  @bs = keys %{$map1{$v0}};
       }
       print "p:$k\;$v0;@bs\n";
     }
