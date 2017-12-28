@@ -239,6 +239,7 @@ sub  dump_newrecords {
      }
    }
    #printf "f1:".$f1." t1:$t1\n";
+   popSeg ($f1, \%mapP);
    popSeg ($f1, \%map);
  }
  my @stuff = ($c1h, $p1, $t1);
