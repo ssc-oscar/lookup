@@ -72,12 +72,13 @@ while(<STDIN>){
   my %mapP = ();
   my %map1 = ();
   my %map1P = ();
+  my %rename = ();
 
   my ($tree, $parent) = getCT ($rev);
   my ($treeP, $parentP) = getCT ($parent);
   getTR ("m", getTO ($tree), "", \%map, \%map1); 
   getTR ("p", getTO ($treeP), "", \%mapP, \%map1P); 
-  my ($uM, $uP, $rename) = separate (\%map, \%mapP);
+  my ($uM, $uP) = separate (\%map, \%mapP, \%rename);
   while (my ($k, $v) = each %{$uM}){
     my @vs = keys %{$v};
     for my $v0 (@vs){
@@ -98,15 +99,15 @@ while(<STDIN>){
       print "p:$k\;$v0;@bs;$v->{$v0}\n";# if $v->{$v0} != 040000;
     }
   }
-  while (my ($k, $v) = each %{$rename}){
+  while (my ($k, $v) = each %rename){
     my @vs = keys %{$v};
     my @vs0 = keys %{$map1{$k}};
-    print "$k\;@vs;@vs0\n";
+    print "rename;$k\;@vs;@vs0\n";
   }
 }
 
 sub separate1 {
-  my ($k, $m, $mP) = @_;
+  my ($k, $m, $mP, $rename) = @_;
   my (%uM, %uP);
   while (my ($k, $v) = each %{$m}){
     if (!defined $mP->{$k}){
@@ -115,25 +116,24 @@ sub separate1 {
   }
   while (my ($k, $v) = each %{$mP}){
     if (!defined $m->{$k}){
-      $uP{$k}++; 
+      $rename->{$k}++; 
     }
   }
   #my @vs = keys %uM;
   #print "uMC: $k:@vs\n" if $#vs >= 0;
-  my @vs = keys %uP;
+  my @vs = keys %{$rename};
   print "uPC: $k:@vs\n" if $#vs >= 0;
-  return (\%uP);
 }
 
 sub separate {
-  my ($m, $mP) = @_;
-  my (%uM, %uP, $rename);
+  my ($m, $mP, $rename) = @_;
+  my (%uM, %uP);
   my @vs;
   while (my ($k, $v) = each %{$m}){
 	 if (!defined $mP->{$k}){
       $uM{$k} = $v; 
     }else{
-		$rename = separate1 ($k, $m->{$k}, $mP->{$k});
+		separate1 ($k, $m->{$k}, $mP->{$k}, $rename);
 	 }
   } 
   while (my ($k, $v) = each %{$mP}){
@@ -143,7 +143,7 @@ sub separate {
 		#my (%a, %b) = separate1 ($k, $m->{$k}, $mP->{$k});
     }
   } 
-  return (\%uM, \%uP, $rename);
+  return (\%uM, \%uP);
 }
 
 sub getTR {
