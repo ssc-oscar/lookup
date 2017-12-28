@@ -78,7 +78,6 @@ while(<STDIN>){
   getTR ("p", getTO ($treeP), "", \%mapP, \%map1P); 
   my ($uM, $uP) = separate (\%map, \%mapP);
   while (my ($k, $v) = each %{$uM}){
-	 print "uM-\;$k\n";
     my @vs = keys %{$v};
     for my $v0 (@vs){
 		my @bs = ();
@@ -119,14 +118,14 @@ sub separate {
 	 if (!defined $mP->{$k}){
       $uM{$k} = $v; 
     }else{
-		my (%a, %b) = separate1 ($m->{$k}, $mP->{$k});
+		#my (%a, %b) = separate1 ($m->{$k}, $mP->{$k});
 	 }
   } 
   while (my ($k, $v) = each %{$mP}){
 	 if (!defined $m->{$k}){
       $uP{$k} = $v; 
     }else{
-		my (%a, %b) = separate1 ($m->{$k}, $mP->{$k});
+		#my (%a, %b) = separate1 ($m->{$k}, $mP->{$k});
     }
   } 
   return (\%uM, \%uP);
@@ -142,7 +141,7 @@ sub getTR {
       my ($mode, $name, $bytes) = (oct($1),$2,$3);
       my $nO = $name;
       my $bH = toHex ($bytes);
-      print "$lab;$prefix/$name;$bH;$mode\n";
+      #print "$lab;$prefix/$name;$bH;$mode\n";
       $map->{$bH}{"$prefix/$nO"}++;
       $map1->{"$prefix/$nO"}{$bH}++;
       if ($mode == 040000){
