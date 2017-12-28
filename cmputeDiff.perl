@@ -78,6 +78,7 @@ while(<STDIN>){
   getTR ("p", getTO ($treeP), "", \%mapP, \%map1P); 
   my (%uM, %uP) = separate (\%map, \%mapP);
   while (my ($k, $v) = each %uM){
+	 print "uM-\;$k\n";
     my @vs = keys %{$v};
     for my $v0 (@vs){
 		my @bs = ();
