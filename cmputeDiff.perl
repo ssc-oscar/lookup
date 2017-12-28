@@ -72,7 +72,7 @@ while(<STDIN>){
   my %mapP = ();
   my ($tree, $parent) = getCT ($rev);
   my ($treeP, $parentP) = getCT ($parent);
-  getTRP (getTO ($treeP, "/", \%mapP)) 
+  getTRP (getTO ($treeP), "/", \%mapP); 
 }
 
 
