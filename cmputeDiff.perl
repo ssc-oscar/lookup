@@ -90,6 +90,11 @@ sub separate1 {
       $uP{$k}++; 
     }
   }
+  my @vs = keys %a;
+  print "uMC: @vs\n" if $#vs >= 0;
+  @vs = keys %b;
+  print "uPC: @vs\n" if $#vs >= 0;
+
   return (%uM, %uP);
 }
 
@@ -102,11 +107,7 @@ sub separate {
       $uM{$k} = $v; 
     }else{
 		my (%a, %b) = separate1 ($m->{$k}, $mP->{$k});
-		@vs = keys %a;
-		print "uM: @vs\n" if $#vs >= 0;
-		@vs = keys %b;
-		print "uP: @vs\n" if $#vs >= 0;
-    }
+	 }
   } 
   @vs = keys %uM;
   print "uM:@vs\n"  if $#vs >= 0;
@@ -114,7 +115,7 @@ sub separate {
 	 if (!defined $mP->{$k}){
       $uP{$k} = $v; 
     }else{
-		#separate1 ($m->{$k}, $mP->{$k});
+		my (%a, %b) = separate1 ($m->{$k}, $mP->{$k});
     }
   } 
   @vs = keys %uP;
@@ -131,7 +132,7 @@ sub getTR {
       my ($mode, $name, $bytes) = (oct($1),$2,$3);
       my $nO = $name;
       my $bH = toHex ($bytes);
-      print "$mode $prefix/$name $bH\n";
+      #print "$mode $prefix/$name $bH\n";
       $map->{$bH}{"$prefix"}{$nO}++;
       if ($mode == 040000){
         #print "got tree: $prefix $bH\n";
