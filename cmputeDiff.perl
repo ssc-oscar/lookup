@@ -92,7 +92,7 @@ sub getTRP {
       $map->{"$prefix"}{$nO}=$bH;
       if ($mode == 040000){
         #print "got tree: $prefix $bH\n";
-        getTRP (getTO($bH), "$prefix/$nO", $map, $stuff);
+        getTRP (getTO($bH), "$prefix/$nO", $map);
       }
     }    
   }
