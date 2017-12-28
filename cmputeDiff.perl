@@ -152,7 +152,7 @@ sub getTR {
       my ($mode, $name, $bytes) = (oct($1),$2,$3);
       my $nO = $name;
       my $bH = toHex ($bytes);
-      #print "$lab;$prefix/$name;$bH;$mode\n";
+      print "$lab;$prefix/$name;$bH;$mode\n";
       $map->{$bH}{"$prefix/$nO"} = $mode;
       $map1->{"$prefix/$nO"}{$bH} = $mode;
       if ($mode == 040000){
