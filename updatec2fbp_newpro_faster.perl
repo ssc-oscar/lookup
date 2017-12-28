@@ -54,7 +54,7 @@ while(<STDIN>){
   my $rev_pac = fromHex($rev);
   my $k = "$prj;$rev;$tree";
   if ($prev ne $k && $prev ne ""){
-    dump_newrecords($prev, $fs, $parent);
+    dump_newrecords($prev, $fs, $tree, $parent);
     $fs = $f;
     $prev = $k;
   }else{
@@ -67,7 +67,7 @@ while(<STDIN>){
   }
 }
 #print "here:$prev;$fs\n";
-dump_newrecords($prev, $fs, $parent);
+dump_newrecords($prev, $fs, $tree, $parent);
 
 #open(my $Curstatus, '>>', '/da4_data/play/newc2fbpPieces/Curstatus1');
 #print $Curstatus "One piece process finished\n";
