@@ -79,7 +79,10 @@ while(<STDIN>){
   my (%uM, %uP) = separate (\%map, \%mapP);
   while (my ($k, $v) = each %uM){
     my @vs = keys %{$v};
-    print "$k\;@vs\n";
+    for my $v0 (@vs){
+		 @bs = keys %{$map1P{$v0}};
+       print "$k\;$v0;@bs\n";
+    }
   }
 }
 
