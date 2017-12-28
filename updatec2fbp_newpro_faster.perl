@@ -179,10 +179,11 @@ sub getTRP {
     }    
   }
 }
+
 sub getTR {
   my ($to, $prefix, $map, $stuff) = @_;
   if (length ($to) == 0){
-    print STDERR "no tree $stuff->[2];cmt=$stuff->[0];$prefix/;prj=$stuff->[1]\n";
+    print STDERR "$.;no tree $stuff->[2];cmt=$stuff->[0];$prefix/;prj=$stuff->[1]\n";
     return;
   }
   #print "getTR:$prefix\n";
