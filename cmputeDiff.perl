@@ -101,7 +101,7 @@ while(<STDIN>){
   while (my ($k, $v) = each %{$rename}){
     my @vs = keys %{$v};
     my @vs0 = keys %{$map1{$k}};
-    print "@vs;@vs1\n";
+    print "@vs;@vs0\n";
   }
 }
 
