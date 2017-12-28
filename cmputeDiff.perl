@@ -136,7 +136,7 @@ sub separate {
 	 if (!defined $m->{$k}){
       $uP{$k} = $v; 
     }else{
-		my (%a, %b) = separate1 ($k, $m->{$k}, $mP->{$k});
+		#my (%a, %b) = separate1 ($k, $m->{$k}, $mP->{$k});
     }
   } 
   return (\%uM, \%uP);
