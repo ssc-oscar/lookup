@@ -80,8 +80,11 @@ while(<STDIN>){
   while (my ($k, $v) = each %uM){
     my @vs = keys %{$v};
     for my $v0 (@vs){
-		 my @bs = keys %{$map1P{$v0}};
-       print "$k\;$v0;@bs\n";
+		my @bs = ();
+      if (defined $map1P{$v0}){
+		  @bs = keys %{$map1P{$v0}};
+      }
+      print "$k\;$v0;@bs\n";
     }
   }
 }
@@ -143,7 +146,7 @@ sub getTR {
       $map1->{"$prefix/$nO"}{$bH}++;
       if ($mode == 040000){
         #print "got tree: $prefix $bH\n";
-        getTR (getTO($bH), "$prefix/$nO", $map);
+        getTR ($lab, getTO($bH), "$prefix/$nO", $map);
       }
     }    
   }
