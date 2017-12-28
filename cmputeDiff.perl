@@ -81,7 +81,7 @@ sub separate {
   my ($m, $mP) = @_;
   my (%uM, %uP);
   while (my ($k, $v) = each %{$m}){
-	 if (!defined %{$mP->{$k}}){
+	 if (!defined $mP->{$k}){
       $uM{$k} = $v; 
     }else{
 		#separate1 ($m->{$k}, $mP->{$k});
@@ -89,7 +89,7 @@ sub separate {
   } 
   print "".(sort keys %uM)."\n";
   while (my ($k, $v) = each %{$mP}){
-	 if (!defined %{$mP->{$k}}){
+	 if (!defined $mP->{$k}){
       $uP{$k} = $v; 
     }else{
 		#separate1 ($m->{$k}, $mP->{$k});
