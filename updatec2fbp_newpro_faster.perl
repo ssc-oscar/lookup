@@ -170,7 +170,7 @@ sub getTRP {
             getTRP (getTO($bH), "$prefix/$nO", $map, $stuff);
          }else{
             $didP{"$prefix/$nO"} = $bH;
-            print "P $stuff->[0];$prefix/$nO;$bH;$stuff->[1]\n";
+            #print "P $stuff->[0];$prefix/$nO;$bH;$stuff->[1]\n";
          }
       }
     }    
@@ -210,9 +210,10 @@ sub compare {
         if (defined $did{$k}){           
         }else{
            if (defined $didP{$k}){
-             print "deleted: $stuff->[0];$k;$didP{$k};$stuff->[1]\n";
+             print "$stuff->[0];$k;$didP{$k};$stuff->[1];deleted\n";
+           }else{
+             print STDERR "$.;no $k;$stuff->[0];;;$stuff->[1]\n";
            }
-           print STDERR "$.;no $k;$stuff->[0];;;$stuff->[1]\n";
         }
      }
   }
