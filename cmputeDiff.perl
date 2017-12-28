@@ -85,7 +85,7 @@ while(<STDIN>){
       if (defined $map1P{$v0}){
 		  @bs = keys %{$map1P{$v0}};
       }
-      print "m:$k\;$v0;@bs\n";
+      print "m:$k\;$v0;@bs\n" if $v->{$v0} != 040000;
     }
   }
   while (my ($k, $v) = each %{$uP}){
@@ -95,7 +95,7 @@ while(<STDIN>){
       if (defined $map1{$v0}){
 		  @bs = keys %{$map1{$v0}};
       }
-      print "p:$k\;$v0;@bs\n";
+      print "p:$k\;$v0;@bs\n" if $v->{$v0} != 040000;
     }
   }
 }
@@ -153,8 +153,8 @@ sub getTR {
       my $nO = $name;
       my $bH = toHex ($bytes);
       #print "$lab;$prefix/$name;$bH;$mode\n";
-      $map->{$bH}{"$prefix/$nO"}++;
-      $map1->{"$prefix/$nO"}{$bH}++;
+      $map->{$bH}{"$prefix/$nO"} = $mode;
+      $map1->{"$prefix/$nO"}{$bH} = $mode;
       if ($mode == 040000){
         #print "got tree: $prefix $bH\n";
         getTR ($lab, getTO($bH), "$prefix/$nO", $map, $map1);
