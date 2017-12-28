@@ -70,10 +70,12 @@ while(<STDIN>){
   next if length($rev) ne 40;    
   my %map = ();
   my %mapP = ();
+  my %map1 = ();
+  my %map1P = ();
   my ($tree, $parent) = getCT ($rev);
   my ($treeP, $parentP) = getCT ($parent);
-  getTR (getTO ($tree), "", \%map); 
-  getTR (getTO ($treeP), "", \%mapP); 
+  getTR (getTO ($tree), "", \%map, \%map1); 
+  getTR (getTO ($treeP), "", \%mapP, \%map1P); 
   separate (\%map, \%mapP);
 }
 
@@ -112,7 +114,7 @@ sub separate {
   @vs = keys %uM;
   print "uM:@vs\n"  if $#vs >= 0;
   while (my ($k, $v) = each %{$mP}){
-	 if (!defined $mP->{$k}){
+	 if (!defined $m->{$k}){
       $uP{$k} = $v; 
     }else{
 		my (%a, %b) = separate1 ($m->{$k}, $mP->{$k});
@@ -123,7 +125,7 @@ sub separate {
 }
 
 sub getTR {
-  my ($to, $prefix, $map) = @_;
+  my ($to, $prefix, $map, $map1) = @_;
   if (length ($to) == 0){
     return "";
   }
@@ -134,6 +136,7 @@ sub getTR {
       my $bH = toHex ($bytes);
       #print "$mode $prefix/$name $bH\n";
       $map->{$bH}{"$prefix"}{$nO}++;
+      $map1->{"$prefix"}{$nO}{$bN}++;
       if ($mode == 040000){
         #print "got tree: $prefix $bH\n";
         getTR (getTO($bH), "$prefix/$nO", $map);
