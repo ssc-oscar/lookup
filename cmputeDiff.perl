@@ -129,14 +129,14 @@ sub separate {
 	 if (!defined $mP->{$k}){
       $uM{$k} = $v; 
     }else{
-		#my (%a, %b) = separate1 ($m->{$k}, $mP->{$k});
+		my (%a, %b) = separate1 ($m->{$k}, $mP->{$k});
 	 }
   } 
   while (my ($k, $v) = each %{$mP}){
 	 if (!defined $m->{$k}){
       $uP{$k} = $v; 
     }else{
-		#my (%a, %b) = separate1 ($m->{$k}, $mP->{$k});
+		my (%a, %b) = separate1 ($m->{$k}, $mP->{$k});
     }
   } 
   return (\%uM, \%uP);
