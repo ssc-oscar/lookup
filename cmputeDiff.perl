@@ -87,7 +87,7 @@ sub separate {
 		#separate1 ($m->{$k}, $mP->{$k});
     }
   } 
-  print "".(sort keys %uM)."\n";
+  print "".(keys %uM)."\n";
   while (my ($k, $v) = each %{$mP}){
 	 if (!defined $mP->{$k}){
       $uP{$k} = $v; 
@@ -95,7 +95,7 @@ sub separate {
 		#separate1 ($m->{$k}, $mP->{$k});
     }
   } 
-  print "".(sort keys %uP)."\n";
+  print "".(keys %uP)."\n";
 }
 
 sub getTR {
@@ -108,7 +108,7 @@ sub getTR {
       my ($mode, $name, $bytes) = (oct($1),$2,$3);
       my $nO = $name;
       my $bH = toHex ($bytes);
-      print "$mode $prefix/$name $bH\n";
+      #print "$mode $prefix/$name $bH\n";
       $map->{"$prefix"}{$nO}{$bH}++;
       if ($mode == 040000){
         #print "got tree: $prefix $bH\n";
