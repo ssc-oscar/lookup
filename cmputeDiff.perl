@@ -70,10 +70,8 @@ while(<STDIN>){
   next if length($rev) ne 40;    
   my %map = ();
   my %mapP = ();
-  my $revH = fromHex($rev);
-  my ($tree, $parent) = getCT ($revH);
-  my $parentH = fromHex($parent); 
-  my ($treeP, $parentP) = getCT ($parentH);
+  my ($tree, $parent) = getCT ($rev);
+  my ($treeP, $parentP) = getCT ($parent);
   getTRP (getTO ($treeP, "", \%mapP)) 
 }
 
@@ -112,6 +110,7 @@ sub extr {
   }
   return @v2;
 }
+
 sub safeDecomp {
   my $codeC = $_[0];
   try {
