@@ -94,7 +94,7 @@ sub separate {
 		#separate1 ($m->{$k}, $mP->{$k});
     }
   } 
-  print "".(keys %uM)."\n";
+  #print "".(keys %uM)."\n";
   while (my ($k, $v) = each %{$mP}){
 	 if (!defined $mP->{$k}){
       $uP{$k} = $v; 
@@ -102,7 +102,7 @@ sub separate {
 		#separate1 ($m->{$k}, $mP->{$k});
     }
   } 
-  print "".(keys %uP)."\n";
+  #print "".(keys %uP)."\n";
 }
 
 sub getTR {
