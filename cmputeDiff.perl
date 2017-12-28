@@ -71,9 +71,9 @@ while(<STDIN>){
   my %map = ();
   my %mapP = ();
   my $revH = fromHex($rev);
-  my ($tree, $parent) = getTC ($revH);
+  my ($tree, $parent) = getCT ($revH);
   my $parentH = fromHex($parent); 
-  my ($treeP, $parentP) = getTC ($parentH);
+  my ($treeP, $parentP) = getCT ($parentH);
   getTRP (getTO ($treeP, "", \%mapP)) 
 }
 
