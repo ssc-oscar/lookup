@@ -102,7 +102,8 @@ while(<STDIN>){
   while (my ($k, $v) = each %rename){
     #my @vs = keys %{$v};
     my @bs0 = keys %{$map1P{$k}};
-    print "rename;$k\;@bs0\n";
+    my @vs0 = keys %{$map{$bs0[0]}};
+    print "rename;$k\;@bs0;@vs0\n";
   }
 }
 
@@ -121,8 +122,8 @@ sub separate1 {
   }
   #my @vs = keys %uM;
   #print "uMC: $k:@vs\n" if $#vs >= 0;
-  my @vs = keys %{$rename};
-  print "uPC: $k:@vs\n" if $#vs >= 0;
+  #my @vs = keys %{$rename};
+  #print "uPC: $k:@vs\n" if $#vs >= 0;
 }
 
 sub separate {
