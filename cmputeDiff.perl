@@ -80,7 +80,7 @@ while(<STDIN>){
 sub separate {
   my ($m, $mP) = @_;
   my (%uM, %uP);
-  while (my ($k, $v) = each %{%m}){
+  while (my ($k, $v) = each %{$m}){
 	 if (!defined %{$mP->{$k}}){
       $uM{$k} = $v; 
     }else{
@@ -88,7 +88,7 @@ sub separate {
     }
   } 
   print "".(sort keys %uM)."\n";
-  while (my ($k, $v) = each %{%mP}){
+  while (my ($k, $v) = each %{$mP}){
 	 if (!defined %{$mP->{$k}}){
       $uP{$k} = $v; 
     }else{
