@@ -96,14 +96,14 @@ while(<STDIN>){
       if (defined $map1{$v0}){
 		  @bs = keys %{$map1{$v0}};
       }
-      print "p:$k\;$v0;@bs;$v->{$v0}\n";# if $v->{$v0} != 040000;
+      print "p:$k\;$v0;@bs;$v->{$v0}\n" if $v->{$v0} != 040000;
     }
   }
   while (my ($k, $v) = each %rename){
     #my @vs = keys %{$v};
     my @bs0 = keys %{$map1P{$k}};
     my @vs0 = keys %{$map{$bs0[0]}};
-    print "rename;$k\;@bs0;@vs0\n";
+    print "@bs0;$k;@vs0\n";
   }
 }
 
@@ -157,7 +157,7 @@ sub getTR {
       my ($mode, $name, $bytes) = (oct($1),$2,$3);
       my $nO = $name;
       my $bH = toHex ($bytes);
-      print "$lab;$prefix/$name;$bH;$mode\n";
+      #print "$lab;$prefix/$name;$bH;$mode\n";
       $map->{$bH}{"$prefix/$nO"} = $mode;
       $map1->{"$prefix/$nO"}{$bH} = $mode;
       if ($mode == 040000){
