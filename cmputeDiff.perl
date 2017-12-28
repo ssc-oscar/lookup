@@ -120,7 +120,7 @@ sub separate1 {
   }
   #my @vs = keys %uM;
   #print "uMC: $k:@vs\n" if $#vs >= 0;
-  @vs = keys %uP;
+  my @vs = keys %uP;
   print "uPC: $k:@vs\n" if $#vs >= 0;
 
   return (\%uP);
