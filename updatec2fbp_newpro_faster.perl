@@ -157,19 +157,19 @@ sub getTRP {
     print STDERR "no tree $stuff->[2];cmt=$stuff->[0];$prefix/;prj=$stuff->[1]\n";
     return;
   }
-  print "getTRP:$prefix\n";
+  #print "getTRP:$prefix\n";
   while ($to) {
     if ($to =~ s/^([0-7]+) (.+?)\0(.{20})//s) {
       my ($mode, $name, $bytes) = (oct($1),$2,$3);
       my $nO = $name;
       my $bH = toHex ($bytes);
-      print "$prefix/$name\n";
+      #print "$prefix/$name\n";
       if (defined $map->{"$prefix/$nO"}){
          if ($mode == 040000){
-            print "got tree: $prefix $bH\n";
+            #print "got tree: $prefix $bH\n";
             getTRP (getTO($bH), "$prefix/$nO", $map, $stuff);
          }else{
-            $didP{"$prefix/$nO"}{$bH}++;
+            $didP{"$prefix/$nO"} = $bH;
             print "P $stuff->[0];$prefix/$nO;$bH;$stuff->[1]\n";
          }
       }
