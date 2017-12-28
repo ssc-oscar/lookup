@@ -210,7 +210,7 @@ sub compare {
         if (defined $did{$k}){           
         }else{
            if (defined $didP{$k}){
-             print "deleted: $stuff->[0];$k;;$stuff->[1]\n";
+             print "deleted: $stuff->[0];$k;$didP{$k};$stuff->[1]\n";
            }
            print STDERR "$.;no $k;$stuff->[0];;;$stuff->[1]\n";
         }
