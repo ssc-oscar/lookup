@@ -96,7 +96,7 @@ while(<STDIN>){
       if (defined $map1{$v0}){
 		  @bs = keys %{$map1{$v0}};
       }
-      print "p:$k\;$v0;@bs;$v->{$v0}\n" if $v->{$v0} != 040000;
+      print "p:$k\;$v0;@bs;$v->{$v0}\n" if $v->{$v0} != 040000 && $#bs < 0;
     }
   }
   while (my ($k, $v) = each %rename){
