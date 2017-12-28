@@ -89,7 +89,8 @@ sub separate {
 	 if (!defined $mP->{$k}){
       $uM{$k} = $v; 
     }else{
-		 print "$k\;$v\n";
+		my @vs = keys %{$v};
+		print "$k\;@vs\n";
 		#separate1 ($m->{$k}, $mP->{$k});
     }
   } 
