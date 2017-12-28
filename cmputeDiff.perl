@@ -108,7 +108,7 @@ sub separate1 {
   @vs = keys %uP;
   print "uPC: @vs\n" if $#vs >= 0;
 
-  return (%uM, %uP);
+  return (\%uM, \%uP);
 }
 
 sub separate {
@@ -119,14 +119,14 @@ sub separate {
 	 if (!defined $mP->{$k}){
       $uM{$k} = $v; 
     }else{
-		#my (%a, %b) = separate1 ($m->{$k}, $mP->{$k});
+		my (%a, %b) = separate1 ($m->{$k}, $mP->{$k});
 	 }
   } 
   while (my ($k, $v) = each %{$mP}){
 	 if (!defined $m->{$k}){
       $uP{$k} = $v; 
     }else{
-		#my (%a, %b) = separate1 ($m->{$k}, $mP->{$k});
+		my (%a, %b) = separate1 ($m->{$k}, $mP->{$k});
     }
   } 
   return (\%uM, \%uP);
