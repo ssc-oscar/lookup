@@ -249,7 +249,7 @@ sub  dump_newrecords {
  my @stuff = ($c1h, $p1, $t1);
  if (defined $parent && $parent ne ""){
 	 my $pT = getCT ($parent);
-    print "pT:$pT\n";
+    #print "pT:$pT\n";
     getTRP (getTO($pT), "", \%map, \@stuff) if $pT ne "";
  }
  getTR (getTO($t1), "", \%map, \@stuff);
