@@ -72,6 +72,7 @@ while(<STDIN>){
   my %mapP = ();
   my %map1 = ();
   my %map1P = ();
+
   my ($tree, $parent) = getCT ($rev);
   my ($treeP, $parentP) = getCT ($parent);
   getTR ("m", getTO ($tree), "", \%map, \%map1); 
@@ -84,7 +85,17 @@ while(<STDIN>){
       if (defined $map1P{$v0}){
 		  @bs = keys %{$map1P{$v0}};
       }
-      print "$k\;$v0;@bs\n";
+      print "m:$k\;$v0;@bs\n";
+    }
+  }
+  while (my ($k, $v) = each %{$uP}){
+    my @vs = keys %{$v};
+    for my $v0 (@vs){
+		my @bs = ();
+      if (defined $mapP{$v0}){
+		  @bs = keys %{$mapP{$v0}};
+      }
+      print "p:$k\;$v0;@bs\n";
     }
   }
 }
