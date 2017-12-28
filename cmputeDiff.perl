@@ -80,7 +80,7 @@ while(<STDIN>){
   while (my ($k, $v) = each %uM){
     my @vs = keys %{$v};
     for my $v0 (@vs){
-		 @bs = keys %{$map1P{$v0}};
+		 my @bs = keys %{$map1P{$v0}};
        print "$k\;$v0;@bs\n";
     }
   }
