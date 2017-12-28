@@ -77,6 +77,11 @@ while(<STDIN>){
   separate (\%map, \%mapP);
 }
 
+sub separate1 {
+  my ($m, $mP) = @_;
+  while (my ($k, $v) = each %{$m}){
+  }
+}
 sub separate {
   my ($m, $mP) = @_;
   my (%uM, %uP);
@@ -84,6 +89,7 @@ sub separate {
 	 if (!defined $mP->{$k}){
       $uM{$k} = $v; 
     }else{
+		 print "$k\;$v\n";
 		#separate1 ($m->{$k}, $mP->{$k});
     }
   } 
