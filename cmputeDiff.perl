@@ -132,7 +132,7 @@ sub getTR {
       my $nO = $name;
       my $bH = toHex ($bytes);
       print "$mode $prefix/$name $bH\n";
-      $map->{"$prefix"}{$nO}{$bH}++;
+      $map->{$bH}{"$prefix"}{$nO}++;
       if ($mode == 040000){
         #print "got tree: $prefix $bH\n";
         getTR (getTO($bH), "$prefix/$nO", $map);
