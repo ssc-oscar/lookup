@@ -52,9 +52,9 @@ while(<STDIN>){
   next if length($rev) ne 40;    
   #p2c, no restruction, 
   my $rev_pac = fromHex($rev);
-  my $k = "$prj;$rev;$tree";
+  my $k = "$prj;$rev;$tree;$parent";
   if ($prev ne $k && $prev ne ""){
-    dump_newrecords($prev, $fs, $tree, $parent);
+    dump_newrecords($prev, $fs);
     $fs = $f;
     $prev = $k;
   }else{
@@ -67,7 +67,7 @@ while(<STDIN>){
   }
 }
 #print "here:$prev;$fs\n";
-dump_newrecords($prev, $fs, $tree, $parent);
+dump_newrecords($prev, $fs);
 
 #open(my $Curstatus, '>>', '/da4_data/play/newc2fbpPieces/Curstatus1');
 #print $Curstatus "One piece process finished\n";
@@ -220,7 +220,6 @@ sub compare {
    
 sub  dump_newrecords {
  my ($p1, $c1h, $t1, $parent) = split (/\;/, $_[0], -1);
- print "$t1\;$parent\n";
  my $c1 = fromHex ($c1h);
  my $t2 = $t1;
  my @fs = sort split(/\;/, $_[1], -1);
