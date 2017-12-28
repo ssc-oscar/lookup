@@ -101,7 +101,7 @@ while(<STDIN>){
 }
 
 sub separate1 {
-  my ($m, $mP) = @_;
+  my ($k, $m, $mP) = @_;
   my (%uM, %uP);
   while (my ($k, $v) = each %{$m}){
     if (!defined $mP->{$k}){
@@ -114,9 +114,9 @@ sub separate1 {
     }
   }
   my @vs = keys %uM;
-  print "uMC: @vs\n" if $#vs >= 0;
+  print "uMC: $k:@vs\n" if $#vs >= 0;
   @vs = keys %uP;
-  print "uPC: @vs\n" if $#vs >= 0;
+  print "uPC: $k:@vs\n" if $#vs >= 0;
 
   return (\%uM, \%uP);
 }
@@ -129,14 +129,14 @@ sub separate {
 	 if (!defined $mP->{$k}){
       $uM{$k} = $v; 
     }else{
-		my (%a, %b) = separate1 ($m->{$k}, $mP->{$k});
+		my (%a, %b) = separate1 ($k, $m->{$k}, $mP->{$k});
 	 }
   } 
   while (my ($k, $v) = each %{$mP}){
 	 if (!defined $m->{$k}){
       $uP{$k} = $v; 
     }else{
-		my (%a, %b) = separate1 ($m->{$k}, $mP->{$k});
+		my (%a, %b) = separate1 ($k, $m->{$k}, $mP->{$k});
     }
   } 
   return (\%uM, \%uP);
