@@ -76,7 +76,11 @@ while(<STDIN>){
   my ($treeP, $parentP) = getCT ($parent);
   getTR (getTO ($tree), "", \%map, \%map1); 
   getTR (getTO ($treeP), "", \%mapP, \%map1P); 
-  separate (\%map, \%mapP);
+  my (%uM, %uP) = separate (\%map, \%mapP);
+  while (my ($k, $v) = each %uM){
+    my @vs = keys %{$v};
+    print "$k\;@vs\n";
+  }
 }
 
 sub separate1 {
@@ -111,8 +115,6 @@ sub separate {
 		my (%a, %b) = separate1 ($m->{$k}, $mP->{$k});
 	 }
   } 
-  @vs = keys %uM;
-  print "uM:@vs\n"  if $#vs >= 0;
   while (my ($k, $v) = each %{$mP}){
 	 if (!defined $m->{$k}){
       $uP{$k} = $v; 
@@ -120,8 +122,7 @@ sub separate {
 		my (%a, %b) = separate1 ($m->{$k}, $mP->{$k});
     }
   } 
-  @vs = keys %uP;
-  print "uP:@vs\n"  if $#vs >= 0;
+  return (%uM, %uP);
 }
 
 sub getTR {
