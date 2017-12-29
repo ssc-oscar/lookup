@@ -27,6 +27,10 @@ my $sections = 128;
 # need to update the tree_$sec.tch first ... for new data. like update0 and update1...
 my (%fhos);
 my (%fhoc);
+my (%fhop);
+#tie %fhop, "TokyoCabinet::HDB", "$pre/c2p.tch", TokyoCabinet::HDB::OREADER,  
+#        16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
+#     or die "cant open $pre/c2p.tch\n";
 for my $sec (0 .. ($sections-1)){
   tie %{$fhos{$sec}}, "TokyoCabinet::HDB", "$pre/tree_$sec.tch", TokyoCabinet::HDB::OREADER,  
         16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
@@ -79,6 +83,7 @@ while(<STDIN>){
   getTR ("m", getTO ($tree), "", \%map, \%map1); 
   getTR ("p", getTO ($treeP), "", \%mapP, \%map1P); 
   my ($uM, $uP) = separate (\%map, \%mapP, \%rename);
+  my $p = ""
   while (my ($k, $v) = each %{$uM}){
     my @vs = keys %{$v};
     for my $v0 (@vs){
@@ -86,7 +91,7 @@ while(<STDIN>){
       if (defined $map1P{$v0}){
 		  @bs = keys %{$map1P{$v0}};
       }
-      print "m;$k\;$v0;@bs\n" if $v->{$v0} != 040000;
+      print "$rev;$v0;$k;@bs;$p\n" if $v->{$v0} != 040000;
     }
   }
   while (my ($k, $v) = each %{$uP}){
@@ -96,14 +101,14 @@ while(<STDIN>){
       if (defined $map1{$v0}){
 		  @bs = keys %{$map1{$v0}};
       }
-      print "d;$k\;$v0;@bs;$v->{$v0}\n" if $v->{$v0} != 040000 && $#bs < 0;
+      print "$rev;$v0;$k;;$p\n" if $v->{$v0} != 040000 && $#bs < 0;
     }
   }
   while (my ($k, $v) = each %rename){
     #my @vs = keys %{$v};
     my @bs0 = keys %{$map1P{$k}};
     my @vs0 = keys %{$map{$bs0[0]}};
-    print "r;@bs0;$k;@vs0\n";
+    print "$rev;$k;@bs0;@vs0;$p\n";
   }
 }
 
