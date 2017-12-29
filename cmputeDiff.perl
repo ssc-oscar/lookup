@@ -120,6 +120,7 @@ while(<STDIN>){
 		  #my @ns = join ':::', keys $map1{$v0};
 		  print "$rev;$v0;$k;$p;\n" if $v->{$v0} != 040000;
       }
+    }
   }
 }
 
