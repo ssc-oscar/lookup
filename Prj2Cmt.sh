@@ -2,32 +2,52 @@
 #now do Project to commit
 ##################################
 
-#on beacon
+#in the future, just get updates only from All.blobs/commit_XX.vs
+#get the complete info from All.blobs/commit_XX.vs
+cut -d\; -f4,6 /data/All.blobs/commit_*.vs | perl -ane 'chop();($c,$p)=split(/\;/,$_,-1);$p=~s/.*github.com_//;$p=~s/^bitbucket.org_/bb_/;$p=~s|\.git$||;$p=~s|/*$||;$p=~s/\;/SEMICOLON/g;$p = "EMPTY" if $p eq "";print "$c;$p\n";' | lsort 130G -u | gzip > /data/basemaps/c2p.s 
 
+#check if all are in
+gunzip -c /data/basemaps/c2p.s | cut -d\; -f1 | uniq | join -v2 - <(gunzip -c /data/basemaps/cNotInC2fbp.s) | gzip > /data/basemaps/cNoPrj.s &
+
+#now merge
+gunzip -c /data/basemaps/c2p.s | sed 's/;/;;;/' | /da3_data/lookup/Cmt2PrjBin.perl c2p.tch 
+cp -p c2p.tch /fast1
+ls -f /fast1/c2p.tch |  /da3_data/lookup/f2nMergeSplit.perl c2p 8
+cp -p c2p.*.tch /fast1
+for i in {0..4}; do ls -f /fast1/c2p.$i.tch /fast1/Cmt2Prj.$i.tch | ./f2nMergeSplit.perl Cmt2Prj.$i.tch 1; done &
+for i in {7..5}; do ls -f /fast1/c2p.$i.tch /fast1/Cmt2Prj.$i.tch | ./f2nMergeSplit.perl Cmt2Prj.$i.tch 1; done &
+
+
+#Collect into one
+for i in {0..7}; do ls -f Prj2Cmt.$i.tch;
+done | /da3_data/lookup/Blob2CmtMergeTCDisjoint.perl Prj2Cmt.tch
+
+
+for i in {0..7}; do ls -f Cmt2Prj.$i.tch;
+done | /da3_data/lookup/Blob2CmtMergeTCDisjoint.perl Cmt2Prj.tch
+
+##########################################
+
+#on beacon
 #Produce for each c2fbp.NNN.gz
 for i in {00..81}; do sed "s/NNN/$i/g" | doP2CBin.pbs |qsub; done
 for i in {00..81}; do sed "s/NNN/$i/g" | doC2POne.pbs |qsub; done
 #Premerge
-for i in {0..8}; do ls -f /fast1/Prj2Cmt.${i}[0-9].tch | ./f2bMergeSplit.perl Prj2Cmt.${i}0-${i}9.tch 8; done
-for i in {0..8}; do ls -f /fast1/Cmt2Prj.${i}[0-9].tch | ./f2nMergeSplit.perl Cmt2Prj.${i}0-${i}9.tch 8; done
+for i in {0..8}; do ls -f /fast1/Prj2Cmt.${i}[0-9].tch | ./f2bMergeSplit.perl Prj2Cmt.${i}0-${i}9 8; done
+for i in {0..8}; do ls -f /fast1/Cmt2Prj.${i}[0-9].tch | ./f2nMergeSplit.perl Cmt2Prj.${i}0-${i}9 8; done
 #Merge
 for k in {0..7}; do 
   for i in 00-09 10-19 20-29 30-39 40-49 50-59 60-69 70-79 80-89
   do echo /fast1/Prj2Cmt.$i.$k.tch; 
   done | ./f2bMerge.perl Prj2Cmt.$k
 done
+
 for k in {0..7}; do 
   for i in 00-09 10-19 20-29 30-39 40-49 50-59 60-69 70-79 80-89
   do echo /fast1/Cmt2Prj.$i.$k.tch; 
-  done | ./f2nMerge.perl Cmt2Prj.$k
+  done | ./f2nMergeSplit.perl /data/basemaps/Cmt2Prj.$k.tch 1
 done
 
-
-#Collect into one
-for i in {0..7}; do ls -f Prj2Cmt.$i.tch;
-done | ./Blob2CmtMergeTCDisjoint.perl Prj2Cmt.tch
-for i in {0..7}; do ls -f Cmt2Prj.$i.tch;
-done | ./Blob2CmtMergeTCDisjoint.perl Cmt2Prj.tch
 
 
 
@@ -43,6 +63,51 @@ done
 
 
 #the below no longer relevant
+##	*****		      See solution above with /data/All.blobs/commit_*.vs
+### It seems lots of alldelta are missing, try to complete that
+(gunzip -c cs.s;gunzip -c cs.81.gz) | grep -v '[^0-9a-f]'  | lsort 20G -u |gzip > cs.s1
+mv cs.s1 cs.s
+
+cut -d\; -f4 /data/All.blobs/commit_*.idx | lsort 40G | gzip > /data/basemaps/cmts.s
+gunzip -c /data/basemaps/cmts.s | perl -ane 'chop(); next if length($_) != 40;print "$_\n";' | join -v1 - <(gunzip -c /da0_data/c2fbp/cs.s) | gzip >/data/basemaps/cNotInC2fbp.s
+cd /data/update
+gunzip -c /data/basemaps/cNotInC2fbp.s | split -l 10000000 -da 2 --filter='gzip > $FILE.gz' - cNotInC2fbp.
+
+cat list1 | while read i; do gunzip -c $i; done | split -d -l 2000000 - list1.
+for i in {00..89} {9000..9232}; do cat list1.$i | /da3_data/lookup/updatec2fbp_newpro_faster.perl 2> list1.$i.err | gzip > list1.$i.c2fbp & done
+#see what we got
+cat list1 | while read i; do  gunzip -c $i | cut -d\; -f2; done | lsort 80G | gzip > list1.cs &
+for i in {00..89} {9000..9232}; do gunzip -c list1.$i.c2fbp | cut -d\; -f1; done | lsort 80G -u |gzip > list1.cs1 &
+for i in {00..89} {9000..9232}; do gunzip -c list1.$i.c2fbp; done | uniq | gzip > list1.c2fbp &
+for i in {00..89} {9000..9232}; do cat list1.$i.c2fbp.err; done | uniq | gzip > list1.c2fbp.err &
+
+#do list2
+cat list2 | while read i; do  gunzip -c $i | cut -d\; -f2; done | lsort 180G | gzip > list2.cs &
+cat list2 | while read i; do gunzip -c $i; done | split -l 20000000 -d -a 3 --filter='gzip > $FILE.gz' - list2.
+for i in {000..02}; do gunzip -c list2.$i.gz | /da3_data/lookup/updatec2fbp_newpro_faster.perl 2> list2.$i.err | gzip > list2.$i.c2fbp & done
+
+for i in {000..}; do gunzip -c list2.$i.c2fbp | cut -d\; -f1; done | lsort 80G -u |gzip > list2.cs1 &
+for i in {000..}; do gunzip -c list2.$i.c2fbp; done | uniq | lsort 80G -u | gzip > list2.c2fbp &
+for i in {000..}; do cat list2.$i.c2fbp.err; done | uniq | gzip > list2.c2fbp.err &
+
+#do list3
+cat list3 | while read i; do  gunzip -c $i | cut -d\; -f2; done | lsort 180G | gzip > list3.cs &
+cat list3 | while read i; do gunzip -c $i; done | split -l 20000000 -d -a 3 --filter='gzip > $FILE.gz' - list3.
+for i in {000..0}; do gunzip -c list3.$i.gz | /da3_data/lookup/updatec2fbp_newpro_faster.perl 2> list3.$i.err | gzip > list3.$i.c2fbp & done
+for i in {000..}; do gunzip -c list3.$i.c2fbp | cut -d\; -f1; done | lsort 80G -u |gzip > list3.cs1 &
+for i in {000..}; do gunzip -c list3.$i.c2fbp; done | uniq | lsort 80G -u | gzip > list3.c2fbp &
+for i in {000..}; do cat list3.$i.c2fbp.err; done | uniq | gzip > list3.c2fbp.err &
+
+
+
+gunzip -c c2fbp.81.gz list[1-3].c2fbp |  split -l 1000000000 --numeric-suffixes=81 -a 2 --filter='gzip > $FILE.gz' - c2fpb81.
+ls -f c2fpb81.*.c2fbp | while read i; j=$(echo $i | sed 's/^c2fpb81\./c2fpb./'); mv $i $j; done
+
+
+###
+			      
+
+
 for i in {00..80}; do sed "s/NNN/$i/g" | doC2Pbin.pbs |qsub; done
 # now pack every other into tch
 for i in 00 02 04 06 08; do sed "s/NNN/$i/g" | doP2Cpack.pbs |qsub; done
