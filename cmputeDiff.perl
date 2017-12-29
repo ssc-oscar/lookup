@@ -79,7 +79,7 @@ while(<STDIN>){
   my %rename = ();
 
   my ($tree, $parent) = getCT ($rev);
-  $parent = substr )$parent, 0, 40); #ignore additional parents
+  $parent = substr ($parent, 0, 40); #ignore additional parents
   my ($treeP, $parentP) = getCT ($parent);
   getTR ("m", getTO ($tree), "", \%map, \%map1); 
   getTR ("p", getTO ($treeP), "", \%mapP, \%map1P); 
