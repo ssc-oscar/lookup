@@ -78,38 +78,48 @@ while(<STDIN>){
   my %map1P = ();
   my %rename = ();
 
-  my ($tree, $parent) = getCT ($rev);
-  $parent = substr ($parent, 0, 40); #ignore additional parents
-  my ($treeP, $parentP) = getCT ($parent);
-  getTR ("m", getTO ($tree), "", \%map, \%map1); 
-  getTR ("p", getTO ($treeP), "", \%mapP, \%map1P); 
-  my ($uM, $uP) = separate (\%map, \%mapP, \%rename);
   my $p = "";
-  while (my ($k, $v) = each %{$uM}){
-    my @vs = keys %{$v};
-    for my $v0 (@vs){
-		my @bs = ();
-      if (defined $map1P{$v0}){
-		  @bs = keys %{$map1P{$v0}};
+
+  my ($tree, $parent) = getCT ($rev);
+  getTR ("m", getTO ($tree), "", \%map, \%map1); 
+  if (defined $parent && $parent ne ""){
+    $parent = substr ($parent, 0, 40); #ignore additional parents
+    my ($treeP, $parentP) = getCT ($parent);
+    getTR ("p", getTO ($treeP), "", \%mapP, \%map1P); 
+    my ($uM, $uP) = separate (\%map, \%mapP, \%rename);
+    while (my ($k, $v) = each %{$uM}){
+      my @vs = keys %{$v};
+      for my $v0 (@vs){
+	  	  my @bs = ();
+        if (defined $map1P{$v0}){
+		    @bs = keys %{$map1P{$v0}};
+        }
+        print "$rev;$v0;$k;$p;@bs\n" if $v->{$v0} != 040000;
       }
-      print "$rev;$v0;$k;$p;@bs\n" if $v->{$v0} != 040000;
     }
-  }
-  while (my ($k, $v) = each %{$uP}){
-    my @vs = keys %{$v};
-    for my $v0 (@vs){
-		my @bs = ();
-      if (defined $map1{$v0}){
-		  @bs = keys %{$map1{$v0}};
+    while (my ($k, $v) = each %{$uP}){
+      my @vs = keys %{$v};
+      for my $v0 (@vs){
+		  my @bs = ();
+        if (defined $map1{$v0}){
+		    @bs = keys %{$map1{$v0}};
+        }
+        print "$rev;;$k;$p;$v0\n" if $v->{$v0} != 040000 && $#bs < 0;
       }
-      print "$rev;$v0;$k;$p;\n" if $v->{$v0} != 040000 && $#bs < 0;
     }
-  }
-  while (my ($k, $v) = each %rename){
-    #my @vs = keys %{$v};
-    my @bs0 = keys %{$map1P{$k}};
-    my @vs0 = keys %{$map{$bs0[0]}};
-    print "$rev;$k;@bs0;$p;@vs0\n";
+    while (my ($k, $v) = each %rename){
+      #my @vs = keys %{$v};
+      my @bs0 = keys %{$map1P{$k}};
+      my @vs0 = keys %{$map{$bs0[0]}};
+      print "$rev;$k;@bs0;$p;@vs0\n";
+    }
+  }else{
+    while (my ($k, $v) = each %map){
+      my @vs = keys %{$v};
+      for my $v0 (@vs){
+		  #my @ns = join ':::', keys $map1{$v0};
+		  print "$rev;$v0;$k;$p;\n" if $v->{$v0} != 040000;
+      }
   }
 }
 
