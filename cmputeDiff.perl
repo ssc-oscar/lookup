@@ -110,7 +110,7 @@ while(<STDIN>){
     while (my ($k, $v) = each %rename){
       #my @vs = keys %{$v};
       my @bs0 = keys %{$map1P{$k}};
-      my @vs0 = keys %{$map{$bs0[0]}};
+      my @vs0 = join ':::', sort keys %{$map{$bs0[0]}};
       print "$rev;$k;@bs0;$p;@vs0\n";
     }
   }else{
