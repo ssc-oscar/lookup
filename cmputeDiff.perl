@@ -81,16 +81,21 @@ while(<STDIN>){
   my $p = "";
 
   my ($tree, $parent) = getCT ($rev);
-  my $to = getTO ($tree);
-  if ($to eq ""){
-    print STDERR "no tree: $tree for $rev\n";
+  my $t1 = getTO ($tree);
+  if ($t1 eq ""){
+    print STDERR "no tree t1: $tree for $rev\n";
     next;
   }
-  getTR ("m", getTO ($tree), "", \%map, \%map1); 
+  getTR ("m", $t1, "", \%map, \%map1); 
   if (defined $parent && $parent ne ""){
     $parent = substr ($parent, 0, 40); #ignore additional parents
     my ($treeP, $parentP) = getCT ($parent);
-    getTR ("p", getTO ($treeP), "", \%mapP, \%map1P); 
+    my $pT1 = getTO ($treeP);
+    if ($pT1 eq ""){
+      print STDERR "no tree pT1: $tree for $rev\n";
+      next;
+    }
+    getTR ("p", $pT1, "", \%mapP, \%map1P); 
     my ($uM, $uP) = separate (\%map, \%mapP, \%rename);
     while (my ($k, $v) = each %{$uM}){
       my @vs = keys %{$v};
