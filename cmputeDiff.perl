@@ -79,6 +79,7 @@ while(<STDIN>){
   my %rename = ();
 
   my ($tree, $parent) = getCT ($rev);
+  $parent = substr )$parent, 0, 40); #ignore additional parents
   my ($treeP, $parentP) = getCT ($parent);
   getTR ("m", getTO ($tree), "", \%map, \%map1); 
   getTR ("p", getTO ($treeP), "", \%mapP, \%map1P); 
@@ -91,7 +92,7 @@ while(<STDIN>){
       if (defined $map1P{$v0}){
 		  @bs = keys %{$map1P{$v0}};
       }
-      print "$rev;$v0;$k;@bs;$p\n" if $v->{$v0} != 040000;
+      print "$rev;$v0;$k;$p;@bs\n" if $v->{$v0} != 040000;
     }
   }
   while (my ($k, $v) = each %{$uP}){
@@ -101,14 +102,14 @@ while(<STDIN>){
       if (defined $map1{$v0}){
 		  @bs = keys %{$map1{$v0}};
       }
-      print "$rev;$v0;$k;;$p\n" if $v->{$v0} != 040000 && $#bs < 0;
+      print "$rev;$v0;$k;$p;\n" if $v->{$v0} != 040000 && $#bs < 0;
     }
   }
   while (my ($k, $v) = each %rename){
     #my @vs = keys %{$v};
     my @bs0 = keys %{$map1P{$k}};
     my @vs0 = keys %{$map{$bs0[0]}};
-    print "$rev;$k;@bs0;@vs0;$p\n";
+    print "$rev;$k;@bs0;$p;@vs0\n";
   }
 }
 
