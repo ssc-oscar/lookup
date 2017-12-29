@@ -83,7 +83,7 @@ while(<STDIN>){
   getTR ("m", getTO ($tree), "", \%map, \%map1); 
   getTR ("p", getTO ($treeP), "", \%mapP, \%map1P); 
   my ($uM, $uP) = separate (\%map, \%mapP, \%rename);
-  my $p = ""
+  my $p = "";
   while (my ($k, $v) = each %{$uM}){
     my @vs = keys %{$v};
     for my $v0 (@vs){
