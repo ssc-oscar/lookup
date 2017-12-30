@@ -108,20 +108,9 @@ while(<STDIN>){
       print STDERR "no tree pT1: $tree for parent $parent of $rev\n";
       next;
     }
-    getTR ($pT1, "", \%mapP, \%mapPI, \%mapPF, \%mapPFI);
+    #getTR ($pT1, "", \%mapP, \%mapPI, \%mapPF, \%mapPFI);
     #my ($uM, $uP) = separate2 (\%mapF, \%mapPF, \%mapFI, \%mapPFI, \%rename);
-    my $ts = separate2T ("", \%map, \%mapP, \%mapI, \%mapPI, \%rename);
-    my @vv = keys %{$ts};
-    for my $vv0 (@vv){
-		for my $kk (keys %{$ts->{$vv0}}){
-        my $bP = toHex ($kk);
-		  for my $kk1 (keys %{$ts->{$vv0}{$kk}}){
-          my $bP1 = toHex ($kk1);
-		    print "$vv0;$bP;$bP1\n";
-          my $ts = separate2T ($vv0, \%map, \%mapP, \%mapI, \%mapPI, \%rename);
-        }
-      }
-	 }
+    separate2T ("", $t1, $pT1);
     next;
     my ($uM, $uP) = separate (\%map, \%mapP, \%rename);
     while (my ($k, $v) = each %{$uM}){
@@ -194,32 +183,28 @@ sub separate2 {
 }
 
 sub separate2T {
-  my ($pre, $m, $mP, $mI, $mPI) = @_;
+  my ($pre, $t, $tP) = @_;
+  my (%map, %mapI, %mapF, %mapFI);
+  my (%mapP, %mapPI, %mapPF, %mapPFI);
+  
+  getTR ($t, $pre, \%map, \%mapI, \%mapF, \%mapFI); 
+  getTR ($tP, $pre, \%mapP, \%mapPI, \%mapPF, \%mapPFI); 
   my (%uM, %uP);
-  while (my ($k, $v) = each %{$m}){
+  while (my ($k, $v) = each %map){
     if (!defined $mP->{$k}){
       $uM{$k}++; 
-    }
-  }
-  while (my ($k, $v) = each %{$mP}){
-    if (!defined $m->{$k}){
-      #$rename->{$k}++; 
     }
   }
   my @vs = keys %uM;
   my %res = ();
   for my $v0 (@vs){
-    #my $v0H = toHex ($v0);     
+    my $v0H = toHex ($v0);     
     #print "$v0H\n";
     my @ns = keys %{$m->{$v0}}; 
     my $bP = toHex ($mPI->{$ns[0]});
-    $res{"$pre/$ns[0]"}{$v0}  = $mPI->{$ns[0]};
+    separate2T ("$pre/$ns[0]", $v0H, $bP);
     #print "$pre;@ns;$bP - $v0H\n";
   }
-  return \%res;
-  #print "uMC: @vs\n" if $#vs >= 0;
-  #my @vs = keys %{$rename};
-  #print "uPC: $k:@vs\n" if $#vs >= 0;
 }
 
 sub separate1 {
