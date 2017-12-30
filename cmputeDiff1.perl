@@ -1,4 +1,10 @@
 #!/usr/bin/perl -I /home/audris/lib64/perl5
+############
+############ See accurate diff ib cmputeDiff.perl
+############ this is 40X faster but may miss renamed files under renamrd subflders
+############ treating some as adds: see commit 0010db3b9a569500a8974bb680acaad12e72a72b
+############ Not clear what git diff does here
+############
 use strict;
 use warnings;
 use Compress::LZF;
