@@ -187,7 +187,7 @@ sub separate2T {
   my (%map, %mapI, %mapF, %mapFI);
   my (%mapP, %mapPI, %mapPF, %mapPFI);
   
-  #print "$pre\n";
+  print "$pre\n";
   getTR ($t, $pre, \%map, \%mapI, \%mapF, \%mapFI); 
   getTR ($tP, $pre, \%mapP, \%mapPI, \%mapPF, \%mapPFI); 
   my (%uM, %uP);
@@ -200,13 +200,14 @@ sub separate2T {
   my %res = ();
   for my $v0 (@vs){
     my $v0H = toHex ($v0);     
-    print "$v0H\n";
+    #print "$v0H\n";
     my @ns = keys $map{$v0}; 
     if (defined $mapPI{$ns[0]}){
       my $bP = toHex ($mapPI{$ns[0]});
       separate2T ("$pre/$ns[0]", getTO($v0H), getTO($bP));
 	 }else{
       #new folder? /renamed folder?
+		 print "$pre/$ns[0];$v0H\n";
     }
     #print "$pre;@ns;$bP - $v0H\n";
   }
