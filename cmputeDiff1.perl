@@ -104,8 +104,8 @@ while(<STDIN>){
       print STDERR "no tree pT1: $tree for parent $parent of $rev\n";
       next;
     }
-    getTR ($pT1, "", \%mapP, \%map1P);
     next; 
+    getTR ($pT1, "", \%mapP, \%map1P);
     my ($uM, $uP) = separate (\%map, \%mapP, \%rename);
     while (my ($k, $v) = each %{$uM}){
       my @vs = keys %{$v};
