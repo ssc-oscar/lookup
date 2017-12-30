@@ -90,8 +90,9 @@ while(<STDIN>){
     print STDERR "no tree t1: $tree for $rev\n";
     next;
   }
-  next;
-  getTR ($t1, "", \%map, \%map1); 
+  #this is super fast
+  getTR ($t1, "", \%map, \%map1);
+  next; 
   if (defined $parent && $parent ne ""){
     $parent = substr ($parent, 0, 40); #ignore additional parents
     my ($treeP, $parentP) = getCT ($parent);
