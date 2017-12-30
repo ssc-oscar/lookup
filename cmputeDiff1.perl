@@ -110,7 +110,7 @@ while(<STDIN>){
     }
     #getTR ($pT1, "", \%mapP, \%mapPI, \%mapPF, \%mapPFI);
     #my ($uM, $uP) = separate2 (\%mapF, \%mapPF, \%mapFI, \%mapPFI, \%rename);
-    separate2T ("", $t1, $pT1);
+    separate2T ($rev, $parent, "", $tree, $treeP);
     next;
     my ($uM, $uP) = separate (\%map, \%mapP, \%rename);
     while (my ($k, $v) = each %{$uM}){
@@ -157,13 +157,13 @@ while(<STDIN>){
 
 
 sub separate2T {
-  my ($pre, $t, $tP) = @_;
+  my ($c, $cP, $pre, $t, $tP) = @_;
   my (%map, %mapI, %mapF, %mapFI);
   my (%mapP, %mapPI, %mapPF, %mapPFI);
   
-  print "doing :$pre:\n";
-  getTR ($t, \%map, \%mapI, \%mapF, \%mapFI); 
-  getTR ($tP, \%mapP, \%mapPI, \%mapPF, \%mapPFI);  
+  print "doing :$pre:$t:$tP\n";
+  getTR (getTO($t), \%map, \%mapI, \%mapF, \%mapFI); 
+  getTR (getTO($tP), \%mapP, \%mapPI, \%mapPF, \%mapPFI);  
   while (my ($k, $v) = each %mapF){
     if (!defined $mapPF{$k}){
       my $kH = toHex ($k);
@@ -184,7 +184,7 @@ sub separate2T {
       if (defined $mapPI{$ns[0]}){
         my $bP = toHex ($mapPI{$ns[0]});
         print "doing $#ns:$pre/$ns[0];$v0H;$bP\n";
-        separate2T ("$pre/$ns[0]", getTO($v0H), getTO($bP));
+        separate2T ($c, $cP, "$pre/$ns[0]", $v0H, $bP);
 	   }else{
         #new folder? /renamed folder?
 		  #print "$pre/$ns[0];$v0H\n";
