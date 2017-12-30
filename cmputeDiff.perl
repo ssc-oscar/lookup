@@ -94,7 +94,7 @@ while(<STDIN>){
   if (defined $parent && $parent ne ""){
     $parent = substr ($parent, 0, 40); #ignore additional parents
     my ($treeP, $parentP) = getCT ($parent);
-    if ($t1 eq ""){
+    if ($treeP eq ""){
       print STDERR "no parent commit: $parent for $rev\n";
       next;
     }
