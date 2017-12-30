@@ -156,7 +156,7 @@ while(<STDIN>){
 
 
 sub separate2 {
-  my ($m, $mP) = @_;
+  my ($m, $mP, $mI, $mPI) = @_;
   my (%uM, %uP);
   while (my ($k, $v) = each %{$m}){
     if (!defined $mP->{$k}){
@@ -169,7 +169,13 @@ sub separate2 {
     }
   }
   my @vs = keys %uM;
-  print "uMC: @vs\n" if $#vs >= 0;
+  for my $v0 (@vs){
+    my $n = $mI->{$v0}; 
+    my $bP = fromHex ($mPI->{$v0});     
+    my $v0H = fromHex ($v0);     
+    print "$n;$bP - $v0H\n";
+  }
+  #print "uMC: @vs\n" if $#vs >= 0;
   #my @vs = keys %{$rename};
   #print "uPC: $k:@vs\n" if $#vs >= 0;
 }
