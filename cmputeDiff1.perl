@@ -189,27 +189,32 @@ sub separate2T {
   
   print "$pre\n";
   getTR ($t, $pre, \%map, \%mapI, \%mapF, \%mapFI); 
-  getTR ($tP, $pre, \%mapP, \%mapPI, \%mapPF, \%mapPFI); 
-  my (%uM, %uP);
-  while (my ($k, $v) = each %map){
-    if (!defined $mapP{$k}){
-      $uM{$k}++; 
+  getTR ($tP, $pre, \%mapP, \%mapPI, \%mapPF, \%mapPFI);  
+  while (my ($k, $v) = each %mapF){
+    if (!defined $mapFP{$k}){
+      my $kH = toHex ($k);
+      my @ns = keys %{$v};
+      if (defined $mapFPI{$ns[0]}){
+        my $bP = toHex ($mapFPI{$ns[0]});
+        print "$pre/$ns[0];$kH;$bP\n";
+      }else{
+      }
     }
   }
-  my @vs = keys %uM;
-  my %res = ();
-  for my $v0 (@vs){
-    my $v0H = toHex ($v0);     
-    #print "$v0H\n";
-    my @ns = keys $map{$v0}; 
-    if (defined $mapPI{$ns[0]}){
-      my $bP = toHex ($mapPI{$ns[0]});
-      separate2T ("$pre/$ns[0]", getTO($v0H), getTO($bP));
-	 }else{
-      #new folder? /renamed folder?
-		 print "$pre/$ns[0];$v0H\n";
+  while (my ($v0, $v) = each %map){
+    if (!defined $mapP{$v0}){
+      my $v0H = toHex ($v0);     
+      #print "$v0H\n";
+      my @ns = keys $map{$v0}; 
+      if (defined $mapPI{$ns[0]}){
+        my $bP = toHex ($mapPI{$ns[0]});
+        separate2T ("$pre/$ns[0]", getTO($v0H), getTO($bP));
+	   }else{
+        #new folder? /renamed folder?
+		  #print "$pre/$ns[0];$v0H\n";
+      }
+      #print "$pre;@ns;$bP - $v0H\n";
     }
-    #print "$pre;@ns;$bP - $v0H\n";
   }
 }
 
