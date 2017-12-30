@@ -202,8 +202,12 @@ sub separate2T {
     my $v0H = toHex ($v0);     
     #print "$v0H\n";
     my @ns = keys $map{$v0}; 
-    my $bP = toHex ($mapPI{$ns[0]});
-    separate2T ("$pre/$ns[0]", getTO($v0H), getTO($bP));
+    if (defined $mapPI{$ns[0]}){
+      my $bP = toHex ($mapPI{$ns[0]});
+      separate2T ("$pre/$ns[0]", getTO($v0H), getTO($bP));
+	 }else{
+      #new folder? /renamed folder?
+    }
     #print "$pre;@ns;$bP - $v0H\n";
   }
 }
