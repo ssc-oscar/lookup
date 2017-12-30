@@ -109,6 +109,7 @@ while(<STDIN>){
       next;
     }
     getTR ($pT1, "", \%mapP, \%mapPI, \%mapPF, \%mapPFI);
+    my ($uM, $uP) = separate2 (\%mapF, \%mapPF, \%rename);
     next;
     my ($uM, $uP) = separate (\%map, \%mapP, \%rename);
     while (my ($k, $v) = each %{$uM}){
@@ -167,8 +168,8 @@ sub separate2 {
       #$rename->{$k}++; 
     }
   }
-  #my @vs = keys %uM;
-  #print "uMC: $k:@vs\n" if $#vs >= 0;
+  my @vs = keys %uM;
+  print "uMC: $k:@vs\n" if $#vs >= 0;
   #my @vs = keys %{$rename};
   #print "uPC: $k:@vs\n" if $#vs >= 0;
 }
