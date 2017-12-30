@@ -116,6 +116,7 @@ sub separate2T {
     if (!defined $mapPF{$k}){
       my $kH = toHex ($k);
       my @ns = keys %{$v};
+      print STDERR "@ns\n";
       if (defined $mapPFI{$ns[0]}){
 		  my @bs = keys %{$mapPFI{$ns[0]}};
         my $bP = toHex ($bs[0]);
