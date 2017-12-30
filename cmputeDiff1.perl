@@ -138,6 +138,7 @@ while(<STDIN>){
       print "$rev;$k;@bs0;@vs0\n";
     }
   }else{
+	 next;
     while (my ($k, $v) = each %map){
       my @vs = keys %{$v};
       for my $v0 (@vs){
