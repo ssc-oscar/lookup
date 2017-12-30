@@ -81,7 +81,7 @@ while(<STDIN>){
 
 
   my ($tree, $parent) = getCT ($rev);
-  if ($t1 eq ""){
+  if ($tree eq ""){
     print STDERR "no commit $rev\n";
     next;
   }
