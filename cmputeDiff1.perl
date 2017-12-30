@@ -187,7 +187,7 @@ sub separate2T {
   my (%map, %mapI, %mapF, %mapFI);
   my (%mapP, %mapPI, %mapPF, %mapPFI);
   
-  print "$pre\n";
+  #print "$pre\n";
   getTR ($t, $pre, \%map, \%mapI, \%mapF, \%mapFI); 
   getTR ($tP, $pre, \%mapP, \%mapPI, \%mapPF, \%mapPFI);  
   while (my ($k, $v) = each %mapF){
