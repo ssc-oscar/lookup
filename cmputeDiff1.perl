@@ -190,7 +190,7 @@ sub printTR {
       if ($mode == 040000){
         printTR ($c, getTO($bH), "$prefix/$nO");
       }else{
-        print "$c;$prefix/$n0;$bH;\n";
+        print "$c;$prefix/$nO;$bH;\n";
 	   }
     }    
   }
