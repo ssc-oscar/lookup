@@ -78,7 +78,9 @@ while(<STDIN>){
   my %mapF = ();
   my %mapFI = ();
   my %mapP = ();
-  my %map1P = ();
+  my %mapPI = ();
+  my %mapPF = ();
+  my %mapPFI = ();
   my %rename = ();
 
 
@@ -107,15 +109,15 @@ while(<STDIN>){
       print STDERR "no tree pT1: $tree for parent $parent of $rev\n";
       next;
     }
-    getTR ($pT1, "", \%mapP, \%map1P);
+    getTR ($pT1, "", \%mapP, \%mapPI);
     my ($uM, $uP) = separate (\%map, \%mapP, \%rename);
     while (my ($k, $v) = each %{$uM}){
       my @vs = keys %{$v};
       for my $v0 (@vs){
 		  if ($v->{$v0} != 040000){
 	  	    my @bs = ();
-          if (defined $map1P{$v0}){
-		      @bs = keys %{$map1P{$v0}};
+          if (defined $mapPI{$v0}){
+		      @bs = keys %{$mapPI{$v0}};
           }
           print "$rev;$v0;$k;@bs\n";
         }
@@ -127,7 +129,7 @@ while(<STDIN>){
 		  if ($v->{$v0} != 040000){
           my @bs = ();
           if (defined $map1{$v0}){
-		      @bs = keys %{$map1{$v0}};
+		      @bs = keys %{$mapI{$v0}};
           }
           print "$rev;$v0;;$k\n" if $#bs < 0;
         }
@@ -135,7 +137,7 @@ while(<STDIN>){
     }
     while (my ($k, $v) = each %rename){
       #my @vs = keys %{$v};
-      my @bs0 = keys %{$map1P{$k}};
+      my @bs0 = keys %{$mapPI{$k}};
       my @vs0 = join ':::', sort keys %{$map{$bs0[0]}};
       print "$rev;$k;@bs0;@vs0\n";
     }
@@ -144,11 +146,31 @@ while(<STDIN>){
     while (my ($k, $v) = each %map){
       my @vs = keys %{$v};
       for my $v0 (@vs){
-		  #my @ns = join ':::', keys $map1{$v0};
+		  #my @ns = join ':::', keys $mapI{$v0};
 		  print "$rev;$v0;$k;\n" if $v->{$v0} != 040000;
       }
     }
   }
+}
+
+
+sub separate2 {
+  my ($m, $mP) = @_;
+  my (%uM, %uP);
+  while (my ($k, $v) = each %{$m}){
+    if (!defined $mP->{$k}){
+      $uM{$k}++; 
+    }
+  }
+  while (my ($k, $v) = each %{$mP}){
+    if (!defined $m->{$k}){
+      $rename->{$k}++; 
+    }
+  }
+  #my @vs = keys %uM;
+  #print "uMC: $k:@vs\n" if $#vs >= 0;
+  #my @vs = keys %{$rename};
+  #print "uPC: $k:@vs\n" if $#vs >= 0;
 }
 
 sub separate1 {
