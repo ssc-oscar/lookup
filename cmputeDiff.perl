@@ -100,7 +100,7 @@ while(<STDIN>){
     }
     my $pT1 = getTO ($treeP);
     if ($pT1 eq ""){
-      print STDERR "no tree pT1: $tree for $rev\n";
+      print STDERR "no tree pT1: $tree for parent $parent of $rev\n";
       next;
     }
     getTR ("p", $pT1, "", \%mapP, \%map1P); 
