@@ -191,11 +191,11 @@ sub separate2T {
   getTR ($t, $pre, \%map, \%mapI, \%mapF, \%mapFI); 
   getTR ($tP, $pre, \%mapP, \%mapPI, \%mapPF, \%mapPFI);  
   while (my ($k, $v) = each %mapF){
-    if (!defined $mapFP{$k}){
+    if (!defined $mapPF{$k}){
       my $kH = toHex ($k);
       my @ns = keys %{$v};
-      if (defined $mapFPI{$ns[0]}){
-        my $bP = toHex ($mapFPI{$ns[0]});
+      if (defined $mapPFI{$ns[0]}){
+        my $bP = toHex ($mapPFI{$ns[0]});
         print "$pre/$ns[0];$kH;$bP\n";
       }else{
       }
