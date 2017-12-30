@@ -191,7 +191,7 @@ sub separate2T {
   getTR ($tP, $pre, \%mapP, \%mapPI, \%mapPF, \%mapPFI); 
   my (%uM, %uP);
   while (my ($k, $v) = each %map){
-    if (!defined $mP->{$k}){
+    if (!defined $mapP{$k}){
       $uM{$k}++; 
     }
   }
@@ -200,8 +200,8 @@ sub separate2T {
   for my $v0 (@vs){
     my $v0H = toHex ($v0);     
     #print "$v0H\n";
-    my @ns = keys %{$m->{$v0}}; 
-    my $bP = toHex ($mPI->{$ns[0]});
+    my @ns = keys $map{$v0}; 
+    my $bP = toHex ($mapPI{$ns[0]});
     separate2T ("$pre/$ns[0]", $v0H, $bP);
     #print "$pre;@ns;$bP - $v0H\n";
   }
