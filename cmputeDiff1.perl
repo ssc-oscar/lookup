@@ -72,7 +72,7 @@ my $fs="";
 while(<STDIN>){
   chop();
   $rev = $_;
-  next if length($rev) ne 40;    
+  next if length($rev) ne 40;    	
   my %map = ();
   my %mapI = ();
   my %mapF = ();
@@ -128,7 +128,7 @@ while(<STDIN>){
       for my $v0 (@vs){
 		  if ($v->{$v0} != 040000){
           my @bs = ();
-          if (defined $map1{$v0}){
+          if (defined $mapI{$v0}){
 		      @bs = keys %{$mapI{$v0}};
           }
           print "$rev;$v0;;$k\n" if $#bs < 0;
