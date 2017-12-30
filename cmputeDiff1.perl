@@ -170,9 +170,10 @@ sub separate2 {
   }
   my @vs = keys %uM;
   for my $v0 (@vs){
+    my $v0H = toHex ($v0);     
+    print "$v0H\n";
     my $n = $mI->{$v0}; 
-    my $bP = fromHex ($mPI->{$v0});     
-    my $v0H = fromHex ($v0);     
+    my $bP = toHex ($mPI->{$v0});     
     print "$n;$bP - $v0H\n";
   }
   #print "uMC: @vs\n" if $#vs >= 0;
