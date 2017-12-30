@@ -74,8 +74,10 @@ while(<STDIN>){
   $rev = $_;
   next if length($rev) ne 40;    
   my %map = ();
+  my %mapI = ();
+  my %mapF = ();
+  my %mapFI = ();
   my %mapP = ();
-  my %map1 = ();
   my %map1P = ();
   my %rename = ();
 
@@ -90,7 +92,7 @@ while(<STDIN>){
     print STDERR "no tree t1: $tree for $rev\n";
     next;
   }
-  getTR ($t1, "", \%map, \%map1);
+  getTR ($t1, "", \%map, \%mapI, \%mapF, \%mapFI);
   next; 
   #this is super fast   
   if (defined $parent && $parent ne ""){
@@ -190,7 +192,7 @@ sub separate {
 }
 
 sub getTR {
-  my ($to, $prefix, $map, $map1) = @_;
+  my ($to, $prefix, $map, $mapI, $mapF, $mapFI) = @_;
   if (length ($to) == 0){
     return "";
   }
@@ -198,14 +200,18 @@ sub getTR {
     if ($to =~ s/^([0-7]+) (.+?)\0(.{20})//s) {
       my ($mode, $name, $bytes) = (oct($1),$2,$3);
       my $nO = $name;
-      my $bH = toHex ($bytes);
+      #my $bH = toHex ($bytes);
       #print "$prefix/$name;$bH;$mode\n";
-      $map->{$bH}{"$prefix/$nO"} = $mode;
-      $map1->{"$prefix/$nO"}{$bH} = $mode;
       if ($mode == 040000){
+		  $map->{$bytes}{"$prefix/$nO"} = $mode;
+        $mapI->{"$prefix/$nO"}{$bytes} = $mode;        
         #print "got tree: $prefix $bH\n";
+        #this is where time is sent
         #getTR (getTO($bH), "$prefix/$nO", $map, $map1);
-      }
+      }else{
+		  $mapF->{$bytes}{"$prefix/$nO"} = $mode;
+        $mapFI->{"$prefix/$nO"}{$bytes} = $mode;                
+	   }
     }    
   }
 }
