@@ -73,29 +73,12 @@ while(<STDIN>){
   chop();
   $rev = $_;
   next if length($rev) ne 40;    	
-  my %map = ();
-  my %mapI = ();
-  my %mapF = ();
-  my %mapFI = ();
-  my %mapP = ();
-  my %mapPI = ();
-  my %mapPF = ();
-  my %mapPFI = ();
-  my %rename = ();
-
 
   my ($tree, $parent) = getCT ($rev);
   if ($tree eq ""){
     print STDERR "no commit $rev\n";
     next;
   }
-  my $t1 = getTO ($tree);
-  if ($t1 eq ""){
-    print STDERR "no tree t1: $tree for $rev\n";
-    next;
-  }
-  #getTR ($t1, "", \%map, \%mapI, \%mapF, \%mapFI); 
-  #this is super fast   
   if (defined $parent && $parent ne ""){
     $parent = substr ($parent, 0, 40); #ignore additional parents
     my ($treeP, $parentP) = getCT ($parent);
@@ -103,55 +86,9 @@ while(<STDIN>){
       print STDERR "no parent commit: $parent for $rev\n";
       next;
     }
-    my $pT1 = getTO ($treeP);
-    if ($pT1 eq ""){
-      print STDERR "no tree pT1: $tree for parent $parent of $rev\n";
-      next;
-    }
-    #getTR ($pT1, "", \%mapP, \%mapPI, \%mapPF, \%mapPFI);
-    #my ($uM, $uP) = separate2 (\%mapF, \%mapPF, \%mapFI, \%mapPFI, \%rename);
     separate2T ($rev, $parent, "", $tree, $treeP);
-    next;
-    my ($uM, $uP) = separate (\%map, \%mapP, \%rename);
-    while (my ($k, $v) = each %{$uM}){
-      my @vs = keys %{$v};
-      for my $v0 (@vs){
-		  if ($v->{$v0} != 040000){
-	  	    my @bs = ();
-          if (defined $mapPI{$v0}){
-		      @bs = keys %{$mapPI{$v0}};
-          }
-          print "$rev;$v0;$k;@bs\n";
-        }
-      }
-    }
-    while (my ($k, $v) = each %{$uP}){
-      my @vs = keys %{$v};
-      for my $v0 (@vs){
-		  if ($v->{$v0} != 040000){
-          my @bs = ();
-          if (defined $mapI{$v0}){
-		      @bs = keys %{$mapI{$v0}};
-          }
-          print "$rev;$v0;;$k\n" if $#bs < 0;
-        }
-      }
-    }
-    while (my ($k, $v) = each %rename){
-      #my @vs = keys %{$v};
-      my @bs0 = keys %{$mapPI{$k}};
-      my @vs0 = join ':::', sort keys %{$map{$bs0[0]}};
-      print "$rev;$k;@bs0;@vs0\n";
-    }
   }else{
-	 next;
-    while (my ($k, $v) = each %map){
-      my @vs = keys %{$v};
-      for my $v0 (@vs){
-		  #my @ns = join ':::', keys $mapI{$v0};
-		  print "$rev;$v0;$k;\n" if $v->{$v0} != 040000;
-      }
-    }
+    #commit with no parents
   }
 }
 
@@ -160,10 +97,20 @@ sub separate2T {
   my ($c, $cP, $pre, $t, $tP) = @_;
   my (%map, %mapI, %mapF, %mapFI);
   my (%mapP, %mapPI, %mapPF, %mapPFI);
-  
+    
   #print "doing :$pre:$t:$tP\n";
-  getTR (getTO($t), \%map, \%mapI, \%mapF, \%mapFI); 
-  getTR (getTO($tP), \%mapP, \%mapPI, \%mapPF, \%mapPFI);  
+  my $tree = getTO($t);
+  my $treeP = getTO($tP);
+  if ($tree eq ""){
+	 print STDERR "no tree:$t for $c\n";
+    return;
+  }
+  if ($treeP eq ""){
+	 print STDERR "no tree:$tP for parent $cP of $c\n";
+    return;
+  }
+  getTR ($tree, \%map, \%mapI, \%mapF, \%mapFI); 
+  getTR ($treeP, \%mapP, \%mapPI, \%mapPF, \%mapPFI);  
   while (my ($k, $v) = each %mapF){
     if (!defined $mapPF{$k}){
       my $kH = toHex ($k);
@@ -178,6 +125,10 @@ sub separate2T {
       }
     }else{
       #potential rename
+      my $kH = toHex ($k);
+      my @ns = keys %{$v};
+      my @nsp = keys %{$mapPF{$k}};
+      print STDERR "rename $c;$pre/$ns[0];$kH;$pre/$nsp[0]\n" $if $ns[0] ne $nsP[0];
     }
   }
   while (my ($v0, $v) = each %map){
