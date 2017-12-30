@@ -118,6 +118,7 @@ while(<STDIN>){
 		  for my $kk1 (keys %{$ts->{$vv0}{$kk}}){
           my $bP1 = toHex ($kk1);
 		    print "$vv0;$bP;$bP1\n";
+          my $ts = separate2T ($vv0, \%map, \%mapP, \%mapI, \%mapPI, \%rename);
         }
       }
 	 }
