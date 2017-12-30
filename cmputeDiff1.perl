@@ -90,7 +90,6 @@ while(<STDIN>){
     print STDERR "no tree t1: $tree for $rev\n";
     next;
   }
-  next;
   getTR ($t1, "", \%map, \%map1);
   next; 
   #this is super fast   
@@ -205,7 +204,7 @@ sub getTR {
       $map1->{"$prefix/$nO"}{$bH} = $mode;
       if ($mode == 040000){
         #print "got tree: $prefix $bH\n";
-        getTR (getTO($bH), "$prefix/$nO", $map, $map1);
+        #getTR (getTO($bH), "$prefix/$nO", $map, $map1);
       }
     }    
   }
