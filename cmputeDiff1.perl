@@ -110,8 +110,8 @@ while(<STDIN>){
     }
     getTR ($pT1, "", \%mapP, \%mapPI, \%mapPF, \%mapPFI);
     #my ($uM, $uP) = separate2 (\%mapF, \%mapPF, \%mapFI, \%mapPFI, \%rename);
-    my %ts = separate2T ("", \%map, \%mapP, \%mapI, \%mapPI, \%rename);
-    my @vv = keys %ts;
+    my $ts = separate2T ("", \%map, \%mapP, \%mapI, \%mapPI, \%rename);
+    my @vv = keys %{$ts};
     print "@vv\n";
     next;
     my ($uM, $uP) = separate (\%map, \%mapP, \%rename);
