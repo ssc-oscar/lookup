@@ -90,6 +90,7 @@ while(<STDIN>){
     print STDERR "no tree t1: $tree for $rev\n";
     next;
   }
+  next;
   getTR ($t1, "", \%map, \%map1);
   next; 
   #this is super fast   
