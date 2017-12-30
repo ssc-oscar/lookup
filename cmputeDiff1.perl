@@ -114,7 +114,8 @@ while(<STDIN>){
     my @vv = keys %{$ts};
     for my $vv0 (@vv){
 		for my $kk (keys %{$ts->{$vv0}}){
-		  print "$vv0;$ts->{$vv0}{$kk}\n";
+        my $bP = toHex ($kk);
+		  print "$vv0;$bP;$ts->{$vv0}{$kk}\n";
       }
 	 }
     next;
