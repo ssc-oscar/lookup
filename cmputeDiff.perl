@@ -43,7 +43,7 @@ sub getCT {
   my $sec = hex (substr($c, 0, 2)) % $sections;
   my $cB = fromHex ($c);
   if (!defined $fhoc{$sec}{$cB}){
-	 print STDERR "no commit $c\n";
+	 #print STDERR "no commit $c\n";
     return ("", "");
   }
   my $codeC = $fhoc{$sec}{$cB};
