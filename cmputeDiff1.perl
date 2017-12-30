@@ -142,7 +142,7 @@ sub separate2T {
         separate2T ($c, $cP, "$pre/$ns[0]", $v0H, $bP);      
 	   }else{
 		  print STDERR "new folder $c;$t;$tP;$pre/$ns[0];$v0H\n";
-		  printTR ($c, "$pre/$ns[0]", getTO ($v0H));
+		  printTR ($c, getTO ($v0H), "$pre/$ns[0]");
         #new folder? /renamed folder?
 		  #print "$pre/$ns[0];$v0H\n";
       }
