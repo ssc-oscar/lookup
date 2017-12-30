@@ -161,7 +161,7 @@ sub separate2T {
   my (%map, %mapI, %mapF, %mapFI);
   my (%mapP, %mapPI, %mapPF, %mapPFI);
   
-  print "doing :$pre:$t:$tP\n";
+  #print "doing :$pre:$t:$tP\n";
   getTR (getTO($t), \%map, \%mapI, \%mapF, \%mapFI); 
   getTR (getTO($tP), \%mapP, \%mapPI, \%mapPF, \%mapPFI);  
   while (my ($k, $v) = each %mapF){
@@ -169,7 +169,7 @@ sub separate2T {
       my $kH = toHex ($k);
       my @ns = keys %{$v};
       if (defined $mapPFI{$ns[0]}){
-		  my @bs = keys %{$mapPI{$ns[0]}};
+		  my @bs = keys %{$mapPFI{$ns[0]}};
         my $bP = toHex ($bs[0]);
         print "$pre/$ns[0];$kH;$bP\n";
       }else{
