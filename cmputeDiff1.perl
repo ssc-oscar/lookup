@@ -99,7 +99,8 @@ sub separate2T {
   my (%map, %mapI, %mapF, %mapFI);
   my (%mapP, %mapPI, %mapPF, %mapPFI);
     
-  #print "doing :$pre:$t:$tP\n";
+  print "doing :$pre:$t:$tP\n";
+  
   my $tree = getTO($t);
   my $treeP = getTO($tP);
   if ($tree eq ""){
