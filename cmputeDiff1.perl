@@ -124,7 +124,7 @@ sub separate2T {
         print "$c;$pre/$ns[0];$kH;\n";
       }
     }else{
-      #potential rename
+      #rename
       my $kH = toHex ($k);
       my @ns = keys %{$v};
       my @nsp = keys %{$mapPF{$k}};
@@ -141,55 +141,15 @@ sub separate2T {
         #print "doing $#ns:$#bs:$pre/$ns[0];$v0H;$bP\n";
         separate2T ($c, $cP, "$pre/$ns[0]", $v0H, $bP);      
 	   }else{
+		  printTR ($c, "$pre/$ns[0]", getTO ($v0H));
         print STDERR "new folder $c;$t;$tP;$pre/$ns[0];$v0H\n",
         #new folder? /renamed folder?
 		  #print "$pre/$ns[0];$v0H\n";
       }
-      #print "$pre;@ns;$bP - $v0H\n";
     }else{
-      #potential rename
+      #potential rename, no need to catch these
     }
   }
-}
-
-sub separate1 {
-  my ($k, $m, $mP, $rename) = @_;
-  my (%uM, %uP);
-  while (my ($k, $v) = each %{$m}){
-    if (!defined $mP->{$k}){
-      $uM{$k}++; 
-    }
-  }
-  while (my ($k, $v) = each %{$mP}){
-    if (!defined $m->{$k}){
-      $rename->{$k}++; 
-    }
-  }
-  #my @vs = keys %uM;
-  #print "uMC: $k:@vs\n" if $#vs >= 0;
-  #my @vs = keys %{$rename};
-  #print "uPC: $k:@vs\n" if $#vs >= 0;
-}
-
-sub separate {
-  my ($m, $mP, $rename) = @_;
-  my (%uM, %uP);
-  my @vs;
-  while (my ($k, $v) = each %{$m}){
-	 if (!defined $mP->{$k}){
-      $uM{$k} = $v; 
-    }else{
-		#separate1 ($k, $m->{$k}, $mP->{$k}, $rename);
-	 }
-  } 
-  while (my ($k, $v) = each %{$mP}){
-	 if (!defined $m->{$k}){
-      $uP{$k} = $v; 
-    }else{
-		#my (%a, %b) = separate1 ($k, $m->{$k}, $mP->{$k});
-    }
-  } 
-  return (\%uM, \%uP);
 }
 
 sub getTR {
@@ -212,6 +172,25 @@ sub getTR {
       }else{
 		  $mapF->{$bytes}{"$nO"} = $mode;
         $mapFI->{"$nO"}{$bytes} = $mode;                
+	   }
+    }    
+  }
+}
+
+sub printTR {
+  my ($c, $to, $prefix) = @_;
+  if (length ($to) == 0){
+    return "";
+  }
+  while ($to) {
+    if ($to =~ s/^([0-7]+) (.+?)\0(.{20})//s) {
+      my ($mode, $name, $bytes) = (oct($1),$2,$3);
+      my $nO = $name;
+      my $bH = toHex ($bytes);
+      if ($mode == 040000){
+        printTR ($c, getTO($bH), "$prefix/$nO", $map, $map1);
+      }else{
+        print "$c;$prefix/$name;$bH;\n";
 	   }
     }    
   }
