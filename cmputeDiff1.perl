@@ -203,7 +203,7 @@ sub separate2T {
     print "$v0H\n";
     my @ns = keys $map{$v0}; 
     my $bP = toHex ($mapPI{$ns[0]});
-    separate2T ("$pre/$ns[0]", $v0H, $bP);
+    separate2T ("$pre/$ns[0]", getTO($v0H), getTO($bP));
     #print "$pre;@ns;$bP - $v0H\n";
   }
 }
