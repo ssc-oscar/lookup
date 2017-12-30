@@ -204,7 +204,7 @@ sub separate2T {
     #print "$v0H\n";
     my @ns = keys %{$m->{$v0}}; 
     my $bP = toHex ($mPI->{$ns[0]});
-    $res{$pre/$ns[0]}{$v0}  = $mPI->{$ns[0]};
+    $res{"$pre/$ns[0]"}{$v0}  = $mPI->{$ns[0]};
     #print "$pre;@ns;$bP - $v0H\n";
   }
   return \%res;
