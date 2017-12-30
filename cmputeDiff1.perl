@@ -185,7 +185,7 @@ sub separate2T {
       if (defined $mapPI{$ns[0]}){
 		  my @bs = keys %{$mapPI{$ns[0]}};
         my $bP = toHex ($bs[0]);
-        print "doing $#ns:$#bs:$pre/$ns[0];$v0H;$bP\n";
+        #print "doing $#ns:$#bs:$pre/$ns[0];$v0H;$bP\n";
         separate2T ($c, $cP, "$pre/$ns[0]", $v0H, $bP);      
 	   }else{
         #new folder? /renamed folder?
