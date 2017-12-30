@@ -200,7 +200,7 @@ sub separate2T {
   my %res = ();
   for my $v0 (@vs){
     my $v0H = toHex ($v0);     
-    #print "$v0H\n";
+    print "$v0H\n";
     my @ns = keys $map{$v0}; 
     my $bP = toHex ($mapPI{$ns[0]});
     separate2T ("$pre/$ns[0]", $v0H, $bP);
