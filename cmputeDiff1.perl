@@ -164,7 +164,7 @@ sub separate2 {
   }
   while (my ($k, $v) = each %{$mP}){
     if (!defined $m->{$k}){
-      $rename->{$k}++; 
+      #$rename->{$k}++; 
     }
   }
   #my @vs = keys %uM;
