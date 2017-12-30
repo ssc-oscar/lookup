@@ -170,8 +170,10 @@ sub getTR {
         #this is where time is sent
         #getTR (getTO($bH), "$prefix/$nO", $map, $map1);
       }else{
-		  $mapF->{$bytes}{"$nO"} = $mode;
-        $mapFI->{"$nO"}{$bytes} = $mode;                
+		  if ($mode == 0100644){
+  		    $mapF->{$bytes}{"$nO"} = $mode;
+          $mapFI->{"$nO"}{$bytes} = $mode; 
+        }               
 	   }
     }    
   }
@@ -190,8 +192,8 @@ sub printTR {
       my $bH = toHex ($bytes);
       if ($mode == 040000){
         printTR ($c, getTO($bH), "$prefix/$nO");
-      }else{
-        print "$c;$prefix/$nO;$bH;\n";
+      }else{        
+        print "$c;$prefix/$nO;$bH;\n" if $mode == 0100644;
 	   }
     }    
   }
