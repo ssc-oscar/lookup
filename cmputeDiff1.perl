@@ -94,7 +94,7 @@ while(<STDIN>){
     print STDERR "no tree t1: $tree for $rev\n";
     next;
   }
-  getTR ($t1, "", \%map, \%mapI, \%mapF, \%mapFI); 
+  #getTR ($t1, "", \%map, \%mapI, \%mapF, \%mapFI); 
   #this is super fast   
   if (defined $parent && $parent ne ""){
     $parent = substr ($parent, 0, 40); #ignore additional parents
@@ -156,40 +156,14 @@ while(<STDIN>){
 }
 
 
-sub separate2 {
-  my ($m, $mP, $mI, $mPI, ) = @_;
-  my (%uM, %uP);
-  while (my ($k, $v) = each %{$m}){
-    if (!defined $mP->{$k}){
-      $uM{$k}++; 
-    }
-  }
-  while (my ($k, $v) = each %{$mP}){
-    if (!defined $m->{$k}){
-      #$rename->{$k}++; 
-    }
-  }
-  my @vs = keys %uM;
-  for my $v0 (@vs){
-    my $v0H = toHex ($v0);     
-    print "$v0H\n";
-    my @ns = keys %{$m->{$v0}}; 
-    my $bP = toHex ($mPI->{$ns[0]});     
-    print "@ns;$bP - $v0H\n";
-  }
-  #print "uMC: @vs\n" if $#vs >= 0;
-  #my @vs = keys %{$rename};
-  #print "uPC: $k:@vs\n" if $#vs >= 0;
-}
-
 sub separate2T {
   my ($pre, $t, $tP) = @_;
   my (%map, %mapI, %mapF, %mapFI);
   my (%mapP, %mapPI, %mapPF, %mapPFI);
   
   #print "$pre\n";
-  getTR ($t, $pre, \%map, \%mapI, \%mapF, \%mapFI); 
-  getTR ($tP, $pre, \%mapP, \%mapPI, \%mapPF, \%mapPFI);  
+  getTR ($t, \%map, \%mapI, \%mapF, \%mapFI); 
+  getTR ($tP, \%mapP, \%mapPI, \%mapPF, \%mapPFI);  
   while (my ($k, $v) = each %mapF){
     if (!defined $mapPF{$k}){
       my $kH = toHex ($k);
@@ -198,6 +172,8 @@ sub separate2T {
         my $bP = toHex ($mapPFI{$ns[0]});
         print "$pre/$ns[0];$kH;$bP\n";
       }else{
+        #new file
+        print "$pre/$ns[0];$kH;\n";
       }
     }
   }
@@ -259,7 +235,7 @@ sub separate {
 }
 
 sub getTR {
-  my ($to, $prefix, $map, $mapI, $mapF, $mapFI) = @_;
+  my ($to, $map, $mapI, $mapF, $mapFI) = @_;
   if (length ($to) == 0){
     return "";
   }
@@ -270,14 +246,14 @@ sub getTR {
       #my $bH = toHex ($bytes);
       #print "$prefix/$name;$bH;$mode\n";
       if ($mode == 040000){
-		  $map->{$bytes}{"$prefix/$nO"} = $mode;
+		  $map->{$bytes}{"$nO"} = $mode;
         $mapI->{"$prefix/$nO"}{$bytes} = $mode;        
         #print "got tree: $prefix $bH\n";
         #this is where time is sent
         #getTR (getTO($bH), "$prefix/$nO", $map, $map1);
       }else{
-		  $mapF->{$bytes}{"$prefix/$nO"} = $mode;
-        $mapFI->{"$prefix/$nO"}{$bytes} = $mode;                
+		  $mapF->{$bytes}{"$nO"} = $mode;
+        $mapFI->{"$nO"}{$bytes} = $mode;                
 	   }
     }    
   }
