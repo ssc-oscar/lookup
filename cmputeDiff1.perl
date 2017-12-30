@@ -110,7 +110,7 @@ while(<STDIN>){
     }
     getTR ($pT1, "", \%mapP, \%mapPI, \%mapPF, \%mapPFI);
     #my ($uM, $uP) = separate2 (\%mapF, \%mapPF, \%mapFI, \%mapPFI, \%rename);
-    my ($uM, $uP) = separate2 ("", \%map, \%mapP, \%mapI, \%mapPI, \%rename);
+    my ($uM, $uP) = separate2T ("", \%map, \%mapP, \%mapI, \%mapPI, \%rename);
     next;
     #my ($uM, $uP) = separate (\%map, \%mapP, \%rename);
     while (my ($k, $v) = each %{$uM}){
