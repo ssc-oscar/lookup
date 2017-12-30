@@ -182,10 +182,10 @@ sub separate2T {
       my $v0H = toHex ($v0);     
       my @ns = keys %{$v}; 
       if (defined $mapPI{$ns[0]}){
-			print "$mapPI{$ns[0]}\n";
-        my $bP = toHex ($mapPI{$ns[0]});
-        print "doing $#ns:$pre/$ns[0];$v0H;$bP\n";
-        separate2T ($c, $cP, "$pre/$ns[0]", $v0H, $bP);
+		  my @bs = keys %{$mapPI{$ns[0]}};
+        my $bP = toHex ($bs[0]);
+        print "doing $#ns:$#bs:$pre/$ns[0];$v0H;$bP\n";
+        separate2T ($c, $cP, "$pre/$ns[0]", $v0H, $bP);      
 	   }else{
         #new folder? /renamed folder?
 		  #print "$pre/$ns[0];$v0H\n";
