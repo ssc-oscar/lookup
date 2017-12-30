@@ -169,7 +169,8 @@ sub separate2T {
       my $kH = toHex ($k);
       my @ns = keys %{$v};
       if (defined $mapPFI{$ns[0]}){
-        my $bP = toHex ($mapPFI{$ns[0]});
+		  my @bs = keys %{$mapPI{$ns[0]}};
+        my $bP = toHex ($bs[0]);
         print "$pre/$ns[0];$kH;$bP\n";
       }else{
         #new file
