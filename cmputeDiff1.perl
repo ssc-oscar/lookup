@@ -110,7 +110,7 @@ while(<STDIN>){
     }
     getTR ($pT1, "", \%mapP, \%mapPI, \%mapPF, \%mapPFI);
     #my ($uM, $uP) = separate2 (\%mapF, \%mapPF, \%mapFI, \%mapPFI, \%rename);
-    my ($uM, $uP) = separate2 (\%map, \%mapP, \%mapI, \%mapPI, \%rename);
+    my ($uM, $uP) = separate2 ("", \%map, \%mapP, \%mapI, \%mapPI, \%rename);
     next;
     #my ($uM, $uP) = separate (\%map, \%mapP, \%rename);
     while (my ($k, $v) = each %{$uM}){
@@ -176,6 +176,32 @@ sub separate2 {
     my @ns = keys %{$m->{$v0}}; 
     my $bP = toHex ($mPI->{$ns[0]});     
     print "@ns;$bP - $v0H\n";
+  }
+  #print "uMC: @vs\n" if $#vs >= 0;
+  #my @vs = keys %{$rename};
+  #print "uPC: $k:@vs\n" if $#vs >= 0;
+}
+
+sub separate2T {
+  my ($pre, $m, $mP, $mI, $mPI) = @_;
+  my (%uM, %uP);
+  while (my ($k, $v) = each %{$m}){
+    if (!defined $mP->{$k}){
+      $uM{$k}++; 
+    }
+  }
+  while (my ($k, $v) = each %{$mP}){
+    if (!defined $m->{$k}){
+      #$rename->{$k}++; 
+    }
+  }
+  my @vs = keys %uM;
+  for my $v0 (@vs){
+    my $v0H = toHex ($v0);     
+    print "$v0H\n";
+    my @ns = keys %{$m->{$v0}}; 
+    my $bP = toHex ($mPI->{$ns[0]});     
+    print "$pre;@ns;$bP - $v0H\n";
   }
   #print "uMC: @vs\n" if $#vs >= 0;
   #my @vs = keys %{$rename};
