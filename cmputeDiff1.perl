@@ -89,6 +89,7 @@ while(<STDIN>){
     separate2T ($rev, $parent, "", $tree, $treeP);
   }else{
     #commit with no parents
+    printTR ($rev, getTO ($tree), "");
   }
 }
 
