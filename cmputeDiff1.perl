@@ -99,7 +99,7 @@ sub separate2T {
   my (%map, %mapI, %mapF, %mapFI);
   my (%mapP, %mapPI, %mapPF, %mapPFI);
     
-  print "doing :$pre:$t:$tP\n";
+  #print "doing :$pre:$t:$tP\n";
   
   my $tree = getTO($t);
   my $treeP = getTO($tP);
@@ -117,7 +117,7 @@ sub separate2T {
     if (!defined $mapPF{$k}){
       my $kH = toHex ($k);
       my @ns = keys %{$v};
-      print STDERR "@ns\n";
+      #print STDERR "@ns\n";
       if (defined $mapPFI{$ns[0]}){
 		  my @bs = keys %{$mapPFI{$ns[0]}};
         my $bP = toHex ($bs[0]);
@@ -174,10 +174,10 @@ sub getTR {
         #this is where time is sent
         #getTR (getTO($bH), "$prefix/$nO", $map, $map1);
       }else{
-		  if ($mode == 0100644){
+		  #if ($mode == 0100644){
   		    $mapF->{$bytes}{"$nO"} = $mode;
           $mapFI->{"$nO"}{$bytes} = $mode; 
-        }               
+        #}               
 	   }
     }    
   }
@@ -197,7 +197,7 @@ sub printTR {
       if ($mode == 040000){
         printTR ($c, getTO($bH), "$prefix/$nO");
       }else{        
-        print "$c;$prefix/$nO;$bH;\n" if $mode == 0100644;
+        print "$c;$prefix/$nO;$bH;\n";# if $mode == 0100644;
 	   }
     }    
   }
