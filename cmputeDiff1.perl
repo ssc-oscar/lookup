@@ -138,7 +138,7 @@ sub separate2T {
     if (!defined $mapP{$v0}){
       my $v0H = toHex ($v0);     
       my @ns = keys %{$v};
-      print STDERR "@ns\n"; 
+      #print STDERR "@ns\n"; 
       if (defined $mapPI{$ns[0]}){
 		  my @bs = keys %{$mapPI{$ns[0]}};
         my $bP = toHex ($bs[0]);
