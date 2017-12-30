@@ -141,8 +141,8 @@ sub separate2T {
         #print "doing $#ns:$#bs:$pre/$ns[0];$v0H;$bP\n";
         separate2T ($c, $cP, "$pre/$ns[0]", $v0H, $bP);      
 	   }else{
-		  printTR ($c, "$pre/$ns[0]", getTO ($v0H));
         print STDERR "new folder $c;$t;$tP;$pre/$ns[0];$v0H\n",
+		  printTR ($c, "$pre/$ns[0]", getTO ($v0H));
         #new folder? /renamed folder?
 		  #print "$pre/$ns[0];$v0H\n";
       }
@@ -190,7 +190,7 @@ sub printTR {
       if ($mode == 040000){
         printTR ($c, getTO($bH), "$prefix/$nO");
       }else{
-        print "$c;$prefix/$name;$bH;\n";
+        print "$c;$prefix/$n0;$bH;\n";
 	   }
     }    
   }
