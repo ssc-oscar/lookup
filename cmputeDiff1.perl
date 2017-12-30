@@ -112,7 +112,7 @@ while(<STDIN>){
     #my ($uM, $uP) = separate2 (\%mapF, \%mapPF, \%mapFI, \%mapPFI, \%rename);
     my $ts = separate2T ("", \%map, \%mapP, \%mapI, \%mapPI, \%rename);
     my @vv = keys %{$ts};
-    for my $vv0 (@vvs){
+    for my $vv0 (@vv){
 		print "$vv0;$ts->{$vv0}\n";
 	 }
     next;
