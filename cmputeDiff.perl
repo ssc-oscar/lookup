@@ -42,6 +42,10 @@ sub getCT {
   my $c = $_[0];
   my $sec = hex (substr($c, 0, 2)) % $sections;
   my $cB = fromHex ($c);
+  if (!defined $fhoc{$sec}{$cB}){
+	 print STDERR "no commit $c\n";
+    return ("", "");
+  }
   my $codeC = $fhoc{$sec}{$cB};
   my $code = safeDecomp ($codeC, $c);
 
@@ -77,6 +81,10 @@ while(<STDIN>){
 
 
   my ($tree, $parent) = getCT ($rev);
+  if ($t1 eq ""){
+    print STDERR "no commit $rev\n";
+    next;
+  }
   my $t1 = getTO ($tree);
   if ($t1 eq ""){
     print STDERR "no tree t1: $tree for $rev\n";
