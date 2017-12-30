@@ -172,9 +172,9 @@ sub separate2 {
   for my $v0 (@vs){
     my $v0H = toHex ($v0);     
     print "$v0H\n";
-    my $n = $m->{$v0}; 
-    my $bP = toHex ($mPI->{$v0});     
-    print "$n;$bP - $v0H\n";
+    my @ns = keys %{$m->{$v0}}; 
+    my $bP = toHex ($mPI->{$$ns[0]});     
+    print "@ns;$bP - $v0H\n";
   }
   #print "uMC: @vs\n" if $#vs >= 0;
   #my @vs = keys %{$rename};
