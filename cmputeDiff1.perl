@@ -188,7 +188,7 @@ sub printTR {
       my $nO = $name;
       my $bH = toHex ($bytes);
       if ($mode == 040000){
-        printTR ($c, getTO($bH), "$prefix/$nO", $map, $map1);
+        printTR ($c, getTO($bH), "$prefix/$nO");
       }else{
         print "$c;$prefix/$name;$bH;\n";
 	   }
