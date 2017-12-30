@@ -128,7 +128,7 @@ sub separate2T {
       my $kH = toHex ($k);
       my @ns = keys %{$v};
       my @nsp = keys %{$mapPF{$k}};
-      print STDERR "rename $c;$pre/$ns[0];$kH;$pre/$nsp[0]\n" if $ns[0] ne $nsp[0];
+      print "$c;$pre/$ns[0];$kH;$pre/$nsp[0]\n" if $ns[0] ne $nsp[0];
     }
   }
   while (my ($v0, $v) = each %map){
