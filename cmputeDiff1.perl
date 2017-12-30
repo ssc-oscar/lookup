@@ -247,7 +247,7 @@ sub getTR {
       #print "$prefix/$name;$bH;$mode\n";
       if ($mode == 040000){
 		  $map->{$bytes}{"$nO"} = $mode;
-        $mapI->{"$prefix/$nO"}{$bytes} = $mode;        
+        $mapI->{"$nO"}{$bytes} = $mode;        
         #print "got tree: $prefix $bH\n";
         #this is where time is sent
         #getTR (getTO($bH), "$prefix/$nO", $map, $map1);
