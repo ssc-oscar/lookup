@@ -90,7 +90,7 @@ while(<STDIN>){
     print STDERR "no tree t1: $tree for $rev\n";
     next;
   }
-  getTR ("m", $t1, "", \%map, \%map1); 
+  getTR ($t1, "", \%map, \%map1); 
   if (defined $parent && $parent ne ""){
     $parent = substr ($parent, 0, 40); #ignore additional parents
     my ($treeP, $parentP) = getCT ($parent);
@@ -103,7 +103,7 @@ while(<STDIN>){
       print STDERR "no tree pT1: $tree for parent $parent of $rev\n";
       next;
     }
-    getTR ("p", $pT1, "", \%mapP, \%map1P); 
+    getTR ($pT1, "", \%mapP, \%map1P); 
     my ($uM, $uP) = separate (\%map, \%mapP, \%rename);
     while (my ($k, $v) = each %{$uM}){
       my @vs = keys %{$v};
@@ -187,7 +187,7 @@ sub separate {
 }
 
 sub getTR {
-  my ($lab, $to, $prefix, $map, $map1) = @_;
+  my ($to, $prefix, $map, $map1) = @_;
   if (length ($to) == 0){
     return "";
   }
@@ -196,12 +196,12 @@ sub getTR {
       my ($mode, $name, $bytes) = (oct($1),$2,$3);
       my $nO = $name;
       my $bH = toHex ($bytes);
-      #print "$lab;$prefix/$name;$bH;$mode\n";
+      #print "$prefix/$name;$bH;$mode\n";
       $map->{$bH}{"$prefix/$nO"} = $mode;
       $map1->{"$prefix/$nO"}{$bH} = $mode;
       if ($mode == 040000){
         #print "got tree: $prefix $bH\n";
-        getTR ($lab, getTO($bH), "$prefix/$nO", $map, $map1);
+        getTR (getTO($bH), "$prefix/$nO", $map, $map1);
       }
     }    
   }
