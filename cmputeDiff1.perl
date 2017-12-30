@@ -180,10 +180,10 @@ sub separate2T {
   while (my ($v0, $v) = each %map){
     if (!defined $mapP{$v0}){
       my $v0H = toHex ($v0);     
-      my @ns = keys $map{$v0}; 
+      my @ns = keys %{$v}; 
       if (defined $mapPI{$ns[0]}){
         my $bP = toHex ($mapPI{$ns[0]});
-        print "doing $pre/$ns[0];$v0H;$bP\n";
+        print "doing $#ns:$pre/$ns[0];$v0H;$bP\n";
         separate2T ("$pre/$ns[0]", getTO($v0H), getTO($bP));
 	   }else{
         #new folder? /renamed folder?
