@@ -171,11 +171,13 @@ sub separate2T {
       if (defined $mapPFI{$ns[0]}){
 		  my @bs = keys %{$mapPFI{$ns[0]}};
         my $bP = toHex ($bs[0]);
-        print "$pre/$ns[0];$kH;$bP\n";
+        print "$c;$pre/$ns[0];$kH;$bP\n";
       }else{
         #new file
-        print "$pre/$ns[0];$kH;\n";
+        print "$c;$pre/$ns[0];$kH;\n";
       }
+    }else{
+      #potential rename
     }
   }
   while (my ($v0, $v) = each %map){
@@ -188,10 +190,13 @@ sub separate2T {
         #print "doing $#ns:$#bs:$pre/$ns[0];$v0H;$bP\n";
         separate2T ($c, $cP, "$pre/$ns[0]", $v0H, $bP);      
 	   }else{
+        print STDERR "new folder $c;$pre/$ns[0];$v0H\n",
         #new folder? /renamed folder?
 		  #print "$pre/$ns[0];$v0H\n";
       }
       #print "$pre;@ns;$bP - $v0H\n";
+    }else{
+      #potential rename
     }
   }
 }
