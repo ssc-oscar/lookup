@@ -169,7 +169,7 @@ sub separate2 {
     }
   }
   my @vs = keys %uM;
-  print "uMC: $k:@vs\n" if $#vs >= 0;
+  print "uMC: @vs\n" if $#vs >= 0;
   #my @vs = keys %{$rename};
   #print "uPC: $k:@vs\n" if $#vs >= 0;
 }
