@@ -182,6 +182,7 @@ sub printTR {
   if (length ($to) == 0){
     return "";
   }
+  print STDERR "printTR: $c;$prefix\n";
   while ($to) {
     if ($to =~ s/^([0-7]+) (.+?)\0(.{20})//s) {
       my ($mode, $name, $bytes) = (oct($1),$2,$3);
