@@ -174,7 +174,7 @@ sub separate2T {
         print "$pre/$ns[0];$kH;$bP\n";
       }else{
         #new file
-        #print "$pre/$ns[0];$kH;\n";
+        print "$pre/$ns[0];$kH;\n";
       }
     }
   }
