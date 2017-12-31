@@ -14,6 +14,8 @@ sub fromHex {
 } 
 
 my (%c2p1);
+my $nsec = 8;
+$nsec = $ARGV[1] if defined $ARGV[1];
 
 my $lines = 0;
 my $nn = $ARGV[0];
@@ -65,17 +67,23 @@ sub output {
 sub outputTC {
   my $n = $_[0];
   my %c2p;
-  tie %c2p, "TokyoCabinet::HDB", $n, TokyoCabinet::HDB::OWRITER | TokyoCabinet::HDB::OCREAT,
-     16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
-     or die "cant open $n\n";
+  for $sec (0..($nsec -1)){
+    my $fname = "$ARGV[0].$sec.tch";
+    tie %{$c2p{$sec}}, "TokyoCabinet::HDB", "$fname", TokyoCabinet::HDB::OWRITER | TokyoCabinet::HDB::OCREAT,   
+        16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
+      or die "cant open $fname\n";
+  }
   while (my ($c, $v) = each %c2p1){
     $lines ++;
     print STDERR "$lines done out of $nc\n" if (!($lines%100000000));
     my $ps = join '', sort keys %{$v};
     #my $psC = safeComp ($ps);
-    $c2p{$c} = $ps;
+    my $sec = (unpack "C", substr ($k, 0, 1))%$nsec;
+    $c2p{$sec}{$c} = $ps;
   }
-  untie %c2p;
+  for $sec (0..15){
+    untie %{$c2p{$sec}};
+  }
 }
 
 sub safeComp {
