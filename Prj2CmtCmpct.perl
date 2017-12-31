@@ -16,12 +16,12 @@ sub fromHex {
 
 
 my %p2c;
-tie %p2c, "TokyoCabinet::HDB", "/fast1/All.sha1c/project_commit.tch", TokyoCabinet::HDB::OREADER,   
+tie %p2c, "TokyoCabinet::HDB", "$ARGV[0]", TokyoCabinet::HDB::OREADER,   
         16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
-     or die "cant open project_commit.tch\n";
+     or die "cant open $ARGV[0]\n";
 
 my %p2c2;
-tie %p2c2, "TokyoCabinet::HDB", "$ARGV[0]", TokyoCabinet::HDB::OWRITER | TokyoCabinet::HDB::OCREAT,
+tie %p2c2, "TokyoCabinet::HDB", "$ARGV[1]", TokyoCabinet::HDB::OWRITER | TokyoCabinet::HDB::OCREAT,
         16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
      or die "cant open $ARGV[0]\n";
 
