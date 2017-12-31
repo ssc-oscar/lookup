@@ -30,7 +30,7 @@ my (%fix, %bad);
 while (<STDIN>){
   chop();
   my ($p, $pc) = split (/\;/, $_, -1);
-  $fix{$pc}{$p}++;
+  $fix{$pc}{$p}++ if $p ne $pc;
   $bad{$p}++ if $p ne $pc;
 }
 
