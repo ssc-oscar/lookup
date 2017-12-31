@@ -22,7 +22,7 @@ $nsec = $ARGV[1] if defined $ARGV[1];
 
 for $sec (0..($nsec -1)){
   my $fname = "$ARGV[0].$sec.tch";
-  tie %{$p2c{sec}}, "TokyoCabinet::HDB", "$fname", TokyoCabinet::HDB::OWRITER | TokyoCabinet::HDB::OCREAT,   
+  tie %{$p2c{$sec}}, "TokyoCabinet::HDB", "$fname", TokyoCabinet::HDB::OWRITER | TokyoCabinet::HDB::OCREAT,   
         16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
      or die "cant open $fname\n";
 }
