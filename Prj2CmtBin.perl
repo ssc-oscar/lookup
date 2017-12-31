@@ -31,7 +31,7 @@ while (<STDIN>){
     next;
   }
   my $sha = fromHex ($hsha);
-  $p =~ s/.*github.com_//;
+  $p =~ s/.*github.com_(.*_.*)/$1/;
   $p =~ s/^bitbucket.org_/bb_/;
   $p =~ s/\.git$//;
   $p =~ s|/*$||;

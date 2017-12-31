@@ -4,27 +4,61 @@
 
 #in the future, just get updates only from All.blobs/commit_XX.vs
 #get the complete info from All.blobs/commit_XX.vs
-cut -d\; -f4,6 /data/All.blobs/commit_*.vs | perl -ane 'chop();($c,$p)=split(/\;/,$_,-1);$p=~s/.*github.com_//;$p=~s/^bitbucket.org_/bb_/;$p=~s|\.git$||;$p=~s|/*$||;$p=~s/\;/SEMICOLON/g;$p = "EMPTY" if $p eq "";print "$c;$p\n";' | lsort 130G -u | gzip > /data/basemaps/c2p.s 
+cut -d\; -f4,6 /data/All.blobs/commit_*.vs | perl -ane 'chop();($c,$p)=split(/\;/,$_,-1);$p=~s/.*github.com_(.*_.*)/$1/;$p=~s/^bitbucket.org_/bb_/;$p=~s|\.git$||;$p=~s|/*$||;$p=~s/\;/SEMICOLON/g;$p = "EMPTY" if $p eq "";print "$c;$p\n";' | lsort 130G -u | gzip > /data/basemaps/c2p.s 
+
+
+#get stuff from the missing commits in deltaall
+(list of all deltaall in x00-x31)
+cat x$i | while read k; do gunzip -c $k; done | perl fgrep.perl cc 1 | gzip > x$i.gz
+cat x$i | while read k; do gunzip -c $k; done | perl fgrep.perl cNoFile 1 | gzip > xa$i.gz
+for i in x00.gz x01.gz x02.gz x03.gz x04.gz x05.gz x06.gz x07.gz x08.gz x09.gz x10.gz x11.gz x12.gz x13.gz x14.gz x15.gz x16.gz x17.gz x18.gz x19.gz x20.gz x21.gz x22.gz x23.8.gz x23.9.gz x23.gz x24.gz x25.gz x26.gz x27.gz x28.gz x29.gz x30.gz x31.gz xa00.gz xa01.gz xa02.gz xa03.gz xa04.gz xa05.gz xa06.gz xa07.gz xa08.gz xa09.gz xa10.9.gz xa10.gz xa10.gz xa11.gz xa12.gz xa13.gz xa14.gz xa15.gz xa16.8.gz xa16.9.gz xa16.gz xa16.gz xa17.gz xa18.gz xa19.gz xa20.gz xa21.gz xa22.gz xa23.gz xa24.gz xa25.gz xa26.gz xa27.gz xa28.gz xa29.gz xa30.gz xa31.gz
+do gunzip -c $cloneDir/$i | cut -d\; -f1,2 | uniq | perl -ane 'chop();($p,$c)=split(/\;/,$_,-1);$p=~s/.*github.com_(.*_.*)/$1/;$p=~s/^bitbucket.org_/bb_/;$p=~s|\.git$||;$p=~s|/*$||;$p=~s/\;/SEMICOLON/g;$p = "EMPTY" if $p eq "";print "$c;$p\n";' | lsort 15G -u | gzip > $cloneDir/c2p.$i
+done
+gunzip -c c2p.x*.gz | lsort 30G -u |gzip >c2p.miss.gz
+gunzip -c c2p.s | join -v2 - <(gunzip -c c2p.miss.gz) | gzip > c2p.s2
 
 #check if all are in
 gunzip -c /data/basemaps/c2p.s | cut -d\; -f1 | uniq | join -v2 - <(gunzip -c /data/basemaps/cNotInC2fbp.s) | gzip > /data/basemaps/cNoPrj.s &
 
-#now merge
-gunzip -c /data/basemaps/c2p.s | sed 's/;/;;;/' | /da3_data/lookup/Cmt2PrjBin.perl c2p.tch 
-cp -p c2p.tch /fast1
-ls -f /fast1/c2p.tch |  /da3_data/lookup/f2nMergeSplit.perl c2p 8
-cp -p c2p.*.tch /fast1
-for i in {0..4}; do ls -f /fast1/c2p.$i.tch /fast1/Cmt2Prj.$i.tch | ./f2nMergeSplit.perl Cmt2Prj.$i.tch 1; done &
-for i in {7..5}; do ls -f /fast1/c2p.$i.tch /fast1/Cmt2Prj.$i.tch | ./f2nMergeSplit.perl Cmt2Prj.$i.tch 1; done &
+#now create tch
+gunzip -c /data/basemaps/{c2p.s,c2p.s2} | split -l 1000000000 -da 1 --filter='gzip > $FILE.gz' - c2p
+for i in {0..2}; do gunzip -c c2p$i.s | sed 's/;/;;;/' | /da3_data/lookup/Cmt2PrjBin.perl c2p$i.tch; done
+for i in {0..2}; do ls -f  c2p$i.tch | /da3_data/lookup/f2nMergeSplit.perl c2p$i 8; done
+cp -p c2p$i.[0-7].tch /fast1
+for i in {0..7}
+do ls -f /fast1/{c2p[0-2],Cmt2Prj}.$i.tch | /da3_data/lookup/f2nMergeSplit.perl Cmt2Prj.$i.tch 1
+done
+for i in {2..7..2}; do ls -f /fast1/{c2p[0-2],Cmt2Prj}.$i.tch | /da3_data/lookup/f2nMergeSplit.perl Cmt2Prj.$i.tch 1; done &
+for i in {3..7..2}; do ls -f /fast1/{c2p[0-2],Cmt2Prj}.$i.tch | /da3_data/lookup/f2nMergeSplit.perl Cmt2Prj.$i.tch 1; done &
 
 
-#Collect into one
+gunzip -c /data/basemaps/c2p.s | /da3_data/lookup/Prj2CmtBin.perl Prj2CmtA.tch
+gunzip -c /data/basemaps/c2p.s2 | /da3_data/lookup/Prj2CmtBin.perl Prj2CmtB.tch
+for i in A B; do ls -f  Prj2Cmt$i.tch | /da3_data/lookup/f2nMergeSplit.perl Prj2Cmt$i 8
+for i in {0..7}; do ls -f /fast1/Prj2Cmt*.$i.tch | /da3_data/lookup/f2bMergeSplit.perl Prj2Cmt.$i.tch 1 &
+
+#somehow bad project names got created
+for i in {0..7}		    
+do gunzip -c Prj2Cmt.$i.lst | cut -d\; -f1 | perl -ane 'chop();$p0=$_;s/.*github.com_(.*_.*)/$1/;s/^bitbucket.org_/bb_/;s|\.git$||;s|/*$||;s/\;/SEMICOLON/g;$_ = "EMPTY" if $_ eq "";print "$p0;$_\n" if $p0 ne $_;' > Prj2Cmt.$i.fix
+done   
+
+s/.*github.com_([.*]_[.*])/$1/
+
+#Collect into one if desired
 for i in {0..7}; do ls -f Prj2Cmt.$i.tch;
 done | /da3_data/lookup/Blob2CmtMergeTCDisjoint.perl Prj2Cmt.tch
 
 
 for i in {0..7}; do ls -f Cmt2Prj.$i.tch;
 done | /da3_data/lookup/Blob2CmtMergeTCDisjoint.perl Cmt2Prj.tch
+		    
+# ******** Done **************
+
+#some deltaall files need fixing
+gunzip -c gitPnew20140205.3.deltaall.gz | cut -d\; -f2 | uniq | gzip > c.badPrj
+replace EMPTY with the 
+
+
 
 ##########################################
 

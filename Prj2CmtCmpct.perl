@@ -37,9 +37,12 @@ sub list {
   my $p0 = $p;
   my $ns = length($v)/20;
   my %tmp = ();
-  $p =~ s/\.git$//;
+  $p =~ s/.*github.com_(.*_.*)/$1/;
   $p =~ s/^bitbucket.org_/bb_/;
-  $p =~ s/^github.com_//;
+  $p =~ s/\.git$//;
+  $p =~ s|/*$||;
+  $p =~ s/\;/SEMICOLON/g;
+  $p = "EMPTY" if $p eq "";
   if ($p0 ne $p){
     if (defined $p2c{$p}){
       my %tmp = ();
