@@ -16,6 +16,7 @@ sub fromHex {
 
 
 my %p2c;
+my $sec;
 my $nsec = 8;
 $nsec = $ARGV[1] if defined $ARGV[1];
 

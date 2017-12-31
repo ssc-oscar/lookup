@@ -66,12 +66,11 @@ while (my ($p, $v) = each %p2c){
   }
   if ($correct){
     $v1 = safeComp (join ';', keys %tmp);
-    $p2c{$c} = $v1;
+    $p2c{$k} = $v1;
   }
 }
 
 
-for $sec (0..($nsec -1)){
-  untie %{$p2c{$sec}};
-}
+untie %p2c;
+
 
