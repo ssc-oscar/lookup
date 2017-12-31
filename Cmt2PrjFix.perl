@@ -51,7 +51,7 @@ while (<STDIN>){
   $fix{$p} = $pc if $p ne $pc;
 }
 
-while (my ($p, $v) = each %p2c){
+while (my ($k, $v) = each %p2c){
   my $v1 = safeDecomp ($v);
   my @ps = split(/\;/, $v1, -1);  
   my %tmp;
