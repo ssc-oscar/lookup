@@ -26,6 +26,10 @@ sub safeComp {
   }
 }
 
+my %b2c;
+my $sec;
+my $nsec = 8;
+$nsec = $ARGV[1] if defined $ARGV[1];
 
 
 my (%c2p, %c2p1);
@@ -40,21 +44,29 @@ while (<STDIN>){
   my ($hsha, $f, $p, $b) = split (/\;/, $_);
   my $sha = fromHex ($hsha);
   $f =~ s/;/SEMICOLON/g;
+  $f =~ s|^/*||;
   $c2p1{$sha}{$f}++;
   print STDERR "$lines done\n" if (!($lines%100000000));
 }
 
-tie %c2p, "TokyoCabinet::HDB", "$ARGV[0]", TokyoCabinet::HDB::OWRITER | TokyoCabinet::HDB::OCREAT,   
+for $sec (0..($nsec -1)){
+  my $fname = "$ARGV[0].$sec.tch";
+  tie %{$c2p{$sec}}, "TokyoCabinet::HDB", "$fname", TokyoCabinet::HDB::OWRITER | TokyoCabinet::HDB::OCREAT,   
         16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
-     or die "cant open $ARGV[0]\n";
-output ();
-untie %c2p;
+     or die "cant open $fname\n";
+}
 
+output ();
+
+for $sec (0..15){
+  untie %{$c2p{$sec}};
+}
 
 sub output { 
   while (my ($k, $v) = each %c2p1){
-    my $str = join ';', keys %{$v};
-    $c2p{$k} = safeComp ($str);
+    my $str = join ';', sort keys %{$v};
+    my $sec = (unpack "C", substr ($k, 0, 1))%$nsec;
+    $c2p{$sec}{$k} = safeComp ($str);
   }
 }
 
