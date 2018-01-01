@@ -46,7 +46,7 @@ my $shap = "";
 while (<STDIN>){
   chop();
   $lines ++;
-  my ($hsha, $p) = split (/\;/, $_);
+  my ($hsha, $f, $b, $p) = split (/\;/, $_);
   if (length ($hsha) != 40){
     print STDERR "bad sha:$_\n";
     next;
@@ -63,6 +63,9 @@ while (<STDIN>){
     my $ps = join ';', sort keys %tmp;
     my $psC = safeComp ($ps);
     $sec = (unpack "C", substr ($shap, 0, 1))%$nsec;
+    if (defined $c2p{$sec}{$shap}){
+		die "input not sorted at $lines $hsha seen in ".(toHex($shap))."\n";
+    }
     $c2p{$sec}{$shap} = $psC;
     %tmp = ();
   }  
