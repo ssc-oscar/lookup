@@ -58,12 +58,12 @@ while (<STDIN>){
   $p =~ s|/*$||;
   $p =~ s/\;/SEMICOLON/g;
   $p = "EMPTY" if $p eq "";
-  if ($sha ne $shap && $hshap ne ""){
+  if ($sha ne $shap && $shap ne ""){
     $nc ++;
     my $ps = join ';', sort keys %tmp;
     my $psC = safeComp ($ps);
-    my $sec = (unpack "C", substr ($sha, 0, 1))%$nsec;
-    $c2p{$sha} = $pscC;
+    $sec = (unpack "C", substr ($sha, 0, 1))%$nsec;
+    $c2p{$sec}{$sha} = $psC;
     %tmp = ();
   }  
   $shap = $sha;
