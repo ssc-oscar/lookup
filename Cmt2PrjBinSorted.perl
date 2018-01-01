@@ -27,6 +27,7 @@ sub safeComp {
 
 
 my (%tmp, %c2p);
+my $sec;
 my $nsec = 8;
 $nsec = $ARGV[1] if defined $ARGV[1];
 
