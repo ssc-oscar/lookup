@@ -73,7 +73,7 @@ while (<STDIN>){
 my $ps = join ';', sort keys %tmp;
 my $psC = safeComp ($ps);
 $sec = (unpack "C", substr ($shap, 0, 1))%$nsec;
-$c2p{$shap} = $pscC;
+$c2p{$shap} = $psC;
 
 for $sec (0..15){
   untie %{$c2p{$sec}};
