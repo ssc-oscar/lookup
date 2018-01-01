@@ -27,6 +27,7 @@ sub safeComp {
 
 
 my (%c2p1);
+my $sec;
 my $nsec = 8;
 $nsec = $ARGV[1] if defined $ARGV[1];
 
@@ -88,7 +89,7 @@ sub outputTC {
     print STDERR "$lines done out of $nc\n" if (!($lines%100000000));
     my $ps = join ';', sort keys %{$v};
     my $psC = safeComp ($ps);
-    my $sec = (unpack "C", substr ($k, 0, 1))%$nsec;
+    my $sec = (unpack "C", substr ($c, 0, 1))%$nsec;
     $c2p{$sec}{$c} = $psC;
   }
   for $sec (0..15){
