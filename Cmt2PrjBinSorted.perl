@@ -62,8 +62,8 @@ while (<STDIN>){
     $nc ++;
     my $ps = join ';', sort keys %tmp;
     my $psC = safeComp ($ps);
-    $sec = (unpack "C", substr ($sha, 0, 1))%$nsec;
-    $c2p{$sec}{$sha} = $psC;
+    $sec = (unpack "C", substr ($shap, 0, 1))%$nsec;
+    $c2p{$sec}{$shap} = $psC;
     %tmp = ();
   }  
   $shap = $sha;
@@ -72,8 +72,8 @@ while (<STDIN>){
 }
 my $ps = join ';', sort keys %tmp;
 my $psC = safeComp ($ps);
-my $sec = (unpack "C", substr ($sha, 0, 1))%$nsec;
-$c2p{$sha} = $pscC;
+$sec = (unpack "C", substr ($shap, 0, 1))%$nsec;
+$c2p{$shap} = $pscC;
 
 for $sec (0..15){
   untie %{$c2p{$sec}};
