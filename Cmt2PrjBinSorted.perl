@@ -24,6 +24,17 @@ sub safeComp {
     return "";
   }
 }
+sub safeDecomp {
+  my $code = $_[0];
+  try {
+    my $codeC = decompress ($code);
+    return $codeC;
+  } catch Error with {
+    my $ex = shift;
+    print STDERR "Error: $ex\n$code\n";
+    return "";
+  }
+}
 
 
 my (%tmp, %c2p);
@@ -59,13 +70,16 @@ while (<STDIN>){
   $p =~ s/\;/SEMICOLON/g;
   $p = "EMPTY" if $p eq "";
   if ($sha ne $shap && $shap ne ""){
+    $sec = (unpack "C", substr ($shap, 0, 1))%$nsec;
+    if (defined $c2p{$sec}{$shap}){
+		print STDERR "input not sorted at $lines pref $hsha followed by seen ".(toHex($shap)).";$p\n";     
+      for my $p0 in (split(/\;/, safeDecomp($c2p{$sec}{$shap}), -1)){
+         $tmp{$p0}++;
+      }
+    }
     $nc ++;
     my $ps = join ';', sort keys %tmp;
     my $psC = safeComp ($ps);
-    $sec = (unpack "C", substr ($shap, 0, 1))%$nsec;
-    if (defined $c2p{$sec}{$shap}){
-		die "input not sorted at $lines $hsha seen in ".(toHex($shap))."\n";
-    }
     $c2p{$sec}{$shap} = $psC;
     %tmp = ();
   }  
