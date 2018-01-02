@@ -73,7 +73,7 @@ while (<STDIN>){
     $sec = (unpack "C", substr ($shap, 0, 1))%$nsec;
     if (defined $c2p{$sec}{$shap}){
 		print STDERR "input not sorted at $lines pref $hsha followed by seen ".(toHex($shap)).";$p\n";     
-      for my $p0 in (split(/\;/, safeDecomp($c2p{$sec}{$shap}), -1)){
+      for my $p0 (split(/\;/, safeDecomp($c2p{$sec}{$shap}), -1)){
          $tmp{$p0}++;
       }
     }
