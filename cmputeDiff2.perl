@@ -125,15 +125,19 @@ sub separate2T {
     if (!defined $mapPF{$k}){
       my $kH = toHex ($k);
       my @ns = sort keys %{$v};
-      print STDERR "mfiles @ns in $kH for $c\n" if $#ns > 0;
-      if (defined $mapPFI{$ns[0]}){
-        my @bs = sort keys %{$mapPFI{$ns[0]}};
-        my $bP = toHex ($bs[0]);
-        print STDERR "mblobs $bP in $ns[0] for $c\n" if $#bs > 0;
-        print "mod;@ns;$c;$pre/$ns[0];$kH;$bP\n";
-      }else{
-        #new file
-        print "new;@ns;$c;$pre/$ns[0];$kH;\n";
+      if ($#ns >= 0){
+        print STDERR "mfiles @ns in $kH for $c\n" if $#ns > 0;
+        for my $n (@ns){
+          if (defined $mapPFI{$n}){
+            my @bs = sort keys %{$mapPFI{$n}};
+            my $bP = toHex ($bs[0]);
+            print STDERR "mblobs $bP in $n for $c\n" if $#bs > 0;
+            print "$c;$pre/$n;$kH;$bP\n";
+          }else{
+            #new file
+            print "$c;$pre/$n;$kH;\n";
+          }
+        }
       }
     }else{
       #rename
@@ -141,7 +145,16 @@ sub separate2T {
       my @ns = sort keys %{$v};
       my @nsp = sort keys %{$mapPF{$k}};
       print STDERR "mfilesRename @ns and @nsp in $kH for $c\n" if $#ns >0||$#nsp>0;
-      print "ren;@ns;$c;$pre/$ns[0];$kH;$pre/$nsp[0]\n" if $ns[0] ne $nsp[0];
+      for my $n (@ns){
+		  my $found = 0;
+        for my $np (@nsp){
+			  if ($n eq $np){
+				  $found = 1;
+              last;
+           }
+        }
+        print "ren;@ns;$c;$pre/$n;$kH;$pre/@nsp\n" if !$found;
+      }
     }
   }
   while (my ($k, $v) = each %mapPF){
@@ -149,14 +162,16 @@ sub separate2T {
       my $kH = toHex ($k);
       my @ns = sort keys %{$v};
       print STDERR "mfilesP @ns in $kH\n" if $#ns > 0; 
-      if (defined $mapFI{$ns[0]}){
-        my @bs = keys %{$mapFI{$ns[0]}};
-        my $bP = toHex ($bs[0]);
-        print STDERR "mblobsP $bP in $ns[0] for $c\n" if $#bs > 0;
-        print "modP;@ns;$c;$pre/$ns[0];$bP;$kH\n";
-      }else{
-        # deleted  file
-        print "del;@ns;$c;$pre/$ns[0];;$kH\n";
+      for my $n (@ns){
+        if (defined $mapFI{$n}){
+          #my @bs = keys %{$mapFI{$ns[0]}};
+          #my $bP = toHex ($bs[0]);
+          #print STDERR "mblobsP $bP in $ns[0] for $c\n" if $#bs > 0;
+          #print "modP;@ns;$c;$pre/$ns[0];$bP;$kH\n";
+        }else{
+          # deleted  file
+          print "del;@ns;$c;$pre/$ns[0];;$kH\n";
+        }
       }
     }
   }
