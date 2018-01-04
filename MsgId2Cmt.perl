@@ -51,9 +51,9 @@ print STDERR "dumped $lines\n";
 
 sub outputTC {
   my $n = $_[0];
-  my %c2p;
+  my %c2m;
   my $fname = "$ARGV[0]";
-  tie %$c2p, "TokyoCabinet::HDB", "$fname", TokyoCabinet::HDB::OWRITER | TokyoCabinet::HDB::OCREAT,   
+  tie %$c2m, "TokyoCabinet::HDB", "$fname", TokyoCabinet::HDB::OWRITER | TokyoCabinet::HDB::OCREAT,   
         16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
       or die "cant open $fname\n";
   }
@@ -63,5 +63,5 @@ sub outputTC {
     my $ps = join '', sort keys %{$v};
     $c2m{$c} = $ps;
   }
-  untie %c2p;
+  untie %c2m;
 }
