@@ -134,26 +134,18 @@ sub separate2T {
             #print STDERR "mblobs $bP in $n for $c\n" if $#bs > 0;
             print "$c;$pre/$n;$kH;$bP\n";
           }else{
-            #new file
+            #new file (might be a double)
             print "$c;$pre/$n;$kH;\n";
           }
         }
       }
     }else{
-      #rename
+      #rename or clone of preexisting
       my $kH = toHex ($k);
-      my @ns = sort keys %{$v};
-      my @nsp = sort keys %{$mapPF{$k}};
-      print STDERR "mfilesRename @ns and @nsp in $kH for $c\n" if $#ns >0||$#nsp>0;
-      for my $n (@ns){
-		  my $found = 0;
-        for my $np (@nsp){
-			  if ($n eq $np){
-				  $found = 1;
-              last;
-           }
-        }
-        print "ren;@ns;$c;$pre/$n;$kH;$pre/@nsp\n" if !$found;
+      #my @ns = keys %{$v};
+      #print STDERR "mfilesRename @ns and @nsp in $kH for $c\n" if $#ns >0||$#nsp>0;
+      for my $n (keys %{$v}){
+        print "ren;@ns;$c;$pre/$n;$kH;$pre/@nsp\n" if !defined $mapPF{$k}{$n};
       }
     }
   }
