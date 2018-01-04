@@ -53,7 +53,7 @@ sub outputTC {
   my $n = $_[0];
   my %c2m;
   my $fname = "$ARGV[0]";
-  tie %$c2m, "TokyoCabinet::HDB", "$fname", TokyoCabinet::HDB::OWRITER | TokyoCabinet::HDB::OCREAT,   
+  tie %c2m, "TokyoCabinet::HDB", "$fname", TokyoCabinet::HDB::OWRITER | TokyoCabinet::HDB::OCREAT,   
         16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
       or die "cant open $fname\n";
   }
