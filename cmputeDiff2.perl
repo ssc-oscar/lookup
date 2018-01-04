@@ -171,7 +171,7 @@ sub separate2T {
       my $v0H = toHex ($v0);     
       my @ns = keys %{$v};
       print STDERR "mdir @ns in $c\n" if $#ns > 0;
-      for my $n (@ns) 
+      for my $n (@ns){ 
         if (defined $mapPI{$n}){
           my $bs = $mapPI{$n};
           my $bP = toHex ($bs);
