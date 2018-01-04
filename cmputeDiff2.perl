@@ -129,9 +129,9 @@ sub separate2T {
         print STDERR "mfiles @ns in $kH for $c\n" if $#ns > 0;
         for my $n (@ns){
           if (defined $mapPFI{$n}){
-            my @bs = sort keys %{$mapPFI{$n}};
-            my $bP = toHex ($bs[0]);
-            print STDERR "mblobs $bP in $n for $c\n" if $#bs > 0;
+            my $bs = $mapPFI{$n};
+            my $bP = toHex ($bs);
+            #print STDERR "mblobs $bP in $n for $c\n" if $#bs > 0;
             print "$c;$pre/$n;$kH;$bP\n";
           }else{
             #new file
@@ -170,7 +170,7 @@ sub separate2T {
           #print "modP;@ns;$c;$pre/$ns[0];$bP;$kH\n";
         }else{
           # deleted  file
-          print "del;@ns;$c;$pre/$ns[0];;$kH\n";
+          print "del;@ns;$c;$pre/$n;;$kH\n";
         }
       }
     }
@@ -181,9 +181,8 @@ sub separate2T {
       my @ns = sort keys %{$v};
       print STDERR "mdir @ns in $c\n" if $#ns > 0; 
       if (defined $mapPI{$ns[0]}){
-        my @bs = sort keys %{$mapPI{$ns[0]}};
-        my $bP = toHex ($bs[0]);
-        print STDERR "mblobD $bP in $c\n" if $#bs > 0; 
+        my $bs = $mapPI{$ns[0]};
+        my $bP = toHex ($bs);
         #print "doing $#ns:$#bs:$pre/$ns[0];$v0H;$bP\n";
         separate2T ($c, $cP, "$pre/$ns[0]", $v0H, $bP);      
       }else{
@@ -211,14 +210,14 @@ sub getTR {
       #print "$name;$bH;$mode\n";
       if ($mode == 040000){
 		  $map->{$bytes}{"$nO"} = $mode;
-        $mapI->{"$nO"}{$bytes} = $mode;        
+        $mapI->{"$nO"} = $bytes;        
         #print "got tree: $prefix $bH\n";
         #this is where time is sent
         #getTR (getTO($bH), "$prefix/$nO", $map, $map1);
       }else{
 		  #if ($mode == 0100644){
   		    $mapF->{$bytes}{"$nO"} = $mode;
-          $mapFI->{"$nO"}{$bytes} = $mode; 
+          $mapFI->{"$nO"} = $bytes; 
         #}               
 	   }
     }    
