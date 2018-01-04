@@ -145,7 +145,7 @@ sub separate2T {
       #my @ns = keys %{$v};
       #print STDERR "mfilesRename @ns and @nsp in $kH for $c\n" if $#ns >0||$#nsp>0;
       for my $n (keys %{$v}){
-        print "ren;@ns;$c;$pre/$n;$kH;$pre/@nsp\n" if !defined $mapPF{$k}{$n};
+        print "ren;$c;$pre/$n;$kH;$pre/@nsp\n" if !defined $mapPF{$k}{$n};
       }
     }
   }
