@@ -125,10 +125,11 @@ sub separate2T {
     if (!defined $mapPF{$k}){
       my $kH = toHex ($k);
       my @ns = sort keys %{$v};
-      print STDERR "many files @ns in $kH for $c\n" if $#ns > 0;
+      print STDERR "mfiles @ns in $kH for $c\n" if $#ns > 0;
       if (defined $mapPFI{$ns[0]}){
         my @bs = sort keys %{$mapPFI{$ns[0]}};
         my $bP = toHex ($bs[0]);
+        print STDERR "mblobs $bP in $ns[0] for $c\n" if $#bs > 0;
         print "mod;@ns;$c;$pre/$ns[0];$kH;$bP\n";
       }else{
         #new file
@@ -139,7 +140,7 @@ sub separate2T {
       my $kH = toHex ($k);
       my @ns = sort keys %{$v};
       my @nsp = sort keys %{$mapPF{$k}};
-      print STDERR "many files rename @ns and @nsp in $kH for $c\n" if $#ns >0||$#nsp>0;
+      print STDERR "mfilesRename @ns and @nsp in $kH for $c\n" if $#ns >0||$#nsp>0;
       print "ren;@ns;$c;$pre/$ns[0];$kH;$pre/$nsp[0]\n" if $ns[0] ne $nsp[0];
     }
   }
@@ -147,11 +148,12 @@ sub separate2T {
     if (!defined $mapF{$k}){
       my $kH = toHex ($k);
       my @ns = sort keys %{$v};
-      print STDERR "muliple file @ns in $kH\n" if $#ns > 0; 
+      print STDERR "mfilesP @ns in $kH\n" if $#ns > 0; 
       if (defined $mapFI{$ns[0]}){
         my @bs = keys %{$mapFI{$ns[0]}};
         my $bP = toHex ($bs[0]);
-        print "modp;@ns;$c;$pre/$ns[0];$bP;$kH\n";
+        print STDERR "mblobsP $bP in $ns[0] for $c\n" if $#bs > 0;
+        print "modP;@ns;$c;$pre/$ns[0];$bP;$kH\n";
       }else{
         # deleted  file
         print "del;@ns;$c;$pre/$ns[0];;$kH\n";
@@ -162,10 +164,11 @@ sub separate2T {
     if (!defined $mapP{$v0}){
       my $v0H = toHex ($v0);     
       my @ns = sort keys %{$v};
-      print STDERR "muliple dir @ns in $v0H\n" if $#ns > 0; 
+      print STDERR "mdir @ns in $c\n" if $#ns > 0; 
       if (defined $mapPI{$ns[0]}){
-	my @bs = sort keys %{$mapPI{$ns[0]}};
+        my @bs = sort keys %{$mapPI{$ns[0]}};
         my $bP = toHex ($bs[0]);
+        print STDERR "mblobD $bP in $c\n" if $#bs > 0; 
         #print "doing $#ns:$#bs:$pre/$ns[0];$v0H;$bP\n";
         separate2T ($c, $cP, "$pre/$ns[0]", $v0H, $bP);      
       }else{
