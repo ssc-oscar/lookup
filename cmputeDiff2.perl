@@ -124,19 +124,17 @@ sub separate2T {
   while (my ($k, $v) = each %mapF){
     if (!defined $mapPF{$k}){
       my $kH = toHex ($k);
-      my @ns = sort keys %{$v};
-      if ($#ns >= 0){
-        print STDERR "mfiles @ns in $kH for $c\n" if $#ns > 0;
-        for my $n (@ns){
-          if (defined $mapPFI{$n}){
-            my $bs = $mapPFI{$n};
-            my $bP = toHex ($bs);
-            #print STDERR "mblobs $bP in $n for $c\n" if $#bs > 0;
-            print "$c;$pre/$n;$kH;$bP\n";
-          }else{
-            #new file (might be a double)
-            print "$c;$pre/$n;$kH;\n";
-          }
+      #my @ns = keys %{$v};
+      #print STDERR "mfiles @ns in $kH for $c\n" if $#ns > 0;
+      for my $n (keys %{$v}){
+        if (defined $mapPFI{$n}){
+          my $bs = $mapPFI{$n};
+          my $bP = toHex ($bs);
+          #print STDERR "mblobs $bP in $n for $c\n" if $#bs > 0;
+          print "$c;$pre/$n;$kH;$bP\n";
+        }else{
+          #new file (might be a double)
+          print "$c;$pre/$n;$kH;\n";
         }
       }
     }else{
@@ -146,16 +144,16 @@ sub separate2T {
       my @nsp = keys %{$mapPF{$k}};
       #print STDERR "mfilesRename @ns and @nsp in $kH for $c\n" if $#ns >0||$#nsp>0;
       for my $n (keys %{$v}){
-        print "ren;$c;$pre/$n;$kH;$pre/@nsp\n" if !defined $mapPF{$k}{$n};
+        print "$c;$pre/$n;$kH;$pre/@nsp\n" if !defined $mapPF{$k}{$n};
       }
     }
   }
   while (my ($k, $v) = each %mapPF){
     if (!defined $mapF{$k}){
       my $kH = toHex ($k);
-      my @ns = sort keys %{$v};
-      print STDERR "mfilesP @ns in $kH\n" if $#ns > 0; 
-      for my $n (@ns){
+      #my @ns = keys %{$v};
+      #print STDERR "mfilesP @ns in $kH\n" if $#ns > 0; 
+      for my $n (keys %{$v}){
         if (defined $mapFI{$n}){
           #my @bs = keys %{$mapFI{$ns[0]}};
           #my $bP = toHex ($bs[0]);
@@ -163,7 +161,7 @@ sub separate2T {
           #print "modP;@ns;$c;$pre/$ns[0];$bP;$kH\n";
         }else{
           # deleted  file
-          print "del;@ns;$c;$pre/$n;;$kH\n";
+          print "$c;$pre/$n;;$kH\n";
         }
       }
     }
@@ -171,18 +169,20 @@ sub separate2T {
   while (my ($v0, $v) = each %map){
     if (!defined $mapP{$v0}){
       my $v0H = toHex ($v0);     
-      my @ns = sort keys %{$v};
-      print STDERR "mdir @ns in $c\n" if $#ns > 0; 
-      if (defined $mapPI{$ns[0]}){
-        my $bs = $mapPI{$ns[0]};
-        my $bP = toHex ($bs);
-        #print "doing $#ns:$#bs:$pre/$ns[0];$v0H;$bP\n";
-        separate2T ($c, $cP, "$pre/$ns[0]", $v0H, $bP);      
-      }else{
-        #print STDERR "new folder $c;$t;$tP;$pre/$ns[0];$v0H\n";
-        printTR ($c, getTO ($v0H), "$pre/$ns[0]");
-        #new folder? /renamed folder?
-		  #print "$pre/$ns[0];$v0H\n";
+      my @ns = keys %{$v};
+      print STDERR "mdir @ns in $c\n" if $#ns > 0;
+      for my $n (@ns) 
+        if (defined $mapPI{$n}){
+          my $bs = $mapPI{$n};
+          my $bP = toHex ($bs);
+          #print "doing $#ns:$#bs:$pre/$ns[0];$v0H;$bP\n";
+          separate2T ($c, $cP, "$pre/$n", $v0H, $bP);
+        }else{
+          #print STDERR "new folder $c;$t;$tP;$pre/$ns[0];$v0H\n";
+          printTR ($c, getTO ($v0H), "$pre/$n");
+          #new folder? /renamed folder?
+		    #print "$pre/$ns[0];$v0H\n";
+        }
       }
     }else{
       #potential rename, no need to catch these
