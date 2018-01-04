@@ -56,7 +56,6 @@ sub outputTC {
   tie %c2m, "TokyoCabinet::HDB", "$fname", TokyoCabinet::HDB::OWRITER | TokyoCabinet::HDB::OCREAT,   
         16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
       or die "cant open $fname\n";
-  }
   while (my ($c, $v) = each %c2m1){
     $lines ++;
     print STDERR "$lines done out of $nc\n" if (!($lines%100000000));
