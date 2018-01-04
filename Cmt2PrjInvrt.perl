@@ -47,13 +47,15 @@ for $sec (0..($nParts-1)){
   next if $doPart >= 0 && $sec != $doPart;
   my $fname = "$outN.$sec.tch";
   $fname = "$outN" if ($nParts == 1);
-  tie %{$out{$sec}}, "TokyoCabinet::HDB", "$fname", TokyoCabinet::HDB::OWRITER |  TokyoCabinet::HDB::OCREAT,
+  my %out;
+  tie %out, "TokyoCabinet::HDB", "$fname", TokyoCabinet::HDB::OWRITER |  TokyoCabinet::HDB::OCREAT,
     16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
     or die "cant open $fname\n";
   while (my ($k, $v) = each %{$p2c{$sec}}){
     my $vO = join '', sort keys %{$v};
-    $out{$sec}{$k} = $v;
+    $out{$k} = $v;
   }
+  untie %out;
 }
 
 
@@ -80,26 +82,4 @@ sub safeDecomp {
     return "";
   }
 }
-
-print STDERR "writing $lines\n";
-$lines = 0;
-outputTC ($ARGV[1]);
-
-
-sub outputTC {
-  my $n = $_[0];
-  my %p2c1;
-  tie %p2c1, "TokyoCabinet::HDB", $n, TokyoCabinet::HDB::OWRITER | TokyoCabinet::HDB::OCREAT,
-     16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
-     or die "cant open $n\n";
-  while (my ($p, $v) = each %p2c){
-    $lines ++;
-    print STDERR "$lines done out\n" if (!($lines%100000000));
-    my $cs = join '', sort keys %{$v};
-    $p2c1{$p} = $cs;
-  }
-  untie %p2c1;
-}
-
-
 
