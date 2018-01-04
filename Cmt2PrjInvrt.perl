@@ -53,7 +53,7 @@ for $sec (0..($nParts-1)){
     or die "cant open $fname\n";
   while (my ($k, $v) = each %{$p2c{$sec}}){
     my $vO = join '', sort keys %{$v};
-    $out{$k} = $v;
+    $out{$k} = $v0;
   }
   untie %out;
 }
