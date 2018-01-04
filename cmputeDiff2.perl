@@ -143,6 +143,7 @@ sub separate2T {
       #rename or clone of preexisting
       my $kH = toHex ($k);
       #my @ns = keys %{$v};
+      my @nsp = keys %{$mapPF{$k}};
       #print STDERR "mfilesRename @ns and @nsp in $kH for $c\n" if $#ns >0||$#nsp>0;
       for my $n (keys %{$v}){
         print "ren;$c;$pre/$n;$kH;$pre/@nsp\n" if !defined $mapPF{$k}{$n};
