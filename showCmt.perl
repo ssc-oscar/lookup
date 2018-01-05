@@ -109,7 +109,7 @@ sub getCmt {
   $msg =~ s/\n/__NEWLINE__/g;
   if ($debug){
     $msg =~ s/__NEWLINE__$//;
-    my ($a, $e) = git_signature_parse (auth);
+    my ($a, $e) = git_signature_parse ($auth);
     print "$msg;$cmt;$a;$e;$ta\n";
   }else{
     print "$cmt;$tree;$parents;$auth;$cmtr;$ta;$tc\n";
