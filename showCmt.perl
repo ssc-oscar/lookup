@@ -54,7 +54,7 @@ sub getCmt {
   $msg =~ s/\n/__NEWLINE__/g;
   if ($debug){
     $msg =~ s/__NEWLINE__$//;
-    print "$msg;$cmt\n";
+    print "$msg;$cmt;$auth;$ta\n";
   }else{
     print "$cmt;$tree;$parents;$auth;$cmtr;$ta;$tc\n";
   }
