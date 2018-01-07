@@ -199,6 +199,9 @@ sub getTR {
     if ($to =~ s/^([0-7]+) (.+?)\0(.{20})//s) {
       my ($mode, $name, $bytes) = (oct($1),$2,$3);
       my $nO = $name;
+      $nO =~ s/\r/__CR__/g;
+      $nO =~ s/\n/__NEWLINE__/g;
+      $nO =~ s/;/SEMICOLON/g;
       my $bH = toHex ($bytes);
       #print "$name;$bH;$mode\n";
       if ($mode == 040000){
