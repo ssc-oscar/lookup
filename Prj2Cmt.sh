@@ -4,8 +4,53 @@
 
 #in the future, just get updates only from All.blobs/commit_XX.vs
 #get the complete info from All.blobs/commit_XX.vs
-cut -d\; -f4,6 /data/All.blobs/commit_*.vs | perl -ane 'chop();($c,$p)=split(/\;/,$_,-1);$p=~s/.*github.com_(.*_.*)/$1/;$p=~s/^bitbucket.org_/bb_/;$p=~s|\.git$||;$p=~s|/*$||;$p=~s/\;/SEMICOLON/g;$p = "EMPTY" if $p eq "";print "$c;$p\n";' | lsort 130G -u | gzip > /data/basemaps/c2p.s 
+#cut -d\; -f4,6 /data/All.blobs/commit_*.vs | perl -ane 'chop();($c,$p)=split(/\;/,$_,-1);$p=~s/.*github.com_(.*_.*)/$1/;$p=~s/^bitbucket.org_/bb_/;$p=~s|\.git$||;$p=~s|/*$||;$p=~s/\;/SEMICOLON/g;$p = "EMPTY" if $p eq "";print "$c;$p\n";' | lsort 130G -u | gzip > /data/basemaps/c2pN.s 
+keep track of prior commit_.vs state in All.blobs, perhaps via line numbers?, then only process that
 
+
+#Do full snapshot from all possible sources
+cd /da3_data/lookup
+cut -d\; -f4,6 /da4_data/All.blobs/commit_*.vs | perl -ane 'chop();($c,$p)=split(/\;/,$_,-1);$p=~s/.*github.com_(.*_.*)/$1/;$p=~s/^bitbucket.org_/bb_/;$p=~s|\.git$||;$p=~s|/*$||;$p=~s/\;/SEMICOLON/g;$p = "EMPTY" if $p eq "";print "$c;$p\n";' | gzip > c2pN.gz 
+gunzip -c c2pN.gz | split -l 1000000000 -da2 --filter='gzip > $FILE.gz' - c2pN.
+for i in {00..02}; do gunzip -c c2pN.$i.gz | uniq | lsort 90G -u | gzip > c2pN.$i.s & done
+gunzip -c c2pN.00.s | lsort 240G --merge -u - <(gunzip -c c2pN.01.s) <(gunzip -c c2pN.02) |gzip > c2pN.s
+gunzip -c c2pN.s | sed 's/;/;;;/'| ./Cmt2PrjBinSorted.perl c2pN
+
+
+#get the list from c2fbp
+cd /da0_data/c2fbp
+for i in {00..81}; do gunzip -c c2fbp.$i.gz | cut -d\; -f1,4 | uniq | perl -ane 'chop();($c,$p)=split(/\;/,$_,-1);$p=~s/.*github.com_(.*_.*)/$1/;$p=~s/^bitbucket.org_/bb_/;$p=~s|\.git$||;$p=~s|/*$||;$p=~s/\;/SEMICOLON/g;$p = "EMPTY" if $p eq "";print "$c;$p\n";' | lsort 30G -u | gzip > c2p.$i.s; done 
+for i in {00..81}
+do gunzip -c /da0_data/c2fbp/c2p.$i.s | sed 's/;/;;;/'| ./Cmt2PrjBinSorted.perl c2p.$i
+done
+
+#get the list from deltaall
+ls -f *.deltaall.gz  > /tmp/a
+split -n l/10 -da1 /tmp/a proc.
+for i in {0..9}; do cat proc.$i | while read k; do gunzip -c $k | cut -d\; -f1,2; done | gzip > proc.$i.gz & done
+for i in {0..9}; do gunzip < proc.$i.gz | uniq | \
+   perl -ane 'chop();($p,$c)=split(/\;/,$_,-1);$p=~s/.*github.com_(.*_.*)/$1/;$p=~s/^bitbucket.org_/bb_/;$p=~s|\.git$||;$p=~s|/*$||;$p=~s/\;/SEMICOLON/g;$p = "EMPTY" if $p eq "";print "$c;$p\n";' | \
+   lsort 70G -u > proc.$i.s
+done
+gunzip -c /da1_data/delta/proc.$i.s | sed 's/;/;;;/'| ./Cmt2PrjBinSorted.perl proc.$i
+#or
+gunzip -c /da1_data/delta/proc.$i.gz | uniq | perl -ane 'chop();($p,$c)=split(/\;/,$_,-1);$p=~s/.*github.com_(.*_.*)/$1/;$p=~s/^bitbucket.org_/bb_/;$p=~s|\.git$||;$p=~s|/*$||;$p=~s/\;/SEMICOLON/g;$p = "EMPTY" if $p eq "";print "$c;$p\n";'  | \
+    sed 's/;/;;;/'| ./Cmt2PrjBin.perl proc.$i
+
+
+#now merge all the lists:
+for i in {0..7}
+do ls -f /fast1/*.$i.tch | ./f2nMergeSplit.perl Cmt2PrjFull.$i.tch 1
+done
+# export
+./Cmt2PrjList.perl Cmt2PrjFull.$i.tch 1 | perl -ane 'chop();($c, $l, @v)=split(/\;/, $_, -1);
+
+#then invert for prj2cmt
+
+
+
+
+#below is history!
 
 #get stuff from the missing commits in deltaall
 (list of all deltaall in x00-x31)
@@ -105,7 +150,11 @@ mv cs.s1 cs.s
 cut -d\; -f4 /data/All.blobs/commit_*.idx | lsort 40G | gzip > /data/basemaps/cmts.s
 gunzip -c /data/basemaps/cmts.s | perl -ane 'chop(); next if length($_) != 40;print "$_\n";' | join -v1 - <(gunzip -c /da0_data/c2fbp/cs.s) | gzip >/data/basemaps/cNotInC2fbp.s
 cd /data/update
-gunzip -c /data/basemaps/cNotInC2fbp.s | split -l 10000000 -da 2 --filter='gzip > $FILE.gz' - cNotInC2fbp.
+gunzip -c cNotInC2fbp.s | split -l 200000 -da 3 --filter='gzip > $FILE.gz' - cNot.
+#now process it e.g.
+#for i in {500..614..4}; do gunzip -c cNot.$i.gz | ./cmputeDiff2.perl 2> cNot.$i.err | gzip > cNot.$i.c2fb; done 
+#for i in {051..080}; do sed "s/NNN/$i/g" doExtr.pbs | qsub; done
+
 
 cat list1 | while read i; do gunzip -c $i; done | split -d -l 2000000 - list1.
 for i in {00..89} {9000..9232}; do cat list1.$i | /da3_data/lookup/updatec2fbp_newpro_faster.perl 2> list1.$i.err | gzip > list1.$i.c2fbp & done
