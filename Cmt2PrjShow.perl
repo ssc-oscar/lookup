@@ -46,7 +46,7 @@ while (<STDIN>){
   my $c1 = $_;
   my $c = fromHex($c1);
   my $sec = (unpack "C", substr ($c, 0, 1))%$split;
-  list ($c, $p2c{$sec}{$c});
+  list ($c, $p2c{$sec}{$c}) if defined $p2c{$sec}{$c};
 }
 for my $sec (0..($split-1)){
   untie %{$p2c{$sec}};
