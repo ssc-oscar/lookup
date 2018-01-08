@@ -7,11 +7,11 @@ use TokyoCabinet;
 use Compress::LZF;
 
 sub toHex { 
-        return unpack "H*", $_[0]; 
+  return unpack "H*", $_[0]; 
 } 
 
 sub fromHex { 
-        return pack "H*", $_[0]; 
+  return pack "H*", $_[0]; 
 } 
 
 sub safeDecomp {
@@ -45,7 +45,7 @@ while (<STDIN>){
   chop ();
   my $c1 = $_;
   my $c = fromHex($c1);
-  my $sec = (unpack "C", substr ($c, 0, 1))%$nsec;
+  my $sec = (unpack "C", substr ($c, 0, 1))%$split;
   list ($c, $p2c{$sec}{$c});
 }
 for my $sec (0..($split-1)){
