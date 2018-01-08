@@ -109,6 +109,7 @@ sub getCmt {
   $msg =~ s/\n/__NEWLINE__/g;
   if ($debug){
     $msg =~ s/__NEWLINE__$//;
+    $msg =~ s/;/SEMICOLON/g;
     my ($a, $e) = git_signature_parse ($auth);
     print "$msg;$cmt;$a;$e;$ta\n";
   }else{
