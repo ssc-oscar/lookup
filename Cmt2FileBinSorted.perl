@@ -58,13 +58,14 @@ while (<STDIN>){
   chop();
   $lines ++;
   my ($hsha, $f, $b, $p) = split (/\;/, $_);
-  if (length ($hsha) != 40){
+  if ($hsha !~ m|^[0-a-f]{40}$|){
     print STDERR "bad sha:$_\n";
     next;
   }    
   my $sha = fromHex ($hsha);
-  $p =~ s/;/SEMICOLON/g;
-  $p =~ s|^/*||;
+ 
+  $f =~ s/;/SEMICOLON/g;
+  $f =~ s|^/*||;
   if ($sha ne $shap && $shap ne ""){
     $sec = (unpack "C", substr ($shap, 0, 1))%$nsec;
     if (defined $c2p{$sec}{$shap}){
@@ -80,7 +81,7 @@ while (<STDIN>){
     %tmp = ();
   }  
   $shap = $sha;
-  $tmp{$p}++;
+  $tmp{$f}++;
   print STDERR "$lines done\n" if (!($lines%100000000));
 }
 my $ps = join ';', sort keys %tmp;
