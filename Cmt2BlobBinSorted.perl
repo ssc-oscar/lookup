@@ -13,29 +13,6 @@ sub fromHex {
         return pack "H*", $_[0]; 
 } 
 
-sub safeComp {
-  my $code = $_[0];
-  try {
-    my $codeC = compress ($code);
-    return $codeC;
-  } catch Error with {
-    my $ex = shift;
-    print STDERR "Error: $ex\n$code\n";
-    return "";
-  }
-}
-sub safeDecomp 
-  my $code = $_[0];
-  try 
-    my $codeC = decompress ($code);
-    return $codeC;
-  } catch Error with {
-    my $ex = shift;
-    print STDERR "Error: $ex\n$code\n";
-    return "";
-  }
-}
-
 
 my (%tmp, %c2p);
 my $sec;
