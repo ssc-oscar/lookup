@@ -45,10 +45,6 @@ sub safeDecomp {
 }
 
 my %fhoa;
-tie %fhoa, "TokyoCabinet::HDB", "$ARGV[0]", TokyoCabinet::HDB::OREADER,   
-        16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
-     or die "cant open $ARGV[0]\n";
-
 my $sections = 128;
 my %map;
 my $fbase="/data/All.blobs/commit_";
@@ -65,19 +61,9 @@ for my $s (0..127){
     my $codeC = "";
     my $rl = read (FD, $codeC, $len);
     my ($tree, $parent, $auth, $cmtr, $ta, $tc, @rest) = extrCmt ($codeC, $hash);
-    if (defined $fhoa{$auth}){
-      my $v = $fhoa{$auth};
-      my $ns = length ($v)/20;
-      my %tmp = ();
-      for my $i (0..($ns-1)){
-        $tmp{substr ($v, $i*20, 20)}++;
-      } 
-      last if defined $tmp{$h};
-    }
     $map{$auth}{$h}++;
   }
 }
-untie %fhoa;
 
 tie %fhoa, "TokyoCabinet::HDB", "$ARGV[0]", TokyoCabinet::HDB::OWRITER | TokyoCabinet::HDB::OCREAT,
         16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
