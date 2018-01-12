@@ -111,11 +111,11 @@ sub separate2T {
   
   my $tree = getTO($t);
   my $treeP = getTO($tP);
-  if ($tree eq ""){
+  if ($tree eq "" && $t ne "4b825dc642cb6eb9a060e54bf8d69288fbee4904"){
     print STDERR "no tree:$t for $c\n";
     return;
   }
-  if ($treeP eq ""){
+  if ($treeP eq "" && $tP ne "4b825dc642cb6eb9a060e54bf8d69288fbee4904"){
     print STDERR "no tree:$tP for parent $cP of $c\n";
     return;
   }
