@@ -116,7 +116,7 @@ sub separate2T {
     return;
   }
   if ($treeP eq ""){
-	 print STDERR "no tree:$tP for parent $cP of $c\n";
+    print STDERR "no tree:$tP for parent $cP of $c\n";
     return;
   }
   getTR ($tree, \%map, \%mapI, \%mapF, \%mapFI); 
@@ -179,13 +179,25 @@ sub separate2T {
           separate2T ($c, $cP, "$pre/$n", $v0H, $bP);
         }else{
           #print STDERR "new folder $c;$t;$tP;$pre/$ns[0];$v0H\n";
-          printTR ($c, getTO ($v0H), "$pre/$n");
+          printTR ($c, getTO ($v0H), "$pre/$n", 1);
           #new folder? /renamed folder?
 		    #print "$pre/$ns[0];$v0H\n";
         }
       }
     }else{
       #potential rename, no need to catch these
+    }
+  }
+  # handle deleted trees
+  while (my ($v0, $v) = each %mapP){
+    if (!defined $map{$v0}){
+      my $v0H = toHex ($v0);
+      my @ns = keys %{$v};
+      for my $n (@ns){
+        if (!defined $mapI{$n}){
+          printTR ($c, getTO ($v0H), "$pre/$n", 0);
+        }
+      }
     }
   }
 }
@@ -221,7 +233,7 @@ sub getTR {
 }
 
 sub printTR {
-  my ($c, $to, $prefix) = @_;
+  my ($c, $to, $prefix, $created) = @_;
   if (length ($to) == 0){
     return "";
   }
@@ -235,10 +247,14 @@ sub printTR {
       $nO =~ s/;/SEMICOLON/g;
       my $bH = toHex ($bytes);
       if ($mode == 040000){
-        printTR ($c, getTO($bH), "$prefix/$nO");
+        printTR ($c, getTO($bH), "$prefix/$nO", $created);
       }else{        
-        print "$c;$prefix/$nO;$bH;\n";# if $mode == 0100644;
-	   }
+        if ($created){
+          print "$c;$prefix/$nO;$bH;\n";# if $mode == 0100644;
+        }else{
+          print "$c;$prefix/$nO;;$bH\n";# if $mode == 0100644;
+        }
+      }
     }    
   }
 }
