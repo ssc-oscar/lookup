@@ -116,7 +116,7 @@ sub separate2T {
     return;
   }
   if ($treeP eq "" && $tP ne "4b825dc642cb6eb9a060e54bf8d69288fbee4904"){
-    print STDERR "no tree:$tP for parent $cP of $c\n";
+    print STDERR "no tree:$tP for parent $cP for $c\n";
     return;
   }
   getTR ($tree, \%map, \%mapI, \%mapF, \%mapFI); 
