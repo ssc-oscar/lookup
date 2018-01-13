@@ -76,6 +76,11 @@ for my $sec (0..($split-1)){
       $p2c2{$k} = $v1 
     }
   }
+  while (my ($k, $v) = each %p2c){
+    if (!defined $p2c1{$k}){
+      $p2c2{$k} = $v;
+    }
+  }
   untie %p2c1;
   untie %p2c;
   untie %p2c2;
