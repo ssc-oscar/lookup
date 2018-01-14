@@ -57,7 +57,7 @@ for my $s (0..127){
     chop();
     my ($nn, $of, $len, $hash) = split (/\;/, $_, -1);
     my $h = fromHex ($hash);
-    #seek (FD, $of, 0);
+    # seek (FD, $of, 0);
     my $codeC = "";
     my $rl = read (FD, $codeC, $len);
     my ($tree, $parent, $auth, $cmtr, $ta, $tc, @rest) = extrCmt ($codeC, $hash);
