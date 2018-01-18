@@ -55,24 +55,28 @@ sub safeComp {
   }
 }
 
+my $sections = 8;
 my $fbase="/fast1/All.sha1c/";
 my %a2c;
 tie %a2c, "TokyoCabinet::HDB", "$fbase/Auth2Cmt.tch", TokyoCabinet::HDB::OREADER,   
         16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
      or die "cant open $fbase/Auth2Cmt.tch\n";
 my %c2f;
-tie %c2f, "TokyoCabinet::HDB", "$fbase/Cmt2File.tch", TokyoCabinet::HDB::OREADER,   
+for my $sec (0..($sections-1)){
+  tie %{$c2f{$sec}}, "TokyoCabinet::HDB", "$fbase/c2fFull.$sec.tch", TokyoCabinet::HDB::OREADER,   
         16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
-     or die "cant open $fbase/Cmt2File.tch\n";
+     or die "cant open $fbase/c2fFull.$sec.tch\n";
+}
 
 my %a2f;
 while (my ($a, $v) = each %a2c){
-	$a2f{$a}{"."}++;
+  $a2f{$a}{"."}++;
   my $ns = length ($v)/20;
   for my $i (0..($ns-1)){
-	 my $c = substr ($v, $i*20, 20);
-    if (defined $c2f{$c}){
-      my @fs = split(/\;/, safeDecomp($c2f{$c}, $a), -1);
+    my $c = substr ($v, $i*20, 20);
+    my $sec =  hex (unpack "H*", substr($c, 0, 1)) % $sections;
+    if (defined $c2f{$sec}{$c}){
+      my @fs = split(/\;/, safeDecomp ($c2f{$sec}{$c}, $a), -1);
       for my $f (@fs){
         $a2f{$a}{$f}++;
       }
@@ -83,8 +87,9 @@ while (my ($a, $v) = each %a2c){
   } 
 }
 untie %a2c;
-untie %c2f;
-
+for my $sec (0..($sections-1)){
+  untie %{$c2f{$sec}};
+}
 
 my %a2f1;
 tie %a2f1, "TokyoCabinet::HDB", "$ARGV[0]", TokyoCabinet::HDB::OWRITER | TokyoCabinet::HDB::OCREAT,
