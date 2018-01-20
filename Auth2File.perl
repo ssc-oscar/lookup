@@ -94,7 +94,7 @@ while (my ($a, $v) = each %a2c){
   $line ++;
   if (!($line%1000000)){
     print STDERR "dumping $line\n";
-    dump();
+    dumpData();
     %a2f = ();
   }   
 }
@@ -103,7 +103,7 @@ for my $sec (0..($sections-1)){
   untie %{$c2f{$sec}};
 }
 
-sub dump { 
+sub dumpData { 
   while (my ($a, $v) = each %a2f){
     delete $v ->{"."};
     my $v1 = safeComp (join ";", sort keys %{$v}, $a);
