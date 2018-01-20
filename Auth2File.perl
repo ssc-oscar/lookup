@@ -68,6 +68,12 @@ for my $sec (0..($sections-1)){
      or die "cant open $fbase/c2fFull.$sec.tch\n";
 }
 
+my %a2f1;
+tie %a2f1, "TokyoCabinet::HDB", "$ARGV[0]", TokyoCabinet::HDB::OWRITER | TokyoCabinet::HDB::OCREAT,
+        16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
+     or die "cant open $ARGV[0]\n";
+
+my $line = 0;
 my %a2f;
 while (my ($a, $v) = each %a2c){
   $a2f{$a}{"."}++;
@@ -81,24 +87,28 @@ while (my ($a, $v) = each %a2c){
         $a2f{$a}{$f}++;
       }
     }else{
-		 my $c1 = toHex($c);
-       print STDERR "$c1\n";
+      my $c1 = toHex($c);
+      print STDERR "no commit $c1\n";
     }
-  } 
+  }
+  $line ++;
+  if (!($line%1000000)){
+    print STDERR "dumping $line\n";
+    dump();
+    %a2f = ();
+  }   
 }
 untie %a2c;
 for my $sec (0..($sections-1)){
   untie %{$c2f{$sec}};
 }
 
-my %a2f1;
-tie %a2f1, "TokyoCabinet::HDB", "$ARGV[0]", TokyoCabinet::HDB::OWRITER | TokyoCabinet::HDB::OCREAT,
-        16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
-     or die "cant open $ARGV[0]\n";
-while (my ($a, $v) = each %a2f){
-  delete $v ->{"."};
-  my $v1 = safeComp (join ";", sort keys %{$v}, $a);
-  $a2f1{$a}=$v1;
+sub dump { 
+  while (my ($a, $v) = each %a2f){
+    delete $v ->{"."};
+    my $v1 = safeComp (join ";", sort keys %{$v}, $a);
+    $a2f1{$a}=$v1;
+  }
 }
 untie %a2f1;
 
