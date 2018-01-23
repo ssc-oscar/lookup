@@ -54,7 +54,7 @@ my $lines = 0;
 my $f0 = "";
 my $cnn = 0;
 my $nc = 0;
-my doDump = 0;
+my $doDump = 0;
 my $shap = "";
 while (<STDIN>){
   chop();
