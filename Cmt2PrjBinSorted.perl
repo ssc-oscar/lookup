@@ -109,7 +109,7 @@ sub dumpData {
     while (my ($c, $v) = each %{$c2p1{$s}}){
       $c2p{$s}{$c} = $v;
     }
-    %{$c2p1{$s}} = "";         
+    %{$c2p1{$s}} = ();         
   }
 }
 
