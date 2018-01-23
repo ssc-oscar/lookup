@@ -56,10 +56,10 @@ sub output {
       my $ns = length($v0)/20;
       for my $i (0..($ns-1)){
         my $c0 = substr ($v0, 20*$i, 20);      
-        $vs{$c0}++;
+        $vs{$c0}++ if $c0 ne $k;
       }
       for my $vv (keys %{$v}){
-        $vs{$vv}++;
+        $vs{$vv}++ if $vv ne $k;
       }
     }else{
 		 %vs = %{$v};
