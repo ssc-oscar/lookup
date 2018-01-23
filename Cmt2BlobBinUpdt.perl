@@ -50,15 +50,21 @@ for $sec (0..($nsec -1)){
 sub output {
   while (my ($k, $v) = each %b2c1){
     my $sec = (unpack "C", substr ($k, 0, 1))%$nsec;
+    my %vs = ();
     if (defined $b2c{$sec}{$k}){
 		my $v0 = $b2c{$sec}{$k};
       my $ns = length($v0)/20;
       for my $i (0..($ns-1)){
-        my $c0 = substr ($v0, 20*$i, 20);
-        $v->{$c0}++;
+        my $c0 = substr ($v0, 20*$i, 20);      
+        $vs{$c0}++ if $c0 ne $k;
       }
+      for my $vv (keys %{$v}){
+        $vs{$vv}++ if $vv ne $k;
+      }
+    }else{
+		 %vs = %{$v};
     }
-    my @shas = sort keys %{$v};
+    my @shas = sort keys %vs;
     my $v1 = join '', @shas;
     $b2c{$sec}{$k} = $v1;
   }
