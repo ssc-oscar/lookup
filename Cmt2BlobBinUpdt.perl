@@ -55,7 +55,7 @@ sub output {
       my $ns = length($v0)/20;
       for my $i (0..($ns-1)){
         my $c0 = substr ($v0, 20*$i, 20);
-        %{$v{$c0}}++;
+        %{$v->{$c0}}++;
       }
     }
     my @shas = sort keys %{$v};
