@@ -36,16 +36,17 @@ while (<STDIN>){
   my $fs = getFs ($a2f{$n});
   my %d = ();
   for my $f (keys %{$fs}){
-    my $fn = 1.0/$fs->{$f};
-    print "$na".(toNum($f))."$fn\n";
-	 #my $as = getAs ($f2a{$f});
-    #for my $au (keys %{$as}){
-	 #  $d{$au} += 1.0/$fs->{$f};
-    #}
+    my $fn = 1.0/toNum($fs->{$f});
+    #print "$na;".(toNum($f)).";$fn\n";
+    #print "$na".(toNum($f))."\n";
+    my $as = getAs ($f2a{$f});
+    for my $au (keys %{$as}){
+     $d{$au} += $fn;
+    }
   }
-  #for my $au (sort { $d{$b} <=> $d{$a} } keys %d){
-  #  print "$na;".(toNum($au)).";$d{$au}\n";
-  #}
+  for my $au (sort { $d{$b} <=> $d{$a} } keys %d){
+    print "$na;".(toNum($au)).";$d{$au}\n";
+  }
 }
 
 sub getFs {
