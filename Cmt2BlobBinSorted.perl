@@ -14,7 +14,8 @@ sub fromHex {
 } 
 
 
-my (%tmp, %c2p);
+
+my (%tmp, %c2p, %c2p1);
 my $sec;
 my $nsec = 8;
 $nsec = $ARGV[1] if defined $ARGV[1];
@@ -30,6 +31,7 @@ my $lines = 0;
 my $f0 = "";
 my $cnn = 0;
 my $nc = 0;
+my $doDump = 0;
 my $shap = "";
 while (<STDIN>){
   chop();
@@ -45,24 +47,42 @@ while (<STDIN>){
   }
   if ($sha ne $shap && $shap ne ""){
     $sec = (unpack "C", substr ($shap, 0, 1))%$nsec;
-    if (defined $c2p{$sec}{$shap}){
-		print STDERR "input not sorted at $lines pref $hsha followed by seen ".(toHex($shap)).";$p\n";
-      exit ();     
-    }
+    #if (defined $c2p{$sec}{$shap}){
+    #  print STDERR "input not sorted at $lines pref $hsha followed by seen ".(toHex($shap)).";$p\n";
+    #  exit ();     
+    #}
     $nc ++;
     my $ps = join '', sort keys %tmp;
-    $c2p{$sec}{$shap} = $ps;
+    $c2p1{$sec}{$shap} = $ps;
     %tmp = ();
+    if ($doDump){
+      dumpData ();
+      $doDump = 0;
+    }
   }  
   $shap = $sha;
   my $bb = fromHex ($hsha);
   $tmp{$bb}++;
-  print STDERR "$lines done\n" if (!($lines%100000000));
+  if (!($lines%500000000)){
+    print STDERR "$lines done\n";
+    $doDump = 1;
+  }
 }
 
 my $ps = join '', sort keys %tmp;
 $sec = (unpack "C", substr ($shap, 0, 1))%$nsec;
-$c2p{$shap} = $ps;
+$c2p1{$shap} = $ps;
+dumpData ();
+
+
+sub dumpData {
+  for my $s (0..($nsec -1)){
+    while (my ($c, $v) = each %{$c2p1{$s}}){
+      $c2p{$s}{$c} = $v;
+    }
+    %{$c2p1{$s}} = ();         
+  }
+}
 
 for $sec (0..($nsec -1)){
   untie %{$c2p{$sec}};
