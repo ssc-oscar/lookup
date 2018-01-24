@@ -16,36 +16,34 @@ sub fromHex {
 } 
 
 my %fi;
-open B, "|gzip>$ARGV[0].idxf";
-open A, "gunzip -c files2p.gz|";
-my $idx = 0;
-while (<A>){
+open B, "gunzip -c $ARGV[0].idxf|";
+while (<B>){
   chop();
-  my ($f, $n) = split(/\;/, $_, -1);
-  if (!defined $fi{$f}){
-    print B "$idx;$f\n";
-    $fi{$f} = $idx;
-    $idx ++;
-  }
+  my ($idx, $f) = split(/\;/, $_, -1);
+  $fi{$f} = $idx;
 }
 close (B);
-close (A);
-
-my %a2f;
-my $fbase="/fast1/All.sha1c/";
-tie %a2f, "TokyoCabinet::HDB", "$fbase/a2fFull.tch", TokyoCabinet::HDB::OREADER,
-   16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
-  or die "cant open $fbase/a2fFull.tch\n";
 
 
-open A, "|gzip>$ARGV[0].bina";
-open B, "|gzip>$ARGV[0].idxa";
+my $sec = $ARGV[1];
 my $idxA = 0;
-while (my ($a, $v) = each %a2f){
-  reMap ($a, $v);
-}
-untie %a2f;
-close B;
+open B, "|gzip>$ARGV[0].$sec.idxc";
+open A, "|gzip>$ARGV[0].$sec.binc";
+my $sections = 8;
+my $fbase ="/fast1/All.sha1c";
+my %c2f;
+#for my $sec (0..($sections-1)){
+  tie %c2f, "TokyoCabinet::HDB", "$fbase/c2fFull.$sec.tch", TokyoCabinet::HDB::OREADER,   
+        16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
+     or die "cant open $fbase/c2fFull.$sec.tch\n";
+
+  while (my ($a, $v) = each %c2f){
+    reMap (toHex ($a), $v);
+  }
+
+  untie %c2f;
+#}
+
 
 sub reMap {
   my ($a, $v) = @_;
@@ -89,7 +87,5 @@ sub safeComp {
     return "";
   }
 }
-
-
 
 
