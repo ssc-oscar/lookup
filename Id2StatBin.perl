@@ -59,6 +59,7 @@ sub outputTC {
   while (my ($c, $v) = each %c2p1){
     my $vp = pack "L*", ($v + 0);
     $c2p{$c} = $vp;
+    print "$lines dumped\n" if (!(($lines++)%10000000));
   }
   untie %c2p;
 }
