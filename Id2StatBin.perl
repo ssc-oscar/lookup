@@ -43,7 +43,7 @@ while (<STDIN>){
   my $fp = pack "L*", ($f+0);
   $c2p1{$fp}+=$p;
 }
-print STDERR "read $lines dumping $nc commits\n";
+print STDERR "read $lines dumping\n";
 
 $lines = 0;
 outputTC ($ARGV[0]);
@@ -57,7 +57,7 @@ sub outputTC {
         16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
       or die "cant open $fname\n";
   while (my ($c, $v) = each %c2p1){
-    my $vp = pack "L*", $v + 0;
+    my $vp = pack "L*", ($v + 0);
     $c2p{$c} = $vp;
   }
   untie %c2p;
