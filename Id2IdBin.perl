@@ -40,8 +40,8 @@ while (<STDIN>){
   chop();
   $lines ++;
   my ($f, $p) = split (/\;/, $_);
-  my $fp = pack "L*", $f;
-  my $pp = pack "L*", $p;
+  my $fp = pack "L*", $f+0;
+  my $pp = pack "L*", $p+0;
   if ($inverse){
     $nc ++ if !defined $c2p1{$pp};
     $c2p1{$pp}{$fp}++;

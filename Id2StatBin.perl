@@ -40,7 +40,7 @@ while (<STDIN>){
   chop();
   $lines ++;
   my ($f, $p) = split (/\;/, $_);
-  my $fp = pack "L*", $f;
+  my $fp = pack "L*", ($f+0);
   $c2p1{$fp}+=$p;
 }
 print STDERR "read $lines dumping $nc commits\n";
