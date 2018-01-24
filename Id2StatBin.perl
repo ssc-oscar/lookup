@@ -57,7 +57,7 @@ sub outputTC {
         16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
       or die "cant open $fname\n";
   while (my ($c, $v) = each %c2p1){
-    my $vp = pack "L*", $v;
+    my $vp = pack "L*", $v + 0;
     $c2p{$c} = $vp;
   }
   untie %c2p;
