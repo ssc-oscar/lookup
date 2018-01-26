@@ -17,17 +17,28 @@ sub fromHex {
 
 my $detail = 0;
 $detail = $ARGV[1]+0 if defined $ARGV[1];
+my $split = 1;
+$split = $ARGV[2] + 0 if defined $ARGV[2];
+
 my %p2c;
-tie %p2c, "TokyoCabinet::HDB", "$ARGV[0]", TokyoCabinet::HDB::OREADER,   
+for my $sec (0..($split-1)){
+  my $fname = "$ARGV[0].$sec.tch";
+  $fname = $ARGV[0] if ($split == 1);
+  tie %{$p2c{$sec}}, "TokyoCabinet::HDB", "$fname", TokyoCabinet::HDB::OREADER,   
         16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
-     or die "cant open $ARGV[0]\n";
+      or die "cant open $fname\n";
+}
 
 while (<STDIN>){
   chop();
   my $p = $_;
-  list ($p, $p2c{$p}) if defined $p2c{$p};
+  my $sec = (unpack "C", substr ($p, 0, 1))%$split;
+  list ($p, $p2c{$sec}{$p}) if defined $p2c{$sec}{$p};
 }
-untie %p2c;
+for my $sec (0..($split-1)){
+  untie %{$p2c{$sec}};
+}
+
 
 sub list {
   my ($p, $v) = @_;
