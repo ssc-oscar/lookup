@@ -19,19 +19,20 @@ my %a2f;
 my %f2a;
 my %fstat;
 
-tie %a2f, "TokyoCabinet::HDB", "A2F.tch", TokyoCabinet::HDB::OWRITER | TokyoCabinet::HDB::OCREAT,   
+tie %a2f, "TokyoCabinet::HDB", "/fast1/A2F.tch", TokyoCabinet::HDB::OREADER,   
         16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
-     or die "cant open A2F.tch\n";
-#tie %f2a, "TokyoCabinet::HDB", "F2A.tch", TokyoCabinet::HDB::OWRITER | TokyoCabinet::HDB::OCREAT,   
-#        16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
-#     or die "cant open F2A.tch\n";
-tie %fstat, "TokyoCabinet::HDB", "F2NC.tch", TokyoCabinet::HDB::OWRITER | TokyoCabinet::HDB::OCREAT,   
+     or die "cant open /fast1/A2F.tch\n";
+tie %f2a, "TokyoCabinet::HDB", "/fast1/F2A.tch", TokyoCabinet::HDB::OREADER,   
         16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
-     or die "cant open F2NC.tch\n";
+     or die "cant open /fast1/F2A.tch\n";
+tie %fstat, "TokyoCabinet::HDB", "/fast1/F2NC.tch", TokyoCabinet::HDB::OREADER,   
+        16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
+     or die "cant open /fast1/F2NC.tch\n";
 
 while (<STDIN>){
   chop();
   my $na = $_ + 0;
+  print STDERR "doing $na\n";
   my $n = fromNum ($na);
   my $fs = getFs ($a2f{$n});
   my %d = ();
@@ -44,14 +45,18 @@ while (<STDIN>){
      $d{$au} += $fn;
     }
   }
+  my $nn = 0;
   for my $au (sort { $d{$b} <=> $d{$a} } keys %d){
     print "$na;".(toNum($au)).";$d{$au}\n";
+    $nn++;
+    last if $nn > 200;
   }
 }
 
 sub getFs {
   my $v = $_[0];
   my $ns = length($v)/4;
+  print STDERR "$ns files\n";
   my %fs = ();
   for my $i (0..($ns-1)){
     my $a = substr ($v, 4*$i, 4);
@@ -63,6 +68,7 @@ sub getFs {
 sub getAs {
   my $v = $_[0];
   my $ns = length($v)/4;
+  #print STDERR "$ns authors\n";
   my %as = ();
   for my $i (0..($ns-1)){
     my $a = substr ($v, 4*$i, 4);
