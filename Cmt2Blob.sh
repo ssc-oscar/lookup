@@ -21,20 +21,25 @@ lsort 20G -u --merge <(gunzip -c /da0_data/c2fbp/os.p2c.000-890.cs) <(gunzip -c 
 gunzip -c c2fFullE[0-7].gz | awk -F\; '{print $2";"$1}' | /da3_data/lookup/splitSec.perl f2cFullE. 8
 for i in {0..7}
 do gunzip -c /da0_data/c2fbp/c2fFullE$i.gz | /da3_data/lookup/Cmt2FileBin.perl c2fFullE.$i 1
-   gunzip -c /da0_data/c2fbp/f2cFullE.6.gz | awk -F\; '{print $2";"$1}' | /da3_data/lookup/File2CmtBin.perl f2cFullE.6 1 &
+   gunzip -c /da0_data/c2fbp/f2cFullE.$i.gz | awk -F\; '{print $2";"$1}' | /da3_data/lookup/File2CmtBin.perl f2cFullE.$i 1 &
 done
 
 #c2b,b2c
+gunzip -c b2cFullE[0-7].s | awk -F\; '{print $2";"$1}' | /da3_data/lookup/splitSec.perl c2bFullE. 16
 for i in {0..15}
-do gunzip -c /da0_data/c2fbp/b2cFullB$i.gz | awk -F\; '{print $2";;"$1}'| /da3_data/lookup/Cmt2BlobBin.perl c2bFullB.$i.tch 1 & done
-   gunzip -c /da0_data/c2fbp/b2cFullB$i.gz | awk -F\; '{print $1";;"$2}'| /da3_data/lookup/Cmt2BlobBin.perl b2cFullB.$i.tch 1 & done
+do gunzip -c /da4_data/basemaps/gz/c2bFullE$i.gz | awk -F\; '{print $1";;"$2}'| /da3_data/lookup/Cmt2BlobBin.perl c2bFullE.$i.tch 1 & done
+   gunzip -c /da4_data/basemaps/gz/b2cFullE$i.s | awk -F\; '{print $1";;"$2}'| /da3_data/lookup/Cmt2BlobBinSorted.perl b2cFullE.$i.tch 1 & done
 done
 
 
 #When updatig do two things
 #1) extract project to commit map from olist
 #2) run ./cmputeDiff2.perl to create additional c2fb
-
+#3) get c2f, b2c from these new c2fb
+#4) merge with  b2cFullX and c2fFullX
+#5) produce b2cFullX and c2fFullX tch
+#6) invert b2cFullX and c2fFullX with splitSec.perl
+#7) produce c2bFullX and f2cFullX tch
 
 ###################################
 #everything below is old stuff
@@ -192,7 +197,7 @@ for k in {0..5}; do
 done
 gunzip -c c2fN.[0-5].bad.c2fb | head -30 | perl -ane '@x=split(/;/, $_, -1);$x[1]=~s|^/*||;print "$x[0];$x[1]\n" if $x[0] =~ m/^[0-9a-f]{40}$/;' | lsort 100G -t\; -k1b -u | gzip > c2fN.bad.gz
 sort 130G -u -k1b --merge <(gunzip -c c2fN.{133,363,400-427,428,429-521,522,523-614}.gz) <(gunzip -c c2fN.0-399.133,363.gz) <(gunzip -c c2fN.bad.gz) <(gunzip -c /data/basemaps/c2f.00-81.s) | ./splitSec.perl c2fFull 8
-for i in {0..7}; do gunzip -c c2fFull$i.gz | /da3_data/lookup/Cmt2FileBinSorted.perl c2fFull.$i 1 & done
+for i in {0..7}; do gunzip -c c2fFull$i.gz | /da3_data/lookup/Cmt2FileBin.perl c2fFull.$i 1 & done
 
 
 #Similarly for blob2commit
@@ -212,11 +217,17 @@ done
 #cmd=$(echo "lsort 10G -t\; -k1b,2 --merge -u"; for k in {NNN..MMM}; do echo " <(gunzip -c $c/$s.$k.gz)"; done)
 #eval $cmd | gzip > $c/$s.$i-$j.gz
 #lsort 130G -u -k1b --merge <(gunzip -c b2cN.000-614.gz) <(gunzip -c b2c.00-81.gz) | /da3_data/lookup/splitSec.perl b2cFull 16
-lsort 50G -t\; -k1b,2 --merge -u <(gunzip -c b2c.00-19.s) <(gunzip -c b2c.20-39.s) <(gunzip -c b2c.40-59.s) <(gunzip -c b2c.60-81.s) <(gunzip -c b2cN.000-614.gz) | /da3_data/lookup/splitSec.perl b2cFull 16 &
-for i in {0..15}; do gunzip -c b2cFull$i.gz | sed 's/;/;;/' | /da3_data/lookup/Cmt2BlobBinSorted.perl b2cFull.$i 1 & done
+#lsort 50G -t\; -k1b,2 --merge -u <(gunzip -c b2c.00-19.s) <(gunzip -c b2c.20-39.s) <(gunzip -c b2c.40-59.s) <(gunzip -c b2c.60-81.s) <(gunzip -c b2cN.000-614.gz) | /da3_data/lookup/splitSec.perl b2cFull 16 &
+
+ls -f *.c2fb | grep -v '^cNot\.[0-6][0-9][0-9]\.' | while read i; do gunzip -c $i | awk -F\; '{print $3";"$1}' ; done | grep -E '^[0-9a-f]{40};[0-9a-f]{40}$' | \
+     /da3_data/lookup/splitSec.perl b2c.misc.  16 &
+gunzip -c b2cN.000-614.gz | grep -E '^[0-9a-f]{40};' | /da3_data/lookup/splitSec.perl b2c.000-614. 16 &
 
 
+gunzip -c b2c.000-614.$i.gz ../basemaps/gz/b2c.00-81.s1.$i.gz b2c.misc.$i.gz ../basemaps/b2cFullB$i.s | lsort 70G -t\; -k1b,2 -u | gzip > b2cFullE$i.s
 
+for i in {0..15}; do
+    gunzip -c b2cFullE$i.s | sed 's/;/;;/' | /da3_data/lookup/Cmt2BlobBin.perl b2cFullD.$i.tch 1 & done
 
 #do summaries of the old stuff in  c2b.00-81.s, b2f.00-81.s, c2f.00-81.s
 for i in {00..81}; do
