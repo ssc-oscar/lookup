@@ -28,7 +28,7 @@ sub safeDecomp {
 
 
 my $detail = 0;
-$detail = $ARGV[1] if defined $ARGV[1];
+$detail = $ARGV[1]+0 if defined $ARGV[1];
 my $split = 1;
 $split = $ARGV[2] + 0 if defined $ARGV[2];
 
