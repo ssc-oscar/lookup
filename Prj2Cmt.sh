@@ -2,10 +2,49 @@
 #now do Project to commit
 ##################################
 
+#See steps in Cmt2Blob.sh
+#1) extract project to commit list from olist
+#2) update Cmt2Prj
+#e.d .CRAN
+cd /da4/data/update
+cd CRAN
+ls -f CRAN/*.olist.gz  | while read i; do gunzip -c $i | \
+ grep ';commit;' | \
+ sed 's/;commit;/;/;s|/*;|;|;s|\.git;|;|;s|/*;|;|'  | \
+ perl -ane 'chop();($p,$c)=split(/\;/,$_,-1);$p=~s/.*github.com_(.*_.*)/$1/;$p=~s/^bitbucket.org_/bb_/;$p=~s|\.git$||;$p=~s|/*$||;$p=~s/\;/SEMICOLON/g;$p = "EMPTY" if $p eq "";print "$c;$p\n";'  
+done | lsort 20G -t\; -k1b,2 -u | gzip > CRAN.c2p &
+gunzip -c CRAN.c2p | /da3_data/lookup/splitSec.perl CRAN.c2p. 8
+
+for i in {0..7}; do 
+lsort 100G --merge -u -t\; -k1b,2 <(gunzip -c CRAN.c2p.$i.gz) \
+      <(gunzip -c /data/basemaps/gz/Cmt2PrjF$i.s) | \
+    gzip > /data/basemaps/gz/Cmt2PrjG$i.s
+gunzip -c Cmt2PrjG$i.s | sed 's/;/;;;/'| /da3_data/lookup/Cmt2PrjBinSorted.perl /data/basemaps/Cmt2PrjG.$i.tch 1
+done
+for i in {0..7}; do gunzip -c Cmt2PrjG$i.s
+done | awk -F\; '{print $2";"$1}' | \
+    /da3_data/lookup/splitSec.perl Prj2CmtG. 8 
+for i in {0..7}; do 
+    gunzip -c Prj2CmtG$i.s | sed 's/;/;;;/'| \
+   /da3_data/lookup/Prj2CmtBin.perl /data/basemaps/Prj2CmtG.$i.tch 1
+done
+
+
+############################
+##################
+#this is old
+##################
+
+gunzip -c /da4_data/basemaps/Cmt2Prj.$i.lst | perl -ane 'chop();($k,$n,@ps)=split(/\;/, $_, -1); for my $p (@ps){print "$k;$p\n";}' | join -v2 -t\; - <(gunzip -c FromNewOlist|grep -E '^[0-9a-f]{40};') | gzip > Cmt2Prj.$i.notIn1
+
+
+
+
+####
 #in the future, just get updates only from All.blobs/commit_XX.vs
 #get the complete info from All.blobs/commit_XX.vs
 #cut -d\; -f4,6 /data/All.blobs/commit_*.vs | perl -ane 'chop();($c,$p)=split(/\;/,$_,-1);$p=~s/.*github.com_(.*_.*)/$1/;$p=~s/^bitbucket.org_/bb_/;$p=~s|\.git$||;$p=~s|/*$||;$p=~s/\;/SEMICOLON/g;$p = "EMPTY" if $p eq "";print "$c;$p\n";' | lsort 130G -u | gzip > /data/basemaps/c2pN.s 
-keep track of prior commit_.vs state in All.blobs, perhaps via line numbers?, then only process that
+#keep track of prior commit_.vs state in All.blobs, perhaps via line numbers?, then only process that
 
 
 #Do full snapshot from all possible sources
@@ -37,15 +76,56 @@ gunzip -c /da1_data/delta/proc.$i.s | sed 's/;/;;;/'| ./Cmt2PrjBinSorted.perl pr
 gunzip -c /da1_data/delta/proc.$i.gz | uniq | perl -ane 'chop();($p,$c)=split(/\;/,$_,-1);$p=~s/.*github.com_(.*_.*)/$1/;$p=~s/^bitbucket.org_/bb_/;$p=~s|\.git$||;$p=~s|/*$||;$p=~s/\;/SEMICOLON/g;$p = "EMPTY" if $p eq "";print "$c;$p\n";'  | \
     sed 's/;/;;;/'| ./Cmt2PrjBin.perl proc.$i
 
+####################################
+#get the list of objects from olist files
+####################################
+da4
+cd /data/
+find . -name '*olist*' > os.$(date +"%Y%m%d")
+
+#actually its run on beacon since it takes forever
+cat os.$(date +"%Y%m%d") | grep '\.gz$' | while read i; do
+    gunzip -c $i | grep ';commit;' | sed 's/;commit;/;/;s|/*;|;|;s|\.git;|;|;s|/*;|;|';
+done | gzip > os.p2c &
+gunzip -c os.p2c | awk -F\; '{ print $2";"$1}' | lsort 240G -t\; -k1b,2 -u | gzip > os.p2c.s 
+
+da3
+cd /data
+find . -name '*olist*' > os.$(date +"%Y%m%d")
+
+#actually its run on beacon since it takes forever
+cat os.$(date +"%Y%m%d") | grep '\.gz$' | while read i; do
+    gunzip -c $i | grep ';commit;' | sed 's/;commit;/;/;s|/*;|;|;s|\.git;|;|;s|/*;|;|';
+done | gzip > os.p2c.da3 &
+gunzip -c os.p2c.da3 | awk -F\; '{ print $2";"$1}' | lsort 240G -t\; -k1b,2 -u | gzip > os.p2c.da3.s 
+
+## Final merge
+da4
+cd /data
+lsort 100G --merge -u -t\; -k1b,2 <(gunzip -c /da1_data/os.p2c.000-249.gz) <(gunzip -c /da3_data/os.p2c.da3.s) <(gunzip -c /da3_data/os.p2c1.s) <(gunzip -c os.p2c2.s) <(gunzip -c os.p2c3.s) <(gunzip -c os.p2c4.s) | /da3_data/lookup/splitSec.perl os.p2c. 8
+cmd=$(echo "lsort 50G -u --merge";ls -f os.p2c.[0-7].gz |while read i; do echo " <(gunzip -c $i|cut -d\; -f1|uniq)"; done)
+eval $cmd | gzip > os.p2c.cs
+
+#In parallel based on beakon data:
+cd /da0_data/c2fbp
+cmd=$(echo "lsort 50G -u --merge";ls -f os.p2c.*.gz |while read i; do echo " <(gunzip -c $i|cut -d\; -f1|uniq)"; done)
+eval $cmd | gzip > os.p2c.000-890.cs1 
+#gunzip -c /data/os.p2c.0.gz | perl -ane 'chop();($c,$p)=split(/\;/,$_,-1);$p=~s/.*github.com_(.*_.*)/$1/;$p=~s/^bitbucket.org_/bb_/;$p=~s|\.git$||;$p=~s|/*$||;$p=~s/\;/SEMICOLON/g;$p = "EMPTY" if $p eq "";print "$c;$p\n";' 
+
+
+
 
 #now merge all the lists:
-for i in {0..7}
-do ls -f /fast1/*.$i.tch | ./f2nMergeSplit.perl Cmt2PrjFull.$i.tch 1
-done
+#for i in {0..7}
+#do ls -f /fast1/*.$i.tch | ./f2nMergeSplit.perl Cmt2PrjFull.$i.tch 1
+#done
 # export
-./Cmt2PrjList.perl Cmt2PrjFull.$i.tch 1 | perl -ane 'chop();($c, $l, @v)=split(/\;/, $_, -1);
+#./Cmt2PrjList.perl Cmt2PrjFull.$i.tch 1 | perl -ane 'chop();($c, $l, @v)=split(/\;/, $_, -1);
+
+
 
 #then invert for prj2cmt
+
 
 
 

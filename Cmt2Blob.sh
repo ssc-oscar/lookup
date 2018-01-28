@@ -41,6 +41,10 @@ done
 #6) invert b2cFullX and c2fFullX with splitSec.perl
 #7) produce c2bFullX and f2cFullX tch
 
+What to do with the tree-base maps f2b, b2pt, t2pt
+
+What do do with c2pc, c2cc, t2c?
+
 ###################################
 #everything below is old stuff
 ###################################
