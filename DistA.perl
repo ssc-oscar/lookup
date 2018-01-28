@@ -1,4 +1,4 @@
-#!/bin/perl -I /home/audris/lib64/perl5
+#!/usr/bin/perl -I /home/audris/lib64/perl5
 
 use strict;
 use warnings;
