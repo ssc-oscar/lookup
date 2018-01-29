@@ -61,7 +61,7 @@ while (<STDIN>){
     }
   }  
   $cp = $c;
-  my $b = fromHex ($bb);
+  my $b = fromHex ($hb);
   $tmp{$b}++;
   if (!($lines%500000000)){
     print STDERR "$lines done\n";
