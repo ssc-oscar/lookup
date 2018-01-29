@@ -40,11 +40,11 @@ sub safeDecomp {
 my (%tmp, %c2p, %c2p1);
 my $sec;
 my $nsec = 8;
-$nsec = $ARGV[1] if defined $ARGV[1];
+$nsec = $ARGV[1] + 0 if defined $ARGV[1];
 
 for $sec (0..($nsec -1)){
   my $fname = "$ARGV[0].$sec.tch";
-  $fname = "$ARGV[0]" if $nsec == 1;
+  $fname = $ARGV[0] if $nsec == 1;
   tie %{$c2p{$sec}}, "TokyoCabinet::HDB", "$fname", TokyoCabinet::HDB::OWRITER | TokyoCabinet::HDB::OCREAT,   
       16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
      or die "cant open $fname\n";
@@ -55,41 +55,40 @@ my $f0 = "";
 my $cnn = 0;
 my $nc = 0;
 my $doDump = 0;
-my $shap = "";
+my $cp = "";
 while (<STDIN>){
   chop();
   $lines ++;
-  my ($hsha, $f, $b, $p) = split (/\;/, $_);
-  if (length ($hsha) != 40){
+  my ($hc, $f, $hb, $p) = split (/\;/, $_);
+  if ($hc !~ m|^[0-9a-f]{40}$|){
     print STDERR "bad sha:$_\n";
     next;
   }
-  my $sha = fromHex ($hsha);
+  my $c = fromHex ($hc);
   $p =~ s/.*github.com_(.*_.*)/$1/;
   $p =~ s/^bitbucket.org_/bb_/;
   $p =~ s/\.git$//;
   $p =~ s|/*$||;
   $p =~ s/\;/SEMICOLON/g;
   $p = "EMPTY" if $p eq "";
-  if ($sha ne $shap && $shap ne ""){
-    $sec = (unpack "C", substr ($shap, 0, 1))%$nsec;
+  if ($c ne $cp && $cp ne ""){
+    $sec = (unpack "C", substr ($cp, 0, 1))%$nsec;
     #if (defined $c2p{$sec}{$shap}){
-    #  print STDERR "input not sorted at $lines pref $hsha followed by seen ".(toHex($shap)).";$p\n";     
+    #  print STDERR "input not sorted at $lines pref $hc followed by seen ".(toHex($cp)).";$p\n";     
     #  for my $p0 (split(/\;/, safeDecomp($c2p{$sec}{$shap}), -1)){
     #    $tmp{$p0}++;
-    #  }
     #}
     $nc ++;
     my $ps = join ';', sort keys %tmp;
     my $psC = safeComp ($ps);
-    $c2p1{$sec}{$shap} = $psC;
+    $c2p{$sec}{$cp} = $psC;
     %tmp = ();
     if ($doDump){
       dumpData ();
       $doDump = 0;
     }
   }  
-  $shap = $sha;
+  $cp = $c;
   $tmp{$p}++;
   if (!($lines%500000000)){
     print STDERR "$lines done\n";
@@ -99,8 +98,8 @@ while (<STDIN>){
 
 my $ps = join ';', sort keys %tmp;
 my $psC = safeComp ($ps);
-$sec = (unpack "C", substr ($shap, 0, 1))%$nsec;
-$c2p1{$shap} = $psC;
+$sec = (unpack "C", substr ($cp, 0, 1))%$nsec;
+$c2p1{$sec}{$cp} = $psC;
 dumpData ();
 
 
