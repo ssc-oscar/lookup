@@ -71,7 +71,7 @@ while (<STDIN>){
 
 my $bs = join '', sort keys %tmp;
 $sec = (unpack "C", substr ($cp, 0, 1))%$nsec;
-$c2p1{$cp} = $bs;
+$c2p1{$sec}{$cp} = $bs;
 dumpData ();
 
 
