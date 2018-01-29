@@ -32,46 +32,46 @@ my $f0 = "";
 my $cnn = 0;
 my $nc = 0;
 my $doDump = 0;
-my $shap = "";
+my $cp = "";
 while (<STDIN>){
   chop();
   $lines ++;
-  my ($hsha, $f, $b, $p) = split (/\;/, $_);
-  if ($hsha !~ m|^[0-9a-f]{40}$|){
+  my ($hc, $f, $hb, $p) = split (/\;/, $_);
+  if ($hc !~ m|^[0-9a-f]{40}$|){
     print STDERR "bad sha:$_\n";
     next;
   }    
-  my $sha = fromHex ($hsha);
-  if ($b !~ m|^[0-9a-f]{40}$|){
+  my $c = fromHex ($hc);
+  if ($hb !~ m|^[0-9a-f]{40}$|){
     print STDERR "bad sha:$_\n";
   }
-  if ($sha ne $shap && $shap ne ""){
-    $sec = (unpack "C", substr ($shap, 0, 1))%$nsec;
+  if ($c ne $cp && $cp ne ""){
+    $sec = (unpack "C", substr ($cp, 0, 1))%$nsec;
     #if (defined $c2p{$sec}{$shap}){
     #  print STDERR "input not sorted at $lines pref $hsha followed by seen ".(toHex($shap)).";$p\n";
     #  exit ();     
     #}
     $nc ++;
-    my $ps = join '', sort keys %tmp;
-    $c2p1{$sec}{$shap} = $ps;
+    my $bs = join '', sort keys %tmp;
+    $c2p1{$sec}{$cp} = $bs;
     %tmp = ();
     if ($doDump){
       dumpData ();
       $doDump = 0;
     }
   }  
-  $shap = $sha;
-  my $bb = fromHex ($hsha);
-  $tmp{$bb}++;
+  $cp = $c;
+  my $b = fromHex ($bb);
+  $tmp{$b}++;
   if (!($lines%500000000)){
     print STDERR "$lines done\n";
     $doDump = 1;
   }
 }
 
-my $ps = join '', sort keys %tmp;
-$sec = (unpack "C", substr ($shap, 0, 1))%$nsec;
-$c2p1{$shap} = $ps;
+my $bs = join '', sort keys %tmp;
+$sec = (unpack "C", substr ($cp, 0, 1))%$nsec;
+$c2p1{$cp} = $bs;
 dumpData ();
 
 
