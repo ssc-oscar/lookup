@@ -13,7 +13,17 @@ sub fromHex {
         return pack "H*", $_[0]; 
 } 
 
-my (%c2p1);
+sub safeComp {
+  my $code = $_[0];
+  try {
+    my $codeC = compress ($code);
+    return $codeC;
+  } catch Error with {
+    my $ex = shift;
+    print STDERR "Error: $ex\n$code\n";
+    return "";
+  }
+}my (%c2p1);
 my $nsec = 8;
 $nsec = $ARGV[1] if defined $ARGV[1];
 
@@ -69,6 +79,7 @@ sub outputTC {
   my %c2p;
   for $sec (0..($nsec -1)){
     my $fname = "$ARGV[0].$sec.tch";
+    $fname = "$ARGV[0]" if $nsec == 1;
     tie %{$c2p{$sec}}, "TokyoCabinet::HDB", "$fname", TokyoCabinet::HDB::OWRITER | TokyoCabinet::HDB::OCREAT,   
         16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
       or die "cant open $fname\n";
@@ -83,17 +94,5 @@ sub outputTC {
   }
   for $sec (0..15){
     untie %{$c2p{$sec}};
-  }
-}
-
-sub safeComp {
-  my $code = $_[0];
-  try {
-    my $codeC = compress ($code);
-    return $codeC;
-  } catch Error with {
-    my $ex = shift;
-    print STDERR "Error: $ex\n$code\n";
-    return "";
   }
 }

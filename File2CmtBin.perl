@@ -36,12 +36,21 @@ $nsec = $ARGV[1] if defined $ARGV[1];
 my (%c2p, %c2p1);
 my $lines = 0;
 my $f0 = "";
+
+for $sec (0..($nsec -1)){
+  my $fname = "$ARGV[0].$sec.tch";
+  $fname = "$ARGV[0]" if $nsec == 1;
+  tie %{$c2p{$sec}}, "TokyoCabinet::HDB", "$fname", TokyoCabinet::HDB::OWRITER | TokyoCabinet::HDB::OCREAT,   
+        16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
+     or die "cant open $fname\n";
+}
+
 while (<STDIN>){
   $lines ++;
-  if (!($lines%15000000000)){
-    output ();
-    %c2p1 = ();
-  }    
+  #if (!($lines%15000000000)){
+  #  output ();
+  #  %c2p1 = ();
+  #}    
   my ($hsha, $f, $p, $b) = split (/\;/, $_);
   my $sha = fromHex ($hsha);
   $f =~ s/;/SEMICOLON/g;
@@ -50,16 +59,9 @@ while (<STDIN>){
   print STDERR "$lines done\n" if (!($lines%100000000));
 }
 
-for $sec (0..($nsec -1)){
-  my $fname = "$ARGV[0].$sec.tch";
-  tie %{$c2p{$sec}}, "TokyoCabinet::HDB", "$fname", TokyoCabinet::HDB::OWRITER | TokyoCabinet::HDB::OCREAT,   
-        16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
-     or die "cant open $fname\n";
-}
-
 output ();
 
-for $sec (0..15){
+for $sec (0..($nsec -1)){
   untie %{$c2p{$sec}};
 }
 
