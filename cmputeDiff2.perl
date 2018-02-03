@@ -65,8 +65,8 @@ sub getCT {
 		  $tree = $1;
      } 
      $parent .= ":$1" if ($l =~ m/^parent (.*)$/);
-     ($auth, $ta) = ($1, $2) if ($l =~ m/^author (.*)\s([0-9]+\s[\+\-]+\d+)$/);
-     ($cmtr, $tc) = ($1, $2) if ($l =~ m/^comitter (.*)\s([0-9]+\s[\+\-]+\d+)$/);
+     ($auth, $ta) = ($1, $2) if ($l =~ m/^author (.*)\s([0-9]+\s[\+\-]*\d+)$/);
+     ($cmtr, $tc) = ($1, $2) if ($l =~ m/^comitter (.*)\s([0-9]+\s[\+\-]*\d+)$/);
   }
   $parent =~ s/^:// if defined $parent;
   return ($tree, $parent);
@@ -80,7 +80,11 @@ my $fs="";
 while(<STDIN>){
   chop();
   $rev = $_;
-  next if length($rev) ne 40;    	
+  next if length($rev) ne 40; 
+  if ($rev eq "3759c6529b44b636b845fb1c8a0f42c4d14d7150"){
+    print STDERR "nasty test commit 3759c6529b44b636b845fb1c8a0f42c4d14d7150: ignoring\n";
+    next;
+  }   	
 
   my ($tree, $parent) = getCT ($rev);
   if ($tree eq ""){
