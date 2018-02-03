@@ -60,13 +60,10 @@ sub getCT {
   my ($tree, $parent, $auth, $cmtr, $ta, $tc) = ("","","","","","");
   my ($pre, @rest) = split(/\n\n/, $code, -1);
   for my $l (split(/\n/, $pre, -1)){
-     #print "$l\n";
      if ($l =~ m/^tree (.*)$/){
 		  $tree = $1;
      } 
      $parent .= ":$1" if ($l =~ m/^parent (.*)$/);
-     ($auth, $ta) = ($1, $2) if ($l =~ m/^author (.*)\s([0-9]+\s[\+\-]*\d+)$/);
-     ($cmtr, $tc) = ($1, $2) if ($l =~ m/^comitter (.*)\s([0-9]+\s[\+\-]*\d+)$/);
   }
   $parent =~ s/^:// if defined $parent;
   return ($tree, $parent);
