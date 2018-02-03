@@ -18,6 +18,20 @@ sub fromNum {
 my %a2f;
 my %f2a;
 my %fstat;
+my %i2a;
+my %a2i;
+
+my $unmap = 0;
+$unmap = $ARGV[0] if ($ARGV[0]);
+if ($unmap){
+  open A, "gunzip -c Auth2FID.idxa|";
+  while (<A>){
+    chop();
+    my ($i, $a) = split (/\;/);
+    $i2a{$i} = $a;
+    $a2i{$a} = $i;
+  }
+}
 
 tie %a2f, "TokyoCabinet::HDB", "/fast1/A2F.tch", TokyoCabinet::HDB::OREADER,   
         16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
@@ -26,9 +40,16 @@ tie %f2a, "TokyoCabinet::HDB", "/fast1/F2A.tch", TokyoCabinet::HDB::OREADER,
         16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
      or die "cant open /fast1/F2A.tch\n";
 
+
 while (<STDIN>){
   chop();
-  my $na = $_ + 0;
+  my $na = $_;
+  my $na0 = $na;
+  if ($unmap){
+    $na = $a2i{$na};
+  }else{
+    $na = $na0 + 0;
+  }
   print STDERR "doing $na\n";
   my $n = fromNum ($na);
   my $fs = getFs ($a2f{$n});
@@ -44,7 +65,9 @@ while (<STDIN>){
   }
   my $nn = 0;
   for my $au (sort { $d{$b} <=> $d{$a} } keys %d){
-    print "$na;".(toNum($au)).";$d{$au}\n";
+    my $a = toNum($au);
+    $a = $i2a{$a} if ($unmap);
+    print "$na0;$a;$d{$au}\n";
     $nn++;
     last if $nn > 200;
   }
