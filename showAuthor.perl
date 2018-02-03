@@ -118,8 +118,7 @@ sub extrCmt {
   my ($tree, $parent, $auth, $cmtr, $ta, $tc) = ("","","","","","");
   my ($pre, @rest) = split(/\n\n/, $code, -1);
   for my $l (split(/\n/, $pre, -1)){
-     ($auth, $ta) = ($1, $2) if ($l =~ m/^author (.*)\s([0-9]+\s[\+\-]+\d+)$/);
-
+     ($auth, $ta) = ($1, $2) if ($l =~ m/^author (.*)\s([0-9]+\s[\+\-]*\d+)$/);
   }
   return ($auth);
 }

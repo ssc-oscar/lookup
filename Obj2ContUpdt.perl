@@ -26,8 +26,8 @@ my (%fhos);
 my $sec = $ARGV[1];
 my $nTot = -1;
 $nTot = $ARGV[2] if defined $ARGV[2];
-{
-  my $lhash;
+my $lhash;
+if ($nTot < 0) {
   if ( -f "$fbaseOld$sec.idx"){
      open A, "tac $fbaseOld$sec.idx|head -1|" or die ($!);
      while (<A>){
@@ -39,8 +39,10 @@ $nTot = $ARGV[2] if defined $ARGV[2];
     die "No old idx: $fbaseOld$sec.idx\n";
   }
   print "up to $lhash\n";
-
+}
+{
   my $count = 0;
+  my $new = 0;
   my $pre = "/fast1";
   tie %{$fhos{$sec}}, "TokyoCabinet::HDB", "$pre/${fbase}$sec.tch", TokyoCabinet::HDB::OWRITER | TokyoCabinet::HDB::OCREAT,
         16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
@@ -66,13 +68,16 @@ $nTot = $ARGV[2] if defined $ARGV[2];
       my $codeC = "";
       #seek (FD, $of, 0);
       $boff -= $len;
-      seek (FD, $boff, 2);
-      my $rl = read (FD, $codeC, $len);
-      $fhos{$sec}{$h} = $codeC;      
+      if (!defined $fhos{$sec}{$h}){
+        seek (FD, $boff, 2);
+        my $rl = read (FD, $codeC, $len);
+        $fhos{$sec}{$h} = $codeC;
+        $new ++;
+      }      
     }
   }else{
     die "no $fbasei$sec.idx\n";
   }
-  print "$count ${type}s added\n";
+  print "$count ${type}s looked at and $new new added\n";
   untie %{$fhos{$sec}};
 }

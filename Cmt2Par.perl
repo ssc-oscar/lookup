@@ -28,7 +28,7 @@ for my $sec (0..127){
      or die "cant open $pre/${fbase}$sec.tch\n";
 
   while (my ($sha, $v) = each %{$fhos{$sec}}){
-    my ($tree, $parent, $auth, $cmtr, $ta, $tc, @rest) = extrCmt ($v);
+    my $parent = extrPar ($v);
     for my $p (split(/:/, $parent)){
       my $par = fromHex ($p);
       if (defined $fhoc{$par}){
@@ -54,19 +54,16 @@ sub safeDecomp {
         }
 }
 
-sub extrCmt {
+sub extrPar {
   my $codeC = $_[0];
   my $code = safeDecomp ($codeC);
 
-  my ($tree, $parent, $auth, $cmtr, $ta, $tc) = ("","","","","","");
+  my $parent = "";
   my ($pre, @rest) = split(/\n\n/, $code, -1);
   for my $l (split(/\n/, $pre, -1)){
-     $tree = $1 if ($l =~ m/^tree (.*)$/);
      $parent .= ":$1" if ($l =~ m/^parent (.*)$/);
-     ($auth, $ta) = ($1, $2) if ($l =~ m/^author (.*)\s([0-9]+\s[\+\-]+\d+)$/);
-     ($cmtr, $tc) = ($1, $2) if ($l =~ m/^committer (.*)\s([0-9]+\s[\+\-]+\d+)$/);
   }
   $parent =~ s/^:// if defined $parent;
-  return ($tree, $parent, $auth, $cmtr, $ta, $tc, @rest);
+  return $parent;
 }
 

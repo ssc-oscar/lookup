@@ -32,6 +32,9 @@ sub list {
   my ($p, $v) = @_;
   my $ns = length($v)/20;
   my %tmp = ();
+  #$p =~ s/\n$//;
+  #my $sec = (unpack "C", substr ($p, 0, 1))%8;
+  #print "$sec;$p;$ns";
   print "$p;$ns";
   if ($detail){
     for my $i (0..($ns-1)){
