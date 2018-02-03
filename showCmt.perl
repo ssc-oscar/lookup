@@ -47,11 +47,17 @@ sub extract_trimmed {
 }
 
 sub git_signature_parse {
-   my $buffer = $_[0];
+   my ($buffer, $cmt) = @_;
    my $email_start = index ($buffer, '<');
    my $email_end = index ($buffer, '>');
    if ($email_start < 0 || !$email_end || $email_end <= $email_start){
-      return signature_error("malformed e-mail ($email_start, $email_end): $buffer");
+     if ($email_end < $email_start){
+       print STDERR  "in $cmt malformed e-mail ($email_start, $email_end): $buffer\n";
+       $buffer =~ s/\>//;
+       return git_signature_parse ($buffer, $cmt);
+     }else{
+       return signature_error("in $cmt malformed e-mail ($email_start, $email_end): $buffer", $buffer);
+     }
    }
    $email_start += 1;
    my $name = extract_trimmed ($buffer, $email_start - 1);
@@ -110,7 +116,7 @@ sub getCmt {
   if ($debug){
     $msg =~ s/__NEWLINE__$//;
     $msg =~ s/;/SEMICOLON/g;
-    my ($a, $e) = git_signature_parse ($auth);
+    my ($a, $e) = git_signature_parse ($auth, $cmt);
     print "$msg;$cmt;$a;$e;$ta\n";
   }else{
     print "$cmt;$tree;$parents;$auth;$cmtr;$ta;$tc\n";
@@ -135,10 +141,13 @@ sub extrCmt {
      #print "$l\n";
      $tree = $1 if ($l =~ m/^tree (.*)$/);
      $parent .= ":$1" if ($l =~ m/^parent (.*)$/);
-     ($auth, $ta) = ($1, $2) if ($l =~ m/^author (.*)\s([0-9]+\s[\+\-]*\d+)$/);
-     ($cmtr, $tc) = ($1, $2) if ($l =~ m/^committer (.*)\s([0-9]+\s[\+\-]*\d+)$/);
-
+     #($auth, $ta) = ($1, $2) if ($l =~ m/^author (.*)\s([0-9]+\s[\+\-]*\d+)$/);
+     #($cmtr, $tc) = ($1, $2) if ($l =~ m/^committer (.*)\s([0-9]+\s[\+\-]*\d+)$/);
+     ($auth) = ($1) if ($l =~ m/^author (.*)$/);
+     ($cmtr) = ($1) if ($l =~ m/^committer (.*)$/);
   }
+  ($auth, $ta) = ($1, $2) if ($auth =~ m/^(.*)\s(-?[0-9]+\s+[\+\-]*\d+)$/);
+  ($cmtr, $tc) = ($1, $2) if ($cmtr =~ m/^(.*)\s(-?[0-9]+\s+[\+\-]*\d+)$/);
   $parent =~ s/^:// if defined $parent;
   return ($tree, $parent, $auth, $cmtr, $ta, $tc, @rest);
 }
