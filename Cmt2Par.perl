@@ -1,3 +1,4 @@
+#!/usr/bin/perl -I /home/audris/lib64/perl5
 use strict;
 use warnings;
 use Error qw(:try);
@@ -15,32 +16,34 @@ sub fromHex {
 
 my $sections = 128;
 
-my $fbase="All.sha1c/commit_";
+my $fbase="/fast1/All.sha1c/commit_";
 
-my (%fhos, %fhoc);
-my $pre = "/fast1";
-tie %fhoc, "TokyoCabinet::HDB", "$pre/${fbase}child.tch", TokyoCabinet::HDB::OWRITER | TokyoCabinet::HDB::OCREAT,
-        16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
-     or die "cant open $pre/${fbase}child.tch\n";
+my (%fhos, %fhoc, %fhoc1);
+
 for my $sec (0..127){
-  tie %{$fhos{$sec}}, "TokyoCabinet::HDB", "$pre/${fbase}$sec.tch", TokyoCabinet::HDB::OREADER,
+  tie %{$fhos{$sec}}, "TokyoCabinet::HDB", "${fbase}$sec.tch", TokyoCabinet::HDB::OREADER,
         16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
      or die "cant open $pre/${fbase}$sec.tch\n";
 
   while (my ($sha, $v) = each %{$fhos{$sec}}){
-    my $parent = extrPar ($v);
+    my ($parent) = extrPar ($v);
+    next if $parent eq "";
     for my $p (split(/:/, $parent)){
       my $par = fromHex ($p);
-      if (defined $fhoc{$par}){
-        $fhoc{$par} .= $sha;
-      }else{
-        $fhoc{$par} = $sha;
-      }
+      $fhoc{$par}{$sha}++;
     } 
   }
   untie %{$fhos{$sec}};
 }
-untie %fhoc;
+
+tie %fhoc1, "TokyoCabinet::HDB", "$ARGV[0]", TokyoCabinet::HDB::OWRITER | TokyoCabinet::HDB::OCREAT,
+        16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
+     or die "cant open $ARGV[0]\n";
+while (my ($sha, $v) = each %fhoc){
+  my $v1 = join '', sort keys %{$v};
+  $fhoc1{$k} = $v1;
+}
+untie %fhoc1;
 
 sub safeDecomp {
         my $codeC = $_[0];
@@ -54,7 +57,7 @@ sub safeDecomp {
         }
 }
 
-sub extrPar {
+sub extrCmt {
   my $codeC = $_[0];
   my $code = safeDecomp ($codeC);
 
