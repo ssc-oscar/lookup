@@ -23,7 +23,7 @@ my (%fhos, %fhoc, %fhoc1);
 for my $sec (0..127){
   tie %{$fhos{$sec}}, "TokyoCabinet::HDB", "${fbase}$sec.tch", TokyoCabinet::HDB::OREADER,
         16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
-     or die "cant open $pre/${fbase}$sec.tch\n";
+     or die "cant open ${fbase}$sec.tch\n";
 
   while (my ($sha, $v) = each %{$fhos{$sec}}){
     my ($parent) = extrPar ($v);
@@ -41,7 +41,7 @@ tie %fhoc1, "TokyoCabinet::HDB", "$ARGV[0]", TokyoCabinet::HDB::OWRITER | TokyoC
      or die "cant open $ARGV[0]\n";
 while (my ($sha, $v) = each %fhoc){
   my $v1 = join '', sort keys %{$v};
-  $fhoc1{$k} = $v1;
+  $fhoc1{$sha} = $v1;
 }
 untie %fhoc1;
 
@@ -57,7 +57,7 @@ sub safeDecomp {
         }
 }
 
-sub extrCmt {
+sub extrPar {
   my $codeC = $_[0];
   my $code = safeDecomp ($codeC);
 
