@@ -34,6 +34,7 @@ for my $sec (0..127){
     } 
   }
   untie %{$fhos{$sec}};
+  print STDERR "$sec done\n";
 }
 
 tie %fhoc1, "TokyoCabinet::HDB", "$ARGV[0]", TokyoCabinet::HDB::OWRITER | TokyoCabinet::HDB::OCREAT,
