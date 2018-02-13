@@ -1,0 +1,65 @@
+#!/usr/bin/perl -I /home/audris/lib64/perl5
+use strict;
+use warnings;
+use Error qw(:try);
+
+use Digest::SHA qw (sha1_hex sha1);
+use TokyoCabinet;
+use Compress::LZF;
+
+my $type = $ARGV[0];
+my $ncheck = 1;
+$ncheck = $ARGV[2] if defined $ARGV[2];
+
+sub safeDecomp {
+        my ($codeC, $msg) = @_;
+        try {
+                my $code = decompress ($codeC);
+                return $code;
+        } catch Error with {
+                my $ex = shift;
+                print STDERR "Error: $ex in $msg\n";
+                return "";
+        }
+}
+my $sections = 128;
+
+#for my $s (0..($sections-1)){
+  my $fname = $ARGV[1];
+  open (FD, "$fname.bin") or die "$!";
+  binmode(FD);
+
+  open A, "tac $fname.idx|head -$ncheck|";
+  my $oback = 0;
+  while (<A>){
+    chop();
+    my @x = split(/\;/);
+    my ($o, $l, $s, $hsha, @rest) = @x;
+    $oback -= $s;
+    my $sha = fromHex ($hsha);
+    my $sec = hex (substr($hsha, 0, 2)) % $sections;
+    my $codeC = "";
+    seek (FD, $oback, 2);
+    my $rl = read (FD, $codeC, $s);
+
+    my $off = tell (FD);
+    my @stat = stat "$fname.bin";
+
+    my $msg = "s=$s, hsha=$hsha, o=$o, l=$l sec=$sec";
+    my $code = safeDecomp ($codeC, $msg);
+    #my $code = $codeC;
+    my $len = length ($code);
+    #print "$code\n";
+    my $hsha1 = sha1_hex ("$type $len\0$code");
+    print "$hsha != $hsha1;$off+$oback+$s != $stat[7];$len == 0;$s;$sec\n" 
+	if $hsha ne $hsha1 || $off-$oback-$s != $stat[7] || $len == 0;
+  }
+#}
+sub toHex { 
+        return unpack "H*", $_[0]; 
+} 
+
+sub fromHex { 
+        return pack "H*", $_[0]; 
+} 
+
