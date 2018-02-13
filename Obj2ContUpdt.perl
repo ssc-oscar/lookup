@@ -29,12 +29,12 @@ $nTot = $ARGV[2] if defined $ARGV[2];
 my $lhash;
 if ($nTot < 0) {
   if ( -f "$fbaseOld$sec.idx"){
-     open A, "tac $fbaseOld$sec.idx|head -1|" or die ($!);
-     while (<A>){
-       chop ();
-       my ($nn, $of, $len, $hash) = split (/\;/, $_, -1);
-       $lhash = $hash;
-     }
+    open A, "tac $fbaseOld$sec.idx|head -1|" or die ($!);
+    while (<A>){
+      chop ();
+      my ($nn, $of, $len, $hash) = split (/\;/, $_, -1);
+      $lhash = $hash;
+    }
   }else{
     die "No old idx: $fbaseOld$sec.idx\n";
   }
@@ -45,8 +45,8 @@ if ($nTot < 0) {
   my $new = 0;
   my $pre = "/fast1";
   tie %{$fhos{$sec}}, "TokyoCabinet::HDB", "$pre/${fbase}$sec.tch", TokyoCabinet::HDB::OWRITER | TokyoCabinet::HDB::OCREAT,
-        16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
-     or die "cant open $pre/$fbase$sec.tch\n";  
+     16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
+      or die "cant open $pre/$fbase$sec.tch\n";  
   open (FD, "$fbasei$sec.bin") or die "$!";
   binmode(FD);
   if ( -f "$fbasei$sec.idx"){
