@@ -1,34 +1,59 @@
 #swich away to c2fb and Cmt2Prj
 #get commits in All.blobs
-cd /da0_data/c2fbp
-cut -d\; -f4 /data/All.blobs/commit_*.idx | lsort 40G | gzip > /data/basemaps/cmts.s
+#cd /da0_data/c2fbp
+#cut -d\; -f4 /data/All.blobs/commit_*.idx | lsort 40G | gzip > /data/basemaps/cmts.s
 
-#get commits from All.blobs that are not in c2fbp.00-81 and that are in
-gunzip -c cmts.s | perl -ane 'chop(); next if length($_) != 40;print "$_\n";' | join -v1 - <(gunzip -c /da0_data/c2fbp/cs.s) | gzip >/data/basemaps/cNotInC2fbp.s
-gunzip -c cmts.s | join -v1 - <(gunzip -c cNotInC2fbp.s) | gzip > cInC2fbp.s
-gunzip -c /data/basemaps/cNotInC2fbp.s | split -l 200000 -d -a 3 --filter='gzip > $FILE.gz' - cNot.
-gunzip -c /data/basemaps/cInC2fbp.s | split -l 1000000 -d -a 3 --filter='gzip > $FILE.gz' - cIn.
 
 # collect all commits in call
 # collect commits from olist files (see #Prj2Cmt.sh)
 #add them to the full list
-lsort 20G -u --merge <(gunzip -c /da0_data/c2fbp/os.p2c.000-890.cs) <(gunzip -c /da4_data/basemaps/cmts.s) <(gunzip -c /da4_data/basemaps/cs.s) | gzip > call.cs
+# add c2p cmts from Inc20180213.c2p.
+lsort 20G -u --merge <(gunzip -c /da0_data/c2fbp/os.p2c.000-890.cs) <(gunzip -c Inc20180213.c2p.*.gz|lsort 10G) <(gunzip -c /da4_data/basemaps/cmts.s) <(gunzip -c /da4_data/basemaps/cs.s) | gzip > call.cs
 # empty.cs have no files changed, bad.cs have tree or parent missing, and nc.cs are simply missing and need to be extrcted
+
+for i in {0..7}; do 
+  lsort 30G --merge -u -t\; -k1b,2 <(gunzip -c /da4_data/update/Inc20180213.c2f.$i.c2f) \
+      <(gunzip -c /da4_data/basemaps/gz/c2fFullE$i.s) | \
+    gzip > /da4_data/basemaps/gz/c2fFullF$i.s
+done
+
+for i in {0..7}; do 
+  gunzip -c /da4_data/update/Inc20180213.c2f.$i.c2f
+done | awk -F\; '{print $2";"$1}' | /da3_data/lookup/splitSecCh.perl /da4_data/update/Inc20180213.f2c. 8 &
+for i in {0..7}; do 
+  lsort 30G --merge -u -t\; -k1b,2 <(gunzip -c /da4_data/update/Inc20180213.f2c.$i.gz|lsort 5G -u  -t\; -k1b,2) \
+      <(gunzip -c /da4_data/basemaps/gz/f2cFullE$i.s) | \
+    gzip > /da4_data/basemaps/gz/f2cFullF$i.s
+done
 
 
 #Produce tch
 #c2f, f2c
-gunzip -c c2fFullE[0-7].gz | awk -F\; '{print $2";"$1}' | /da3_data/lookup/splitSec.perl f2cFullE. 8
+#use splitSecCh.perl on non hex strings
+#gunzip -c /da4_data/basemaps/gz/c2fFullF[0-7].s | awk -F\; '{print $2";"$1}' | /da3_data/lookup/splitSecCh.perl /da4_data/basemaps/gz/f2cFullF. 8
+
 for i in {0..7}
-do gunzip -c /da0_data/c2fbp/c2fFullE$i.gz | /da3_data/lookup/Cmt2FileBin.perl c2fFullE.$i 1
-   gunzip -c /da0_data/c2fbp/f2cFullE.$i.gz | awk -F\; '{print $2";"$1}' | /da3_data/lookup/File2CmtBin.perl f2cFullE.$i 1 &
+do gunzip -c /da4_data/basemaps/c2fFullF$i.s | /da3_data/lookup/Cmt2FileBin.perl /da4_data/basemaps/c2fFullF.$i 1
+   gunzip -c /da4_data/basemaps/gz/f2cFullF$i.s | awk -F\; '{print $2";"$1}' | /da3_data/lookup/File2CmtBin.perl /da4_data/basemaps/f2cFullF.$i.tch 1 &
 done
 
+for i in {0..15}; do 
+  lsort 30G --merge -u -t\; -k1b,2 <(gunzip -c /da4_data/update/Inc20180213.b2c.$i.gz) \
+      <(gunzip -c /da4_data/basemaps/gz/b2cFullE$i.s) | \
+    gzip > /da4_data/basemaps/gz/b2cFullF$i.s &
+done
+for i in {0..15}; do 
+  lsort 30G --merge -u -t\; -k1b,2 <(gunzip -c /da4_data/update/Inc20180213.b2c.$i.gz) \
+      <(gunzip -c /da4_data/basemaps/gz/b2cFullE$i.s) | \
+    gzip > /da4_data/basemaps/gz/b2cFullF$i.s &
+done
+
+
 #c2b,b2c
-gunzip -c b2cFullE[0-7].s | awk -F\; '{print $2";"$1}' | /da3_data/lookup/splitSec.perl c2bFullE. 16
+for i in {0..15}; do gunzip -c b2cFullF$i.s; done | awk -F\; '{print $2";"$1}' | /da3_data/lookup/splitSec.perl c2bFullF. 16
 for i in {0..15}
-do gunzip -c /da4_data/basemaps/gz/c2bFullE$i.gz | awk -F\; '{print $1";;"$2}'| /da3_data/lookup/Cmt2BlobBin.perl c2bFullE.$i.tch 1 & done
-   gunzip -c /da4_data/basemaps/gz/b2cFullE$i.s | awk -F\; '{print $1";;"$2}'| /da3_data/lookup/Cmt2BlobBinSorted.perl b2cFullE.$i.tch 1 & done
+do gunzip -c /da4_data/basemaps/gz/c2bFullF$i.gz | awk -F\; '{print $1";;"$2}'| /da3_data/lookup/Cmt2BlobBin.perl /da4_data/basemaps/c2bFullF.$i.tch 1 & done
+   gunzip -c /da4_data/basemaps/gz/b2cFullF$i.s | awk -F\; '{print $1";;"$2}'| /da3_data/lookup/Cmt2BlobBinSorted.perl /da4_data/basemaps/b2cFullF.$i.tch 1 & done
 done
 
 
@@ -43,11 +68,22 @@ done
 
 What to do with the tree-base maps f2b, b2pt, t2pt
 
-What do do with c2pc, c2cc, t2c?
+#Committ to child
+/da3_data/lookup/Cmt2Par.perl Cmt2Chld.tch
+
+# What do do with t2c?
+
 
 ###################################
 #everything below is old stuff
 ###################################
+
+#get commits from All.blobs that are not in c2fbp.00-81 and that are in
+gunzip -c cmts.s | perl -ane 'chop(); next if length($_) != 40;print "$_\n";' | join -v1 - <(gunzip -c /da0_data/c2fbp/cs.s) | gzip >/data/basemaps/cNotInC2fbp.s
+gunzip -c cmts.s | join -v1 - <(gunzip -c cNotInC2fbp.s) | gzip > cInC2fbp.s
+gunzip -c /data/basemaps/cNotInC2fbp.s | split -l 200000 -d -a 3 --filter='gzip > $FILE.gz' - cNot.
+gunzip -c /data/basemaps/cInC2fbp.s | split -l 1000000 -d -a 3 --filter='gzip > $FILE.gz' - cIn.
+
 
 #lsort 50G -t\; -k1b,2 --merge -u <(gunzip -c b2c.00-19.s) <(gunzip -c b2c.20-39.s) <(gunzip -c b2c.40-59.s) <(gunzip -c b2c.60-81.s) <(gunzip -c b2cN.000-614.gz) | /da3_data/lookup/splitSec.perl b2cFull 16 &
 #for i in {0..15}; do gunzip -c b2cFull$i.gz | sed 's/;/;;/' | /da3_data/lookup/Cmt2BlobBinSorted.perl b2cFull.$i 1 & done
