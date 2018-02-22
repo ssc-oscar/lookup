@@ -15,25 +15,22 @@ sub fromHex {
         return pack "H*", $_[0]; 
 } 
 
-sub extrCmt {
+sub extrAuth {
   my ($codeC, $par) = @_;
   my $code = safeDecomp ($codeC, $par);
 
   my ($tree, $parent, $auth, $cmtr, $ta, $tc) = ("","","","","","");
   my ($pre, @rest) = split(/\n\n/, $code, -1);
   for my $l (split(/\n/, $pre, -1)){
-     #print "$l\n";
-     $tree = $1 if ($l =~ m/^tree (.*)$/);
-     $parent .= ":$1" if ($l =~ m/^parent (.*)$/);
-     #($auth, $ta) = ($1, $2) if ($l =~ m/^author (.*)\s([0-9]+\s[\+\-]*\d+)$/);
-     #($cmtr, $tc) = ($1, $2) if ($l =~ m/^committer (.*)\s([0-9]+\s[\+\-]*\d+)$/);
+     #$tree = $1 if ($l =~ m/^tree (.*)$/);
+     #$parent .= ":$1" if ($l =~ m/^parent (.*)$/);
      ($auth) = ($1) if ($l =~ m/^author (.*)$/);
-     ($cmtr) = ($1) if ($l =~ m/^committer (.*)$/);
+     #($cmtr) = ($1) if ($l =~ m/^committer (.*)$/);
   }
   ($auth, $ta) = ($1, $2) if ($auth =~ m/^(.*)\s(-?[0-9]+\s+[\+\-]*\d+)$/);
-  ($cmtr, $tc) = ($1, $2) if ($cmtr =~ m/^(.*)\s(-?[0-9]+\s+[\+\-]*\d+)$/);
-  $parent =~ s/^:// if defined $parent;
-  return ($tree, $parent, $auth, $cmtr, $ta, $tc, @rest);
+  #($cmtr, $tc) = ($1, $2) if ($cmtr =~ m/^(.*)\s(-?[0-9]+\s+[\+\-]*\d+)$/);
+  #$parent =~ s/^:// if defined $parent;
+  return ($auth);
 }
 
 sub safeDecomp {
@@ -50,9 +47,8 @@ sub safeDecomp {
 
 my %fhoa;
 tie %fhoa, "TokyoCabinet::HDB", "$ARGV[0]", TokyoCabinet::HDB::OREADER,
-        16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
-     or die "cant open $ARGV[0]\n";
-
+   16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
+    or die "cant open $ARGV[0]\n";
 my $sections = 128;
 my %map;
 my $fbase="/data/All.blobs/commit_";
@@ -73,7 +69,7 @@ for my $s (0..127){
     seek (FD, $bof, 2);
     my $codeC = "";
     my $rl = read (FD, $codeC, $len);
-    my ($tree, $parent, $auth, $cmtr, $ta, $tc, @rest) = extrCmt ($codeC, $hash);
+    my ($auth) = extrAut ($codeC, $hash);
     
     if (defined $fhoa{$auth}){
       my $v = $fhoa{$auth};
@@ -84,19 +80,18 @@ for my $s (0..127){
       } 
       last if defined $tmp{$h};
       for my $c1 (keys %tmp){
-			$map{$auth}{$h}++;
+        $map{$auth}{$h}++;
       }
     }
     $map{$auth}{$h}++;
     $count ++;
   }
 }
-
 untie %fhoa;
 
 tie %fhoa, "TokyoCabinet::HDB", "$ARGV[0].new", TokyoCabinet::HDB::OWRITER | TokyoCabinet::HDB::OCREAT,
-        16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
-     or die "cant open $ARGV[0]\n";
+   16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
+    or die "cant open $ARGV[0]\n";
 while (my ($a, $v) = each %map){
   my $v1 = join "", sort keys %{$v};
   $fhoa{$a}=$v1;

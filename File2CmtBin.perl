@@ -46,6 +46,7 @@ for $sec (0..($nsec -1)){
 }
 
 while (<STDIN>){
+  chop();
   $lines ++;
   #if (!($lines%15000000000)){
   #  output ();
