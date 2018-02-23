@@ -154,6 +154,7 @@ done
 ls -l /da4_data/basemaps/{Auth2Cmt,Cmt2Chld,Auth2File}.tch
 
 ## Cmt2Blob.sh Blob to commit and inverse
+```
 ls -l /da4_data/basemaps/gz/f2cFullF[0-7].s
 ls -l /da4_data/basemaps/f2cFullF.[0-7].tch
 
@@ -166,20 +167,22 @@ ls -l /da4_data/basemaps/b2cFullF.*.tch
 
 ls -f /da4_data/basemaps/gz/c2bFullF[0-7].gz
 ls -l /da4_data/basemaps/c2bFullF.*.tch
+```
 
 ## Prj2Cmt.sh Project to commit and inverse
-
+```
 ls -l /da4_data/basemaps/gz/Cmt2PrjG*.s
 ls -l /da4_data/basemaps/Cmt2PrjG.*.tch
 ls -l /da4_data/basemaps/gz/Prj2CmtG*.s
-
+```
 
 ## f2b.md
 describes mapping between trees/blobs and file/folder names. It
 oprates off blob/tree/commit objects. The remaining maps utilize
 c2fbp map split into 80 (1B line) chunks (see below).
 
-#update commit messages
+# Update commit message map
+```
 cd /da3_data/delta
 for i in {0..127}; do /da3_data/lookup/lstCmt.perl $i 1 |gzip > cmt.$i.lst; done
 for i in {0..127}; do gunzip -c cmt.$i.lst; done | gzip > cmt.lst
@@ -206,7 +209,7 @@ gunzip -c ALLCVEs.cs | /da3_data/lookup/Cmt2BlobShow.perl /da4_data/basemaps/c2b
 gunzip -c ALLCVEs.c2f| perl -ane 'chop();($c,$n,@fs)=split(/;/,$_,-1);for my $f (@fs){print "$f\n";}' | lsort 10G -u | gzip > ALLCVEs.fs
 gunzip -c /da4_data/basemaps/f2cFullF.[0-7].lst | ~/bin/grepFile.perl ALLCVEs.fs 1 | cut -d\; -f1 | lsort 10G -u > ALLCVEs.fs.all
 
-
+# seems like common names that need to be excluded to track vulnerable files
 gunzip -c ALLCVEs.fs| awk -F/ '{print $NF}' | lsort 10G | uniq -c | sort -rn | head
   25351 Makefile
    8443 distinfo
@@ -230,6 +233,7 @@ cat ALLCVEs.fs.all| awk -F/ '{print $NF}' | lsort 10G | uniq -c | sort -rn | hea
 2953876 __init__.py
 2532450 description.txt
 2208862 .travis.yml
+```
 
 ## (OLD stuff) c2fbp.[0-9][0-9].gz
 
