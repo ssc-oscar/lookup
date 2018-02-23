@@ -149,7 +149,9 @@ done
 /da3_data/lookup/Auth2CmtUpdt.perl Auth2Cmt.tch
 # The above may be faster and more correct
 # /da3_data/lookup/Auth2CmtUpdt.perl /data/basemaps/Auth2Cmt.tch
+/da3_data/lookup/Cmt2Par.perl Cmt2Chld.tch
 ```
+ls -l /da4_data/basemaps/{Auth2Cmt,Cmt2Chld,Auth2File}.tch
 
 ## Cmt2Blob.sh Blob to commit and inverse
 ls -l /da4_data/basemaps/gz/f2cFullF[0-7].s
@@ -167,6 +169,9 @@ ls -l /da4_data/basemaps/c2bFullF.*.tch
 
 ## Prj2Cmt.sh Project to commit and inverse
 
+ls -l /da4_data/basemaps/gz/Cmt2PrjG*.s
+ls -l /da4_data/basemaps/Cmt2PrjG.*.tch
+ls -l /da4_data/basemaps/gz/Prj2CmtG*.s
 
 
 ## f2b.md
@@ -174,7 +179,57 @@ describes mapping between trees/blobs and file/folder names. It
 oprates off blob/tree/commit objects. The remaining maps utilize
 c2fbp map split into 80 (1B line) chunks (see below).
 
+#update commit messages
+cd /da3_data/delta
+for i in {0..127}; do /da3_data/lookup/lstCmt.perl $i 1 |gzip > cmt.$i.lst; done
+for i in {0..127}; do gunzip -c cmt.$i.lst; done | gzip > cmt.lst
 
+gunzip -c /da4_data/update/Inc20180213.c2f.[0-7].gz |uniq | /da3_data/lookup/showCmt.perl 1 | gzip > Inc20180213.delta
+#gunzip -c /da4_data/update/Inc20180213.c2p.[0-7].gz | cut -d\; -f1 | uniq | /da3_data/lookup/showCmt.perl 1 | gzip > Inc20180213.delta
+gunzip -c Inc20180213.delta | perl -I ~/lib64/perl5/ deltaHash.perl
+perl -I ~/lib64/perl5 /home/audris/bin/listTC.perl delta.tch 1 | gzip > delta.id2content.gz
+
+cat delta.idx | perl -ane 'chop();@x=split(/\;/, $_,-1); $c=$x[2];next if length($c) != 40 || "$c" =~ /[^0-9a-f]/;print "$c;$x[0];$x[1]\n";' | uniq | lsort 130G -u -t\; -k1b,2 |gzip > delta.idx.37.c2mid
+lsort 20G --merge -t\; -k1b,2 -u <(gunzip -c delta.idx.37.c2mid) <(gunzip -c delta.idx.c2mid) | gzip > delta.idx.c2mid1
+mv delta.idx.c2mid1 delta.idx.c2mid
+
+# ? gunzip -c /da3_data/delta/delta.idx.c2mid | sed 's/;/;;;/' | perl /da3_data/lookup/Cmt2PrjBinSorted.perl mid2cmt.tch 1
+# ? gunzip -c /da3_data/delta/delta.idx.c2mid | awk -F\; '{print $2";"$1}' | /da3_data/lookup/File2CmtBin.perl delta.idx.mid2c 1
+gunzip -c delta.id2content.gz | grep -iw cve > ALLCVEs
+cut -d\; -f1 ALLCVEs | gzip > ALLCVEs.ids
+gunzip -c delta.idx.c2mid | ~/bin/grepField.perl ALLCVEs.ids 2 | cut -d\; -f1 | gzip > ALLCVEs.cs
+gunzip -c ALLCVEs.cs | /da3_data/lookup/showCmt.perl 2> CVEbadcmt | gzip > CVECommitInfo
+gunzip -c ALLCVEs.cs | /da3_data/lookup/Cmt2PrjShow.perl /da4_data/basemaps/Cmt2PrjG 1 8 | gzip > ALLCVEs.c2p
+gunzip -c ALLCVEs.cs | /da3_data/lookup/Cmt2PrjShow.perl /da4_data/basemaps/c2fFullF 1 8 | gzip > ALLCVEs.c2f
+gunzip -c ALLCVEs.cs | /da3_data/lookup/Cmt2BlobShow.perl /da4_data/basemaps/c2bFullE 1 16 | gzip > ALLCVEs.c2b
+#get file names without path and search of them in /da4_data/basemaps/f2cFullF
+gunzip -c ALLCVEs.c2f| perl -ane 'chop();($c,$n,@fs)=split(/;/,$_,-1);for my $f (@fs){print "$f\n";}' | lsort 10G -u | gzip > ALLCVEs.fs
+gunzip -c /da4_data/basemaps/f2cFullF.[0-7].lst | ~/bin/grepFile.perl ALLCVEs.fs 1 | cut -d\; -f1 | lsort 10G -u > ALLCVEs.fs.all
+
+
+gunzip -c ALLCVEs.fs| awk -F/ '{print $NF}' | lsort 10G | uniq -c | sort -rn | head
+  25351 Makefile
+   8443 distinfo
+   5546 pkg-descr
+   3972 default.nix
+   3617 pkg-plist
+    823 Makefile.in
+    777 index.html
+    713 README
+    682 Kconfig
+    653 Pkgfile
+
+cat ALLCVEs.fs.all| awk -F/ '{print $NF}' | lsort 10G | uniq -c | sort -rn | head
+13923697 index.js
+12497147 package.json
+11913352 README.md
+10694499 index.html
+5715190 LICENSE
+3657013 Makefile
+3482778 .npmignore
+2953876 __init__.py
+2532450 description.txt
+2208862 .travis.yml
 
 ## (OLD stuff) c2fbp.[0-9][0-9].gz
 
