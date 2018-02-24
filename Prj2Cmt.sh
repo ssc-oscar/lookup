@@ -6,27 +6,21 @@
 #1) extract project to commit list from olist
 #2) update Cmt2Prj
 #e.d .CRAN
-cd /da4/data/update
-cd CRAN
-ls -f CRAN/*.olist.gz  | while read i; do gunzip -c $i | \
- grep ';commit;' | \
- sed 's/;commit;/;/;s|/*;|;|;s|\.git;|;|;s|/*;|;|'  | \
- perl -ane 'chop();($p,$c)=split(/\;/,$_,-1);$p=~s/.*github.com_(.*_.*)/$1/;$p=~s/^bitbucket.org_/bb_/;$p=~s|\.git$||;$p=~s|/*$||;$p=~s/\;/SEMICOLON/g;$p = "EMPTY" if $p eq "";print "$c;$p\n";'  
-done | lsort 20G -t\; -k1b,2 -u | gzip > CRAN.c2p &
-gunzip -c CRAN.c2p | /da3_data/lookup/splitSec.perl CRAN.c2p. 8
-
+cd /da4_data/update
 for i in {0..7}; do 
-lsort 100G --merge -u -t\; -k1b,2 <(gunzip -c CRAN.c2p.$i.gz) \
+lsort 30G --merge -u -t\; -k1b,2 <(gunzip -c Inc20180213.c2p.$i.gz) \
       <(gunzip -c /data/basemaps/gz/Cmt2PrjF$i.s) | \
-    gzip > /data/basemaps/gz/Cmt2PrjG$i.s
-gunzip -c Cmt2PrjG$i.s | sed 's/;/;;;/'| /da3_data/lookup/Cmt2PrjBinSorted.perl /data/basemaps/Cmt2PrjG.$i.tch 1
+    gzip > /da4_data/basemaps/gz/Cmt2PrjG$i.s
 done
-for i in {0..7}; do gunzip -c Cmt2PrjG$i.s
-done | awk -F\; '{print $2";"$1}' | \
-    /da3_data/lookup/splitSec.perl Prj2CmtG. 8 
 for i in {0..7}; do 
-    gunzip -c Prj2CmtG$i.s | sed 's/;/;;;/'| \
-   /da3_data/lookup/Prj2CmtBin.perl /data/basemaps/Prj2CmtG.$i.tch 1
+  gunzip -c /da4_data/basemaps/gz/Cmt2PrjG$i.s | sed 's/;/;;;/'| /da3_data/lookup/Cmt2PrjBinSorted.perl Cmt2PrjG.$i.tch 1
+done
+
+#this takes fairly long
+for i in {0..7}; do gunzip -c /da4_data/basemaps/gz/Cmt2PrjG$i.s
+done | awk -F\; '{print $2";"$1}' | /da3_data/lookup/splitSecCh.perl /da4_data/basemaps/gz/Prj2CmtG 8 &
+for i in {0..7}; do 
+    gunzip -c /da4_data/basemaps/gz/Prj2CmtG.$i.gz | awk -F\; '{print $2";;;"$1}'| /da3_data/lookup/Prj2CmtBin.perl /data/basemaps/Prj2CmtG.$i.tch 1
 done
 
 
