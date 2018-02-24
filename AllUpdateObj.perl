@@ -85,6 +85,10 @@ while (<STDIN>){
       print STDERR "zero length for: $offset\;$siz\;@p\;$readFileBase\n";
       next;
     }
+    if ($siz >= 2147483647){
+      print STDERR "uncompressable object: too large: $siz\n";
+      next;
+    }
 
     my $sha1Full = fromHex ($hsha1Full);
     my $id = $size{$sec};

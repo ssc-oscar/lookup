@@ -32,9 +32,14 @@ my $sections = 128;
   my $codeC = "";
   seek (FD, $ARGV[2], 0);
   my $rl = read (FD, $codeC, $ARGV[3]);
-  my $code = safeDecomp ($codeC, "$ARGV[2];$ARGV[3]");
+  my $code = $codeC;
+  if ($s < 2147483647){# longer than that is not compressed
+    $code = safeDecomp ($codeC, "$ARGV[2];$ARGV[3]");
+  }
   if ($code ne ""){
-    print "$ARGV[3];$code\n";
+    my $code = safeDecomp ($codeC, "$ARGV[2];$ARGV[3]");
+    my $h = sha1_hex("$type ".length($code)."\000$code");
+    print "$h\n$code\n";
   }else{
     seek (FD, $ARGV[2], 0);
     my $rl = read (FD, $codeC, 10000000);
@@ -42,7 +47,8 @@ my $sections = 128;
        my $tmp = substr ($codeC, 0, $s);
        my $code = safeDecomp ($codeC, "$ARGV[2];$ARGV[3]");
        if ($code ne ""){
-         print "$ARGV[3];$code\n";
+         my $h = sha1_hex("tag ".length($code)."\000$code");
+         print "$h\n$code\n";
          exit();
        }
     }

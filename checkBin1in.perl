@@ -53,7 +53,10 @@ my $sections = 128;
     seek (FD, $l, 0);
     my $rl = read (FD, $codeC, $s);
     my $msg = "s=$s, hsha=$hsha, l=$l sec=$sec";
-    my $code = safeDecomp ($codeC, $msg);
+    my $code = $codeC;
+    if ($s < 2147483647){# longer than that is not compressed
+      $code = safeDecomp ($codeC, $msg);
+    }
     my $len = length ($code);
     my $hsha1 = sha1_hex ("$type $len\0$code");
     if ($code eq "" || $hsha ne $hsha1 || $l != $oback){
