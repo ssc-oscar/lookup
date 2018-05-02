@@ -69,7 +69,7 @@ for my $s (0..127){
     seek (FD, $bof, 2);
     my $codeC = "";
     my $rl = read (FD, $codeC, $len);
-    my ($auth) = extrAut ($codeC, $hash);
+    my ($auth) = extrAuth ($codeC, $hash);
     
     if (defined $fhoa{$auth}){
       my $v = $fhoa{$auth};
