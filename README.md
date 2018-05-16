@@ -1,16 +1,55 @@
 # Available maps/tables and their locations 
 In da4:/data/basemaps
 
-  1. author2commit: Auth2Cmt.tch
-  2. author2file: Auth2File.tch
-  3. blob2commit: b2cFullF.{0..15}.tch
-  4. commit2blob: c2bFullF.{0..15}.tch
-  5. commit2project: Cmt2PrjG.{0..8}.tch  (A new version Cmt2PrjH exists, not sure it's complete)
-  6. file2commit: f2cFullF.{0..8}.tch
-  7. project2commit: Prj2CmtG.{0..8}.tch
+The last letter denotes version (in alphabetical order)
+
+1. author2commit: Auth2CmtF.tch
+Grab a list of authors
+```
+echo "Audris Mockus <audris@utk.edu>" | /da3_data/lookup/Prj2CmtShow.perl /data/basemaps/Auth2CmtF.tch 1
+```
+2. author2file: Auth2File.tch, tese are files for blobs created or deeted by the commit (see 6)
+```
+echo "Audris Mockus <audris@utk.edu>" | /da3_data/lookup/Prj2FileShow.perl /data/basemaps/Auth2File.tch 1
+```
+
+3. blob2commit: b2cFullF.{0..15}.tch
+```
+echo 05fe634ca4c8386349ac519f899145c75fff4169 | /da3_data/lookup/Cmt2BlobShow.perl /data/basemaps/b2cFullF 1 16
+```
+
+4. commit2blob: c2bFullF.{0..15}.tch 
+```
+echo e4af89166a17785c1d741b8b1d5775f3223f510f | /da3_data/lookup/Cmt2BlobShow.perl /data/basemaps/c2bFullF 1 16
+```
+
+5. commit2project: Cmt2PrjG.{0..8}.tch  (A new version Cmt2PrjH exists, not sure it's complete)
+```
+echo e4af89166a17785c1d741b8b1d5775f3223f510f |/da3_data/lookup/Cmt2PrjShow.perl /data/basemaps/Cmt2PrjH 1 8
+```
+
+6. file2commit: f2cFullF.{0..8}.tch, tese are files for blobs created or deeted by the commit
+```
+echo main.c |/da3_data/lookup/Prj2CmtShow.perl /data/basemaps/f2cFullF 1 8
+```
+
+7. project2commit: Prj2CmtG.{0..8}.tch
+```
+echo ArtiiQ_PocketMine-MP |/da3_data/lookup/Prj2CmtShow.perl /data/basemaps/Prj2CmtG 1 8
+```
+
+# How to see a content of a commit
+
+
+# How to see a content of a tree
+
+
+# How to see conrent of a blob
 
 
 
+
+##############################################
 
 # Scripts to create various lookup tables
 
