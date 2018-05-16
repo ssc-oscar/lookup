@@ -1,3 +1,17 @@
+# available maps/tables and their locations 
+In da4:/data/basemaps
+
+  1. author2commit: Auth2Cmt.tch
+  2. author2file: Auth2File.tch
+  3. blob2commit: b2cFullF.{0..15}.tch
+  4. commit2blob: c2bFullF.{0..15}.tch
+  5. commit2project: Cmt2PrjG.{0..8}.tch  (A new version Cmt2PrjH exists, not sure it's complete)
+  6. file2commit: f2cFullF.{0..8}.tch
+  7. project2commit: Prj2CmtG.{0..8}.tch
+
+
+
+
 # Scripts to create various lookup tables
 
 # Update process
