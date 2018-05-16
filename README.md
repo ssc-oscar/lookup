@@ -1,4 +1,4 @@
-# available maps/tables and their locations 
+# Available maps/tables and their locations 
 In da4:/data/basemaps
 
   1. author2commit: Auth2Cmt.tch
