@@ -15,7 +15,7 @@
 1. extract blobs, commits, trees, tags based on the olist (see beacon scripts below)
 1. Verify input is good
 ```
-   for t in commit blob tree tag; do ls -f *.commit.idx | sed 's/\.idx$//' | while read i; do /da3_data/lookup/checkBin1in.perl $t $i; done; done
+   for t in commit blob tree tag; do ls -f *.$t.idx | sed 's/\.idx$//' | while read i; do /da3_data/lookup/checkBin1in.perl $t $i; done; done
 ```
 1. Update da4:/data/All.blobs
 
@@ -34,8 +34,10 @@
 ```
 1. Update All.sha1c commit and tree needed for c2fb and cmptDiff2.perl
 ```
-   nmax=1000000
+   nmax=2000000
+   #  1475976;
    for i in {0..127}; do /da3_data/lookup/Obj2ContUpdt.perl commit $i $nmax; done
+   nmax=8227751
    for i in {0..127}; do /da3_data/lookup/Obj2ContUpdt.perl tree $i $nmax; done
 ```
 1. Update All.sha1o needed for f2b tree-based stuff
@@ -45,8 +47,19 @@ for i in {0..127}; do /da3_data/lookup/BlobN2Off.perl $i; done
 1. Extract c2p info from *.olist.gz
 ```
 cd /data/update
-for i in CRAN cve secure js
-do gunzip -c $i/*.olist.gz| cut -d\; -f1-3 | grep ';commit;' |\
+for i in with withFrk withWch withIssues chris chrisB py
+do cd /data/update/$i
+   gunzip -c *.olist.gz | /da3_data/lookup/Prj2CmtChk.perl /data/basemaps/Prj2CmtG 8 | gzip > p2c.gz
+   gunzip -c p2c.gz   | lsort 20G -u -t\; -k1b,2 | gzip > p2c.s
+   gunzip -c p2c.gz | awk -F\; '{print $2";"$1}' | lsort 20G -u -t\; -k1b,2 | gzip > c2p.s
+done
+cd /data/update
+lsort 20G -t\; -k1b,2 --merge <(gunzip -c with/p2c.s) <(gunzip -c withFrk/p2c.s) <(gunzip -c withWch/p2c.s) <(gunzip -c withIssues/p2c.s) <(gunzip -c chris/p2c.s) <(gunzip -c chrisB/p2c.s) <(gunzip -c py/p2c.s)  | uniq | /da3_data/lookup/splitSecCh.perl Inc20180510.p2c. 8
+
+lsort 20G -t\; -k1b,2 --merge <(gunzip -c with/c2p.s) <(gunzip -c withFrk/c2p.s) <(gunzip -c withWch/c2p.s) <(gunzip -c withIssues/c2p.s) <(gunzip -c chris/c2p.s) <(gunzip -c chrisB/c2p.s) <(gunzip -c py/c2p.s)  | uniq | /da3_data/lookup/splitSec.perl Inc20180510.c2p. 8
+
+for i in CRAN cve secure js with withFrk withWch
+do gunzip -c $i/*.olist*.gz| cut -d\; -f1-3 | grep ';commit;' |\
    sed 's/;commit;/;/;s|/*;|;|;s|\.git;|;|;s|/*;|;|'  | \
    perl -ane 'chop();($p,$c)=split(/\;/,$_,-1);next if $c !~ m/^[a-f0-9]{40}$/; $p=~s/.*github.com_(.*_.*)/$1/;$p=~s/^bitbucket.org_/bb_/;$p=~s|\.git$||;$p=~s|/*$||;$p=~s/\;/SEMICOLON/g;$p = "EMPTY" if $p eq "";print "$c;$p\n";'\
    | lsort 20G -t\; -k1b,2 -u | gzip > $i/c2p.$i.gz 
@@ -74,7 +87,8 @@ do gunzip -c Inc20180213.c2f.$j.todo | /da3_data/lookup/cmputeDiff2.perl 2> Inc2
 done
 
 #get full list of stuff in the database
-cut -d\; -f4 /data/All.blobs/commit_*.idx | lsort 40G | gzip > /data/basemaps/cmts.s
+cut -d\; -f4 /data/All.blobs/commit_*.idx | lsort 40G | gzip > /data/basemaps/cmts.s1
+gunzip -c /data/basemaps/cmts.s | join -v1 <(gunzip -c /data/basemaps/cmts.s1) - | gzip > /data/basemaps/cmts.s1.new
 
 #check for/update empty/bad/missing in c2fb.err ({nc,npc,empty,bad}.cs nt.ts)
 # empty.cs have no files changed, bad.cs have tree or parent missing, and nc.cs are simply missing and need to be extrcted null.cs are null (content is \x00'oes)
@@ -146,10 +160,10 @@ done
 ```
 1. Update various maps
 ```
-/da3_data/lookup/Auth2CmtUpdt.perl Auth2Cmt.tch
+/da3_data/lookup/Auth2Cmt.perl /data/basemaps/Auth2CmtNew.tch
 # The above may be faster and more correct
 # /da3_data/lookup/Auth2CmtUpdt.perl /data/basemaps/Auth2Cmt.tch
-/da3_data/lookup/Cmt2Par.perl Cmt2Chld.tch
+/da3_data/lookup/Cmt2Par.perl /data/basemaps/Cmt2Chld.tch
 ```
 ls -l /da4_data/basemaps/{Auth2Cmt,Cmt2Chld,Auth2File}.tch
 
