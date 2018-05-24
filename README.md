@@ -213,9 +213,14 @@ done
 ```
 1. Update various maps
 ```
-/da3_data/lookup/Auth2Cmt.perl /data/basemaps/Auth2CmtNew.tch
-# The above may be faster and more correct
-# /da3_data/lookup/Auth2CmtUpdt.perl /data/basemaps/Auth2Cmt.tch
+#/da3_data/lookup/Auth2Cmt.perl /data/basemaps/Auth2CmtNew.tch
+# The above may be more correct
+# 394525: how much back to go from the end of All.blobs/commit_X.idx
+/da3_data/lookup/Auth2CmtUpdt.perl Auth2CmtNew 394525
+/da3_data/lookup//Auth2CmtMrg.perl Auth2CmtNew Auth2CmtNew.new Auth2Cmt
+#13978401 authors added
+
+#the following is slow: needs > 4ooG of ram
 /da3_data/lookup/Cmt2Par.perl /data/basemaps/Cmt2Chld.tch
 ```
 ls -l /da4_data/basemaps/{Auth2Cmt,Cmt2Chld,Auth2File}.tch
