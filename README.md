@@ -38,14 +38,18 @@ echo main.c |/da3_data/lookup/Prj2CmtShow.perl /data/basemaps/f2cFullF 1 8
 echo ArtiiQ_PocketMine-MP |/da3_data/lookup/Prj2CmtShow.perl /data/basemaps/Prj2CmtG 1 8
 ```
 
-# How to see a content of a commit
-
-
-# How to see a content of a tree
-
-
-# How to see conrent of a blob
-
+## How to see a content of a commit
+```
+echo e4af89166a17785c1d741b8b1d5775f3223f510f | perl ~audris/bin/showCmt.perl 
+```
+## How to see a content of a tree
+```
+echo f1b66dcca490b5c4455af319bc961a34f69c72c2 | perl ~audris/bin/showTree.perl
+```
+## How to see conrent of a blob
+```
+echo 05fe634ca4c8386349ac519f899145c75fff4169 | perl ~audris/bin/showBlob.perl
+```
 
 
 
