@@ -26,14 +26,21 @@ sub safeDecomp {
         }
 }
 
+my $dC1 = 0;
+my $uP1 = 1;
+my $dC2 = 1;
+$dC2 = $ARGV[1] if defined $ARGV[1];
 
+ 
 my $offset = 0;
 while (my ($h, $codeC) = each %clones){
-        my $hh = unpack 'H*', $h;
-	my $code = safeDecomp ($codeC, "$offset;$hh");
+        my $hh = $h;
+        $hh = unpack 'H*', $h if $uP1 && length($h) == 20;
+        my $code = $codeC;
+	$code = safeDecomp ($codeC, "$offset;$hh") if $dC2;
         $code =~ s/\r//g;
         #$code =~ s/\n/NEWLINE/g;
-        print "$hh;$code\n";
+        print "$h;$code\n";
 	$offset++;
 }
 untie %clones;

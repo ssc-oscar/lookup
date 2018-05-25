@@ -31,7 +31,7 @@ my $sec = $ARGV[0];
   open (FD, "$fbasei$sec.bin") or die "$!";
   binmode(FD);
   if ( -f "$fbasei$sec.idx"){
-    open A, "tac $fbasei$sec.idx | " or die ($!);
+    open A, "$fbasei$sec.idx" or die ($!);
     while (<A>){
       chop ();
       my @x = split (/\;/, $_, -1);
@@ -44,7 +44,7 @@ my $sec = $ARGV[0];
       my $h = fromHex ($hash);
 
       my $codeC = "";
-      seek (FD, $of, 0);
+      #seek (FD, $of, 0);
       my $rl = read (FD, $codeC, $len);
       if (defined $fhos{$sec}{$h}){
         print STDERR "done\n";

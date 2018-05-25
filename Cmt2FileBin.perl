@@ -38,12 +38,14 @@ my (%c2p, %c2p1);
 my $lines = 0;
 my $f0 = "";
 while (<STDIN>){
+  chop();
   $lines ++;
   if (!($lines%15000000000)){
     output ();
     %c2p1 = ();
   }    
-  my ($hsha, $f, $p, $b) = split (/\;/, $_);
+  my ($hsha, $f, $p, $b) = split (/\;/, $_, -1);
+  #print "$.;$hsha;$f;\n";
   my $sha = fromHex ($hsha);
   $f =~ s/;/SEMICOLON/g;
   $f =~ s|^/*||;

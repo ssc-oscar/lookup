@@ -33,8 +33,9 @@ while (<STDIN>){
   chop();
   my $p = $_;
   my $sec = (unpack "C", substr ($p, 0, 1))%$split;
-  print "$sec;$p\n";
+  #print "$sec;$p\n";
   list ($p, $p2c{$sec}{$p}) if defined $p2c{$sec}{$p};
+  list ("$p\n", $p2c{$sec}{"$p\n"}) if defined $p2c{$sec}{"$p\n"};
 }
 for my $sec (0..($split-1)){
   untie %{$p2c{$sec}};

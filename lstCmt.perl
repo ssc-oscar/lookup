@@ -22,24 +22,7 @@ for my $s (0..($sections-1)){
     #seek (FD, $of, 0);
     my $codeC = "";
     my $rl = read (FD, $codeC, $len);
-    my ($tree, $parents, $auth, $cmtr, $ta, $tc, @rest) = extrCmt ($codeC,"$s:$nn");
-    my $msg = join '\n\n', @rest;
-    if ($debug){
-      $msg =~ s/[\r\n;]/ /g;
-      $msg =~ s/^\s*//;
-      $msg =~ s/\s*$//;
-      $auth =~ s/;/ /g;
-      print "$msg;$auth;$ta;$msg\n";
-    }else{
-      $msg =~ s/[\r\n]*$//;
-      $msg =~ s/\r/__CR__/g;
-      $msg =~ s/\n/__NEWLINE__/g; 
-      $msg =~ s/;/SEMICOLON/g; 
-      $auth =~ s/;/SEMICOLON/g; 
-      $cmtr =~ s/;/SEMICOLON/g;
-      my ($a, $e) = git_signature_parse ($auth, $msg);
-      print "$msg;$tree;$parents;$a;$e;$auth;$cmtr;$ta;$tc;$msg\n";
-    }
+    cleanCmt ($codeC, $hash, $debug);
   }
 }
 

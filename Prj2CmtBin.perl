@@ -77,7 +77,7 @@ sub output {
 sub outputTC {
   my $n = $_[0];
   my %c2p;
-  for $sec (0..($nsec -1)){
+  for my $sec (0..($nsec -1)){
     my $fname = "$ARGV[0].$sec.tch";
     $fname = "$ARGV[0]" if $nsec == 1;
     tie %{$c2p{$sec}}, "TokyoCabinet::HDB", "$fname", TokyoCabinet::HDB::OWRITER | TokyoCabinet::HDB::OCREAT,   
@@ -89,10 +89,10 @@ sub outputTC {
     print STDERR "$lines done out of $nc\n" if (!($lines%100000000));
     my $ps = join '', sort keys %{$v};
     #my $psC = safeComp ($ps);
-    my $sec = (unpack "C", substr ($k, 0, 1))%$nsec;
+    my $sec = (unpack "C", substr ($c, 0, 1))%$nsec;
     $c2p{$sec}{$c} = $ps;
   }
-  for $sec (0..15){
+  for my $sec (0..15){
     untie %{$c2p{$sec}};
   }
 }
