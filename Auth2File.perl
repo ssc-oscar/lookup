@@ -1,82 +1,40 @@
-#!/usr/bin/perl -I /home/audris/lib64/perl5
+#!/usr/bin/perl -I /home/audris/lib64/perl5 -I /da3_data/lookup
 
 use strict;
 use warnings;
 use Error qw(:try);
-
 use TokyoCabinet;
 use Compress::LZF;
+use cmt;
 
-sub toHex { 
-        return unpack "H*", $_[0]; 
-} 
-
-sub fromHex { 
-        return pack "H*", $_[0]; 
-} 
-
-sub extrCmt {
-  my ($codeC, $par) = @_;
-  my $code = safeDecomp ($codeC, $par);
-
-  my ($tree, $parent, $auth, $cmtr, $ta, $tc) = ("","","","","","");
-  my ($pre, @rest) = split(/\n\n/, $code, -1);
-  for my $l (split(/\n/, $pre, -1)){
-     #print "$l\n";
-     $tree = $1 if ($l =~ m/^tree (.*)$/);
-     $parent .= ":$1" if ($l =~ m/^parent (.*)$/);
-     #($auth, $ta) = ($1, $2) if ($l =~ m/^author (.*)\s([0-9]+\s[\+\-]*\d+)$/);
-     #($cmtr, $tc) = ($1, $2) if ($l =~ m/^committer (.*)\s([0-9]+\s[\+\-]*\d+)$/);
-     ($auth) = ($1) if ($l =~ m/^author (.*)$/);
-     ($cmtr) = ($1) if ($l =~ m/^committer (.*)$/);
-  }
-  ($auth, $ta) = ($1, $2) if ($auth =~ m/^(.*)\s(-?[0-9]+\s+[\+\-]*\d+)$/);
-  ($cmtr, $tc) = ($1, $2) if ($cmtr =~ m/^(.*)\s(-?[0-9]+\s+[\+\-]*\d+)$/);
-  $parent =~ s/^:// if defined $parent;
-  return ($tree, $parent, $auth, $cmtr, $ta, $tc, @rest);
-}
-
-sub safeDecomp {
-  my ($codeC, $par) = @_;
-  try {
-    my $code = decompress ($codeC);
-    return $code;
-  } catch Error with {
-    my $ex = shift;
-    print STDERR "Error: $ex par=$par\n";
-    return "";
-  }
-}
-sub safeComp {
-  my ($codeC, $par) = @_;
-  try {
-    my $code = compress ($codeC);
-    return $code;
-  } catch Error with {
-    my $ex = shift;
-    print STDERR "Error: $ex par=$par\n";
-    return "";
-  }
-}
 
 my $sections = 8;
 my $fbase="/fast1/All.sha1c/";
+
+
+my $a2cf = $ARGV[0];
 my %a2c;
-tie %a2c, "TokyoCabinet::HDB", "$fbase/Auth2Cmt.tch", TokyoCabinet::HDB::OREADER,   
+tie %a2c, "TokyoCabinet::HDB", "$a2cf", TokyoCabinet::HDB::OREADER,   
         16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
-     or die "cant open $fbase/Auth2Cmt.tch\n";
+     or die "cant open $a2cf\n";
+
+my $c2ff = $ARGV[1];
 my %c2f;
 for my $sec (0..($sections-1)){
-  tie %{$c2f{$sec}}, "TokyoCabinet::HDB", "$fbase/c2fFull.$sec.tch", TokyoCabinet::HDB::OREADER,   
+  tie %{$c2f{$sec}}, "TokyoCabinet::HDB", "$c2ff.$sec.tch", TokyoCabinet::HDB::OREADER,   
         16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
-     or die "cant open $fbase/c2fFull.$sec.tch\n";
+     or die "cant open $c2ff.$sec.tch\n";
 }
 
 my %a2f1;
-tie %a2f1, "TokyoCabinet::HDB", "$ARGV[0]", TokyoCabinet::HDB::OWRITER | TokyoCabinet::HDB::OCREAT,
+tie %a2f1, "TokyoCabinet::HDB", "$ARGV[2]", TokyoCabinet::HDB::OWRITER | TokyoCabinet::HDB::OCREAT,
         16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
      or die "cant open $ARGV[0]\n";
 
+my %badC;
+for my $c (keys %badCmt){
+  $badC{fromHex ($c)}++;
+}
 my $line = 0;
 my %a2f;
 while (my ($a, $v) = each %a2c){
@@ -84,6 +42,7 @@ while (my ($a, $v) = each %a2c){
   my $ns = length ($v)/20;
   for my $i (0..($ns-1)){
     my $c = substr ($v, $i*20, 20);
+    next if defined $badC{$c}; #ignore humongous commits
     my $sec =  hex (unpack "H*", substr($c, 0, 1)) % $sections;
     if (defined $c2f{$sec}{$c}){
       my @fs = split(/\;/, safeDecomp ($c2f{$sec}{$c}, $a), -1);

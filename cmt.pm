@@ -6,9 +6,23 @@ use Compress::LZF;
 
 require Exporter;
 our @ISA = qw (Exporter);
-our @EXPORT = qw(signature_error contains_angle_brackets extract_trimmed git_signature_parse extrCmt cleanCmt safeDecomp safeComp toHex fromHex);
+our @EXPORT = qw(%badCmt %badBlob signature_error contains_angle_brackets extract_trimmed git_signature_parse extrCmt getTime cleanCmt safeDecomp safeComp toHex fromHex);
 use vars qw(@ISA);
 
+our %badCmt = (
+  "c89423063a78259e6a7d13d9b00278a0c5e637b0" => 10000000005,
+  "45546f17e5801791d4bc5968b91253a2f4b0db72" => 10000000000,
+  "ce1407a59c910ac5dead8cb1b8b4841cabfce000" => 6649016,
+  "f905f1dfa705708c4a85b04cc81b5823f1112d1c" => 6356922,
+  "83c453d73f1eac85263c89d5a50ba8f9ddfccaf2" => 3336152,
+  "1651ff7cb254006d82d2148c281ec3945f266b38" => 2918400,
+  "3d156dd720d679df5cb2468c7eb4fe58dc642494" => 2219847
+);
+our %badBlob  = (
+  "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391" => 7826798, #\n
+  "8b137891791fe96927ad78e64b0aad7bded08bdc" => 957235, #\n\n
+  "de6be7945c6a59798eb0ace177df38b05e98c2f0" => 650111   #"module ApplicationHelpe\nend\n"
+);
 sub toHex {
         return unpack "H*", $_[0];
 }
@@ -121,6 +135,20 @@ sub extrCmt {
   return ($tree, $parent, $auth, $cmtr, $ta, $tc, @rest);
 }
 
+sub getTime {
+  my ($codeC, $str) = @_;
+  my $code = safeDecomp ($codeC, $str);
+  my ($pre, @rest) = split(/\n\n/, $code, -1);
+  my ($auth, $cmtr, $ta, $tc) = ("","","","");
+  for my $l (split(/\n/, $pre, -1)){
+    ($auth) = ($1) if ($l =~ m/^author (.*)$/);
+    ($cmtr) = ($1) if ($l =~ m/^committer (.*)$/);
+  }
+  ($auth, $ta) = ($1, $2) if ($auth =~ m/^(.*)\s(-?[0-9]+\s+[\+\-]*\d+)$/);
+  ($cmtr, $tc) = ($1, $2) if ($cmtr =~ m/^(.*)\s(-?[0-9]+\s+[\+\-]*\d+)$/);
+  ($ta, $tc);
+}
+
 sub cleanCmt {
   my ($cont, $cmt, $debug) = @_;
   my ($tree, $parents, $auth, $cmtr, $ta, $tc, @rest) = extrCmt ($cont, $cmt);
@@ -138,8 +166,12 @@ sub cleanCmt {
       if ($debug == 2){
         print "$cmt;$auth;$ta;$msg\n";
       }else{
-        my ($a, $e) = git_signature_parse ($auth, $msg);
-        print "$msg;$cmt;$a;$e;$ta;$auth\n";
+        if ($debug == 4){
+          print "$cmt;$auth\n";
+        }else{
+          my ($a, $e) = git_signature_parse ($auth, $msg);
+          print "$msg;$cmt;$a;$e;$ta;$auth\n";
+        }
       }
     }
   }else{

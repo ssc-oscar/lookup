@@ -1,4 +1,4 @@
-#!/usr/bin/perl -I /home/audris/lib64/perl5 -I /da3_ddata/lookup
+#!/usr/bin/perl -I /home/audris/lib64/perl5 -I /da3_data/lookup
 use strict;
 use warnings;
 use Error qw(:try);
