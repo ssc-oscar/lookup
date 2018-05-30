@@ -8,6 +8,43 @@
 #e.d .CRAN
 cd /da4_data/update
 for i in {0..7}; do 
+lsort 30G --merge -u -t\; -k1b,2 <(gunzip -c Inc20180510.c2p.$i.gz) \
+      <(gunzip -c /data/basemaps/gz/Cmt2PrjG$i.s) | \
+    gzip > /da4_data/basemaps/gz/Cmt2PrjH$i.s
+done
+for i in {0..7}; do 
+  gunzip -c /da4_data/basemaps/gz/Cmt2PrjH$i.s | sed 's/;/;;;/'| /da3_data/lookup/Cmt2PrjBinSorted.perl Cmt2PrjH.$i.tch 1
+done
+for i in {0..7}; do 
+    gunzip -c /da4_data/basemaps/gz/Prj2CmtH$i.gz | awk -F\; '{print $2";;;"$1}'| /da3_data/lookup/Prj2CmtBin.perl /da4_data/basemaps/Prj2CmtG.$i.tch 1
+done
+
+#calculate data needed for people movement
+#depends on all commits in /data/All.blobs/commit_*
+#for i in {0..15}; do for k in 0 16 32 48 64 80 96 112; do j=$(($i+$k)); ./lstCmt.perl -1 $j |  ./Cmt2TimeBin.perl c2t.$j.tch 1; done & done
+for i in {0..15}; do for k in 0 16 32 48 64 80 96 112; do j=$(($i+$k)); ./lstCmt.perl 1 $j |  ./Cmt2AttBin.perl c2a.$j.tch 1; done & done
+wait
+cp -p c2a.*.tch /tmp
+cd /da4_data/basemaps/gz/
+for j in {0..7}; do /da3_data/lookup/Prj2DTime.perl ../Prj2CmtH.$j.tch /fast1/c2a 2> Prj2CmtH.$j.atime.err | gzip > Prj2CmtH.$j.atime; done
+for i in {0..7}; do zcat Prj2CmtH.$i.atime | \
+ perl -ane 'chop(); ($p,$nc,$na,@a)=split(/\;/); ($mi,$ma)=($a[1],$a[2]);for $i (1..($na-1)){$o=$i*3;$mi=$a[$o+1] if $mi>$a[$o+1];$ma=$a[$o+2] if $ma<$a[$o+2];}; print "$p;$nc;$na;$mi;$ma\n"' | \
+ gzip > gz/Prj2CmtH.$i.time
+done		    
+
+
+# resulting Prj2CmtH$i.s are several times larger than Prj2CmtH$i.gz, don't do them
+#for i in {0..7}; do 
+#lsort 30G --merge -u -t\; -k1b,2 <(gunzip -c Inc20180510.p2c.$i.s)  <(gunzip -c /data/basemaps/gz/Prj2CmtG$i.s) | gzip > /da4_data/basemaps/gz/Prj2CmtH$i.s
+#done
+
+############################
+##################
+#this is old
+##################
+
+
+for i in {0..7}; do 
 lsort 30G --merge -u -t\; -k1b,2 <(gunzip -c Inc20180213.c2p.$i.gz) \
       <(gunzip -c /data/basemaps/gz/Cmt2PrjF$i.s) | \
     gzip > /da4_data/basemaps/gz/Cmt2PrjG$i.s
@@ -20,14 +57,10 @@ done
 for i in {0..7}; do gunzip -c /da4_data/basemaps/gz/Cmt2PrjG$i.s
 done | awk -F\; '{print $2";"$1}' | /da3_data/lookup/splitSecCh.perl /da4_data/basemaps/gz/Prj2CmtG 8 &
 for i in {0..7}; do 
-    gunzip -c /da4_data/basemaps/gz/Prj2CmtG.$i.gz | awk -F\; '{print $2";;;"$1}'| /da3_data/lookup/Prj2CmtBin.perl /data/basemaps/Prj2CmtG.$i.tch 1
+    gunzip -c /da4_data/basemaps/gz/Prj2CmtG$i.gz | awk -F\; '{print $2";;;"$1}'| /da3_data/lookup/Prj2CmtBin.perl /da4_data/basemaps/Prj2CmtG.$i.tch 1
 done
 
 
-############################
-##################
-#this is old
-##################
 
 gunzip -c /da4_data/basemaps/Cmt2Prj.$i.lst | perl -ane 'chop();($k,$n,@ps)=split(/\;/, $_, -1); for my $p (@ps){print "$k;$p\n";}' | join -v2 -t\; - <(gunzip -c FromNewOlist|grep -E '^[0-9a-f]{40};') | gzip > Cmt2Prj.$i.notIn1
 
