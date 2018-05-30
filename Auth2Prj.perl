@@ -1,29 +1,53 @@
-#!/usr/bin/perl -I /home/audris/lib64/perl5 -I /da3_data/lookup
+#!/usr/bin/perl -I /home/audris/lib64/perl5
 
 use strict;
 use warnings;
 use Error qw(:try);
+
 use TokyoCabinet;
 use Compress::LZF;
-use cmt;
 
+sub toHex { 
+        return unpack "H*", $_[0]; 
+} 
+
+sub fromHex { 
+        return pack "H*", $_[0]; 
+} 
+
+sub safeDecomp {
+  my ($codeC, $par) = @_;
+  try {
+    my $code = decompress ($codeC);
+    return $code;
+  } catch Error with {
+    my $ex = shift;
+    print STDERR "Error: $ex par=$par\n";
+    return "";
+  }
+}
+sub safeComp {
+  my ($codeC, $par) = @_;
+  try {
+    my $code = compress ($codeC);
+    return $code;
+  } catch Error with {
+    my $ex = shift;
+    print STDERR "Error: $ex par=$par\n";
+    return "";
+  }
+}
 
 my $sections = 8;
-my $fbase="/fast1/All.sha1c/";
-
-
-my $a2cf = $ARGV[0];
 my %a2c;
-tie %a2c, "TokyoCabinet::HDB", "$a2cf", TokyoCabinet::HDB::OREADER,   
+tie %a2c, "TokyoCabinet::HDB", "$ARGV[0].tch", TokyoCabinet::HDB::OREADER,   
         16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
-     or die "cant open $a2cf\n";
-
-my $c2ff = $ARGV[1];
+     or die "can't open $fbase/Auth2Cmt.tch\n";
 my %c2f;
 for my $sec (0..($sections-1)){
-  tie %{$c2f{$sec}}, "TokyoCabinet::HDB", "$c2ff.$sec.tch", TokyoCabinet::HDB::OREADER,   
+  tie %{$c2f{$sec}}, "TokyoCabinet::HDB", "$ARGV[1].$sec.tch", TokyoCabinet::HDB::OREADER,   
         16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
-     or die "cant open $c2ff.$sec.tch\n";
+     or die "can't open $fbase/c2fFull.$sec.tch\n";
 }
 
 my %a2f1;
@@ -31,10 +55,6 @@ tie %a2f1, "TokyoCabinet::HDB", "$ARGV[2]", TokyoCabinet::HDB::OWRITER | TokyoCa
         16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
      or die "cant open $ARGV[0]\n";
 
-my %badC;
-for my $c (keys %badCmt){
-  $badC{fromHex ($c)}++;
-}
 my $line = 0;
 my %a2f;
 while (my ($a, $v) = each %a2c){
@@ -42,7 +62,6 @@ while (my ($a, $v) = each %a2c){
   my $ns = length ($v)/20;
   for my $i (0..($ns-1)){
     my $c = substr ($v, $i*20, 20);
-    next if defined $badC{$c}; #ignore humongous commits
     my $sec =  hex (unpack "H*", substr($c, 0, 1)) % $sections;
     if (defined $c2f{$sec}{$c}){
       my @fs = split(/\;/, safeDecomp ($c2f{$sec}{$c}, $a), -1);

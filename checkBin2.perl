@@ -34,7 +34,8 @@ my $sections = 128;
   my $rl = read (FD, $codeC, $ARGV[3]);
   my $code = safeDecomp ($codeC, "$ARGV[2];$ARGV[3]");
   if ($code ne ""){
-    print "$ARGV[3];$code\n";
+    my $lc = length($code);
+    print "$ARGV[3];$lc;$code;END\n";
   }else{
     seek (FD, $ARGV[2], 0);
     my $rl = read (FD, $codeC, 10000000);

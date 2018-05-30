@@ -48,7 +48,13 @@ sub git_signature_parse {
    my $email_start = index ($buffer, '<');
    my $email_end = index ($buffer, '>');
    if ($email_start < 0 || !$email_end || $email_end <= $email_start){
-      return signature_error("malformed e-mail ($email_start, $email_end): $buffer");
+     if ($email_end < $email_start){
+       print STDERR  "malformed e-mail ($email_start, $email_end): $buffer\n";
+       $buffer =~ s/\>//;
+       return git_signature_parse ($buffer);
+     }else{
+       return signature_error("malformed e-mail ($email_start, $email_end): $buffer", $buffer);
+     }
    }
    $email_start += 1;
    my $name = extract_trimmed ($buffer, $email_start - 1);
@@ -60,12 +66,15 @@ sub git_signature_parse {
 
 while (<STDIN>){
   chop();
-  my ($a, @rest) = split(/\;/, $_, -1);
+  my (@rest) = split(/\;/, $_, -1);
+  my $nc = pop @rest;
+  $a = join ';', @rest;
   my $aO = $a;
   $a =~ s/SEMICOLON/;/g;
   my ($n, $e) = git_signature_parse ($a);
   $n =~ s/;/SEMICOLON/g if $n ne "";
   $e =~ s/;/SEMICOLON/g if $e ne "";
-  print "$n;$e;$a;".(join ';', @rest)."\n";
+  $a =~ s/;/:/g;
+  print "$n;$e;$a;$nc\n";
 }
 

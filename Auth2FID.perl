@@ -17,7 +17,9 @@ sub fromHex {
 
 my %fi;
 open B, "|gzip>$ARGV[0].idxf";
-open A, "gunzip -c files2p.gz|";
+
+#gunzip -c /da4_data/basemaps/f2cFullF.[0-7].lst | grep -v ';1$' | gzip > files2pF.gz
+open A, "gunzip -c files2pF.gz|";
 my $idx = 0;
 while (<A>){
   chop();
@@ -31,11 +33,14 @@ while (<A>){
 close (B);
 close (A);
 
+
+#./Auth2File.perl Auth2File.tch &> Auth2File.err
+#cp -p Auth2File.tch  /fast1/All.sha1c/
 my %a2f;
 my $fbase="/fast1/All.sha1c/";
-tie %a2f, "TokyoCabinet::HDB", "$fbase/a2fFull.tch", TokyoCabinet::HDB::OREADER,
+tie %a2f, "TokyoCabinet::HDB", "$fbase/Auth2File.tch", TokyoCabinet::HDB::OREADER,
    16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
-  or die "cant open $fbase/a2fFull.tch\n";
+  or die "cant open $fbase/Auth2File.tch\n";
 
 
 open A, "|gzip>$ARGV[0].bina";

@@ -1,4 +1,4 @@
-#!/bin/perl -I /home/audris/lib64/perl5
+#!/bin/perl -I /home/audris/lib64/perl5 -I /da3_data/lookup
 
 use strict;
 use warnings;
@@ -6,14 +6,7 @@ use Error qw(:try);
 
 use TokyoCabinet;
 use Compress::LZF;
-
-sub toHex { 
-        return unpack "H*", $_[0]; 
-} 
-
-sub fromHex { 
-        return pack "H*", $_[0]; 
-} 
+use cmt;
 
 my %b2c;
 my $sec;
@@ -27,6 +20,14 @@ for $sec (0..($nsec -1)){
         16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
      or die "cant open $fname\n";
 }
+my %bad;
+for my $c (keys %badCmt){
+  $bad{$c}++;
+}
+for my $c (keys %badBlob){
+  $bad{$c}++;
+}
+
 
 my %b2c1;
 my $lines = 0;
@@ -34,6 +35,7 @@ while (<STDIN>){
   chop();
   my ($c, $f, $bb, $p) = split(/\;/, $_, -1);
   next if length ($c) != 40 || length ($bb) != 40 || $c !~ /^[0-9a-f]{40}$/ || $bb !~ /^[0-9a-f]{40}$/;
+  next if defined $bad{$c} || defined $bad{$bb};
   my $cmt = fromHex ($c);
   my $b = fromHex ($bb);
   $b2c1{$cmt}{$b}++;
