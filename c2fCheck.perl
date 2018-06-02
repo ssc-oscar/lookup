@@ -14,7 +14,7 @@ my %c2f0;
 for my $sec (0..($split-1)){
   my $fname = "$ARGV[0].$sec.tch";
   $fname = $ARGV[0] if ($split == 1);
-  tie %{$p2c{$sec}}, "TokyoCabinet::HDB", "$fname", TokyoCabinet::HDB::OREADER,   
+  tie %{$c2f0{$sec}}, "TokyoCabinet::HDB", "$fname", TokyoCabinet::HDB::OREADER,   
         16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
       or die "cant open $fname\n";
 }
@@ -35,7 +35,7 @@ while (<STDIN>){
 		 $c2f{$sha}{$f}++;
     }
   }
-  print "$str\n" if !defined $c2f{$c}{$f};
+  print "$str\n" if !defined $c2f{$sha}{$f};
 }
 
 
