@@ -24,6 +24,7 @@ while (<STDIN>){
   chop();
   my $str = $_;
   my ($hsha, $f, $p, $b) = split (/\;/, $str, -1);
+  next if $hsha !~ m/^[0-f]{40}$/;
   next if defined $badCmt{$hsha};
   my $sha = fromHex ($hsha);
   $f =~ s/;/SEMICOLON/g;
