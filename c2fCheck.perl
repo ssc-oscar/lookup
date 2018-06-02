@@ -31,8 +31,11 @@ while (<STDIN>){
   next if $f eq "";
   if (!defined  $c2f{$sha}){
     my $sec = (unpack "C", substr ($sha, 0, 1))%$split;
-    for my $f0 (split(/\;/, safeDecomp ($c2f0{$sec}{$sha}), -1)){
-		 $c2f{$sha}{$f}++;
+    if (defined $c2f0{$sec}{$sha}){
+      for my $f0 (split(/\;/, safeDecomp ($c2f0{$sec}{$sha}), -1)){
+        #print "$f0\n";
+        $c2f{$sha}{$f0}++;
+      }
     }
   }
   print "$str\n" if !defined $c2f{$sha}{$f};
