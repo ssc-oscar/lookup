@@ -22,7 +22,8 @@ for my $sec (0..($split-1)){
 my %c2f;
 while (<STDIN>){
   chop();
-  my ($hsha, $f, $p, $b) = split (/\;/, $_, -1);
+  my $str = $_;
+  my ($hsha, $f, $p, $b) = split (/\;/, $str, -1);
   next if defined $badCmt{$hsha};
   my $sha = fromHex ($hsha);
   $f =~ s/;/SEMICOLON/g;
@@ -34,7 +35,7 @@ while (<STDIN>){
 		 $c2f{$sha}{$f}++;
     }
   }
-  print "$hsha;$f\n" if !defined $c2f{$c}{$f};
+  print "$str\n" if !defined $c2f{$c}{$f};
 }
 
 
