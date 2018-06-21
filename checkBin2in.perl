@@ -47,6 +47,10 @@ my $sections = 128;
       shTr($code);
     }else{
       print "$h;".(length($code))."\n$code\n";
+      my $h1 = sha1_hex("$type ".(length($code)-1)."\000".(substr($code, 0,length($code)-1)));
+      print "need newline $h1 $h\n" if $h1 ne $h;
+      #$h = sha1_hex("$type ".(length($code)+1)."\000".$code."\n");
+      #print "$h\n";
     }
   }else{
     seek (FD, $ARGV[2], 0);
