@@ -51,8 +51,8 @@ for my $sec (0 .. ($sections-1)){
   $size{$sec} = $off;
   $cnt{$sec} = $n;
 	
-  my $pre = "/fast/";
-  $pre = "/fast1" if $type eq "blob";
+  my $pre = "/fast1";
+  $pre = "/fast" if $type eq "tag" || $type eq "commit";
   #$pre = "/fast" if $sec % $parts;
   tie %{$fhos{$sec}}, "TokyoCabinet::HDB", "$pre/${fbase}$sec.tch", TokyoCabinet::HDB::OWRITER | 
      TokyoCabinet::HDB::OCREAT, 16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000

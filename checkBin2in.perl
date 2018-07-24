@@ -31,21 +31,33 @@ my $sections = 128;
 
   my $codeC = "";
   seek (FD, $ARGV[2], 0);
-  my $rl = read (FD, $codeC, $ARGV[3]);
+  my $s = $ARGV[3];
+  my $rl = read (FD, $codeC, $s);
   my $code = $codeC;
   if ($s < 2147483647){# longer than that is not compressed
-    $code = safeDecomp ($codeC, "$ARGV[2];$ARGV[3]");
+    $code = safeDecomp ($codeC, "$ARGV[2];$s");
   }
   if ($code ne ""){
-    my $code = safeDecomp ($codeC, "$ARGV[2];$ARGV[3]");
+    my $code = safeDecomp ($codeC, "$ARGV[2];$s");
     my $h = sha1_hex("$type ".length($code)."\000$code");
-    print "$h\n$code\n";
+    if ($type eq "tree"){
+      my $hm1 = sha1_hex("$type ".(length($code)+4)."\000$code\000\000\000\000\000");
+      my $hp1 = sha1_hex("$type ".(length($code)+4)."\000$code\n");
+      print "$h;".(length($code)).";$hm1;$hp1\n";
+      shTr($code);
+    }else{
+      print "$h;".(length($code))."\n$code\n";
+      my $h1 = sha1_hex("$type ".(length($code)-1)."\000".(substr($code, 0,length($code)-1)));
+      print "need newline $h1 $h\n" if $h1 ne $h;
+      #$h = sha1_hex("$type ".(length($code)+1)."\000".$code."\n");
+      #print "$h\n";
+    }
   }else{
     seek (FD, $ARGV[2], 0);
     my $rl = read (FD, $codeC, 10000000);
     for my $s (1..10000000){
        my $tmp = substr ($codeC, 0, $s);
-       my $code = safeDecomp ($codeC, "$ARGV[2];$ARGV[3]");
+       my $code = safeDecomp ($codeC, "$ARGV[2];$s");
        if ($code ne ""){
          my $h = sha1_hex("tag ".length($code)."\000$code");
          print "$h\n$code\n";
@@ -54,6 +66,23 @@ my $sections = 128;
     }
   } 
 #}
+
+sub shTr {
+  my $code = $_[0];
+  my $len = length ($code);
+  my $treeobj = $code;
+  while ($treeobj) {
+    if ($treeobj =~ s/^([0-7]+) (.+?)\0(.{20})//s) {
+      my ($mode,$name,$bytes) = (oct($1),$2,$3);
+      $name =~ s/\n/__NEWLINE__/g;
+      printf "%06o;%s;%s\n",
+      $mode, #($mode == 040000 ? "tree" : "blob"),
+      unpack("H*", $bytes), $name;
+    } else {
+      die "$0: unexpected tree entry";
+    }
+  }
+}
 sub toHex { 
         return unpack "H*", $_[0]; 
 } 

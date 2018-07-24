@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/perl -I/home/audris/lib64/perl5
 use strict;
 use warnings;
 use Error qw(:try);
@@ -33,6 +33,9 @@ my $offset = 0;
 while (my ($codeC, $vs) = each %clones){
 	my $lC = length($codeC);
 	my $l = length($vs);
+        $codeC =~ s/;/SEMICOLON/g;
+        $codeC =~ s/\r/CRCRCR/g;
+        $codeC =~ s/\n/NEWLINE/g;
 	print "$lC\;$l\;$codeC";
         for my $i (0..($l/20-1)){
           print ";".(unpack "H*", substr($vs, $i*20, 20));

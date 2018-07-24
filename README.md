@@ -1,7 +1,63 @@
+# Available maps/tables and their locations 
+In da4:/data/basemaps
+
+The last letter denotes version (in alphabetical order)
+
+1. author2commit: Auth2CmtF.tch
+Grab a list of authors
+```
+echo "Audris Mockus <audris@utk.edu>" | /da3_data/lookup/Prj2CmtShow.perl /data/basemaps/Auth2CmtF.tch 1
+```
+2. author2file: Auth2File.tch, tese are files for blobs created or deeted by the commit (see 6)
+```
+echo "Audris Mockus <audris@utk.edu>" | /da3_data/lookup/Prj2FileShow.perl /data/basemaps/Auth2File.tch 1
+```
+
+3. blob2commit: b2cFullF.{0..15}.tch
+```
+echo 05fe634ca4c8386349ac519f899145c75fff4169 | /da3_data/lookup/Cmt2BlobShow.perl /data/basemaps/b2cFullF 1 16
+```
+
+4. commit2blob: c2bFullF.{0..15}.tch 
+```
+echo e4af89166a17785c1d741b8b1d5775f3223f510f | /da3_data/lookup/Cmt2BlobShow.perl /data/basemaps/c2bFullF 1 16
+```
+
+5. commit2project: Cmt2PrjG.{0..8}.tch  (A new version Cmt2PrjH exists, not sure it's complete)
+```
+echo e4af89166a17785c1d741b8b1d5775f3223f510f |/da3_data/lookup/Cmt2PrjShow.perl /data/basemaps/Cmt2PrjH 1 8
+```
+
+6. file2commit: f2cFullF.{0..8}.tch, tese are files for blobs created or deeted by the commit
+```
+echo main.c |/da3_data/lookup/Prj2CmtShow.perl /data/basemaps/f2cFullF 1 8
+```
+
+7. project2commit: Prj2CmtG.{0..8}.tch
+```
+echo ArtiiQ_PocketMine-MP |/da3_data/lookup/Prj2CmtShow.perl /data/basemaps/Prj2CmtG 1 8
+```
+
+## How to see a content of a commit
+```
+echo e4af89166a17785c1d741b8b1d5775f3223f510f | perl ~audris/bin/showCmt.perl 
+```
+## How to see a content of a tree
+```
+echo f1b66dcca490b5c4455af319bc961a34f69c72c2 | perl ~audris/bin/showTree.perl
+```
+## How to see conrent of a blob
+```
+echo 05fe634ca4c8386349ac519f899145c75fff4169 | perl ~audris/bin/showBlob.perl
+```
+
+
+
+##############################################
+
 # Scripts to create various lookup tables
 
 # Update process
-
 1. select a sample of repos (da0:/data/github/YearlyUpdate.sh)
 
         i. the mongodb github-ghReposList2017/repos for overview
@@ -13,9 +69,38 @@
 1. clone repos in the list (breatk into 400Gb chunks based on size github.github-ghUsers17.repos.values.full_name.id.size.private.fork.forks.forks_count.watchers.watchers_count.stargazers_count.has_downloads.has_pages.open_issues.hompage.language.created_at.updated_at.pushed_at.default_branch.description)
 1. extract olist.gz for each chunk
 1. extract blobs, commits, trees, tags based on the olist (see beacon scripts below)
+1. Extract c2p info from *.olist.gz, olist.gz is obtained first, then objects are extracted based on it
+```
+cd /data/update
+# 20180510
+for i in bbnew # with withFrk withWch withIssues chris chrisB py
+do cd /data/update/$i
+   #use seen to avoid extracting the same object twice, as in runing iteratively, over multiple folders
+   #zcat *.olist.gz | ~/bin/grepFieldv.perl ../seen 3 | perl -ane '@x=split(/;/);print if !defined $m{$x[2]}; $m{$x[2]}++' | ~/bin/hasObj.perl | gzip > 12-17.todo
+   zcat *.olist.gz | perl -ane '@x=split(/;/);print if !defined $m{$x[2]}; $m{$x[2]}++' | ~/bin/grepFieldv.perl ../bbnew/olist.willextract 3 \
+            | ~/bin/hasObj.perl | gzip > olist.todo
+   for m in {00..14}; do for n in {00..01}; do zcat olist.todo | ~/bin/grepField.perl list2018.withDnld1.$m.$n.gz 1 | gzip > $m.$n.todo; done; done
+
+
+   #zcat *.olist.gz | cut -d\; -f3 | perl -e 'while(<STDIN>){chop();$x{$_}++};while (($k,$v)=each %x){print "$k\n"}' | gzip > seen
+   zcat olist.todo | cut -d\; -f3 |perl -e 'while(<STDIN>){chop();$x{$_}++};while (($k,$v)=each %x){print "$k\n"}' | gzip > olist.willextract
+   #handle subfolders on knl by separating extraction by the folder in which repo resides in
+   #for m in {00..25}; do zcat *.$m.[0-9][0-9].olist.gz |cut -d\; -f1 | lsort 3G -u | gzip > $m; done 
+   #for m in {00..25}; do zcat olist.todo | ~/bin/grepField.perl $m 1 | gzip > olist.todo.$m; done
+
+   gunzip -c *.olist.gz | /da3_data/lookup/Prj2CmtChk.perl /data/basemaps/Prj2CmtH 8 | gzip > p2c.gz
+   gunzip -c p2c.gz   | lsort 120G -u -t\; -k1b,2 | gzip > p2c.s
+   gunzip -c p2c.gz | awk -F\; '{print $2";"$1}' | lsort 120G -u -t\; -k1b,2 | gzip > c2p.s
+done
+cd /data/update
+lsort 20G -t\; -k1b,2 --merge <(gunzip -c with/p2c.s) <(gunzip -c withFrk/p2c.s) <(gunzip -c withWch/p2c.s) <(gunzip -c withIssues/p2c.s) <(gunzip -c chris/p2c.s) <(gunzip -c chrisB/p2c.s) <(gunzip -c py/p2c.s)  | uniq | /da3_data/lookup/splitSecCh.perl Inc20180510.p2c. 8
+
+lsort 20G -t\; -k1b,2 --merge <(gunzip -c with/c2p.s) <(gunzip -c withFrk/c2p.s) <(gunzip -c withWch/c2p.s) <(gunzip -c withIssues/c2p.s) <(gunzip -c chris/c2p.s) <(gunzip -c chrisB/c2p.s) <(gunzip -c py/c2p.s)  | uniq | /da3_data/lookup/splitSec.perl Inc20180510.c2p. 8
+
+```
 1. Verify input is good
 ```
-   for t in commit blob tree tag; do ls -f *.commit.idx | sed 's/\.idx$//' | while read i; do /da3_data/lookup/checkBin1in.perl $t $i; done; done
+   for t in commit blob tree tag; do ls -f *.$t.idx | sed 's/\.idx$//' | while read i; do /da3_data/lookup/checkBin1in.perl $t $i; done; done
 ```
 1. Update da4:/data/All.blobs
 
@@ -34,28 +119,135 @@
 ```
 1. Update All.sha1c commit and tree needed for c2fb and cmptDiff2.perl
 ```
-   nmax=1000000
+   nmax=2000000
+   #  1475976;
    for i in {0..127}; do /da3_data/lookup/Obj2ContUpdt.perl commit $i $nmax; done
+   nmax=8227751
    for i in {0..127}; do /da3_data/lookup/Obj2ContUpdt.perl tree $i $nmax; done
 ```
 1. Update All.sha1o needed for f2b tree-based stuff
 ```
 for i in {0..127}; do /da3_data/lookup/BlobN2Off.perl $i; done
 ```
-1. Extract c2p info from *.olist.gz
+1. Update Author to commit map
 ```
+#/da3_data/lookup/Auth2Cmt.perl /data/basemaps/Auth2CmtNew.tch
+# The above may be more correct
+# 394525: how much back to go from the end of All.blobs/commit_X.idx
+#time /da3_data/lookup/Auth2CmtUpdt.perl Auth2CmtNew 394525
+#time /da3_data/lookup/Auth2CmtMrg.perl Auth2CmtNew Auth2CmtNew.new Auth2CmtH
+#Alternative
+./lstCmt.perl 4 | awk -F\; '{print $2 ";" $1}' | lsort 200G -t\; -k1b,2  | gzip > a2c.s
+gunzip -c a2c.s | ./Prj2CmtBinSorted.perl Auth2CmtH.tch
+
+./lstCmt.perl -1  | gzip > c2t.gz
+
+```
+1. Create c2fb
+```
+cd /data/update/c2fb
+#get full list of commits in the database
+#cut -d\; -f4 /data/All.blobs/commit_*.idx | lsort 40G | gzip > /data/basemaps/cmts.s1
+gunzip -c /data/basemaps/cmts.s | join -v1 <(gunzip -c /data/basemaps/cmts.s1) - | gzip > /data/basemaps/cmts.s1.new
+gunzip -c cmts.s1.new | split -l 2075511 -d -a2 --filter='gzip > $FILE.gz' - cmts.s1.new.
+#this takes a while and requires All.sha1c/{commit,tree}_{0..127}.tch
+for i in {00..99}
+do gunzip -c cmts.s1.new.$i.gz | /da3_data/lookup/cmputeDiff2.perl 2> cmts.s1.new.$i.err | gzip > cmts.s1.new.$i.c2fb
+done
+
+#now put all of that good into one place
+zcat cmts.s[1-3].new.*.c2fb | /da3_data/lookup/splitSec.perl /data/update/Inc20180510.c2f. 8 
 cd /data/update
-for i in CRAN cve secure js
-do gunzip -c $i/*.olist.gz| cut -d\; -f1-3 | grep ';commit;' |\
+
+#now create c2f and b2c (potentially using debugging from below)
+for j in {0..7}; do 
+  zcat Inc20180510.c2f.$j.gz | lsort 80G -t\; -k1b,2 | gzip > Inc20180510.c2f.$j.s
+  lsort 10G --merge -u -t\; -k1b,2 <(zcat /data/basemaps/gz/c2fFullF$j.s) \ 
+    <(zcat Inc20180510.c2f.$j.s| cut -d\; -f1,2 | sed 's|;/|;|') | gzip > /data/basemaps/gz/c2fFullH$j.s
+  zcat /da4_data/basemaps/gz/c2fFullH$j.s | /da3_data/lookup/Cmt2FileBin.perl /da4_data/basemaps/c2fFullH.$j.tch 1
+done
+
+zcat cmts.s[1-3].new.*.c2fb | cut -d\; -f1,3 | grep -v '^;'| grep -v '^$' | awk -F\; '{ print $2";"$1}' | \
+  /da3_data/lookup/splitSec.perl /data/update/Inc20180510.b2c. 16 
+for j in {0..15}; do
+   zcat /data/update/Inc20180510.b2c.$j.gz| grep -v '^;' | grep -v '^$' | lsort 20G -t\; -k1b,2 | gzip > /data/update/Inc20180510.b2c.$j.s
+   lsort 10G --merge -u -t\; -k1b,2 <(zcat /da4_data/basemaps/gz/b2cFullF$j.s) <(zcat /da4_data/update/Inc20180510.b2c.$j.s) |
+     gzip > /data/basemaps/gz/b2cFullH$j.s
+   zcat /data/basemaps/gz/b2cFullH$j.s | awk -F\; '{print $1";;"$2}'| /da3_data/lookup/Cmt2BlobBin.perl /da4_data/basemaps/b2cFullH.$j.tch 1 
+done
+
+#finally invert c2f to f2c and b2c to c2b
+for i in {0..7}; do 
+  gunzip -c /da4_data/update/Inc20180510.c2f.$i.s
+done | perl -I /da3_data/lookup -I ~/lib64/perl5 -ane 'use cmt;@x=split(/\;/);next if defined $badCmt{$x[0]}; print;' |\
+  awk -F\; '{print $2";"$1}' | /da3_data/lookup/splitSecCh.perl Inc20180213.f2c. 8 &
+
+for i in {0..7}; do zcat /da4_data/update/Inc20180510.c2f.$i.s; done | perl -I /da3_data/lookup -I ~/lib64/perl5 \
+   -ane 'use cmt;s|;/|;|;@x=split(/\;/);next if defined $badCmt{$x[0]}; print;' | \
+   awk -F\; '{print $2";"$1}' | /da3_data/lookup/splitSecCh.perl Inc20180510.f2c. 8 &
+for i in {0..7}; do   lsort 30G --merge -u -t\; -k1b,2 <(zcat Inc20180510.f2c.$i.gz|lsort 5G -u  -t\; -k1b,2) \
+      <(zcat /da4_data/basemaps/gz/f2cFullF$i.s) | \
+    gzip > f2cFullH$i.s
+    gunzip -c f2cFullH$i.s | awk -F\; '{print $2";"$1}' | /da3_data/lookup/File2CmtBin.perl f2cFullH.$i.tch 1 
+done
+
+for i in {0..15}; do gunzip -c /da4_data/basemaps/gz/b2cFullH$i.s; done | perl -I /da3_data/lookup -I ~/lib64/perl5 \
+   -ane 'use cmt;@x=split(/\;/);next if defined $badCmt{$x[1]} || defined $badBlob{$x[0]}; print;' | \
+  awk -F\; '{print $2";"$1}' | /da3_data/lookup/splitSec.perl c2bFullH 16
+for i in {0..15}; do gunzip -c c2bFullH$i.gz | awk -F\; '{print $1";;"$2}'| /da3_data/lookup/Cmt2BlobBin.perl c2bFullH.$i.tch 1
+done
+
+```
+
+1. Update various maps
+```
+cd /data/basemaps
+/da3_data/lookup/Auth2File.perl Auth2CmtH.tch /fast1/All.sha1c/c2fFullH Auth2FileH.tch 
+
+#the following is slow: needs > 250G of ram
+/da3_data/lookup/Cmt2Par.perl /data/basemaps/Cmt2Chld.tch
+
+ls -l /da4_data/basemaps/{Auth2Cmt,Cmt2Chld,Auth2File}.tch
+
+## Cmt2Blob.sh Blob to commit and inverse
+
+ls -l /da4_data/basemaps/gz/f2cFullF[0-7].s
+ls -l /da4_data/basemaps/f2cFullF.[0-7].tch
+
+
+ls -l /da4_data/basemaps/gz/c2fFullF[0-7].s
+ls -l /da4_data/basemaps/c2fFullF.[0-7].tch
+
+ls -l /da4_data/basemaps/gz/b2cFullF*.s
+ls -l /da4_data/basemaps/b2cFullF.*.tch
+
+ls -f /da4_data/basemaps/gz/c2bFullF[0-7].gz
+ls -l /da4_data/basemaps/c2bFullF.*.tch
+```
+
+## Prj2Cmt.sh Project to commit and inverse
+```
+ls -l /da4_data/basemaps/gz/Cmt2PrjH*.s
+ls -l /da4_data/basemaps/Cmt2PrjH.*.tch
+ls -l /da4_data/basemaps/gz/Prj2CmtH*.s
+```
+
+
+
+1. Historic stuff below
+
+```
+# 20180213
+for i in CRAN cve secure js with withFrk withWch
+do gunzip -c $i/*.olist*.gz| cut -d\; -f1-3 | grep ';commit;' |\
    sed 's/;commit;/;/;s|/*;|;|;s|\.git;|;|;s|/*;|;|'  | \
    perl -ane 'chop();($p,$c)=split(/\;/,$_,-1);next if $c !~ m/^[a-f0-9]{40}$/; $p=~s/.*github.com_(.*_.*)/$1/;$p=~s/^bitbucket.org_/bb_/;$p=~s|\.git$||;$p=~s|/*$||;$p=~s/\;/SEMICOLON/g;$p = "EMPTY" if $p eq "";print "$c;$p\n";'\
    | lsort 20G -t\; -k1b,2 -u | gzip > $i/c2p.$i.gz 
 done
 lsort 10G -t\; -k1b,2 -u --merge <(gunzip -c CRAN/c2p.CRAN.gz)  <(gunzip -c secure/c2p.secure.gz) <(gunzip -c cve/c2p.cve.gz) <(gunzip -c js/c2p.js.gz) | /da3_data/lookup/splitSec.perl Inc20180213.c2p. 8
-```
-1. Create c2fb
-```
-cd /data/update
+
+
+#debug: look for missing commits/trees
 
 for i in CRAN cve secure js
 do cd $i
@@ -73,8 +265,6 @@ for j in {0..7}
 do gunzip -c Inc20180213.c2f.$j.todo | /da3_data/lookup/cmputeDiff2.perl 2> Inc20180213.c2f.$j.err | gzip > Inc20180213.c2f.$j.c2fb &
 done
 
-#get full list of stuff in the database
-cut -d\; -f4 /data/All.blobs/commit_*.idx | lsort 40G | gzip > /data/basemaps/cmts.s
 
 #check for/update empty/bad/missing in c2fb.err ({nc,npc,empty,bad}.cs nt.ts)
 # empty.cs have no files changed, bad.cs have tree or parent missing, and nc.cs are simply missing and need to be extrcted null.cs are null (content is \x00'oes)
@@ -125,11 +315,11 @@ grep -Ff Inc20180213.c2f.in.extra seeIfBad | /da3_data/lookup/splitSec.perl Inc2
 gunzip -c /data/basemaps/bad.cs1 | join -v1 - <(cut -d\; -f1 seeIfBad | uniq | lsort 10G -u) | gzip > /data/basemaps/bad.cs
 rm  /data/basemaps/bad.cs1
 
-
-#now create c2f and b2c
+#now create c2f and b2c 
 for j in {0..7}
 do  gunzip -c Inc20180213.c2f.$j.c2fb bbnew/missed.$j.c2fb Inc20180213.c2f.extra.$j.gz | cut -d\; -f1,2 | sed 's|;/|;|' | lsort 10G -t\; -k1b,2 -u | gzip > Inc20180213.c2f.$j.c2f &
 done
+
 
 #exclude commmits deleting files grep -v '^;'
 for j in {0..7}; do  
@@ -141,39 +331,6 @@ for j in {0..7}; do
   lsort 10G --merge -u -t\; -k1b,2 <(gunzip -c /data/basemaps/gz/c2fFullE$j.s) \ 
     <(gunzip -c Inc20180213.c2f.$j.c2f) | gzip > /data/basemaps/gz/c2fFullF$j.s
 done
-
-
-```
-1. Update various maps
-```
-/da3_data/lookup/Auth2CmtUpdt.perl Auth2Cmt.tch
-# The above may be faster and more correct
-# /da3_data/lookup/Auth2CmtUpdt.perl /data/basemaps/Auth2Cmt.tch
-/da3_data/lookup/Cmt2Par.perl Cmt2Chld.tch
-```
-ls -l /da4_data/basemaps/{Auth2Cmt,Cmt2Chld,Auth2File}.tch
-
-## Cmt2Blob.sh Blob to commit and inverse
-```
-ls -l /da4_data/basemaps/gz/f2cFullF[0-7].s
-ls -l /da4_data/basemaps/f2cFullF.[0-7].tch
-
-
-ls -l /da4_data/basemaps/gz/c2fFullF[0-7].s
-ls -l /da4_data/basemaps/c2fFullF.[0-7].tch
-
-ls -l /da4_data/basemaps/gz/b2cFullF*.s
-ls -l /da4_data/basemaps/b2cFullF.*.tch
-
-ls -f /da4_data/basemaps/gz/c2bFullF[0-7].gz
-ls -l /da4_data/basemaps/c2bFullF.*.tch
-```
-
-## Prj2Cmt.sh Project to commit and inverse
-```
-ls -l /da4_data/basemaps/gz/Cmt2PrjG*.s
-ls -l /da4_data/basemaps/Cmt2PrjG.*.tch
-ls -l /da4_data/basemaps/gz/Prj2CmtG*.s
 ```
 
 ## f2b.md
@@ -184,8 +341,8 @@ c2fbp map split into 80 (1B line) chunks (see below).
 # Update commit message map
 ```
 cd /da3_data/delta
-for i in {0..127}; do /da3_data/lookup/lstCmt.perl $i 1 |gzip > cmt.$i.lst; done
-for i in {0..127}; do gunzip -c cmt.$i.lst; done | gzip > cmt.lst
+/da3_data/lookup/lstCmt.perl 1 | gzip > /da3_data/delta/cmt.lst
+
 
 gunzip -c /da4_data/update/Inc20180213.c2f.[0-7].gz |uniq | /da3_data/lookup/showCmt.perl 1 | gzip > Inc20180213.delta
 #gunzip -c /da4_data/update/Inc20180213.c2p.[0-7].gz | cut -d\; -f1 | uniq | /da3_data/lookup/showCmt.perl 1 | gzip > Inc20180213.delta

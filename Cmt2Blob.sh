@@ -42,18 +42,12 @@ for i in {0..15}; do
       <(gunzip -c /da4_data/basemaps/gz/b2cFullE$i.s) | \
     gzip > /da4_data/basemaps/gz/b2cFullF$i.s &
 done
-for i in {0..15}; do 
-  lsort 30G --merge -u -t\; -k1b,2 <(gunzip -c /da4_data/update/Inc20180213.b2c.$i.gz) \
-      <(gunzip -c /da4_data/basemaps/gz/b2cFullE$i.s) | \
-    gzip > /da4_data/basemaps/gz/b2cFullF$i.s &
-done
-
 
 #c2b,b2c
-for i in {0..15}; do gunzip -c b2cFullF$i.s; done | awk -F\; '{print $2";"$1}' | /da3_data/lookup/splitSec.perl c2bFullF. 16
+for i in {0..15}; do gunzip -c /da4_data/basemaps/gz/b2cFullF$i.s; done | awk -F\; '{print $2";"$1}' | /da3_data/lookup/splitSec.perl /da4_data/basemaps/gz/c2bFullF 16
 for i in {0..15}
-do gunzip -c /da4_data/basemaps/gz/c2bFullF$i.gz | awk -F\; '{print $1";;"$2}'| /da3_data/lookup/Cmt2BlobBin.perl /da4_data/basemaps/c2bFullF.$i.tch 1 & done
-   gunzip -c /da4_data/basemaps/gz/b2cFullF$i.s | awk -F\; '{print $1";;"$2}'| /da3_data/lookup/Cmt2BlobBinSorted.perl /da4_data/basemaps/b2cFullF.$i.tch 1 & done
+do gunzip -c /da4_data/basemaps/gz/c2bFullF$i.gz | awk -F\; '{print $1";;"$2}'| /da3_data/lookup/Cmt2BlobBin.perl /da4_data/basemaps/c2bFullF.$i.tch 1 
+   gunzip -c /da4_data/basemaps/gz/b2cFullF$i.s | awk -F\; '{print $1";;"$2}'| /da3_data/lookup/Cmt2BlobBinSorted.perl /da4_data/basemaps/b2cFullF.$i.tch 1 
 done
 
 

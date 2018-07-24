@@ -46,7 +46,7 @@ sub safeDecomp {
 }
 
 my %fhoa;
-tie %fhoa, "TokyoCabinet::HDB", "$ARGV[0]", TokyoCabinet::HDB::OREADER,
+tie %fhoa, "TokyoCabinet::HDB", "$ARGV[0].tch", TokyoCabinet::HDB::OREADER,
    16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
     or die "cant open $ARGV[0]\n";
 my $sections = 128;
@@ -55,8 +55,8 @@ my $fbase="/data/All.blobs/commit_";
 my $count = 0;
 my $countA = 0;
 for my $s (0..127){
-  print STDERR "reading $s\n";
-  open A, "tac $fbase$s.idx|";
+  print STDERR "reading $s $count\n";
+  open A, "tail -$ARGV[1] $fbase$s.idx|";
   open FD, "$fbase$s.bin";
   binmode(FD);
   my $bof = 0;
@@ -66,21 +66,23 @@ for my $s (0..127){
     $bof -= $len;
     my $h = fromHex ($hash);
     
-    seek (FD, $bof, 2);
+    #seek (FD, $bof, 2);
+    seek (FD, $of, 0);
     my $codeC = "";
     my $rl = read (FD, $codeC, $len);
-    my ($auth) = extrAut ($codeC, $hash);
+    my ($auth) = extrAuth ($codeC, $hash);
     
-    if (defined $fhoa{$auth}){
+    if (defined $fhoa{$auth} && !defined $map{$auth}){
+    #if (0){
       my $v = $fhoa{$auth};
       my $ns = length ($v)/20;
       my %tmp = ();
       for my $i (0..($ns-1)){
         $tmp{substr ($v, $i*20, 20)}++;
       } 
-      last if defined $tmp{$h};
+      #last if defined $tmp{$h};
       for my $c1 (keys %tmp){
-        $map{$auth}{$h}++;
+        $map{$auth}{$c1}++;
       }
     }
     $map{$auth}{$h}++;
@@ -89,7 +91,7 @@ for my $s (0..127){
 }
 untie %fhoa;
 
-tie %fhoa, "TokyoCabinet::HDB", "$ARGV[0].new", TokyoCabinet::HDB::OWRITER | TokyoCabinet::HDB::OCREAT,
+tie %fhoa, "TokyoCabinet::HDB", "$ARGV[0].new.tch", TokyoCabinet::HDB::OWRITER | TokyoCabinet::HDB::OCREAT,
    16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
     or die "cant open $ARGV[0]\n";
 while (my ($a, $v) = each %map){

@@ -30,6 +30,7 @@ untie %p2c;
 
 sub list {
   my ($p, $v) = @_;
+  $p =~ s/\n$//;
   my $ns = length($v)/20;
   my %tmp = ();
   #$p =~ s/\n$//;

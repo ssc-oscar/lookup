@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/perl -I /home/audris/lib64/perl5
 use strict;
 use warnings;
 use Error qw(:try);
@@ -30,15 +30,28 @@ sub safeDecomp {
 
 
 my $offset = 0;
+my $justBlobs = 0;
+$justBlobs = $ARGV[1] if defined $ARGV[1];
+
 while (<STDIN>){
   chop ();
   my $k = $_;
+  if (! defined $clones{$k}){
+    print STDERR "$k\n";
+    next;
+  }
   my $vs = $clones{$k};
   my $l = length($vs);
-  print "$k;$l";
-  for my $i (0..($l/20-1)){
-    print ";".(unpack "H*", substr($vs, $i*20, 20));
+  if (! $justBlobs){
+    print "$k;$l";
+    for my $i (0..($l/20-1)){
+      print ";".(unpack "H*", substr($vs, $i*20, 20));
+    }
+    print "\n";
+  }else{
+    for my $i (0..($l/20-1)){
+      print "".(unpack "H*", substr($vs, $i*20, 20))."\n";
+    }
   }
-  print "\n";
 } 
 untie %clones;
