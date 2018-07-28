@@ -31,7 +31,10 @@ our %badCmt = (
   "b55208a72f6443eaeaf31789f9a492c20dc021a1" => 10000000000, # tons of fake files
   "f268257b2f1517e4f870820a5a63cbe215668f5c" => 10000000000, # tons of fake files
   "c1ce17533f16f8928878c0cfc45cb4be1b32ca71" => 10000000000, # tons of fake files
+  "5e4c1715341534fbcf4126c053bc0ff64cc48a7c" => 10000000000, # tons of fake files
   "f0e385e0fb36173c53f68f91b6e28023a039da02" => 2043846, # tons of fake files
+  "cc646e6b0c4584134424ce0b2d385080169f3b81" => 1171240, # tons of files
+
 );
 our %badBlob  = (
   "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391" => 7826798, #\n
