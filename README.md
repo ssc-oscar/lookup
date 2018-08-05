@@ -107,6 +107,16 @@ perl connectImport.perl c2pFullI | gzip > c2pFullI.forks
 i=withNthng
 cd /data/update/$i
 gunzip -c *.olist.gz | /da3_data/lookup/Prj2CmtChk.perl p2cFullI 32 | gzip > p2c.gz
+gunzip -c p2c.gz   | lsort 120G -u -t\; -k1b,2 | gzip > p2c.s
+gunzip -c p2c.gz | awk -F\; '{print $2";"$1}' | lsort 120G -u -t\; -k1b,2 | gzip > c2p.s
+cut -d\; -f4 *.commit.idx | lsort 20G -u | gzip > cs
+cd ../
+
+(zcat withNthng/cs; cut -d\; -f4 withDnld/New2018withDnld1.{7[1-9],8[0-9]}*.commit.idx) | lsort 20G -u |gzip > cs.20180810
+zcat /data/basemaps/cmts.s4 | lsort 10G -u --merge - <(zcat cs.20180810) | gzip > /data/basemaps/cmts.s5
+zcat /data/basemaps/cmts.s4 | join -v2 - <(zcat cs.20180810) | gzip > /data/basemaps/cmts.s5.new
+zcat /data/basemaps/cmts.s5.new | split -l 2075511 -d -a 2 --filter='gzip > $FILE.gz' - cmts.s5.new. 
+
 
 # 20180710
 for i in withDnld emr gl 
@@ -117,7 +127,7 @@ do cd /data/update/$i
    cut -d\; -f4 *.commit.idx | lsort 20G -u > cs
 done
 cd ../
-zcat {emr,gl,withDnld}/cs | lsort 50G -u > cs.20180710
+zcat {emr,gl,withDnld}/cs | lsort 50G -u | gzip > cs.20180710
 zcat /data/basemaps/cmts.s3 | lsort 10G -u --merge - <(zcat cs.20180710) | gzip > /data/basemaps/cmts.s4
 zcat /data/basemaps/cmts.s3 | join -v2 - <(zcat cs.20180710) | gzip > /data/basemaps/cmts.s4.new
 zcat /da4_data/basemaps/cmts.s4.new | split -l 2075511 -d -a 2 --filter="gzip ? $FILE.gz" - cmts.s4.new. 
@@ -193,6 +203,7 @@ for i in {0..127}; do /da3_data/lookup/BlobN2Off.perl $i; done
 #Alternative
 ./lstCmt.perl 4 | awk -F\; '{print $2 ";" $1}' | lsort 200G -t\; -k1b,2  | gzip > a2c.s
 gunzip -c a2c.s | ./Prj2CmtBinSorted.perl Auth2CmtH.tch
+gunzip -c a2c.s | ./Prj2CmtBinSorted.perl a2cFullI.tch
 
 ./lstCmt.perl -1  | gzip > c2t.gz
 
@@ -201,40 +212,54 @@ gunzip -c a2c.s | ./Prj2CmtBinSorted.perl Auth2CmtH.tch
 ```
 cd /data/update/c2fb
 #get full list of commits in the database
+#c2f
 zcat cmts.s4.new.*.c2fb \
 perl -I $HOME/lookup -e 'use cmt; while(<STDIN>){ ($c, @r) = split(/;/); print $_ if ! defined $badCmt{$c};}' |\
  /da3_data/lookup/splitSec.perl Inc20180710.c2f. 32
 
+#J contains extra (see below)
 for j in {0..31}; do 
-  zcat Inc20180710.c2f.$j.gz | lsort 30G -t\; -k1b,2 | gzip > Inc20180710.c2f.$j.s
+  zcat Inc20180710.c2f.$j.gz |sed 's|;/|;|' | lsort 30G -t\; -k1b,2 | gzip > Inc20180710.c2f.$j.s
   lsort 10G --merge -u -t\; -k1b,2 <(zcat c2fFullJ$j.s) \ 
-  <(zcat Inc20180710.c2f.$j.s| cut -d\; -f1,2 | sed 's|;/|;|') | \
+  <(zcat Inc20180710.c2f.$j.s| cut -d\; -f1,2 | uniq) | \
     gzip > c2fFullI$j.s
   zcat c2fFullI$j.s | /da3_data/lookup/Cmt2FileBinSorted.perl c2fFullI.$j.tch 1
 done
 
+#b2c 
 zcat cmts.s4.new.*.c2fb | cut -d\; -f1,3 | grep -v '^;'| grep -v '^$' | 
   perl -I $HOME/lookup -e 'use cmt; while(<STDIN>){ ($c, @r) = split(/;/); print $_ if ! defined $badCmt{$c};}' |\
   awk -F\; '{ print $2";"$1}' | \
   perl $HOME/bin/splitSec.perl Inc20180710.b2c. 32
- 
-for j in {0..31}; do 
-  zcat Inc20180710.b2c.$j.gz | lsort 30G -t\; -k1b,2 | gzip > Inc20180710.b2c.$j.s
-  lsort 10G --merge -u -t\; -k1b,2 <(zcat b2cFullJ$j.s) \ 
-  <(zcat Inc20180710.c2f.$j.s| cut -d\; -f1,2 | sed 's|;/|;|') | \
-    gzip > c2fFullI$j.s
-
 #fix missing blobs
 zcat cmts.s.extra.c2fb.[0-7].gz |\
   cut -d\; -f1,3 | grep -v '^;'| grep -v '^$' | grep -v ';$'| \
   perl -I $HOME/lib64/perl5 -I $HOME/lookup/ -e 'use cmt; while(<STDIN>){ ($b, $c, @r) = split(/;/); print $_ if ! defined $badCmt{$c};}' | \
   awk -F\; '{ print $2";"$1}' | \
-  $HOME/bin/splitSec.perl cmts.s.extra.b2c. 32      
+  $HOME/bin/splitSec.perl cmts.s.extra.b2c. 32 
+for j in {0..31}; do 
+  zcat cmts.s.extra.b2c.$i.gz | $HOME/bin/lsort 1G -t\; -k1b,2 |gzip > cmts.s.extra.b2c.$i.s
+  zcat Inc20180710.b2c.$j.gz | lsort 30G -t\; -k1b,2 | gzip > Inc20180710.b2c.$j.s
+  lsort 10G --merge -u -t\; -k1b,2 <(zcat cmts.s.extra.b2c.$i.s) <(zcat b2cFullH$j.s) \ 
+  <(zcat Inc20180710.b2c.$j.s) | \
+    gzip > b2cFullI$j.s
 
+#finally invert c2f to f2c and b2c to c2b
+for i in {0..31}; do 
+  gunzip -c c2fFullI.$i.s
+done |  awk -F\; '{print $2";"$1}' | $HOME/lookup/splitSecCh.perl f2cFullI. 32 &
+for i in {0..31}; do gunzip -c b2cFullI$i.s; done | \
+perl -I $HOME/lookup | \
+   -ane 'use cmt;@x=split(/\;/);next if defined $badBlob{$x[0]}; print;' | \
+  awk -F\; '{print $2";"$1}' | $HOME/bin/splitSec.perl c2bFullI 32
+
+for i in {0..32}; do gunzip -c c2bFullI$i.gz | awk -F\; '{print $1";;"$2}'| $HOME/lookup/Cmt2BlobBin.perl c2bFullI.$i.tch 1
+done
+
+#fix missing for c2f
 (j=0; lsort 10G --merge -u -t\; -k1b,2 <(zcat /data/basemaps/gz/c2fFullH$j.s)  <(zcat /da3_data/update/c2fb/cmts.s.extra.c2fb.$j.gz| cut -d\; -f1,2 | sed 's|;/|;|') |perl -I ~/lib64/perl5/ -I /da3_data/lookup/ -e 'use cmt; while(<STDIN>){ ($c, @r) = split(/;/); print $_ if ! defined $badCmt{$c};}' | gzip > /data/basemaps/gz/c2fFullJ$j.s) &
-(j=0; lsort 10G --merge -u -t\; -k1b,2 <(zcat /data/basemaps/gz/b2cFullH$j.s)  <(zcat /da3_data/update/c2fb/cmts.s.extra.c2fb.$j.gz| awk -F\; '{print $2";"$1}' |lsort 2G -t\; -k1b,2) |perl -I ~/lib64/perl5/ -I /da3_data/lookup/ -e 'use cmt; while(<STDIN>){ ($b,$c, @r) = split(/;/); print $_ if ! defined $badCmt{$c};}' | | gzip > /data/basemaps/gz/b2cFullJ$j.s) &
 
-
+##################################
 #cut -d\; -f4 /data/All.blobs/commit_*.idx | lsort 40G | gzip > /data/basemaps/cmts.s1
 gunzip -c /data/basemaps/cmts.s | join -v1 <(gunzip -c /data/basemaps/cmts.s1) - | gzip > /data/basemaps/cmts.s1.new
 gunzip -c cmts.s1.new | split -l 2075511 -d -a2 --filter='gzip > $FILE.gz' - cmts.s1.new.
