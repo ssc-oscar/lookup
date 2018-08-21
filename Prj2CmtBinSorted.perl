@@ -49,6 +49,7 @@ my $f0 = "";
 my $cnn = 0;
 my $nc = 0;
 my $doDump = 0;
+my $isPrj = 0; #process project name according to our rules
 my $pp = "";
 while (<STDIN>){
   chop();
@@ -59,8 +60,8 @@ while (<STDIN>){
     next;
   }
   my $c = fromHex ($hc);
-  #this may affect author
-  if (0){
+  #this may affect author when used to map authors to commits
+  if ($isPrj){
     $p =~ s/.*github.com_(.*_.*)/$1/;
     $p =~ s/^bitbucket.org_/bb_/;
     $p =~ s/\.git$//;

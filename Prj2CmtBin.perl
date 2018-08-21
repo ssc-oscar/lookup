@@ -23,7 +23,8 @@ sub safeComp {
     print STDERR "Error: $ex\n$code\n";
     return "";
   }
-}my (%c2p1);
+}
+my (%c2p1);
 my $nsec = 8;
 $nsec = $ARGV[1] if defined $ARGV[1];
 
@@ -36,7 +37,7 @@ while (<STDIN>){
   chop();
   $lines ++;
   my ($hsha, $f, $b, $p) = split (/\;/, $_);
-  if (length ($hsha) != 40){
+  if ($hsha !~ m|^[0-9a-f]{40}$){
     print STDERR "bad sha:$_\n";
     next;
   }
