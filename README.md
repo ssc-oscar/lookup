@@ -239,7 +239,7 @@ done
 wait
 
 for j in {0..31}
-do $HOME/bin/lsort 3G -t\; -k1b,2 --merge <(zcat c2fFullI$j.s) <(zcat Inc20180810.c2f.$j.s|cut -d\; -f1,2) |gzip > c2fFullJ$i.s &
+do $HOME/bin/lsort 3G -t\; -k1b,2 --merge <(zcat c2fFullI$j.s) <(zcat Inc20180810.c2f.$j.s|cut -d\; -f1,2) |gzip > c2fFullJ$j.s &
 done
 
 for j in {0..31}
@@ -249,18 +249,20 @@ done
 wait
 
 for j in {0..31}
-do $HOME/bin/lsort 3G -t\; -k1b,2 --merge <(zcat c2bFullI$j.s) <(zcat Inc20180810.c2b.$j.s) |gzip > c2bFullJ$i.s &
+do $HOME/bin/lsort 3G -t\; -k1b,2 --merge <(zcat c2bFullI$j.s) <(zcat Inc20180810.c2b.$j.s) |gzip > c2bFullJ$j.s &
 done
 wait
 
-for j in {0..31}
- do zcat Inc20180810.c2f.$j.s | cut -d\; -f1,2 | grep -v '^;'| grep -v '^$' | grep -v ';$'| \
-    awk -F\; '{ print $2";"$1}' | \
-    perl $HOME/bin/splitSecCh.perl Inc20180810.f2c.$j. 32 &
+for i in {00..41}
+do for j in {0..31}
+ do zcat Inc20180810.c2f.$i.$j.gz
+ done | cut -d\; -f1,2 | grep -v '^;'| grep -v '^$' | grep -v ';$'| \
+awk -F\; '{ print $2";"$1}' | \
+perl $HOME/bin/splitSecCh.perl Inc20180810.f2c.$i. 32 &
 done 
 wait
 
-for i in {00..31}
+for i in {00..41}
  do for j in {0..31}
  do zcat Inc20180810.f2c.$i.$j.gz | $HOME/bin/lsort 1G -t\; -k1b,2 | gzip > Inc20180810.f2c.$i.$j.s &
  done
@@ -278,14 +280,17 @@ done
 wait
 
 for j in {0..31}
-do $HOME/bin/lsort 3G -t\; -k1b,2 --merge <(zcat f2cFullI$j.s) <(zcat Inc20180810.f2c.$j.s) |gzip > f2cFullJ$i.s &
+do $HOME/bin/lsort 3G -t\; -k1b,2 --merge <(zcat ff2cFullI$j.s) <(zcat Inc20180810.f2c.$j.s) |gzip > f2cFullJ$j.s &
 done
 wait
 
-for j in {0..31}
-do zcat Inc20180810.c2f.$j.s | cut -d\; -f1,3 | grep -v '^;'| grep -v '^$' | grep -v ';$'| \
-    awk -F\; '{ print $2";"$1}' |  perl $HOME/bin/splitSec.perl Inc20180810.b2c.$j. 32 &
-done  
+for i in {00..41}
+do for j in {0..31}
+ do zcat Inc20180810.c2f.$i.$j.gz
+ done | cut -d\; -f1,3 | grep -v '^;'| grep -v '^$' | grep -v ';$'| \
+awk -F\; '{ print $2";"$1}' | \
+perl $HOME/bin/splitSec.perl Inc20180810.b2c.$i. 32 &
+done
 wait
 
 for i in {00..41}

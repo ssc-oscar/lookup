@@ -17,16 +17,16 @@ sub fromHex {
 
 my $sections = 128;
 
-my $fbase="All.sha1c/blob_";
-my $fbasei ="/data/All.blobs/blob_";
+my $fbase="/lustre/haven/user/audris/All.sha1c/blob_";
+my $fbasei ="/lustre/haven/user/audris/All.blobs/blob_";
 
 my (%fhos);
 my $sec = $ARGV[0];
 {
   my $pre = "/fast1";
-  tie %{$fhos{$sec}}, "TokyoCabinet::HDB", "$pre/${fbase}$sec.tch", TokyoCabinet::HDB::OWRITER | TokyoCabinet::HDB::OCREAT,
+  tie %{$fhos{$sec}}, "TokyoCabinet::HDB", "${fbase}$sec.tch", TokyoCabinet::HDB::OWRITER | TokyoCabinet::HDB::OCREAT,
         16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
-     or die "cant open $pre/$fbase$sec.tch\n";
+     or die "cant open $fbase$sec.tch\n";
 
   open (FD, "$fbasei$sec.bin") or die "$!";
   binmode(FD);
