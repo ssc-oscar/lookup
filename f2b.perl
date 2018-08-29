@@ -58,8 +58,16 @@ my %out;
 tie %out, "TokyoCabinet::HDB", "$outp/f2b$outN.tch", TokyoCabinet::HDB::OWRITER |  TokyoCabinet::HDB::OCREAT,
   16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
   or die "cant open $outp/f2b$outN.tch\n";
-
+#open A, '>:raw', "$outp/f2b$outN.bin"; 
 while (my ($k, $v) = each %f2b){
+#  my $str = join "", sort keys %{$v};
+#  my $l = length($str)/20;
+#  my $nsha = pack "L", int($l);
+#  my $lp = pack "L", length($k); 
+#  print A $lp;
+#  print A $k;
+#  print A $nsha;
+#  print A $str;
   $out{$k} = join "", sort keys %{$v};
   #my $b = unpack "H*", $k;
   #print "$b\;".(join "", sort keys %{$v})."\n";

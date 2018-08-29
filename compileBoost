@@ -1,0 +1,5 @@
+module unload PE-intel/14.0.4-1.8.4
+module load PE-gnu/4.8.2-1.8.4
+module load boost/1.61.0
+module load openmpi
+g++ $BOOST_INC $NICS_BOOST_INCLUDE_OPTS -I$OMPI_DIR/include -O -o connectMpi connectMpi.cpp $BOOST_LIB $NICS_BOOST_POST_LINK_OPTS -lboost_mpi -lboost_serialization -lboost_system -lboost_graph -lboost_graph_parallel -lboost_iostreams
