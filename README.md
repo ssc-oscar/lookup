@@ -272,7 +272,7 @@ wait
 
 for j in {0..31}
 do str="$HOME/bin/lsort 3G -t\; -k1b,2 --merge"
- for i in {00..41}
+ for i in {00..31}
    do str="$str <(zcat Inc20180810.f2c.$i.$j.s)"
  done
  eval $str | gzip > Inc20180810.f2c.$j.s &
@@ -280,7 +280,7 @@ done
 wait
 
 for j in {0..31}
-do $HOME/bin/lsort 3G -t\; -k1b,2 --merge <(zcat ff2cFullI$j.s) <(zcat Inc20180810.f2c.$j.s) |gzip > f2cFullJ$i.s &
+do $HOME/bin/lsort 3G -t\; -k1b,2 --merge <(zcat ff2cFullI$j.s) <(zcat Inc20180810.f2c.$j.s) |gzip > f2cFullJ$j.s &
 done
 wait
 
@@ -290,7 +290,7 @@ do for j in {0..31}
  done | cut -d\; -f1,3 | grep -v '^;'| grep -v '^$' | grep -v ';$'| \
 awk -F\; '{ print $2";"$1}' | \
 perl $HOME/bin/splitSec.perl Inc20180810.b2c.$i. 32 &
-done  
+done
 wait
 
 for i in {00..41}
