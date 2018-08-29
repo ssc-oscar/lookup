@@ -1,0 +1,205 @@
+#PBS -N getJS.c2f2p
+#PBS -A ACF-UTK0011
+#PBS -l feature=knl
+#PBS -l partition=knl
+#PBS -l nodes=1:ppn=32,walltime=23:50:00
+#PBS -j oe
+#PBS -S /bin/bash
+LD_LIBRARY_PATH=$HOME/lib:$HOME/lib64:$LD_LIBRARY_PATH
+c=/lustre/haven/user/audris/basemaps
+cd $c
+
+#https://github.com/luislobo/common-js-file-extensions/blob/master/index.js
+#'js|iced|liticed|iced.md|coffee|litcoffee|coffee.md|ts|cs|ls|es6|es|jsx|sjs|co|eg|json|json.ls|json5'
+#R extensions: r|R|S|s
+#py extensions: py|py3|pyx|pyo|pyw|pyc
+
+if test 'a' = 'b'; then
+LA=PY
+j=1
+zcat c2fJ$LA.c2p.ps.$j.gz | join -v1 - <(zcat b2fJ$LA.b2c.c2p.ps.$j.gz) | wc
+  31937   31937  803971
+git clone gh:A-ezzat1997/Determint
+find Determint -name '*.py*'
+./Determint/Det.py
+ 
+zcat c2fJ$LA.c2p.ps.$j.gz | join -v2 - <(zcat b2fJ$LA.b2c.c2p.ps.$j.gz) | wc
+ 824613  824613 19640049
+git clone gh:A-A-G/conky
+find conky/ -name '*.py*'
+
+#this is the nonsense blob linking to other files
+echo 72e8ffc0db8aad71a934dd11e5968bd5109e54b4 | /da3_data/lookup/showBlob.perl 
+blob;114;3;46999185316;46999185316;3;72e8ffc0db8aad71a934dd11e5968bd5109e54b4
+*
+
+
+
+fi
+
+####################################################################
+## do c2f -> c2p: This produces many fewer projects, investigate why
+####################################################################
+if test 'a' = 'b'; then
+LA=JS
+pr=c2f
+for j in {0..31}
+do zcat ${pr}J$LA.$j.gz | cut -d\; -f1 | uniq | gzip > ${pr}J$LA.$j.cs &
+done
+wait
+for j in {0..31}
+do zcat c2pFullJ$j.s | perl $HOME/bin/grepField.perl ${pr}J$LA.$j.cs 1 | gzip > ${pr}J$LA.cs.$j.c2p &
+done
+wait
+for j in {0..31}
+do zcat ${pr}J$LA.cs.$j.c2p | cut -d\; -f2 | $HOME/bin/lsort 100M -u | gzip > ${pr}J$LA.cs.$j.c2p.ps &
+done
+wait
+for j in {0..31}
+do zcat ${pr}J$LA.cs.$j.c2p.ps 
+done | $HOME/bin/lsort 8G -u | perl $HOME/lookup/splitSecCh.perl ${pr}J$LA.c2p.ps. 32 &
+wait
+fi
+
+#################################################################
+## do b2f b2c c2p: faster than starting from f2b, same result
+################################################################
+#this is a full cycle based pn b2f of going 
+# from files to blobs: b2fJPY.$j.gz, blobs are in b2fJPY.$j.bs
+# blobs to commits: b2fJPY.$j.b2c, commits are in b2fJPY.b2c.cs.$j.s
+# commits to projects:  b2fJPY.b2c.cs.$j.s.c2p, projects are in b2fJPY.b2c.c2p.ps.$j.gz
+################################################################
+if test 'a' = 'b'; then
+LA=PY
+pr=b2f
+for j in {0..31}
+do zcat ${pr}J$LA.$j.gz | cut -d\; -f1 | uniq | gzip > ${pr}J$LA.$j.bs &
+done
+wait
+for j in {0..31}
+do zcat b2cFullJ$j.s | perl $HOME/bin/grepField.perl ${pr}J$LA.$j.bs 1 | gzip > ${pr}J$LA.$j.b2c &
+done
+wait
+for j in {0..31}
+do zcat ${pr}J$LA.$j.b2c | cut -d\; -f2 | perl $HOME/lookup/splitSec.perl ${pr}J$LA.$j.b2c.cs. 32 &
+done
+wait
+for j in {0..31}
+do for i in {0..31}
+   do zcat ${pr}J$LA.$i.b2c.cs.$j.gz | $HOME/bin/lsort 100M -u | gzip > ${pr}J$LA.$i.b2c.cs.$j.s &
+   done
+   wait
+done
+for j in {0..31}
+do  str="$HOME/bin/lsort 1G -u --merge"
+  for i in {0..31}
+  do str="$str <(zcat ${pr}J$LA.$i.b2c.cs.$j.s)"
+  done
+  eval $str | gzip > ${pr}J$LA.b2c.cs.$j.s &
+done
+wait
+for j in {0..31}
+do zcat c2pFullJ$j.s | perl $HOME/bin/grepField.perl ${pr}J$LA.b2c.cs.$j.s 1 | gzip > ${pr}J$LA.b2c.cs.$j.s.c2p &
+done
+wait
+for j in {0..31}
+do zcat ${pr}J$LA.b2c.cs.$j.s.c2p | cut -d\; -f2 | $HOME/bin/lsort 100M -u | gzip > ${pr}J$LA.b2c.cs.$j.s.c2p.ps &
+done
+wait
+for j in {0..31}
+do zcat ${pr}J$LA.b2c.cs.$j.s.c2p.ps 
+done | $HOME/bin/lsort 8G -u | perl $HOME/lookup/splitSecCh.perl ${pr}J$LA.b2c.c2p.ps. 32 &
+wait
+fi
+
+#######################
+# do f2b b2c c2p
+#######################
+#this is a full cycle based pn f2b of going 
+# from files to blobs: f2bJPY.$j.gz, blobs are in f2bJPY.$j.bs.s
+# blobs to commits: f2bJPY.$j.bs.s.b2c, commits are in f2bJPY.bs.s.b2c.cs.$j.s
+# commits to projects:  f2bJPY.bs.s.b2c.cs.$j.s.c2p, projects are in f2bJPY.b2c.c2p.ps.$j.gz
+################################################################
+if test 'a' = 'b'; then
+LA=JS
+for j in {0..31}
+do zcat f2bJ$LA.$j.gz | cut -d\; -f2 | lsort 2G -u | gzip > f2bJ$LA.$j.bs &
+done
+wait
+for j in {0..31} 
+do zcat f2bJ$LA.$j.bs | perl $HOME/lookup/splitSec.perl f2bJ$LA.$j.bs. 32 &
+done
+wait
+for j in {0..31}
+do for i in {0..31}
+   do zcat f2bJ$LA.$i.bs.$j.gz | $HOME/bin/lsort 100M -u | gzip > f2bJ$LA.$i.bs.$j.s &
+   done
+   wait
+done
+wait
+for j in {0..31}
+do  str="$HOME/bin/lsort 1G -u --merge"
+  for i in {0..31}
+  do str="$str <(zcat f2bJ$LA.$i.bs.$j.s)"
+  done
+  eval $str | gzip > f2bJ$LA.$j.bs.s &
+done
+wait
+for j in {0..31}
+do zcat b2cFullJ$j.s | perl $HOME/bin/grepField.perl f2bJ$LA.$j.bs.s 1 | gzip > f2bJ$LA.$j.bs.s.b2c &
+done
+wait
+for j in {0..31}
+do zcat f2bJ$LA.$j.bs.s.b2c | cut -d\; -f2 | perl $HOME/lookup/splitSec.perl f2bJ$LA.$j.bs.s.b2c.cs. 32 &
+done
+wait
+for j in {0..31}
+do for i in {0..31}
+   do zcat f2bJ$LA.$i.bs.s.b2c.cs.$j.gz | $HOME/bin/lsort 100M -u | gzip > f2bJ$LA.$i.bs.s.b2c.cs.$j.s &
+   done
+   wait
+done
+wait
+for j in {0..31}
+do  str="$HOME/bin/lsort 1G -u --merge"
+  for i in {0..31}
+  do str="$str <(zcat f2bJ$LA.$i.bs.s.b2c.cs.$j.s)"
+  done
+  eval $str | gzip > f2bJ$LA.bs.s.b2c.cs.$j.s &
+done
+wait
+for j in {0..31}
+do zcat c2pFullJ$j.s | perl $HOME/bin/grepField.perl f2bJ$LA.bs.s.b2c.cs.$j.s 1 | gzip > f2bJ$LA.bs.s.b2c.cs.$j.s.c2p &
+done
+wait
+for j in {0..31}
+do zcat f2bJ$LA.bs.s.b2c.cs.$j.s.c2p | cut -d\; -f2 | $HOME/bin/lsort 100M -u | gzip > f2bJ$LA.bs.s.b2c.cs.$j.s.c2p.ps &
+done
+wait
+for j in {0..31}
+do zcat f2bJ$LA.bs.s.b2c.cs.$j.s.c2p.ps 
+done | $HOME/bin/lsort 8G -u | perl $HOME/lookup/splitSecCh.perl f2bJ$LA.b2c.c2p.ps. 32 &
+wait
+fi
+
+
+if test 'a' = 'b'; then
+for j in {0..31}
+#do zcat f2bFullJ$j.s | grep -E '\.(py|py3|pyx|pyo|pyw|pyc);' | gzip > f2bJPY.$j.gz
+#do zcat b2fFullJ$j.s | grep -E '\.(py|py3|pyx|pyo|pyw|pyc)$' | gzip > b2fJPY.$j.gz
+#do zcat c2fFullJ$j.s | grep -E '\.(py|py3|pyx|pyo|pyw|pyc)$' | gzip > c2fJPY.$j.gz
+#do zcat f2bFullJ$j.s | grep -E '\.(js|iced|liticed|iced.md|coffee|litcoffee|coffee.md|ts|cs|ls|es6|es|jsx|sjs|co|eg|json|json.ls|json5);' | gzip > f2bJJS.$j.gz
+#do zcat b2fFullJ$j.s | grep -E '\.(js|iced|liticed|iced.md|coffee|litcoffee|coffee.md|ts|cs|ls|es6|es|jsx|sjs|co|eg|json|json.ls|json5)$' | gzip > b2fJJS.$j.gz
+#do zcat c2fFullJ$j.s | grep -E '\.(js|iced|liticed|iced.md|coffee|litcoffee|coffee.md|ts|cs|ls|es6|es|jsx|sjs|co|eg|json|json.ls|json5)$' | gzip > c2fJJS.$j.gz
+#do zcat f2cFullJ$j.s | grep -E '\.(js|iced|liticed|iced.md|coffee|litcoffee|coffee.md|ts|cs|ls|es6|es|jsx|sjs|co|eg|json|json.ls|json5);' | gzip > f2cJJS.$j.gz
+
+done
+wait
+exit
+fi
+
+#do zcat c2bcsJ$j.s | join -v2 - <(zcat cmts.s5.$j.gz) | gzip > cmts.s5.$j.miss &
+#do zcat c2bFullJ$j.s | cut -d\; -f1 | uniq | gzip > c2bcsJ$j.s &
+#do zcat f2cFullI$j.s | cut -d\; -f1 | uniq | gzip > fs$j.gz &
+#
+
