@@ -90,7 +90,7 @@ while (<STDIN>){
   }  
   $cp = $c;
   $tmp{$p}++;
-  if (!($lines%500000000)){
+  if (!($lines%50000)){
     print STDERR "$lines done\n";
     $doDump = 1;
   }

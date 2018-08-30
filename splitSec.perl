@@ -1,6 +1,6 @@
 #!/usr/bin/perl
-use IO::File;  
-use PerlIO::gzip;
+# use IO::File;  
+# use PerlIO::gzip;
 use strict;
 use warnings;
 
@@ -14,7 +14,8 @@ my $line = 0;
 my @fh;
 for my $seg (0..($nseg-1)){
   my $fh;
-  open $fh, '>:gzip', "${filename}$seg.gz";
+  #open $fh, '>:gzip', "${filename}$seg.gz";
+  open $fh, "|gzip > ${filename}$seg.gz";
   $fh [$seg] = *$fh;
 }
 while (<STDIN>) {
