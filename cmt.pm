@@ -49,6 +49,7 @@ our %badBlob  = (
   "42fa765b495e581408e87614ac90a18b4fb03f09" => 100000, # more than that "<?php require(__FILE__);"
   "f57368ede135004cf1913c9296eaea8ced94ca63" => 100000, # more than that "<?php return unserialize('a:0:{}');"
   "06d7405020018ddf3cacee90fd4af10487da3d20" => 100000, # more than that "23 nuls"
+  "2142470504f0374fee201d2b72d3e7915a2718b5" => 100000, # more than that "
   "0d5a690c8fad5e605a6e8766295d9d459d65de42" => 100000, # more than that "my new file contents"
   "10c09bc50e7c4005d41f8827f1598b74e94cc3de" => 100000, # more than that "Here be even moar damned content"
   "2995a4d0e74917fd3e1383c577d0fc301fff1b04" => 100000, # more than that "dummy"
@@ -71,6 +72,7 @@ our %badBlob  = (
   "79f7797da27875dab3bcd0b496f6ff3c4c08f403" => 100000, # more than that "censored"
   "4b404d55133f3db672a5fb7cb9021302ad644619" => 100000, # more than that "strlen()"
   "7a5ab9c516cf244e80d69d88df9840af416e24ee" => 100000, # more than that "strlen();"
+  "175d1866e44595d0f301a44ef5c419e0c0e6dfc3" => 100000, # more than that "strlen($nothing);"
   "23ba560dd5e0c11633bdb160b31482b9333be639" => 100000, # more than that "this is a test for git performance..."
   "2799b45c6591f1db05c8c00bd1fd0c5c01f57614" => 100000, # more than that "GIF89..."
   "f55d454174c86cf2a8bf76baec8c872de08c8992" => 100000, # more than that "GIF89..."
@@ -84,9 +86,18 @@ our %badBlob  = (
   "b139528a39bef1d78139a00626636f9145db6230" => 100000, # more than that "{"type":"FeatureCollection","msg":"Authentication Required","status":401}.."
   "d4cda3bfd461a9ead8b0add136c8fb1e99c88299" => 100000, # more than that "{"closed": [0, 0, 0, 0, 0, 0, 0, ..."
   "745a4f0917626f3e1f2046b1db94dfa0da0c5181" => 100000, # more than that ".body {}"
+  "734d80e1801769f3d6cf601fe6c7565f59b8595e" => 100000, # more than that "dummy.each do {|d| puts d}"
   "dac35faf8dc87d70cf98b1a6b398e2d025e8fd9c" => 100000, # more than that "/*\n jQuery JavaScript Library v1.6.4\n..."
+  "2d52768ea853f55dd0f7990ac4d5f4a1a4babaaf" => 100000, # more than that "{"first_date": null, "last_date": null, "submissions": 0}"
   "b55c2060ab0b676f951b94bd8b10a09068b6e074" => 100000, # more than that "(function(d){d.execute(function(){})})(function(){var d=window.AmazonUIPageJS||P,c=d.attributeErrors;return c?c("AmazonGatewayAuiAssets"):d}());"
- 
+  "2e524d79a1c1eb7fdd54dfa53370904b1ee31459" => 100000, # more than that "\n/*stdin:\nstdout:\nstderr:\nerror: OK\nstatus: 0\nsignal: 0\nresult: 11\n\n*/"
+  "3305b2123bf3fe557934c2f6225b76bb1791ccd4" => 100000, # more than that "   0.000000000000e+00\n"
+  "3d74f8c7882420c26c6bdd0568cb6d98abd16eae" => 100000, # more than that "                   inf\n                 -inf\n"
+  "40846ebc8b4ffc1680365d46a431973b0cd734c4" => 100000, # more than that " 1.000000000000e+000\n"
+  "524970aba65dc6148301e831d8b37eea3162ea47" => 100000, # more than that "                  inf\n"
+  "c6cf38636b3b1a3156e2facb19b110217276d127" => 100000, # more than that " 1\n"
+  "d14d9c187395940fa1a76bb25024efca358980e9" => 100000, # more than that "    1.000000000000e+00\n"
+  "f9e12117cbb3abbc8665f2d4d8b00eaf23c0686e" => 100000, # more than that "{"closed": [0, 0, 0, 0, 0, 0, 0, 0, 0], "date": ["Oct 2015", "Oct 2015", "Oct 2015", "Nov 2015", "Nov 2015", "Nov 2015", "Nov 2015", "Nov 2015", "Dec 2015"], "id": [0, 1, 2, 3, 4, 5, 6, 7, 8], "unixtime": ["1444608000", "1445212800", "1445817600", "1446422400", "1447027200", "1447632000", "1448236800", "1448841600", "1449446400"], "week": [201542, 201543, 201544, 201545, 201546, 201547, 201548, 201549, 201550]}"
 );
 
 our %badTree = (
