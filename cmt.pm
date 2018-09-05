@@ -58,6 +58,8 @@ our %badBlob  = (
   "b510eff7158ff94f324a99374283722c20daabf5" => 100000, # more than that "Importing file"
   "66d6ed311f56612691e878681bf7b73c57385088" => 100000, # more than that "dummy file to ensure patch has content."
   "38aa015d1fce4924ded80cc26dedcd63e1be767f" => 100000, # more than that "<?xml version="1.0" encoding="UTF-8"?>\n<ApexClass xmlns="http://soap.sforce.com/2006/04/metadata">\n    <apiVersion>36.0</apiVersion>\n    <status>Active</status>\n</ApexClass>"
+  "79f7797da27875dab3bcd0b496f6ff3c4c08f403" => 100000, # more than that "censored"
+  "755b8fd7c101cf89c1bf29303e7f0fab94c8e094" => 100000, # more than that "Importing image file"
 );
 
 our %badTree = (
