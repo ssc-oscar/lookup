@@ -13,10 +13,6 @@ our %badCmt = (
   "c89423063a78259e6a7d13d9b00278a0c5e637b0" => 10000000005,
   "45546f17e5801791d4bc5968b91253a2f4b0db72" => 10000000000,
   "03cb3eb9c22e21e2475fee4fb6013718a2fa39fb" => 100000000,
-  "c1ce17533f16f8928878c0cfc45cb4be1b32ca71" => 1366738243, #this is greater than
-  "f268257b2f1517e4f870820a5a63cbe215668f5c" => 1309902811, #this is greater than
-  "45546f17e5801791d4bc5968b91253a2f4b0db72" => 892148431, #this is greater than
-  "b55208a72f6443eaeaf31789f9a492c20dc021a1" => 654088805, #this is greater than
   "0f17bf2e73149f60302a0a2464b3fadf3ea3e6f9" => 16777217,
   "ce1407a59c910ac5dead8cb1b8b4841cabfce000" => 6649016,
   "f905f1dfa705708c4a85b04cc81b5823f1112d1c" => 6356922,
@@ -41,11 +37,22 @@ our %badCmt = (
   "eecde993ec799b0fb714bbd2124ec893c1125473" => 1130319, # tons of files
   "0e33a9c3e97a85c632f964375c5ecada305514de" => 1217678, # tons of files
 );
+
 our %badBlob  = (
-  "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391" => 7826798, #\n
+  "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391" => 7826798, #\n 
   "8b137891791fe96927ad78e64b0aad7bded08bdc" => 957235, #\n\n
-  "de6be7945c6a59798eb0ace177df38b05e98c2f0" => 650111   #"module ApplicationHelpe\nend\n"
+  "de6be7945c6a59798eb0ace177df38b05e98c2f0" => 650111,   #"module ApplicationHelpe\nend\n"
+  "5c15a99ffacbe23740c4b27cabc1df33988b3b86" => 100000, # more than that "<?php"
+  "06d7405020018ddf3cacee90fd4af10487da3d20" => 100000, # more than that "23 nuls"
+  "0d5a690c8fad5e605a6e8766295d9d459d65de42" => 100000, # more than that "my new file contents"
+  "2995a4d0e74917fd3e1383c577d0fc301fff1b04" => 100000, # more than that "dummy"
+  "521d0e4dde3b141ab557b10589aa4e3f4a5f94b7" => 100000, # more than that "import Foundation"
+  "66d6ed311f56612691e878681bf7b73c57385088" => 100000, # more than that "--- []\n...\n\n"
+  "a686078a02cdf71215e6ce2f9f99e51f9bd5b18c" => 100000, # more than that "This is README.MD"
+  "a726efc43fc177e976fd3b236a15756d5522d5e9" => 100000, # more than that "'use strict';"
+  "b71f2c6f78b435e9e554ed689d94eed705208bf7" => 100000 # more than that "[{"failureDictionary":{}}]" 
 );
+
 our %badTree = (
   "4b825dc642cb6eb9a060e54bf8d69288fbee4904" => 1  #empty tree with no files
 );
