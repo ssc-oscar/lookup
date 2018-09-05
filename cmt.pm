@@ -47,10 +47,17 @@ our %badBlob  = (
   "0d5a690c8fad5e605a6e8766295d9d459d65de42" => 100000, # more than that "my new file contents"
   "2995a4d0e74917fd3e1383c577d0fc301fff1b04" => 100000, # more than that "dummy"
   "521d0e4dde3b141ab557b10589aa4e3f4a5f94b7" => 100000, # more than that "import Foundation"
-  "66d6ed311f56612691e878681bf7b73c57385088" => 100000, # more than that "--- []\n...\n\n"
+  "8a2030a3614762e08d57a138bfcf1b29396eecd4" => 100000, # more than that "--- []\n...\n\n"
   "a686078a02cdf71215e6ce2f9f99e51f9bd5b18c" => 100000, # more than that "This is README.MD"
   "a726efc43fc177e976fd3b236a15756d5522d5e9" => 100000, # more than that "'use strict';"
-  "b71f2c6f78b435e9e554ed689d94eed705208bf7" => 100000 # more than that "[{"failureDictionary":{}}]" 
+  "b71f2c6f78b435e9e554ed689d94eed705208bf7" => 100000, # more than that "[{"failureDictionary":{}}]" 
+  "0637a088a01e8ddab3bf3fa98dbe804cbde1a0dc" => 100000, # more than that "[]"
+  "0cac463bc5168fa988eb04de3ce9389ce402cec2" => 100000, # more than that "'library(reshape);'
+  "2fbf0ffd710189ce2905acb59a57eba453b1b9f9" => 100000, # more than that "--- {}"
+  "6a1fa8227d962757f27b6acd30e6b4ed5e69f901" => 100000, # more than that "[public]"
+  "b510eff7158ff94f324a99374283722c20daabf5" => 100000, # more than that "Importing file"
+  "66d6ed311f56612691e878681bf7b73c57385088" => 100000, # more than that "dummy file to ensure patch has content."
+  "38aa015d1fce4924ded80cc26dedcd63e1be767f" => 100000, # more than that "<?xml version="1.0" encoding="UTF-8"?>\n<ApexClass xmlns="http://soap.sforce.com/2006/04/metadata">\n    <apiVersion>36.0</apiVersion>\n    <status>Active</status>\n</ApexClass>"
 );
 
 our %badTree = (
