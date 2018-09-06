@@ -1,4 +1,4 @@
-#!/usr/bin/perl -I /home/audris/lib64/perl5
+#!/usr/bin/perl -I /da3_data/lookup -I /home/audris/lib64/perl5
 ############
 ############ See accurate diff ib cmputeDiff.perl
 ############ this is 40X faster but may miss renamed files under renamrd subflders
@@ -10,19 +10,16 @@ use warnings;
 use Compress::LZF;
 use Digest::SHA qw (sha1_hex sha1);
 use Time::Local;
+use cmt;
 
 #########################
 # create code to versions database
 #########################
 use TokyoCabinet;
 
-sub fromHex { 
-	return pack "H*", $_[0]; 
-} 
+#sub fromHex { 	return pack "H*", $_[0]; } 
 
-sub toHex { 
-        return unpack "H*", $_[0]; 
-} 
+#sub toHex { return unpack "H*", $_[0]; } 
 
 my ($prj, $rev, $tree, $parent, $aname, $cname, $alogin, $clogin, $path, $atime, $ctime, $f, $comment) = ("","","","","","","","","","","","","");
 my (%c2p, %p2c, %b2c, %c2f);
@@ -78,14 +75,14 @@ while(<STDIN>){
   chop();
   $rev = $_;
   next if length($rev) ne 40; 
-  if ($rev eq "3759c6529b44b636b845fb1c8a0f42c4d14d7150"){
-    print STDERR "nasty test commit 3759c6529b44b636b845fb1c8a0f42c4d14d7150: ignoring\n";
+  if ($rev eq "3759c6529b44b636b845fb1c8a0f42c4d14d7150" || defined $badCmt{$rev}){
+    print STDERR "nasty test commit $rev: ignoring\n";
     next;
   }   	
 
   my ($tree, $parent) = getCT ($rev);
   if ($tree eq ""){
-    print STDERR "no commit $rev\n";
+    print STDERR "no commit for $rev\n";
     next;
   }
   if (defined $parent && $parent ne ""){
@@ -145,7 +142,11 @@ sub separate2T {
       my @nsp = keys %{$mapPF{$k}};
       #print STDERR "mfilesRename @ns and @nsp in $kH for $c\n" if $#ns >0||$#nsp>0;
       for my $n (keys %{$v}){
-        print "$c;$pre/$n;$kH;$pre/@nsp\n" if !defined $mapPF{$k}{$n};
+        if (!defined $badBlob{$kH}){
+          print "$c;$pre/$n;$kH;$pre/@nsp\n" if !defined $mapPF{$k}{$n};
+        }else{
+          print "$c;$pre/$n;$kH;\n" if !defined $mapPF{$k}{$n};
+        }
       }
     }
   }
@@ -273,18 +274,6 @@ sub extr {
     }
   }
   return @v2;
-}
-
-sub safeDecomp {
-  my $codeC = $_[0];
-  try {
-    my $code = decompress ($codeC);
-    return $code;
-  } catch Error with {
-    my $ex = shift;
-    print STDERR "Error: $ex\n";
-    return "";
-  }
 }
 
 sub popSeg {
