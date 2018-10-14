@@ -74,7 +74,7 @@ echo 05fe634ca4c8386349ac519f899145c75fff4169 | perl ~audris/bin/showBlob.perl
 
 
 cd /data/update
-# 20180801
+# 20180810
 for i in {0..7}
 do lsort 5G -t\; -k1b,2 -u --merge --parallel=4 <(zcat Cmt2PrjH$i.s) <(zcat Inc20180710.c2p.$i.gz) <(zcat c2p1.s.$i.gz) | gzip > Cmt2PrjI$i.s 
 lsort 10G -t\; -k1b,2 -u <(zcat Prj2CmtH$i.gz) | gzip > Prj2CmtH$i.s 
@@ -93,17 +93,19 @@ zcat c2pFullI{7,15,23,314
 
 
 
-for i in {0..31}
-zcat p2cFullJ$i.gz | awk -F\; '{print $2";;;"$1}'| perl -I $HOME/lib/perl5 $HOME/lookup/Prj2CmtBin.perl p2cFullI.$i.tch 1
-zcat c2pFullI$i.gz | awk -F\; '{print $1";;;"$2}'| perl -I $HOME/lib/perl5 $HOME/lookup/Cmt2PrjBinSorted.perl c2pFullI.$i.tch 1
-zcat c2pFullI$i.s | perl connectExportPre.perl | gzip > c2pFullI$i.p2p 
-zcat c2pFullI$i.p2p | perl connectExportSrt.perl c2pFullI$i 
-perl connectImport.perl c2pFullI$i | gzip > c2pFullI$i.map
+for j in {0..31}
+zcat p2cFullJ$j.gz | awk -F\; '{print $2";;;"$1}'| perl -I $HOME/lib/perl5 $HOME/lookup/Prj2CmtBin.perl p2cFullI.$j.tch 1
+#zcat c2pFullI$i.gz | awk -F\; '{print $1";;;"$2}'| perl -I $HOME/lib/perl5 $HOME/lookup/Cmt2PrjBinSorted.perl c2pFullI.$i.tch 1
+zcat c2pFullJ$j.s | perl $HOME/lookup/connectExportPre.perl | gzip > c2pFullJ$j.p2p 
+zcat c2pFullJ$j.p2p | awk '{print "id;"$0}' | perl $HOME/lookup/connectExportSrt.perl c2pFullJ$j
+zcat c2pFullJ$j.versions | $HOME/lookup/connectPrune.perl  | gzip > c2pFullJ$j.versions1
+zcat c2pFullJ$j.versions1 | $HOME/lookup/connect  | gzip > c2pFullJ$j.clones
+perl $HOME/lookup/connectImport.perl c2pFullJ$j | gzip > c2pFullJ$j.map
 done
 
-zcat c2pFullI*.map | perl connectExportPre1.perl c2pFullI
-zcat c2pFullI.versions |  ./connect | gzip > c2pFullI.clones
-perl connectImport.perl c2pFullI | gzip > c2pFullI.forks
+zcat c2pFullJ*.map | perl $HOME/lookup/connectExportPre1.perl c2pFullJ
+zcat c2pFullJ.versions |  ./connect | gzip > c2pFullJ.clones
+perl connectImport.perl c2pFullJ | gzip > c2pFullJ.forks
 
 i=withNthng
 cd /data/update/$i

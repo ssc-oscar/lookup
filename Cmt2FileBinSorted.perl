@@ -67,6 +67,7 @@ while (<STDIN>){
   my $c = fromHex ($hc);
   $f =~ s/;/SEMICOLON/g;
   $f =~ s|^/*||;
+  next if $f eq "";
   if ($c ne $cp && $cp ne ""){
     $sec = (unpack "C", substr ($cp, 0, 1))%$nsec;
     #if (defined $c2p{$sec}{$shap}){
