@@ -23,7 +23,7 @@ sub extrPar {
 my $part = 0;
 $part = $ARGV[0] if defined $ARGV[0];
 
-my %c2cc;
+my (%c2cc, %c2pc);
 for my $s (0..31){
   tie %{$c2cc{$s}}, "TokyoCabinet::HDB", "c2cc.$s.tch", TokyoCabinet::HDB::OREADER,
         16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
@@ -37,30 +37,31 @@ my (%c2p);
 my $sections = 128;
 my $fbase="/data/All.blobs/commit_";
 for my $s ($part){
- print STDERR "reading $s\n";
- open A, "$fbase$s.idx";
- open FD, "$fbase$s.bin";
- binmode(FD);
- while (<A>){
-  chop();
-  my ($nn, $of, $len, $hash) = split (/\;/, $_, -1);
-  my $h = fromHex ($hash);
-  my $sec = (unpack "C", substr ($h, 0, 1)) % 32;
-  if (!defined $c2cc{$sec}{$h}){
-    print "$hash\n"; #no child
-  } 
-  # seek (FD, $of, 0);
-  my $codeC = "";
-  my $rl = read (FD, $codeC, $len);
+  print STDERR "reading $s\n";
+  open A, "$fbase$s.idx";
+  open FD, "$fbase$s.bin";
+  binmode(FD);
+  while (<A>){
+    chop();
+    my ($nn, $of, $len, $hash) = split (/\;/, $_, -1);
+    my $h = fromHex ($hash);
+    my $sec = (unpack "C", substr ($h, 0, 1)) % 32;
+    if (!defined $c2cc{$sec}{$h}){
+      print "$hash\n"; #no child
+    } 
+    # seek (FD, $of, 0);
+    my $codeC = "";
+    my $rl = read (FD, $codeC, $len);
 
-  my ($parent) = extrPar ($codeC);
-  if ($parent eq ""){
-    print "$hash\n"; #no parent
-    next;
-  }
-  for my $p (split(/:/, $parent)){
-    my $pbin = fromHex ($p);
-    $c2p{$pbin}++;
+    my ($parent) = extrPar ($codeC);
+    if ($parent eq ""){
+      print "$hash\n"; #no parent
+      next;
+    }
+    for my $p (split(/:/, $parent)){
+      my $pbin = fromHex ($p);
+      $c2p{$pbin}++;
+    }
   }
 }
 
