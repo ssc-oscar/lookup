@@ -60,7 +60,7 @@ for my $s ($part){
     }
     for my $p (split(/:/, $parent)){
       my $pbin = fromHex ($p);
-      $c2p{$pbin}++;
+      $c2p{$pbin}{$h}++;
     }
   }
 }

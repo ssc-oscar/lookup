@@ -64,7 +64,9 @@ for my $s (0..($npar-1)){
         16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
      or die "cant open $ARGV[0].$s.tch\n";
 }
+my $ndone = 0;
 while (my ($c, $v) = each %fhoc){
+  print STDERR "$ndone processed\n" if (!($ndone++ % 10000000));
   my $v1 = join '', sort keys %{$v};
   my $sec = (unpack "C", substr ($c, 0, 1)) % $npar; 
   $fhoc1{$sec}{$c} = $v1;
