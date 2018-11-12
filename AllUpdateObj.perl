@@ -51,8 +51,8 @@ for my $sec (0 .. ($sections-1)){
   $size{$sec} = $off;
   $cnt{$sec} = $n;
 	
-  my $pre = "/fast1";
-  $pre = "/fast" if $type eq "tag" || $type eq "commit";
+  my $pre = "/fast";
+  #$pre = "/fast" if $type eq "tag" || $type eq "commit";
   #$pre = "/fast" if $sec % $parts;
   tie %{$fhos{$sec}}, "TokyoCabinet::HDB", "$pre/${fbase}$sec.tch", TokyoCabinet::HDB::OWRITER | 
      TokyoCabinet::HDB::OCREAT, 16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
@@ -61,6 +61,11 @@ for my $sec (0 .. ($sections-1)){
   open $fhob{$sec}, ">>$fbasei$sec.bin" or die ($!);
   open $fhov{$sec}, ">>$fbasei$sec.vs" or die ($!);
 }
+
+
+open BIGI, ">BigChunks.$type.idx"; 
+open BIGB, ">BigChunks.$type.bin"; 
+my $BOFF = 0;
 
 while (<STDIN>){
   chop();
@@ -82,10 +87,13 @@ while (<STDIN>){
     seek ($fh, $offset, 0);
     my $rl = read($fh, $codeC, $siz);
     if ($siz == 0){
-      print STDERR "zero length for: $offset\;$siz\;@p\;$readFileBase\n";
+      print STDERR "zero length for: $offset\;$siz;@p\;$readFileBase\n";
       next;
     }
     if ($siz >= 2147483647){
+      print BIGI "$BOFF;$siz;$readFileBase;$offset;$sec;$hsha1Full;$path\n";
+      print BIGB $codeC;
+      my $BOFF += $siz;
       print STDERR "uncompressable object: too large: $siz\n";
       next;
     }
@@ -114,4 +122,6 @@ while (<STDIN>){
 for my $sec (0 .. ($sections-1)){
   untie %{$fhos{$sec}};
 }
+close BIGB;
+close BIGI;
 

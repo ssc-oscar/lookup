@@ -29,21 +29,28 @@ my $sections = 128;
   open (FD, "$fname.bin") or die "$!";
   binmode(FD);
 
-  open A, "tac $fname.idx|head -$ncheck|";
-  my $oback = 0;
+open A, "tac $fname.idx|";
+my $lst = <A>;
+my ($nnn, @rest) = split(/;/, $lst, -1);
+$lst = $nnn-$ncheck;
+
+  open A, "$fname.idx";
+  #my $oback = 0;
   while (<A>){
     chop();
     my @x = split(/\;/);
     my ($o, $l, $s, $hsha, @rest) = @x;
-    $oback -= $s;
+    next if $o < $lst;
+    seek (FD, $l, 0) if $lst == $o;
+    #$oback -= $s;
     my $sha = fromHex ($hsha);
     my $sec = hex (substr($hsha, 0, 2)) % $sections;
     my $codeC = "";
-    seek (FD, $oback, 2);
+    #seek (FD, $oback, 2);
     my $rl = read (FD, $codeC, $s);
 
-    my $off = tell (FD);
-    my @stat = stat "$fname.bin";
+    #my $off = tell (FD);
+    #my @stat = stat "$fname.bin";
 
     my $msg = "s=$s, hsha=$hsha, o=$o, l=$l sec=$sec";
     my $code = safeDecomp ($codeC, $msg);
@@ -51,8 +58,9 @@ my $sections = 128;
     my $len = length ($code);
     #print "$code\n";
     my $hsha1 = sha1_hex ("$type $len\0$code");
-    print "$hsha != $hsha1;$off+$oback+$s != $stat[7];$len == 0;$s;$sec\n" 
-	if $hsha ne $hsha1 || $off-$oback-$s != $stat[7] || $len == 0;
+    #print "$hsha != $hsha1;$off+$oback+$s != $stat[7];$len == 0;$s;$sec\n" 
+    print "$hsha != $hsha1;$len == 0;$s;$sec\n" 
+	if $hsha ne $hsha1 || $len == 0;
   }
 #}
 sub toHex { 

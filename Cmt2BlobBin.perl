@@ -45,7 +45,7 @@ while (<STDIN>){
 
 output ();
 
-for $sec (0..15){
+for $sec (0..($nsec -1)){
   untie %{$b2c{$sec}};
 }
 

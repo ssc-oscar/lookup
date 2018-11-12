@@ -26,6 +26,7 @@ my (%fhos);
 my $sec = $ARGV[1];
 my $nTot = -1;
 $nTot = $ARGV[2] if defined $ARGV[2];
+my $from = 0;
 my $lhash;
 if ($nTot < 0) {
   if ( -f "$fbaseOld$sec.idx"){
@@ -34,11 +35,17 @@ if ($nTot < 0) {
       chop ();
       my ($nn, $of, $len, $hash) = split (/\;/, $_, -1);
       $lhash = $hash;
+      $from = $nn;
     }
   }else{
     die "No old idx: $fbaseOld$sec.idx\n";
   }
   print "up to $lhash\n";
+}else{
+  open A, "tac $fbasei$sec.idx|" or die ($!);
+  my $str = <A>;
+  my ($nn, $of, $len, $hash) = split (/\;/, $str, -1);
+  $from = $nn - $nTot;
 }
 {
   my $count = 0;
@@ -50,26 +57,30 @@ if ($nTot < 0) {
   open (FD, "$fbasei$sec.bin") or die "$!";
   binmode(FD);
   if ( -f "$fbasei$sec.idx"){
-    open A, "tac $fbasei$sec.idx|" or die ($!);
+    #open A, "tac $fbasei$sec.idx|" or die ($!);
+    open A, "$fbasei$sec.idx" or die ($!);
     my $boff = 0;
     while (<A>){
       chop ();
       my ($nn, $of, $len, $hash) = split (/\;/, $_, -1);
+      next if $from > $nn;
       my $h = fromHex ($hash);
       if ($nTot < 0 && $lhash eq $hash){
         print STDERR "found $lhash on line $count $boff\n";
         last;
       }
-      if ($nTot > 0 && $count > $nTot+1){
-        print STDERR "reached $count at $boff\n";
-        last;
-      }
+      #if ($nTot > 0 && $count > $nTot+1){
+      #  print STDERR "reached $count at $boff\n";
+      #  last;
+      #}
+      seek (FD, $of, 0) if $from == $nn;
       $count ++;
       my $codeC = "";
       #seek (FD, $of, 0);
-      $boff -= $len;
+      #$boff -= $len;
       if (!defined $fhos{$sec}{$h}){
-        seek (FD, $boff, 2);
+        #seek (FD, $boff, 2);
+        seek (FD, $of, 0) if $of != tell (FD);
         my $rl = read (FD, $codeC, $len);
         $fhos{$sec}{$h} = $codeC;
         $new ++;

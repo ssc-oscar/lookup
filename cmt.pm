@@ -290,11 +290,16 @@ sub cleanCmt {
       if ($debug == 2){
         print "$cmt;$auth;$ta;$msg\n";
       }else{
-        if ($debug == 4){
-          print "$cmt;$auth\n";
-        }else{
+        if ($debug == 3){
           my ($a, $e) = git_signature_parse ($auth, $msg);
           print "$msg;$cmt;$a;$e;$ta;$auth\n";
+        }else{
+          if ($debug == 4){
+             print "$cmt;$auth\n";
+          }else{
+            $ta=~s/ .*//;
+            print "$cmt;$ta;$auth\n";
+          }
         }
       }
     }
