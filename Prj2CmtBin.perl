@@ -37,7 +37,7 @@ while (<STDIN>){
   chop();
   $lines ++;
   my ($hsha, $f, $b, $p) = split (/\;/, $_);
-  if ($hsha !~ m|^[0-9a-f]{40}$){
+  if ($hsha !~ m|^[0-9a-f]{40}$|){
     print STDERR "bad sha:$_\n";
     next;
   }
