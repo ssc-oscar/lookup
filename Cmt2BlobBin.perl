@@ -34,7 +34,7 @@ my $lines = 0;
 while (<STDIN>){
   chop();
   my ($c, $f, $bb, $p) = split(/\;/, $_, -1);
-  next if length ($c) != 40 || length ($bb) != 40 || $c !~ /^[0-9a-f]{40}$/ || $bb !~ /^[0-9a-f]{40}$/;
+  next if $c !~ /^[0-9a-f]{40}$/ || $bb !~ /^[0-9a-f]{40}$/;
   next if defined $bad{$c} || defined $bad{$bb};
   my $cmt = fromHex ($c);
   my $b = fromHex ($bb);
