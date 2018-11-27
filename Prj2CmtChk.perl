@@ -18,13 +18,21 @@ sub fromHex {
 my $split = 1;
 $split = $ARGV[1] + 0 if defined $ARGV[1];
 
-my %p2c;
+my (%p2c, %p2c1);
 for my $sec (0..($split-1)){
   my $fname = "$ARGV[0].$sec.tch";
   $fname = $ARGV[0] if ($split == 1);
   tie %{$p2c{$sec}}, "TokyoCabinet::HDB", "$fname", TokyoCabinet::HDB::OREADER,   
         16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
       or die "cant open $fname\n";
+}
+if (defined $ARGV[2]){
+  for my $sec (0..($split-1)){
+    my $fname = "$ARGV[2].$sec.tch";
+    $fname = $ARGV[2] if ($split == 1);
+    tie %{$p2c1{$sec}}, "TokyoCabinet::HDB", "$fname", TokyoCabinet::HDB::OREADER, 16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
+       or die "cant open $fname\n";
+  }
 }
 
 my %p2c0;
@@ -37,14 +45,22 @@ while (<STDIN>){
   if (! defined $p2c0{$p}){
     my $sec = (unpack "C", substr ($p, 0, 1))%$split;
     list ($p, $p2c{$sec}{$p});
+    list ($p, $p2c1{$sec}{$p}) if defined $ARGV[2];
   }
   if (!defined  $p2c0{$p}{$c}){
     print "$p;$hash\n";
     $p2c0{$p}{$c}++;
   }
 }
+
+
 for my $sec (0..($split-1)){
   untie %{$p2c{$sec}};
+}
+if (defined $ARGV[2]){
+  for my $sec (0..($split-1)){
+    untie %{$p2c1{$sec}};
+  }
 }
 
 

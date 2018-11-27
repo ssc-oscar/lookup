@@ -41,9 +41,16 @@ my $sections = 128;
     my $code = safeDecomp ($codeC, "$ARGV[2];$s");
     my $h = sha1_hex("$type ".length($code)."\000$code");
     if ($type eq "tree"){
-      my $hm1 = sha1_hex("$type ".(length($code)+4)."\000$code\000\000\000\000\000");
-      my $hp1 = sha1_hex("$type ".(length($code)+4)."\000$code\n");
-      print "$h;".(length($code)).";$hm1;$hp1\n";
+      my $hm5 = sha1_hex("$type ".(length($code)+5)."\000$code\000\000\000\000\000");
+      my $hm4 = sha1_hex("$type ".(length($code)+4)."\000$code\000\000\000\000");
+      my $hm3 = sha1_hex("$type ".(length($code)+3)."\000$code\000\000\000");
+      my $hm2 = sha1_hex("$type ".(length($code)+2)."\000$code\000\000");
+      #my $hm5 = sha1_hex("$type ".(length($code)+5)."\000$code");
+      #my $hm4 = sha1_hex("$type ".(length($code)+4)."\000$code");
+      #my $hm3 = sha1_hex("$type ".(length($code)+3)."\000$code");
+      #my $hm2 = sha1_hex("$type ".(length($code)+2)."\000$code");
+      my $hp1 = sha1_hex("$type ".(length($code)+1)."\000$code\000");
+      print "$h;".(length($code)).";$hm5;$hm4;$hm3;$hm2;$hp1\n";
       shTr($code);
     }else{
       print "$h;".(length($code))."\n$code\n";
