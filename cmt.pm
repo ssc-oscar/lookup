@@ -6,7 +6,7 @@ use Compress::LZF;
 
 require Exporter;
 our @ISA = qw (Exporter);
-our @EXPORT = qw(%badCmt %badBlob %badTree seg signature_error contains_angle_brackets extract_trimmed git_signature_parse extrCmt getTime cleanCmt safeDecomp safeComp toHex fromHex);
+our @EXPORT = qw(%badCmt %badBlob %badTree seg signature_error contains_angle_brackets extract_trimmed git_signature_parse extrCmt getTime cleanCmt safeDecomp safeComp toHex fromHex sHash);
 use vars qw(@ISA);
 
 our %badCmt = (
@@ -182,6 +182,14 @@ our %badFile = (
   "main.cpp" => 1426595,
   "Makefile" => 2463961
 );
+
+use Digest::FNV::XS;
+sub sHash {
+  # $nseg is powers of 2
+  #  otherwise use % $nseg
+  my ($v, $nseg) = @_;
+  Digest::FNV::XS::fnv1a_32 ($v) & ($nseg - 1);
+}
 
 sub toHex {
         return unpack "H*", $_[0];
