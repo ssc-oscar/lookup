@@ -61,7 +61,7 @@ our %badCmt = (
   "1fe0c25da3c66e2115c2bbeb8b307b5851bfe908" => 10000000000, # tons of fake blobs
   "351ab852990bb7da9fe7f637163b93d5dd7a008d" => 10000000000, # tons of fake blobs
   "3b273eccbc8abeeb12632c5d1ec555317533af72" => 10000000000, # tons of fake blobs
-
+  "7108364d8d19f9b6377e9a0cdd8b7938873078de" => 10000000000, # tons of fake blobs
 
   "142e0f29cd5bd79f2d2e3aab108a6bc4fc0027d5" => 10000000000, # tons of fake folders
   "b55208a72f6443eaeaf31789f9a492c20dc021a1" => 10000000000, # tons of fake files
