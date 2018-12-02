@@ -50,7 +50,7 @@ my $cnn = 0;
 my $nc = 0;
 my $doDump = 0;
 my $isPrj = 0; #process project name according to our rules
-my $isPrj = $ARGV[1] if defined $ARGV[1] ;  
+$isPrj = $ARGV[1] if defined $ARGV[1] ;  
 my $pp = "";
 while (<STDIN>){
   chop();

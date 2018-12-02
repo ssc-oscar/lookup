@@ -45,6 +45,11 @@ sub safeDecomp {
 while (<STDIN>){
   chop();
   my $tree = $_;
+  getTree ($tree, "");
+}
+
+sub getTree {
+  my ($tree, $off) = @_;
   my $sec = hex (substr($tree, 0, 2)) % $sections;
   my $tB = fromHex ($tree);
   if ($debug < 0){
@@ -57,24 +62,32 @@ while (<STDIN>){
     tie %{$fhos{$sec}}, "TokyoCabinet::HDB", "$pre/${fbase}$sec.tch", TokyoCabinet::HDB::OREADER,
        16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
       or die "cant open $pre/$fbase$sec.tch\n";
-  } 
+  }
   if (! defined $fhos{$sec}{$tB}){
     print STDERR "no tree $tree\n";
     next;
   }
-  my $codeC = $fhos{$sec}{$tB}; 
+  my $codeC = $fhos{$sec}{$tB};
   my $code = safeDecomp ($codeC);
   my $len = length ($code);
   my $treeobj = $code;
+  prtTree ($treeobj, $off);
+}
+
+sub prtTree {
+  my ($treeobj, $off) = @_;
   while ($treeobj) {
   # /s is important so . matches any byte!
     if ($treeobj =~ s/^([0-7]+) (.+?)\0(.{20})//s) {
-      my($mode,$name,$bytes) = (oct($1),$2,$3);
+      my ($mode,$name,$bytes) = (oct($1),$2,$3);
       $name =~ s/\n/__NEWLINE__/g;
-      printf "%06o;%s;%s\n",
+      printf "$off%06o;%s;%s\n",
         $mode, #($mode == 040000 ? "tree" : "blob"),
         unpack("H*", $bytes), $name;
-    } else {
+      if ($debug == 3 && $mode == 040000){
+        getTree (unpack("H*", $bytes), "$off  ");
+      }
+    }else {
       die "$0: unexpected tree entry";
     }
   }

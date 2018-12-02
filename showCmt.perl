@@ -12,10 +12,13 @@ my $parts = 2;
 
 my $fbasec="All.sha1c/commit_";
 
+my $ss = -1;
+$ss = $ARGV[1]+0 if defined $ARGV[1];
 my (%fhob, %fhost, %fhosc);
 for my $sec (0 .. ($sections-1)){
   my $pre = "/fast1/";
   $pre = "/fast1" if $sec % $parts;
+  next if $ss > 0 && $sec != $ss;
   tie %{$fhosc{$sec}}, "TokyoCabinet::HDB", "$pre/${fbasec}$sec.tch", TokyoCabinet::HDB::OREADER,  
 	16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
      or die "cant open $pre/$fbasec$sec.tch\n";
@@ -34,6 +37,7 @@ while (<STDIN>){
 }
 
 for my $sec (0 .. ($sections-1)){
+  next if $ss > 0 && $sec != $ss;
   untie %{$fhosc{$sec}};
 }
 

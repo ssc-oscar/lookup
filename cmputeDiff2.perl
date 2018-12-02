@@ -92,6 +92,10 @@ while(<STDIN>){
       print STDERR "no parent commit: $parent for $rev\n";
       next;
     }
+    if ($treeP eq $tree){
+      print STDERR "identical trees: $tree for $rev and parent $parent\n";
+      next;
+    }
     separate2T ($rev, $parent, "", $tree, $treeP);
   }else{
     #commit with no parents; added missing created parameter to put blobs in the right column
