@@ -25,12 +25,11 @@ $part = $ARGV[0] if defined $ARGV[0];
 
 my (%c2cc, %c2pc);
 for my $s (0..31){
-  tie %{$c2cc{$s}}, "TokyoCabinet::HDB", "c2cc.$s.tch", TokyoCabinet::HDB::OREADER,
+  tie %{$c2cc{$s}}, "TokyoCabinet::HDB", "/fast/All.sha1c/c2cc.$s.tch", TokyoCabinet::HDB::OREADER,
         16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
-     or die "cant open c2cc.$s.tch\n";
+     or die "cant /fast/All.sha1c/c2cc.$s.tch\n";
 }
-tie %c2pc, "TokyoCabinet::HDB", "c2pc.$part.tch", TokyoCabinet::HDB::OWRITER | TokyoCabinet::HDB::OCREAT,
-        16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
+tie %c2pc, "TokyoCabinet::HDB", "c2pc.$part.tch", TokyoCabinet::HDB::OWRITER | TokyoCabinet::HDB::OCREAT
      or die "cant open c2pc.$part.tch\n";
 
 my (%c2p);
@@ -58,17 +57,15 @@ for my $s ($part){
       print "$hash\n"; #no parent
       next;
     }
+    my %tmp;
     for my $p (split(/:/, $parent)){
       my $pbin = fromHex ($p);
-      $c2p{$pbin}{$h}++;
+      $tmp{$pbin}++;
     }
+    my $v1 = join '', sort keys %tmp;
+    $c2pc{$h} = $v1;
   }
 }
 
-
-while (my ($c, $v) = each %c2p){
-  my $v1 = join '', sort keys %{$v};
-  $c2pc{$c} = $v1;
-}
 untie %c2pc;
 
