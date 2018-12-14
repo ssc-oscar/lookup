@@ -20,47 +20,62 @@ $detail = $ARGV[1]+0 if defined $ARGV[1];
 my $split = 32;
 $split = $ARGV[2] + 0 if defined $ARGV[2];
 
-my (%p2c, %c2cc);
-for my $sec (0..($split-1)){
-  my $fname = "$ARGV[0].$sec.tch";
-  $fname = $ARGV[0] if ($split == 1);
-  tie %{$p2c{$sec}}, "TokyoCabinet::HDB", "$fname", TokyoCabinet::HDB::OREADER,   
-        16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
-      or die "cant open $fname\n";
+my (%has, %c2cc);
 
 
 for my $sec (0..($split-1)){
-  tie %{$c2cc{$sec}}, "TokyoCabinet::HDB", "/data/basemaps/c2cc.$sec.tch", TokyoCabinet::HDB::OREADER,
+  tie %{$c2cc{$sec}}, "TokyoCabinet::HDB", "/fast/All.sha1c/c2cc.$sec.tch", TokyoCabinet::HDB::OREADER,
         16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
       or die "cant open /da4_data/basemaps/c2cc.$sec.tch\n";
 }
 
-my $fname = $ARGV[0];
-tie %p2c, "TokyoCabinet::HDB", "$fname", TokyoCabinet::HDB::OREADER,
-   16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
-   or die "cant open $fname\n";
+for my $sec (0..127){
+  tie %{$has{$sec}}, "TokyoCabinet::HDB", "/fast/All.sha1/sha1.commit_$sec.tch", TokyoCabinet::HDB::OREADER,
+        16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
+        or die "cant open /da4_data/basemaps/c2cc.$sec.tch\n";
+}
 
-
-while (my ($p, $v) = each %p2c){
-  my $ns = length($v)/20;
-  my %tmp = ();
-  for my $i (0..($ns-1)){
-    my $c = substr ($v, 20*$i, 20);
-    my $s = (unpack "C", substr ($c, 0, 1))%$split;
-    next if defined $c2cc{$s}{$c};
-    $tmp{$c}++;
+my $pp = "";
+my %tmp = ();
+while (<STDIN>){
+  chop();
+  my ($p, $ch) = split(/\;/, $_, -1);
+  if ($pp eq $p || $pp eq ""){
+    $tmp{$ch}++;
+  }else{
+    out ($pp);
+    %tmp = ();
+    $tmp{$ch}++;
   }
+  $pp=$p;
+}
+out ($pp);
+
+sub out {
+  my $p = $_[0];
   my @t = keys %tmp;
-  print "$p;".($#t+1);
-  for my $h (@t){
-    print ";".(toHex($h));
+  print "$p;$#t";
+  for my $ch (@t){
+    my $c = fromHex ($ch);
+    my $sb = unpack "C", substr ($c, 0, 1);
+    my $s1 = $sb % 128;
+    if (defined $has{$s1}{$c}){
+      my $s = $sb % $split;
+      if (!defined $c2cc{$s}{$c}){
+        print ";$ch";
+      }
+    }else{
+      print ";-$ch";
+    }
   }
   print "\n";
 }
 
 
-untie %p2c;
 for my $sec (0..($split-1)){
   untie %{$c2cc{$sec}};
+}
+for my $sec (0..127){
+  untie %{$has{$sec}};
 }
 
