@@ -73,12 +73,20 @@ our %badCmt = (
   "c1ce17533f16f8928878c0cfc45cb4be1b32ca71" => 10000000000, # tons of fake files
   "5e4c1715341534fbcf4126c053bc0ff64cc48a7c" => 10000000000, # tons of fake files
   "f0e385e0fb36173c53f68f91b6e28023a039da02" => 2043846, # tons of fake files
+  "2dc4ae3376734e12819ebce8140d35f211a8f857" => 1386254, # tons of fake files
   "cc646e6b0c4584134424ce0b2d385080169f3b81" => 1171240, # tons of files
   "eecde993ec799b0fb714bbd2124ec893c1125473" => 1130319, # tons of files
   "0e33a9c3e97a85c632f964375c5ecada305514de" => 1217678, # tons of files
   "209808f8bb917ad827f605df778f1b3413867170" => 1043954, # tons of files
   "20c20b16d41dd820737ead0f0eb3d31fe09e2fbd" => 1053734, # tons of files
   "609c5d1300e75c12239bf304661ab5338df4cc54" => 1984503, # tons of files
+  "fa60ead1916232e59a569d9ee3858ec6a44c3c31" => 1518362, # tons of files
+  "d91f4ab4b1793a7544a4ad68264662303f6a8d60" => 1518362, # tons of files
+  "67e1f49d68c696d4ec1eddaa66327a5ec7e42412" => 1517162, # tons of files
+  "6ab9ad6e8d47cf613e7587afd10ae3f5da8b0a0c" => 1516992, # tons of files
+  "dbe1fe4b27d9f381b3db94a1602e8a039cd4c0ef" => 909063, # tons of files
+  "8ca6512ce8b15ddaf67c1a1a84b5ed837041b319" => 909063, # tons of files
+  "7c1f7ccca7d02522a07a3249dd002af1eec824f5" => 900348, # tons of files
 );
 
 
@@ -369,7 +377,7 @@ sub cleanCmt {
 
 sub seg {
   my ($sh, $n) = @_;
-  return (unpack "C", substr ($sh, 0, 1))%$n;
+  return (unpack "C", substr (fromHex($sh), 0, 1))%$n;
 }
 
 
