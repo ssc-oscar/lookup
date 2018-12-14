@@ -54,10 +54,8 @@ for my $s (0..127){
         $fhoc{$pbin}{$h}++;
       }
     }
- }
+  }
 }
-
-
 for my $s (0..($npar-1)){
   next if $part >= 0 && $s != $part; 
   tie %{$fhoc1{$s}}, "TokyoCabinet::HDB", "$ARGV[0].$s.tch", TokyoCabinet::HDB::OWRITER | TokyoCabinet::HDB::OCREAT,

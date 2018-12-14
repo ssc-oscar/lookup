@@ -6,7 +6,7 @@ use Compress::LZF;
 
 require Exporter;
 our @ISA = qw (Exporter);
-our @EXPORT = qw(%badCmt %badBlob %badTree seg signature_error contains_angle_brackets extract_trimmed git_signature_parse extrCmt getTime cleanCmt safeDecomp safeComp toHex fromHex sHash);
+our @EXPORT = qw(%badCmt %badBlob %badTree segB segH signature_error contains_angle_brackets extract_trimmed git_signature_parse extrCmt getTime cleanCmt safeDecomp safeComp toHex fromHex sHash);
 use vars qw(@ISA);
 
 our %badCmt = (
@@ -367,9 +367,13 @@ sub cleanCmt {
   }
 }
 
-sub seg {
+sub segB {
+  my ($s, $n) = @_;
+  return (unpack "C", substr ($s, 0, 1))%$n;
+}
+sub segH {
   my ($sh, $n) = @_;
-  return (unpack "C", substr ($sh, 0, 1))%$n;
+  return (unpack "C", substr (fromHex ($sh), 0, 1))%$n;
 }
 
 
