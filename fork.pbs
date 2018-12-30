@@ -1,0 +1,50 @@
+#PBS -N forkVER
+#PBS -A ACF-UTK0011
+#PBS -l feature=monster
+#PBS -l partition=monster
+#PBS -l nodes=1,walltime=23:50:00
+#PBS -j oe
+#PBS -S /bin/bash
+LD_LIBRARY_PATH=$HOME/lib:$HOME/lib64:$LD_LIBRARY_PATH
+c=/lustre/haven/user/audris/basemaps
+cd $c
+
+
+ver=VER
+if test 'a' = 'a'; then
+
+for j in {0..31}
+do zcat c2pFull$ver$j.s | perl ../c2fb/connectExportPre.perl | gzip > c2pFull$ver$j.p2p &
+done
+wait
+echo c2pFull$ver$j.p2p
+
+for j in {0..31}
+do zcat c2pFull$ver$j.p2p | awk '{print "id;"$0}' | perl $HOME/lookup/connectExportSrt.perl c2pFull$ver$j &
+done
+wait
+echo c2pFull$ver$j
+
+for j in {0..31}
+do zcat c2pFull$ver$j.versions |  perl ~/bin/connectPrune.perl |gzip > c2pFull$ver$j.versions1 &
+done
+wait
+echo c2pFull$ver$j.versions1
+
+for j in {0..31}
+do (zcat c2pFull$ver$j.versions1| ./connect | gzip > c2pFull$ver$j.clones; perl $HOME/lookup/connectImport.perl c2pFull$ver$j | gzip > c2pFull$ver$j.map) &
+done 
+wait
+echo c2pFull$ver$j.map
+
+zcat c2pFull$ver*.map | perl $HOME/lookup/connectExportPre1.perl c2pFull$ver
+echo c2pFull$ver
+
+zcat c2pFull$ver.versions |  ./connect | gzip > c2pFull$ver.clones
+echo c2pFull$ver.clones
+
+perl $HOME/lookup/connectImport.perl c2pFull$ver | gzip > c2pFull$ver.forks
+echo c2pFull$ver.forks
+
+fi
+
