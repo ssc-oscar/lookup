@@ -72,9 +72,12 @@ done
 wait
 echo b2f$ver$LA.$j.bs
 
+fi
+if test $part = mid; then
+
 #get blob to commit map for blobs related to relevant language files
 for j in {0..31}
-do zcat ../c2fb/b2cFull$ver$j.s |grep -v '^;' | join -t\; - <(zcat b2f$ver$LA.$j.bs) |perl -I $HOME/lib/perl5 -I $HOME/lookup -e 'use cmt; while(<STDIN>){ ($b, $c, @r) = split(/;/); print $_ if ! defined $badCmt{$c} && $badBlob{$b};}'| gzip > b2c$ver$LA.$j.gz &
+do zcat ../c2fb/b2cFull$ver$j.s |grep -v '^;' | join -t\; - <(zcat b2f$ver$LA.$j.bs) |perl -I $HOME/lib/perl5 -I $HOME/lookup -e 'use cmt; while(<STDIN>){ ($b, $c, @r) = split(/;/); print $_ if ! defined $badCmt{$c} && ! defined $badBlob{$b};}'| gzip > b2c$ver$LA.$j.gz &
 done
 wait
 echo b2c$ver$LA.$j.gz
@@ -135,9 +138,6 @@ do zcat ../c2fb/c2fFull$ver$j.s | grep -E "$grepStr" | perl -I $HOME/lib/perl5 -
 done
 wait
 echo c2f$ver$LA.$j.gz
-
-fi
-if test $part = mid; then
 
 for j in {0..31}
 do zcat c2f$ver$LA.$j.gz | cut -d\; -f1 | uniq | gzip > c$ver$LA.$j.cs &
