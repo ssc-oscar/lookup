@@ -68,8 +68,7 @@ echo b2f$ver$LA.$j.gz
 
 #extract a unique list of blobs for the relevant language
 for j in {0..31}
-do zcat b2f$ver$LA.$j.gz | cut -d\; -f1 | uniq | lsort ${maxM}G -u | gzip > b2f$ver$LA.$j.bs
- &
+do zcat b2f$ver$LA.$j.gz | cut -d\; -f1 | uniq | lsort ${maxM}G -u | gzip > b2f$ver$LA.$j.bs &
 done
 wait
 echo b2f$ver$LA.$j.bs
@@ -127,7 +126,7 @@ echo c2bi$ver$LA.$j.s
 # maps to all commits reating empty file, not just commits for a
 # specific file extension 
 for j in {0..31}
-do zcat ../c2fb/c2fFull$ver$j.s | grep -E "$grepStr" | perl -I $HOME/lib/perl5 -I $HOME/lookup -e 'use cmt; while(<STDIN>){ ($c @r) = split(/;/); print $_ if ! defined $badCmt{$c};}' | gzip > c2f$ver$LA.$j.gz &
+do zcat ../c2fb/c2fFull$ver$j.s | grep -E "$grepStr" | perl -I $HOME/lib/perl5 -I $HOME/lookup -e 'use cmt; while(<STDIN>){ ($c, @r) = split(/;/); print $_ if ! defined $badCmt{$c};}' | gzip > c2f$ver$LA.$j.gz &
 done
 wait
 echo c2f$ver$LA.$j.gz
