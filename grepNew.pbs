@@ -149,8 +149,8 @@ done
 wait
 echo c2bi$ver$LA.$j.s
 
-fi
-if test $part = mid; then
+#fi
+#if test $part = mid; then
 
 # is this needed, can get it by inverting b2c?
 # answer: yes, we need to restrict commits to ones creating relevant
