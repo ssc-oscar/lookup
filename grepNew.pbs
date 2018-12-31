@@ -138,7 +138,7 @@ wait
 echo c2f$ver$LA.$j.gz
 
 for j in {0..31}
-do zcat zcat c2f$ver$LA.$j.gz | cut -d\; -f1 | uniq | gzip > c$ver$LA.$j.cs &
+do zcat c2f$ver$LA.$j.gz | cut -d\; -f1 | uniq | gzip > c$ver$LA.$j.cs &
 done
 wait
 echo c$ver$LA.$j.cs
@@ -178,7 +178,7 @@ done
 wait
 echo c2Pta$ver$LA.$j.gz 
 
-# add blobs 
+# add blobs: note that c2f contains deleted files, but b2f/b2c only created blobs  
 for j in {0..31}
 do zcat c2bi$ver$LA.$j.gz | join -t\; - <(zcat c2Pta$ver$LA.$j.gz) | gzip > c2bPta$ver$LA.$j.gz &
 done
