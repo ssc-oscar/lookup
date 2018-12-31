@@ -285,12 +285,12 @@ echo m2nP$ver$LA
 
 # create summaries for the evolution of top modules
 zcat m2nP$ver$LA | lsort 1G -t\; -rnk2 | head -11| cut -d\; -f1 | while read mod 
-do for j in {0..31}
+do (for j in {0..31}
    do zcat c2bPtaPkg$ver$LA.$j.gz
    done | grep ";$mod" | cut -d\; -f2,3 | \
        lsort 1G -t\; -k1,2 | \
        awk -F\; '{ if (p!=$1) print $1";"int($2/3600/365.25/24*12)/12+1970;p=$1}' | \
-       gzip > $ver$LA.$mod &
+       gzip > $ver$LA.$mod) &
 done   
 wait
 
