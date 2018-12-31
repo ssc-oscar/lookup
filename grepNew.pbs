@@ -68,14 +68,15 @@ echo b2f$ver$LA.$j.gz
 
 #extract a unique list of blobs for the relevant language
 for j in {0..31}
-do zcat b2f$ver$LA.$j.gz | cut -d\; -f1 | uniq | lsort ${maxM}G -u | gzip > b2f$ver$LA.$j.bs &
+do zcat b2f$ver$LA.$j.gz | cut -d\; -f1 | uniq | lsort ${maxM}G -u | gzip > b2f$ver$LA.$j.bs
+ &
 done
 wait
 echo b2f$ver$LA.$j.bs
 
 #get blob to commit map for blobs related to relevant language files
 for j in {0..31}
-do zcat ../c2fb/b2cFull$ver$j.s |grep -v '^;' | join -t\; - <(zcat b2f$ver$LA.$j.bs) | gzip > b2c$ver$LA.$j.gz &
+do zcat ../c2fb/b2cFull$ver$j.s |grep -v '^;' | join -t\; - <(zcat b2f$ver$LA.$j.bs) |perl -I $HOME/lib/perl5 -I $HOME/lookup -e 'use cmt; while(<STDIN>){ ($b, $c, @r) = split(/;/); print $_ if ! defined $badCmt{$c} && $badBlob{$b};}'| gzip > b2c$ver$LA.$j.gz &
 done
 wait
 echo b2c$ver$LA.$j.gz
@@ -93,7 +94,8 @@ echo b$ver$LA.
 #grepStr=';(bower.json|package.json|packages/[^/]*/package.json|codemods/[^/]*/package.json|lerna.json|yarn.lock|package-lock.json)$'
 #for j in {0..31}; do zcat b2f$verJS.$j.gz; done | grep -Ei $grepStr | cut -d\; -f1 | uniq | ~/lookup/splitSec.perl b2f$verjson. 128 &
 
-#invert b2c into c2bi
+#invert b2c into c2bi (not clear if needed, since only package
+# inversion is really necessary
 for j in {0..31}
 do zcat b2c$ver$LA.$j.gz | awk -F\; '{print $2";"$1}' | $HOME/lookup/splitSec.perl c2bi$ver$LA.$j. 32 &
 done 
@@ -118,7 +120,6 @@ done
 wait
 echo c2bi$ver$LA.$j.s
 
-
 # is this needed, can get it by inverting b2c?
 # answer: yes, we need to restrict commits to ones creating relevant
 # files because inverting b2c produces massive number of commits
@@ -126,7 +127,7 @@ echo c2bi$ver$LA.$j.s
 # maps to all commits reating empty file, not just commits for a
 # specific file extension 
 for j in {0..31}
-do zcat ../c2fb/c2fFull$ver$j.s | grep -E "$grepStr" | gzip > c2f$ver$LA.$j.gz &
+do zcat ../c2fb/c2fFull$ver$j.s | grep -E "$grepStr" | perl -I $HOME/lib/perl5 -I $HOME/lookup -e 'use cmt; while(<STDIN>){ ($c @r) = split(/;/); print $_ if ! defined $badCmt{$c};}' | gzip > c2f$ver$LA.$j.gz &
 done
 wait
 echo c2f$ver$LA.$j.gz
