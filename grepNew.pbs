@@ -49,7 +49,6 @@ machine=beacon
 maxM=6
 [[ $machine == monster ]] && maxM=30
 
-
 ver=VER
 part=PART
 
@@ -137,6 +136,9 @@ done
 wait
 echo c2f$ver$LA.$j.gz
 
+fi
+if test $part = mid; then
+
 for j in {0..31}
 do zcat c2f$ver$LA.$j.gz | cut -d\; -f1 | uniq | gzip > c$ver$LA.$j.cs &
 done
@@ -180,7 +182,7 @@ echo c2Pta$ver$LA.$j.gz
 
 # add blobs: note that c2f contains deleted files, but b2f/b2c only created blobs  
 for j in {0..31}
-do zcat c2bi$ver$LA.$j.gz | join -t\; - <(zcat c2Pta$ver$LA.$j.gz) | gzip > c2bPta$ver$LA.$j.gz &
+do zcat c2bi$ver$LA.$j.s | join -t\; - <(zcat c2Pta$ver$LA.$j.gz) | gzip > c2bPta$ver$LA.$j.gz &
 done
 wait
 echo c2bPta$ver$LA.$j.gz
