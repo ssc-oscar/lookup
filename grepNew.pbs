@@ -284,7 +284,7 @@ wait
 echo m2nP$ver$LA
 
 # create summaries for the evolution of top modules
-zcat m2nP$ver$LA | lsort 1G -t\; -rnk2 | head -11| cut -d\; -f1 | while read mod 
+zcat m2nP$ver$LA | lsort 1G -t\; -rnk2 | head -32 | cut -d\; -f1 | while read mod 
 do (for j in {0..31}
    do zcat c2bPtaPkg$ver$LA.$j.gz
    done | grep ";$mod" | cut -d\; -f2,3 | \
