@@ -52,15 +52,16 @@ maxM=6
 ver=VER
 part=PART
 
+# find commits that modify files of the relevant language
+# look for c2f, b2f pattern
+grepStr=$(echo $grepStr|sed 's/;$/$/;s/\^/;/g')
+
 if test $part = first; then
     
 #################################################################
 ##########################FIRST##################################
 #################################################################
     
-# find commits that modify files of the relevant language
-grepStr=$(echo $grepStr|sed 's/;$/$/;s/\^/;/g')
-
 #find bobs of the relevant language, exclude generic blobs
 for j in {0..31}
 do zcat ../c2fb/b2fFull$ver$j.s | grep -E "$grepStr" | perl -I $HOME/lib/perl5 -I $HOME/lookup -e 'use cmt; while(<STDIN>){ ($b, @r) = split(/;/); print $_ if ! defined $badBlob{$b};}' | gzip > b2f$ver$LA.$j.gz &
@@ -148,6 +149,9 @@ done
 wait
 echo c2bi$ver$LA.$j.s
 
+fi
+if test $part = mid; then
+
 # is this needed, can get it by inverting b2c?
 # answer: yes, we need to restrict commits to ones creating relevant
 # files because inverting b2c produces massive number of commits
@@ -215,13 +219,13 @@ if test $part = second; then
 ##########################SECOND##################################
 #################################################################
 
-#this is needed prior to the second stage after run on da4 produces b$ver${LA}pkgs.$j.gz1
+#this is needed prior to the second stage after run on da4 produces b$ver${LA}pkgs.$j.gz
 for j in {0..31}
 do $HOME/bin/lsort ${maxM}G -t\; -k1b,1 --merge \
-            <(zcat b$ver${LA}pkgs.$j.gz1 | lsort ${maxM}G -t\; -k1b,1) \
-    <(zcat b$ver${LA}pkgs.$(($j+32)).gz1 | lsort ${maxM}G -t\; -k1b,1) \
-    <(zcat b$ver${LA}pkgs.$(($j+64)).gz1 | lsort ${maxM}G -t\; -k1b,1) \
-    <(zcat b$ver${LA}pkgs.$(($j+96)).gz1 | lsort ${maxM}G -t\; -k1b,1) | \
+            <(zcat b$ver${LA}pkgs.$j.gz | lsort ${maxM}G -t\; -k1b,1) \
+    <(zcat b$ver${LA}pkgs.$(($j+32)).gz | lsort ${maxM}G -t\; -k1b,1) \
+    <(zcat b$ver${LA}pkgs.$(($j+64)).gz | lsort ${maxM}G -t\; -k1b,1) \
+    <(zcat b$ver${LA}pkgs.$(($j+96)).gz | lsort ${maxM}G -t\; -k1b,1) | \
      perl -ane 'print if m/^[0-f]{40};/' | uniq |  gzip > b$ver${LA}pkgs.$j.s &
 done
 wait
