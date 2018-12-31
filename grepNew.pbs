@@ -88,7 +88,13 @@ done | cut -d\; -f1 | uniq | $HOME/lookup/splitSec.perl b$ver$LA. 128
 echo b$ver$LA.
 
 #scp -p b$ver$LA.*.gz da4:/data/play/${LA}thruMaps/
-
+# on the remote do
+# pVer=K
+# ver=L
+# LA=R
+# for j in {0..127}; do zcat b$pVer${LA}.$j.gz | lsort 1G -u | join -v2 - <(zcat b$ver$LA.$j.gz | lsort 1G -u) | gzip > b$ver$LA.$j.s1; done
+# for int in "{0..31}" "{32..63}" "{64..95}" "{96..127}" ; do for j in $(eval "echo $int"); do zcat b$ver${LA}.$j.s1 | ./b2pkgsFast${LA}.perl $j 2> /dev/null |gzip > b$ver${LA}pkgs.$j.s1 &  done; wait; done
+# for j in {0..127}; do lsort 2G -t\; -k1b,2 <(zcat b$pVer${LA}pkgs.$j.gz) <(zcat b$ver${LA}pkgs.$j.s1) | gzip > b$ver${LA}pkgs.$j.gz1; done
 # for JS look in the following, since dependencies are not in the .js files
 #grepStr=';(bower.json|package.json|packages/[^/]*/package.json|codemods/[^/]*/package.json|lerna.json|yarn.lock|package-lock.json)$'
 #for j in {0..31}; do zcat b2f$verJS.$j.gz; done | grep -Ei $grepStr | cut -d\; -f1 | uniq | ~/lookup/splitSec.perl b2f$verjson. 128 &
@@ -122,9 +128,9 @@ echo c2bi$ver$LA.$j.s
 # is this needed, can get it by inverting b2c?
 # answer: yes, we need to restrict commits to ones creating relevant
 # files because inverting b2c produces massive number of commits
-# that do not modify relevant files like a blob for an empty file
-# maps to all commits reating empty file, not just commits for a
-# specific file extension 
+# that do not modify relevant files. E.g., a blob for an empty file
+# maps to all commits reating to all empty files, not just commits for a
+# files wit a specific file extension 
 for j in {0..31}
 do zcat ../c2fb/c2fFull$ver$j.s | grep -E "$grepStr" | perl -I $HOME/lib/perl5 -I $HOME/lookup -e 'use cmt; while(<STDIN>){ ($c, @r) = split(/;/); print $_ if ! defined $badCmt{$c};}' | gzip > c2f$ver$LA.$j.gz &
 done
@@ -160,7 +166,7 @@ zcat c2pFull$ver.forks | lsort $(($maxM*32))G -t\; -k1b,1 | join -t\; - <(zcat p
 
 # create an c2p map for canonical project names
 for j in {0..31}
-do zcat c2p$ver$LA.$j.gz |  perl $HOME/lookup/mp.perl 1 p$ver$LA.forks | uniq | lsort $(($maxM*32))G -u | gzip > c2P$ver$LA.$j.gz &
+do zcat c2p$ver$LA.$j.gz |  perl $HOME/lookup/mp.perl 1 p$ver$LA.forks | uniq | lsort ${maxM}G -u | gzip > c2P$ver$LA.$j.gz &
 done
 wait
 echo c2P$ver$LA.$j.gz
@@ -178,7 +184,6 @@ do zcat c2bi$ver$LA.$j.gz | join -t\; - <(zcat c2Pta$ver$LA.$j.gz) | gzip > c2bP
 done
 wait
 echo c2bPta$ver$LA.$j.gz
-
 
 fi
 if test $part = second; then
@@ -247,5 +252,13 @@ zcat P2m$ver$LA |\
    gzip > m2nP$ver$LA &
 wait
 
+# look at evolution of top modules
+zcat m2nP$ver$LA | lsort 1G -t\; -rnk2 | head -11| cut -d\; -f1 | while read mod 
+do for i in {0..31}; do zcat c2bPtaPkg$ver$LA.$j.gz; done | grep ";$mod" | cut -d\; -f2,3 | \
+   lsort 1G -t\; -k1,2 | awk -F\; '{ if (p!=$1) print $1";"int($2/3600/365.25/24*12)/12+1970;p=$1}' | \
+   gzip > $ver$LA.$mod
+done   
 
 fi
+
+
