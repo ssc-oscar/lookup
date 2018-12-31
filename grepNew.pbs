@@ -76,7 +76,7 @@ done
 wait
 echo b2f$ver$LA.$j.bs
 
-
+#redo C from here
 #get blob to commit map for blobs related to relevant language files
 for j in {0..31}
 do zcat ../c2fb/b2cFull$ver$j.s |grep -v '^;' | join -t\; - <(zcat b2f$ver$LA.$j.bs) |perl -I $HOME/lib/perl5 -I $HOME/lookup -e 'use cmt; while(<STDIN>){ ($b, $c, @r) = split(/;/); print $_ if ! defined $badCmt{$c} && ! defined $badBlob{$b};}'| gzip > b2c$ver$LA.$j.gz &
@@ -276,17 +276,23 @@ do zcat c2bPtaPkg$ver$LA.$j.gz
 done | cut -d\; -f2,6-| \
   perl -e 'while(<STDIN>){chop();($p,@m)=split(/;/);for $mm (@m){$p2m{$p}{$mm}++;}}; for $p (keys %p2m){@ms=sort keys %{$p2m{$p}}; print "$p;",(join ";", @ms)."\n"; }' |gzip > P2m$ver$LA &
 wait
+echo P2m$ver$LA
 zcat P2m$ver$LA |\
    perl -e 'while(<STDIN>){chop();($p,@ms)=split(/;/);for $m (@ms){$mp{$m}{$p}++}};while (($m,$p) = each %mp){@ps=keys %$p;print "$m\;$#ps\n"}' | \
    gzip > m2nP$ver$LA &
 wait
+echo m2nP$ver$LA
 
 # create summaries for the evolution of top modules
 zcat m2nP$ver$LA | lsort 1G -t\; -rnk2 | head -11| cut -d\; -f1 | while read mod 
-do for i in {0..31}; do zcat c2bPtaPkg$ver$LA.$j.gz; done | grep ";$mod" | cut -d\; -f2,3 | \
-   lsort 1G -t\; -k1,2 | awk -F\; '{ if (p!=$1) print $1";"int($2/3600/365.25/24*12)/12+1970;p=$1}' | \
-   gzip > $ver$LA.$mod
+do for i in {0..31}
+   do zcat c2bPtaPkg$ver$LA.$j.gz
+   done | grep ";$mod" | cut -d\; -f2,3 | \
+       lsort 1G -t\; -k1,2 | \
+       awk -F\; '{ if (p!=$1) print $1";"int($2/3600/365.25/24*12)/12+1970;p=$1}' | \
+       gzip > $ver$LA.$mod &
 done   
+wait
 
 fi
 
