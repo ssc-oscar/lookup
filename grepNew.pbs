@@ -287,7 +287,7 @@ echo m2nP$ver$LA
 #if test $part = third; then
 
 # create summaries for the evolution of top modules
-zcat m2nP$ver$LA | lsort ${maxM}G -t\; -rnk2 |gzip > m2nP$ver$LA.s
+zcat m2nP$ver$LA | lsort $(($maxM*32))G -t\; -rnk2 |gzip > m2nP$ver$LA.s
 echo m2nP$ver$LA.s
 
 zcat m2nP$ver$LA.s | cut -d\; -f1 | head -30 > mods.$ver$LA
