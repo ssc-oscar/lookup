@@ -283,12 +283,15 @@ zcat P2m$ver$LA |\
 wait
 echo m2nP$ver$LA
 
+fi
+if test $part = third; then
+
 # create summaries for the evolution of top modules
-zcat m2nP$ver$LA | lsort 1G -t\; -rnk2 | head -32 | cut -d\; -f1 | while read mod 
+zcat m2nP$ver$LA | lsort ${maxM}G -t\; -rnk2 | head -30 | cut -d\; -f1 | while read mod 
 do (for j in {0..31}
    do zcat c2bPtaPkg$ver$LA.$j.gz
    done | grep ";$mod" | cut -d\; -f2,3 | \
-       lsort 1G -t\; -k1,2 | \
+       lsort ${maxM}G -t\; -k1,2 | \
        awk -F\; '{ if (p!=$1) print $1";"int($2/3600/365.25/24*12)/12+1970;p=$1}' | \
        gzip > $ver$LA.$mod) &
 done   
