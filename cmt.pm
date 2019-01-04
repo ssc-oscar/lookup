@@ -93,6 +93,8 @@ our %badCmt = (
 
 our %badBlob  = (
   "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391" => 7826798, #\n 
+  "9daeafb9864cf43055ae93beb0afd6c7d144bfa4" => 1524056, #test\n
+  
   "8b137891791fe96927ad78e64b0aad7bded08bdc" => 957235, #\n\n
   "de6be7945c6a59798eb0ace177df38b05e98c2f0" => 650111,   #"module ApplicationHelpe\nend\n"
   "573541ac9702dd3969c9bc859d2b91ec1f7e6e56" => 100000, # more than that "0\n"

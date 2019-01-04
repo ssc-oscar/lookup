@@ -1,0 +1,304 @@
+#PBS -N LANG.PART.VER
+#PBS -A ACF-UTK0011
+#PBS -l feature=beacon
+#PBS -l partition=beacon
+#PBS -l nodes=1,walltime=23:50:00
+#PBS -j oe
+#PBS -S /bin/bash
+LD_LIBRARY_PATH=$HOME/lib:$HOME/lib64:$LD_LIBRARY_PATH
+c=/lustre/haven/user/audris/basemaps
+cd $c
+
+#https://github.com/luislobo/common-js-file-extensions/blob/master/index.js
+#'js|iced|liticed|iced.md|coffee|litcoffee|coffee.md|ts|cs|ls|es6|es|jsx|sjs|co|eg|json|json.ls|json5'
+#R extensions: r|R|S|s
+#py extensions: py|py3|pyx|pyo|pyw|pyc
+LA=LANG
+if test $LA = 'JS'; then grepStr='\.(js|iced|liticed|iced.md|coffee|litcoffee|coffee.md|ts|cs|ls|es6|es|jsx|sjs|co|eg|json|json.ls|json5);'; fi
+if test $LA = 'PY'; then grepStr='\.(py|py3|pyx|pyo|pyw|pyc);'; fi
+
+if test $LA = 'C'; then grepStr='(\.[Cch]|\.cpp|\.hh|\.cc|\.hpp|\.cxx);'; fi
+if test $LA = 'java'; then grepStr='(\.java|\.iml|\.class);'; fi
+if test $LA = 'Cs'; then grepStr='\.cs;'; fi
+
+if test $LA = 'php'; then grepStr='\.php;'; fi
+if test $LA = 'rb'; then grepStr='\.(rb|erb|gem|gemspec);'; fi
+if test $LA = 'Go'; then grepStr='\.go;'; fi
+if test $LA = 'Rust'; then grepStr='\.(rs|rlib|rst);'; fi
+if test $LA = 'R'; then grepStr='(\.Rd|\.[Rr]|\.Rprofile|\.RData|\.Rhistory|\.Rproj|^NAMESPACE|^DESCRIPTION|/NAMESPACE|/DESCRIPTION);'; fi
+if test $LA = 'Swift'; then grepStr='\.swift;'; fi # .swf is flash
+if test $LA = 'Scala'; then grepStr='\.scala;'; fi
+if test $LA = 'pl'; then grepStr='\.(pl|PL|pm|pod|perl);'; fi
+if test $LA = 'F'; then grepStr='\.(f[hi]|[fF]|[fF]77|[fF]9[0-9]|fortran|forth);'; fi
+if test $LA = 'Ada'; then grepStr='\.ad[abs];'; fi
+if test $LA = 'Erlang'; then grepStr='\.erl;'; fi
+if test $LA = 'Lua'; then grepStr='\.lua;'; fi
+if test $LA = 'Sql'; then grepStr='\.(sql|sqllite|sqllite3|mysql);'; fi
+if test $LA = 'Lisp'; then grepStr='\.(el|lisp|elc);'; fi
+#.COB (Program Source)
+#.CBL (Program Source)
+#.PCO (Recompilation Required Source Code)
+#.FD   (File Descriptions)
+#.SEL (Select Statements)
+#.WS  (Working Storage Copy books)
+#.CPY (Copybooks)
+if test $LA = 'Cob'; then grepStr='\.(COB|CBL|PCO|FD|SEL|CPY|cob|cbl|pco|fd|sel|cpy);'; fi
+#pro pas vbs vb flow ipynb sh csh zsh ex m-objc mat-matlab
+
+machine=beacon
+maxM=6
+[[ $machine == monster ]] && maxM=30
+
+ver=VER
+part=PART
+
+# find commits that modify files of the relevant language
+# look for c2f, b2f pattern
+grepStr=$(echo $grepStr|sed 's/;$/$/;s/\^/;/g')
+
+if test $part = first; then
+    
+#################################################################
+##########################FIRST##################################
+#################################################################
+    
+#find bobs of the relevant language, exclude generic blobs
+for j in {0..31}
+do zcat ../c2fb/b2fFull$ver$j.s | grep -E "$grepStr" | perl -I $HOME/lib/perl5 -I $HOME/lookup -e 'use cmt; while(<STDIN>){ ($b, @r) = split(/;/); print $_ if ! defined $badBlob{$b};}' | gzip > b2f$ver$LA.$j.gz &
+done
+wait
+echo b2f$ver$LA.$j.gz 
+
+#extract a unique list of blobs for the relevant language
+for j in {0..31}
+do zcat b2f$ver$LA.$j.gz | cut -d\; -f1 | uniq | lsort ${maxM}G -u | gzip > b2f$ver$LA.$j.bs &
+done
+wait
+echo b2f$ver$LA.$j.bs
+
+#redo C from here
+#get blob to commit map for blobs related to relevant language files
+for j in {0..31}
+do zcat ../c2fb/b2cFull$ver$j.s |grep -v '^;' | join -t\; - <(zcat b2f$ver$LA.$j.bs) |perl -I $HOME/lib/perl5 -I $HOME/lookup -e 'use cmt; while(<STDIN>){ ($b, $c, @r) = split(/;/); print $_ if ! defined $badCmt{$c} && ! defined $badBlob{$b};}'| gzip > b2c$ver$LA.$j.gz &
+done
+wait
+echo b2c$ver$LA.$j.gz
+
+# get a blob list for blobs related to language files that can also
+# have at least one associated commit 
+
+if test $LA = JS; then
+
+grepStrJS=';(bower.json|package.json|packages/[^/]*/package.json|codemods/[^/]*/package.json|lerna.json|yarn.lock|package-lock.json)$'
+for j in {0..31}
+do zcat b2f$ver$LA.$j.gz | grep -Ei $grepStrJS | cut -d\; -f1 | uniq | join -t\; - <(zcat b2f$ver$LA.$j.bs) 
+done | ~/lookup/splitSec.perl b${ver}$LA. 128 &
+wait
+
+else
+
+for j in {0..31}
+do zcat b2c$ver$LA.$j.gz
+done | cut -d\; -f1 | uniq | $HOME/lookup/splitSec.perl b$ver$LA. 128 &
+wait
+echo b$ver$LA.
+
+fi
+
+# sed "s/PART/first/;s/VER/L/g;s/LANG/$LA/;s/beacon/monster/" ~/lookup/grepNew.pbs | qsub
+# Copy to remote
+# scp -p b$ver$LA.*.gz da4:/data/play/${LA}thruMaps/
+# on the remote do
+# pVer=K
+# ver=L
+# LA=R
+# for j in {0..127}; do zcat b$pVer${LA}.$j.gz | lsort 5G -u | join -v2 - <(zcat b$ver$LA.$j.gz | lsort 1G -u) | gzip > b$ver$LA.$j.s1; done
+# for int in "{0..31}" "{32..63}" "{64..95}" "{96..127}" ; do for j in $(eval "echo $int"); do zcat b$ver${LA}.$j.s1 | ./b2pkgsFast${LA}.perl $j 2> /dev/null |gzip > b$ver${LA}pkgs.$j.s1 &  done; wait; done
+# for j in {0..127}; do lsort 2G -t\; -k1b,2 <(zcat b$pVer${LA}pkgs.$j.gz) <(zcat b$ver${LA}pkgs.$j.s1) | gzip > b$ver${LA}pkgs.$j.gz; done
+# # copy back
+# scp -p da4:/data/play/${LA}thruMaps/b$ver${LA}pkgs.*.gz .
+# sed "s/PART/second/;s/VER/L/g;s/LANG/$LA/;s/beacon/monster/" ~/lookup/grepNew.pbs | qsub
+
+# for JS look in the following, since dependencies are not in the .js files
+#grepStr=';(bower.json|package.json|packages/[^/]*/package.json|codemods/[^/]*/package.json|lerna.json|yarn.lock|package-lock.json)$'
+#for j in {0..31}; do zcat b2f$verJS.$j.gz; done | grep -Ei $grepStr | cut -d\; -f1 | uniq | ~/lookup/splitSec.perl b2f$verjson. 128 &
+#invert b2c into c2bi (not clear if needed, since only package
+# inversion is really necessary
+
+for j in {0..31}
+do zcat b2c$ver$LA.$j.gz | awk -F\; '{print $2";"$1}' | $HOME/lookup/splitSec.perl c2bi$ver$LA.$j. 32 &
+done 
+wait
+echo c2bi$ver$LA.$j.
+
+for j in {0..31}
+do for i in {0..31}
+  do zcat c2bi$ver$LA.$i.$j.gz | lsort ${maxM}G -t\; -k1b,2 -u | gzip > c2bi$ver$LA.$i.$j.s &
+  done
+  wait
+done
+echo c2bi$ver$LA.$i.$j.s
+
+for j in {0..31}
+do  str="$HOME/bin/lsort ${maxM}G -u --merge -t\; -k1b,2"
+  for i in {0..31}
+  do str="$str <(zcat c2bi$ver$LA.$i.$j.s)"
+  done
+  eval $str | gzip > c2bi$ver$LA.$j.s &
+done
+wait
+echo c2bi$ver$LA.$j.s
+
+#fi
+#if test $part = mid; then
+
+# is this needed, can get it by inverting b2c?
+# answer: yes, we need to restrict commits to ones creating relevant
+# files because inverting b2c produces massive number of commits
+# that do not modify relevant files. E.g., a blob for an empty file
+# maps to all commits reating to all empty files, not just commits for a
+# files wit a specific file extension 
+for j in {0..31}
+do zcat ../c2fb/c2fFull$ver$j.s | grep -E "$grepStr" | perl -I $HOME/lib/perl5 -I $HOME/lookup -e 'use cmt; while(<STDIN>){ ($c, @r) = split(/;/); print $_ if ! defined $badCmt{$c};}' | gzip > c2f$ver$LA.$j.gz &
+done
+wait
+echo c2f$ver$LA.$j.gz
+
+for j in {0..31}
+do zcat c2f$ver$LA.$j.gz | cut -d\; -f1 | uniq | gzip > c$ver$LA.$j.cs &
+done
+wait
+echo c$ver$LA.$j.cs
+
+#determine projects for the relevant commits
+for j in {0..31}
+do zcat c2pFull$ver$j.s | join -t\; - <(zcat c$ver$LA.$j.cs) | gzip > c2p$ver$LA.$j.gz &
+done
+wait
+echo c2p$ver$LA.$j.gz
+
+# Get the list of projects
+zcat c2p$ver$LA.*.gz | cut -d\; -f2 | lsort $(($maxM*32))G  -u | gzip > p$ver$LA.gz
+echo p$ver$LA.gz
+
+# get time/author attributes for relevant commits 
+for j in {0..31}
+do zcat c2taF$ver.$j.s | join -t\; - <(zcat c$ver$LA.$j.cs) | gzip > c2ta$ver$LA.$j.gz &
+done
+wait
+echo c2ta$ver$LA.$j.gz
+
+# map projects based on forks
+zcat c2pFull$ver.forks | lsort $(($maxM*32))G -t\; -k1b,1 | join -t\; - <(zcat p$ver$LA.gz) | gzip > p$ver$LA.forks
+
+# create an c2p map for canonical project names
+for j in {0..31}
+do zcat c2p$ver$LA.$j.gz |  perl $HOME/lookup/mp.perl 1 p$ver$LA.forks | uniq | lsort ${maxM}G -u | gzip > c2P$ver$LA.$j.gz &
+done
+wait
+echo c2P$ver$LA.$j.gz
+
+# add time/author attributes (mesed up for all)
+for j in {0..31}
+do zcat c2P$ver$LA.$j.gz | join -t\; - <(zcat c2ta$ver$LA.$j.gz) | gzip > c2Pta$ver$LA.$j.gz &
+done
+wait
+echo c2Pta$ver$LA.$j.gz 
+
+# add blobs: note that c2f contains deleted files, but b2f/b2c only created blobs  
+for j in {0..31}
+do zcat c2bi$ver$LA.$j.s | join -t\; - <(zcat c2Pta$ver$LA.$j.gz) | gzip > c2bPta$ver$LA.$j.gz &
+done
+wait
+echo c2bPta$ver$LA.$j.gz
+
+fi
+if test $part = second; then
+
+#################################################################
+##########################SECOND##################################
+#################################################################
+
+#this is needed prior to the second stage after run on da4 produces b$ver${LA}pkgs.$j.gz
+for j in {0..31}
+do $HOME/bin/lsort ${maxM}G -t\; -k1b,1 --merge \
+            <(zcat b$ver${LA}pkgs.$j.gz | lsort ${maxM}G -t\; -k1b,1) \
+    <(zcat b$ver${LA}pkgs.$(($j+32)).gz | lsort ${maxM}G -t\; -k1b,1) \
+    <(zcat b$ver${LA}pkgs.$(($j+64)).gz | lsort ${maxM}G -t\; -k1b,1) \
+    <(zcat b$ver${LA}pkgs.$(($j+96)).gz | lsort ${maxM}G -t\; -k1b,1) | \
+     perl -ane 'print if m/^[0-f]{40};/' | uniq |  gzip > b$ver${LA}pkgs.$j.s &
+done
+wait
+echo b$ver${LA}pkgs.$j.s
+
+# add package info to minimal b2c
+for j in {0..31}
+do zcat b2c$ver$LA.$j.gz | join -t\; - <(zcat b$ver${LA}pkgs.$j.s) | gzip > b2cPkg$ver$LA.$j.gz &
+done
+wait
+echo b2cPkg$ver$LA.$j.gz
+
+# invert fast because only a meaningful subset has the modules
+for j in {0..31}   
+do zcat b2cPkg$ver$LA.$j.gz | perl -ane '($a,$b,@rest)=split(/\;/, $_, -1);print "$b;$a;".(join ";", @rest)' | $HOME/lookup/splitSec.perl c2bPkg$ver$LA.$j. 32 &
+done
+wait
+echo c2bPkg$ver$LA.$j.
+
+for j in {0..31}  
+do for i in {0..31}
+  do zcat c2bPkg$ver$LA.$i.$j.gz | lsort ${maxM}G -t\; -k1b,2 - | gzip > c2bPkg$ver$LA.$i.$j.s &
+  done
+  wait
+  echo c2bPkg$ver$LA.$i.$j.s
+done
+
+for j in {0..31}
+do  str="$HOME/bin/lsort ${maxM}G -u --merge -t\; -k1b,2"
+  for i in {0..31} 
+  do str="$str <(zcat c2bPkg$ver$LA.$i.$j.s)"
+  done
+  eval $str | gzip > c2bPkg$ver$LA.$j.s &
+done
+wait
+echo c2bPkg$ver$LA.$j.s
+
+# add blob and package info to Pta
+for j in {0..31}
+do zcat c2Pta$ver$LA.$j.gz | join -t\; - <(zcat c2bPkg$ver$LA.$j.s) | gzip > c2bPtaPkg$ver$LA.$j.gz &
+done
+wait
+echo c2bPtaPkg$ver$LA.$j.gz
+
+#do summaries
+for j in {0..31}
+do zcat c2bPtaPkg$ver$LA.$j.gz
+done | cut -d\; -f2,6-| \
+  perl -e 'while(<STDIN>){chop();($p,@m)=split(/;/);for $mm (@m){$p2m{$p}{$mm}++;}}; for $p (keys %p2m){@ms=sort keys %{$p2m{$p}}; print "$p;",(join ";", @ms)."\n"; }' |gzip > P2m$ver$LA &
+wait
+echo P2m$ver$LA
+zcat P2m$ver$LA |\
+   perl -e 'while(<STDIN>){chop();($p,@ms)=split(/;/);for $m (@ms){$mp{$m}{$p}++}};while (($m,$p) = each %mp){@ps=keys %$p;print "$m\;$#ps\n"}' | \
+   gzip > m2nP$ver$LA &
+wait
+echo m2nP$ver$LA
+
+#fi
+#if test $part = third; then
+
+# create summaries for the evolution of top modules
+zcat m2nP$ver$LA | lsort $(($maxM*32))G -t\; -rnk2 |gzip > m2nP$ver$LA.s
+echo m2nP$ver$LA.s
+
+zcat m2nP$ver$LA.s | cut -d\; -f1 | head -30 > mods.$ver$LA
+echo mods.$ver$LA
+
+for mod in $(cat mods.$ver$LA) 
+do (for j in {0..31}; do zcat c2bPtaPkg$ver$LA.$j.gz; done | grep -E ";$mod$|;$mod;" | cut -d\; -f2,3 | lsort ${maxM}G -t\; -k1,2 | awk -F\; '{ if (p!=$1) print $1";"int($2/3600/365.25/24*12)/12+1970;p=$1}' | gzip > $ver$LA.$mod) &
+done   
+wait
+echo $ver$LA.$mod
+
+fi
+
+
