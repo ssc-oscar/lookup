@@ -18,9 +18,9 @@ my $sec = $ARGV[0];
 my $sections = 128;
 my (%fhob, %fhosc);
 open $fhob{$sec}, "/data/All.blobs/blob_$sec.bin";
-tie %{$fhosc{$sec}}, "TokyoCabinet::HDB", "/fast1/All.sha1o/sha1.blob_$sec.tch", TokyoCabinet::HDB::OREADER,  
+tie %{$fhosc{$sec}}, "TokyoCabinet::HDB", "/fast/All.sha1o/sha1.blob_$sec.tch", TokyoCabinet::HDB::OREADER,  
       16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
-   or die "cant open /fast1/All.sha1o/sha1.blob_$sec.tch\n";
+   or die "cant open /fast/All.sha1o/sha1.blob_$sec.tch\n";
 
 
 my $offset = 0;
