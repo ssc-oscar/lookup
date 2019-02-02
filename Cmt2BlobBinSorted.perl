@@ -64,7 +64,7 @@ while (<STDIN>){
   $cp = $c;
   my $b = fromHex ($hb);
   $tmp{$b}++;
-  if (!($lines%100000000)){
+  if (!($lines%50000000)){
     print STDERR "$lines done\n";
     $doDump = 1;
   }
@@ -85,7 +85,7 @@ sub dumpData {
   }
 }
 
-for $sec (0..($nsec -1)){
+for $sec (0..($nsec-1)){
   untie %{$c2p{$sec}};
 }
 

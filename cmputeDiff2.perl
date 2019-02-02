@@ -25,7 +25,7 @@ my ($prj, $rev, $tree, $parent, $aname, $cname, $alogin, $clogin, $path, $atime,
 my (%c2p, %p2c, %b2c, %c2f);
 
 #my $prj = "";
-my $pre = "/fast1/All.sha1c";
+my $pre = "/fast/All.sha1c";
 $pre = $ARGV[0] if defined $ARGV[0];
 
 my $sections = 128;

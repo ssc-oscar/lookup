@@ -23,8 +23,8 @@ my $fbase="All.sha1c/tree_";
 
 my (%fhob, %fhos);
 #for my $sec (0 .. ($sections-1)){
-#  my $pre = "/fast1/";
-#  $pre = "/fast1" if $sec % $parts;
+#  my $pre = "/fast/";
+#  $pre = "/fast" if $sec % $parts;
 #  tie %{$fhos{$sec}}, "TokyoCabinet::HDB", "$pre/${fbase}$sec.tch", TokyoCabinet::HDB::OREADER,  
 #	16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
 #     or die "cant open $pre/$fbase$sec.tch\n";
@@ -57,8 +57,8 @@ sub getTree {
     next;
   }
   if (! defined $fhos{$sec}){
-    my $pre = "/fast1/";
-    $pre = "/fast1" if $sec % $parts;
+    my $pre = "/fast/";
+    $pre = "/fast" if $sec % $parts;
     tie %{$fhos{$sec}}, "TokyoCabinet::HDB", "$pre/${fbase}$sec.tch", TokyoCabinet::HDB::OREADER,
        16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
       or die "cant open $pre/$fbase$sec.tch\n";
