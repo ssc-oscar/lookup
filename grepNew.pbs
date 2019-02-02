@@ -1,7 +1,7 @@
 #PBS -N LANG.PART.VER
 #PBS -A ACF-UTK0011
-#PBS -l feature=beacon
-#PBS -l partition=beacon
+#PBS -l feature=MACHINE
+#PBS -l partition=MACHINE
 #PBS -l nodes=1,walltime=23:50:00
 #PBS -j oe
 #PBS -S /bin/bash
@@ -15,7 +15,7 @@ cd $c
 #py extensions: py|py3|pyx|pyo|pyw|pyc
 LA=LANG
 if test $LA = 'JS'; then grepStr='\.(js|iced|liticed|iced.md|coffee|litcoffee|coffee.md|ts|cs|ls|es6|es|jsx|sjs|co|eg|json|json.ls|json5);'; fi
-if test $LA = 'PY'; then grepStr='\.(py|py3|pyx|pyo|pyw|pyc);'; fi
+if test $LA = 'PY'; then grepStr='\.(py|py3|pyx|pyo|pyw|pyc|whl);'; fi
 
 if test $LA = 'C'; then grepStr='(\.[Cch]|\.cpp|\.hh|\.cc|\.hpp|\.cxx);'; fi
 if test $LA = 'java'; then grepStr='(\.java|\.iml|\.class);'; fi
@@ -35,6 +35,7 @@ if test $LA = 'Erlang'; then grepStr='\.erl;'; fi
 if test $LA = 'Lua'; then grepStr='\.lua;'; fi
 if test $LA = 'Sql'; then grepStr='\.(sql|sqllite|sqllite3|mysql);'; fi
 if test $LA = 'Lisp'; then grepStr='\.(el|lisp|elc);'; fi
+if test $LA = 'Fml'; then grepStr='\.(fs|fsi|ml|mli|hs|lhs|sml|v);'; fi #https://en.wikipedia.org/wiki/Proof_assistant
 #.COB (Program Source)
 #.CBL (Program Source)
 #.PCO (Recompilation Required Source Code)
@@ -45,7 +46,7 @@ if test $LA = 'Lisp'; then grepStr='\.(el|lisp|elc);'; fi
 if test $LA = 'Cob'; then grepStr='\.(COB|CBL|PCO|FD|SEL|CPY|cob|cbl|pco|fd|sel|cpy);'; fi
 #pro pas vbs vb flow ipynb sh csh zsh ex m-objc mat-matlab
 
-machine=beacon
+machine=MACHINE
 maxM=6
 [[ $machine == monster ]] && maxM=30
 
@@ -189,7 +190,8 @@ wait
 echo c2ta$ver$LA.$j.gz
 
 # map projects based on forks
-zcat c2pFull$ver.forks | lsort $(($maxM*32))G -t\; -k1b,1 | join -t\; - <(zcat p$ver$LA.gz) | gzip > p$ver$LA.forks
+#zcat c2pFull$ver.forks | lsort $(($maxM*32))G -t\; -k1b,1 | join -t\; - <(zcat p$ver$LA.gz) | gzip > p$ver$LA.forks
+zcat c2pFull$ver.forks.s | join -t\; - <(zcat p$ver$LA.gz) | gzip > p$ver$LA.forks
 
 # create an c2p map for canonical project names
 for j in {0..31}

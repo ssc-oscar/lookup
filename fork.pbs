@@ -45,7 +45,8 @@ echo c2pFull$ver.clones
 
 perl $HOME/lookup/connectImport.perl c2pFull$ver | gzip > c2pFull$ver.forks
 echo c2pFull$ver.forks
-
+zcat c2pFull$ver.forks | $HOME/bin/lsort 100G -t\; -k1b,1 > c2pFull$ver.forks.s
+echo c2pFull$ver.forks.s
 
 for i in {0..31}; do zcat p$ver$i.s; done | awk '{print $1";"$1}' | perl mp.perl 0 c2pFull$ver.forks | gzip > p$ver.map
 echo p$ver.map

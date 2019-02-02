@@ -1,0 +1,90 @@
+#PBS -N c2pFullM
+#PBS -A ACF-UTK0011
+#PBS -l feature=MACHINE
+#PBS -l partition=MACHINE
+#PBS -l nodes=1,walltime=23:50:00
+#PBS -j oe
+#PBS -S /bin/bash
+LD_LIBRARY_PATH=$HOME/lib:$HOME/lib64:$LD_LIBRARY_PATH
+c=/lustre/haven/user/audris/basemaps
+cd $c
+
+machine=MACHINE
+maxM=6000
+[[ $machine == monster ]] && maxM=30000
+[[ $machine == rho ]] && maxM=900
+[[ $machine == sigma ]] && maxM=2900
+
+if test 'a' = 'n'; then
+
+for j in {0..31}
+do  $HOME/bin/lsort ${maxM}M -t\; -k1b,2 --merge -u <(zcat c2pFullL$j.s) <(zcat c2pM$j.s) | perl -ane 'print if m|^[0-f]{40};.|' | gzip > c2pFullM$j.s &
+done
+wait
+echo c2pFullM$j.s
+
+fi
+if test 'a' = 'n'; then
+
+for j in {0..31}
+do  $HOME/bin/lsort ${maxM}M -t\; -k1b,2 --merge -u <(zcat p2cFullL$j.s) <(zcat p2cM$j.s) | perl -ane 'print if m|^.+;[0-f]{40}$|' | gzip > p2cFullM$j.s &
+done
+wait
+echo p2cFullM$j.s
+
+for j in {0..31}
+do  zcat p2cFullM$j.s | cut -d\; -f1 | uniq | gzip > pM$j.s &
+done
+wait
+echo pL$j.s
+
+
+fi
+if test 'a' = 'b'; then
+
+
+for j in {0..31}
+do zcat c2pFullM$j.s | join -t\; - <(zcat c2taFM.$j.s) | awk -F\; '{ print $4";"$2}' | uniq | $HOME/bin/lsort ${maxM}M -t\; -k1b,2 -u | gzip > a2pM$j.s &
+done  
+wait
+
+fi
+if test 'a' = 'a'; then
+
+for j in {0..31}
+do zcat a2pM$j.s | perl -I$HOME/lookup -I $HOME/lib/perl5 $HOME/lookup/splitSecCh.perl a2pM.$j. 32 &
+done
+wait
+
+for j in {0..31}
+do str="$HOME/bin/lsort ${maxM}M -t\; -k1b,2 --merge -u"
+  for i in {0..31} 
+  do  str="$str <(zcat a2pM.$i.$j.gz)"
+  done
+  eval $str > a2pM.$j.gz &
+done
+wait
+
+for j in {0..31}
+do zcat a2pM$j.s |  awk -F\; '{ print $2";"$1}' | perl -I$HOME/lookup -I $HOME/lib/perl5 $HOME/lookup/splitSecCh.perl p2aM.$j. 32 &
+done
+wait
+
+for j in {0..31}
+do for i in {0..31}
+  do $HOME/bin/lsort ${maxM}M -t\; -k1b,2 <(zcat p2aM.$i.$j.gz) | gzip > p2aM.$i.$j.s &
+  done
+  wait
+done
+
+for j in {0..31}
+do str="$HOME/bin/lsort ${maxM}M -t\; -k1b,2 --merge -u"
+  for i in {0..31}
+  do  str="$str <(zcat p2aM.$i.$j.gz)"
+  done
+  eval $str > p2aM.$j.gz &
+done
+wait
+
+fi
+
