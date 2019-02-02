@@ -50,7 +50,7 @@ if ($nTot < 0) {
 {
   my $count = 0;
   my $new = 0;
-  my $pre = "/fast1";
+  my $pre = "/fast";
   tie %{$fhos{$sec}}, "TokyoCabinet::HDB", "$pre/${fbase}$sec.tch", TokyoCabinet::HDB::OWRITER | TokyoCabinet::HDB::OCREAT,
      16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
       or die "cant open $pre/$fbase$sec.tch\n";  
