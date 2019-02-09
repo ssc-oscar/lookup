@@ -8,10 +8,8 @@ use Compress::LZF;
 use cmt;
 
 
-my $detail = 0;
-$detail = $ARGV[1]+0 if defined $ARGV[1];
 my $split = 1;
-$split = $ARGV[2] + 0 if defined $ARGV[2];
+$split = $ARGV[1] + 0 if defined $ARGV[1];
 
 my %p2c;
 for my $sec (0..($split-1)){
@@ -24,18 +22,20 @@ for my $sec (0..($split-1)){
 
 while (<STDIN>){
   chop();
-  my $p = $_;
+  my ($p, $p1) = split(/\;/, $_, -1);
   #my $sec = (unpack "C", substr ($p, 0, 1))%$split;
   my $sec = 0;
   $sec = sHash ($p, $split) if $split > 1;
+  my $sec1 = 0;
+  $sec1 = sHash ($p1, $split) if $split > 1;
   #print "$sec;$p\n";
-  if (defined $p2c{$sec}{$p}){
-    list ($p, $p2c{$sec}{$p});
+  if (defined $p2c{$sec}{$p} && defined $p2c{$sec1}{$p1}){
+    my ($s, $n, $n1) = list ($p2c{$sec}{$p}, $p2c{$sec1}{$p1});
+    print "$p;$p1;$s;$n;$n1\n";
   }else{
-    print STDERR "no $p in $sec\n";
+    print STDERR "no $p in $sec or $p1 in $sec1\n";
   }
   
-  list ("$p\n", $p2c{$sec}{"$p\n"}) if defined $p2c{$sec}{"$p\n"};
 }
 for my $sec (0..($split-1)){
   untie %{$p2c{$sec}};
@@ -43,17 +43,31 @@ for my $sec (0..($split-1)){
 
 
 sub list {
-  my ($p, $v) = @_;
+  my ($v, $v1) = @_;
   my $ns = length($v)/20;
-  my %tmp = ();
-  print "$p;$ns";
-  if ($detail != 0){
+  my $ns1 = length($v1)/20;
+  my %cs = ();
+  my $sim = 0;
+  if ($ns < $ns1){
     for my $i (0..($ns-1)){
       my $c = substr ($v, 20*$i, 20);
-      print ";".(toHex($c));
+      $cs{$c}++;
+    }
+    for my $i (0..($ns1-1)){
+      my $c = substr ($v1, 20*$i, 20);
+      $sim += 1 if defined $cs{$c};
+    }
+  }else{
+    for my $i (0..($ns1-1)){
+      my $c = substr ($v1, 20*$i, 20);
+      $cs{$c}++;
+    }
+    for my $i (0..($ns-1)){
+      my $c = substr ($v, 20*$i, 20);
+      $sim += 1 if defined $cs{$c};
     }
   }
-  print "\n";
+  ($sim, $ns, $ns1);
 }
 
 
