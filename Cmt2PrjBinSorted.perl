@@ -65,12 +65,14 @@ while (<STDIN>){
     next;
   }
   my $c = fromHex ($hc);
-  $p =~ s/.*github.com_(.*_.*)/$1/;
-  $p =~ s/^bitbucket.org_/bb_/;
-  $p =~ s/\.git$//;
-  $p =~ s|/*$||;
-  $p =~ s/\;/SEMICOLON/g;
-  $p = "EMPTY" if $p eq "";
+  if (0){#keep project names totally intact
+    $p =~ s/.*github.com_(.*_.*)/$1/;
+    $p =~ s/^bitbucket.org_/bb_/;
+    $p =~ s/\.git$//;
+    $p =~ s|/*$||;
+    $p =~ s/\;/SEMICOLON/g;
+    $p = "EMPTY" if $p eq "";
+  }
   if ($c ne $cp && $cp ne ""){
     $sec = (unpack "C", substr ($cp, 0, 1))%$nsec;
     #if (defined $c2p{$sec}{$shap}){
