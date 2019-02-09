@@ -16,8 +16,8 @@ my $ss = -1;
 $ss = $ARGV[1]+0 if defined $ARGV[1];
 my (%fhob, %fhost, %fhosc);
 for my $sec (0 .. ($sections-1)){
-  my $pre = "/fast1/";
-  $pre = "/fast1" if $sec % $parts;
+  my $pre = "/fast/";
+  $pre = "/fast" if $sec % $parts;
   next if $ss > 0 && $sec != $ss;
   tie %{$fhosc{$sec}}, "TokyoCabinet::HDB", "$pre/${fbasec}$sec.tch", TokyoCabinet::HDB::OREADER,  
 	16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000

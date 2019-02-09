@@ -34,12 +34,14 @@ my $sections = 128;
   my $s = $ARGV[3];
   my $rl = read (FD, $codeC, $s);
   my $code = $codeC;
+  print "seek $ARGV[2], read=$s, read $rl\n";
   if ($s < 2147483647){# longer than that is not compressed
     $code = safeDecomp ($codeC, "$ARGV[2];$s");
   }
   if ($code ne ""){
     my $code = safeDecomp ($codeC, "$ARGV[2];$s");
     my $h = sha1_hex("$type ".length($code)."\000$code");
+    
     if ($type eq "tree"){
       my $hm5 = sha1_hex("$type ".(length($code)+5)."\000$code\000\000\000\000\000");
       my $hm4 = sha1_hex("$type ".(length($code)+4)."\000$code\000\000\000\000");
