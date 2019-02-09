@@ -19,9 +19,10 @@ while(<STDIN>){
   my ($id, @vs) = split(/\;/, $_, -1);
   my @vs1 = (); 
   for my $v1 (@vs){
+    next if defined $badPrj{$v1} || $v1 =~ m/^Gitmolrest\.[0-9]*$/;
+    push @vs1, $v1;
     if (!defined $f2num{$v1}){
       next if defined $badPrj{$v1} || $v1 =~ m/^Gitmolrest\.[0-9]*$/;
-      push @vs1, $v1;
       $f2num{$v1} = $i+0;
       print A "$v1\n";
       $i++;
