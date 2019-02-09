@@ -2,6 +2,9 @@ use warnings;
 use strict;
 use File::Temp qw/ :POSIX /;
 
+my %badPrj = ("docker-library_commit-warehouse" => 1, "FER-HT_chef-repo" => 1, 
+              "devillnside_AcerRecovery" => 1, "ezterry_AcerRecovery" => 1);
+
 print STDERR "starting ".(localtime())."\n";
 my $n = 0;
 my $i = 0;
@@ -11,6 +14,10 @@ my %tmp;
 while(<STDIN>){
   chop();
   my ($id, $v) = split(/\;/, $_, -1);
+
+  # ignore problematic project ids
+  next if defined $badPrj{$v} || $v =~ /^Gitmolrest\.[0-9]*$/;
+
   if ($id eq $pid && $pid ne ""){
     $tmp{$v}++;
   }else{

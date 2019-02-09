@@ -14,7 +14,7 @@ ver=VER
 if test 'a' = 'a'; then
 
 for j in {0..31}
-do zcat c2pFull$ver$j.s | perl ../c2fb/connectExportPre.perl | gzip > c2pFull$ver$j.p2p &
+do zcat c2pFull$ver$j.s | perl $HOME/lookup/connectExportPre.perl | gzip > c2pFull$ver$j.p2p &
 done
 wait
 echo c2pFull$ver$j.p2p
@@ -26,7 +26,7 @@ wait
 echo c2pFull$ver$j
 
 for j in {0..31}
-do zcat c2pFull$ver$j.versions |  perl ~/bin/connectPrune.perl |gzip > c2pFull$ver$j.versions1 &
+do zcat c2pFull$ver$j.versions |  perl $HOME/lookup/connectPrune.perl |gzip > c2pFull$ver$j.versions1 &
 done
 wait
 echo c2pFull$ver$j.versions1
