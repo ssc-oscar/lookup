@@ -1,4 +1,4 @@
-#!/usr/bin/perl -I /home/audris/lib64/perl5
+#!/usr/bin/perl -I /home/audris/lib64/perl5 -I /home/audris/lib/x86_64-linux-gnu/perl
 use strict;
 use warnings;
 use Error qw(:try);

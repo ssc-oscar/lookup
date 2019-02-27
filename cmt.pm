@@ -6,7 +6,7 @@ use Compress::LZF;
 
 require Exporter;
 our @ISA = qw (Exporter);
-our @EXPORT = qw(%badCmt %badBlob %badTree segB segH signature_error contains_angle_brackets extract_trimmed git_signature_parse extrCmt getTime cleanCmt safeDecomp safeComp toHex fromHex sHash);
+our @EXPORT = qw(%badCmt %badBlob %badTree splitSignature egB segH signature_error contains_angle_brackets extract_trimmed git_signature_parse extrCmt getTime cleanCmt safeDecomp safeComp toHex fromHex sHash);
 use vars qw(@ISA);
 
 our %badCmt = (
@@ -334,6 +334,11 @@ sub getTime {
   ($auth, $ta) = ($1, $2) if ($auth =~ m/^(.*)\s(-?[0-9]+\s+[\+\-]*\d+)$/);
   ($cmtr, $tc) = ($1, $2) if ($cmtr =~ m/^(.*)\s(-?[0-9]+\s+[\+\-]*\d+)$/);
   ($ta, $tc);
+}
+
+sub splitSignature {
+  my $s = $_[0];
+  return git_signature_parse ($s, "");
 }
 
 sub cleanCmt {
