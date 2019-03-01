@@ -19,8 +19,10 @@ my $i = 0;
 while(<STDIN>){
   chop();
   my ($id, @vs) = split(/\;/, $_, -1);
-  
+  my @vs1 = (); 
   for my $v1 (@vs){
+    next if defined $badPrj{$v1} || $v1 =~ m/^Gitmolrest\.[0-9]*$/;
+    push @vs1, $v1;
     if (!defined $f2num{$v1}){
       next if defined $badPrj{$v1} || $v1 =~ m/^Gitmolrest\.[0-9]*$/;
       $f2num{$v1} = $i+0;
@@ -28,10 +30,9 @@ while(<STDIN>){
       $i++;
     }
   }
-  my $v0 = shift @vs;
-  while (!defined $f2num{$v0} && $#vs > 0) { $v0 = shift @vs };
-  for my $v1 (@vs){
-    print B "$f2num{$v0} $f2num{$v1}\n" if defined $f2num{$v1};
+  my $v0 = shift @vs1;
+  for my $v1 (@vs1){
+    print B "$f2num{$v0} $f2num{$v1}\n";
   } 
   $n ++;
   if (!($n%100000000)) { print STDERR "$n lines in $ARGV[0] done\n";}
