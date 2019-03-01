@@ -1,3 +1,5 @@
+#!/usr/bin/perl
+
 use warnings;
 use strict;
 use File::Temp qw/ :POSIX /;

@@ -6,7 +6,7 @@ use Compress::LZF;
 
 require Exporter;
 our @ISA = qw (Exporter);
-our @EXPORT = qw(%badCmt %badBlob %badTree segB segH signature_error contains_angle_brackets extract_trimmed git_signature_parse extrCmt getTime cleanCmt safeDecomp safeComp toHex fromHex sHash);
+our @EXPORT = qw(%badCmt %badBlob %badTree segB segH signature_error contains_angle_brackets extract_trimmed git_signature_parse extrPar extrCmt getTime cleanCmt safeDecomp safeComp toHex fromHex sHash);
 use vars qw(@ISA);
 
 our %badCmt = (
@@ -322,6 +322,19 @@ sub extrCmt {
   return ($tree, $parent, $auth, $cmtr, $ta, $tc, @rest);
 }
 
+sub extrPar {
+  my ($codeC, $str) = @_;
+  my $code = safeDecomp ($codeC, $str);
+  my ($tree, $parent, $auth, $cmtr, $ta, $tc) = ("","","","","","");
+  my ($pre, @rest) = split(/\n\n/, $code, -1);
+  for my $l (split(/\n/, $pre, -1)){
+    $parent .= ":$1" if ($l =~ m/^parent (.*)$/);
+  }
+  $parent =~ s/^:// if defined $parent;
+  return $parent;
+}
+
+
 sub getTime {
   my ($codeC, $str) = @_;
   my $code = safeDecomp ($codeC, $str);
@@ -338,6 +351,10 @@ sub getTime {
 
 sub cleanCmt {
   my ($cont, $cmt, $debug) = @_;
+  if ($debug == 5){
+    print "$cmt;".(extrPar($cont))."\n";
+    return;
+  }
   my ($tree, $parents, $auth, $cmtr, $ta, $tc, @rest) = extrCmt ($cont, $cmt);
   my $msg = join '\n\n', @rest;
   if ($debug){
@@ -353,16 +370,15 @@ sub cleanCmt {
       if ($debug == 2){
         print "$cmt;$auth;$ta;$msg\n";
       }else{
-        if ($debug == 3){
-          my ($a, $e) = git_signature_parse ($auth, $msg);
-          print "$msg;$cmt;$a;$e;$ta;$auth\n";
+        #if ($debug == 3){
+        #  my ($a, $e) = git_signature_parse ($auth, $msg);
+        #  print "$msg;$cmt;$a;$e;$ta;$auth\n";
+        #}else{
+        if ($debug == 4){
+          print "$cmt;$auth\n";
         }else{
-          if ($debug == 4){
-             print "$cmt;$auth\n";
-          }else{
-            $ta=~s/ .*//;
-            print "$cmt;$ta;$auth\n";
-          }
+          $ta=~s/ .*//;
+          print "$cmt;$ta;$auth\n";
         }
       }
     }
