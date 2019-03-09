@@ -41,7 +41,7 @@ my %csE = ();
 my %empty;
 for my $p1 (keys %p0){
   my $sec1 = 0;
-  $sec1 = sHash ($p1, $split) if $split > 1;
+  $sec1 = sHash ($p1, $split);
   if (defined $p2c{$sec1}{$p1}){
     list ($p2c{$sec1}{$p1}, \%{$cs2{$p1}}, \%csE);
     my @cs3 = keys %{$cs2{$p1}};
@@ -76,30 +76,34 @@ for my $p (keys %pIn){
   %cs2 = ();
   my $sec = 0;
   my $n = 0;
-  $sec = sHash ($p, $split) if $split > 1;
+  $sec = sHash ($p, $split);
   if (defined $p2c{$sec}{$p}){
     $n = listA ($p2c{$sec}{$p}, \%cs2, \%csE, \%csA);
   }
   my @nb = keys %cs2;
   print "0;$p;$n;$ARGV[0];$#na;$#nb\n" if $#nb >= 0;
 }
+print STDERR "done0\n";
 for my $c (keys %csA){
-  my $sec = segB ($c, $split);
-  list1 ($c2p{$sec}{$c}, \%psA, \%psE);
+  my $secc = segB ($c, $split);
+  list1 ($c2p{$secc}{$c}, \%psA, \%psE) if defined $c2p{$secc}{$c};
 }
+print STDERR "done npsA=".(scalar(keys %psA))."\n";
 my %csA1;
 for my $p (keys %pIn){
   next if !defined $psA{$p};
   %cs2 = ();
   my $sec = 0;
   my $n = 0;
-  $sec = sHash ($p, $split) if $split > 1;
+  $sec = sHash ($p, $split);
   if (defined $p2c{$sec}{$p}){
     $n = listA ($p2c{$sec}{$p}, \%cs2, \%csA, \%csA1);
   }
   my @nb = keys %cs2;
   print "1;$p;$n;$ARGV[0];$#na;$#nb\n" if $#nb >= 0;
 }
+print STDERR "done1\n";
+
 my $n = 0;
 for my $c (keys %csA1){
   $n ++ if !defined $csA{$c} && !defined $csE{$c};
