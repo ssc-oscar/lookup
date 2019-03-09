@@ -38,6 +38,7 @@ my %ps = ();
 my %psE = ();
 my %cs2 = ();
 my %csE = ();
+my %empty;
 for my $p1 (keys %p0){
   my $sec1 = 0;
   $sec1 = sHash ($p1, $split) if $split > 1;
@@ -49,7 +50,7 @@ for my $p1 (keys %p0){
       if (!defined $csE{$c}){
         my $secc = segB ($c, $split);
         if (defined $c2p{$secc}{$c}){
-          list1 ($c2p{$secc}{$c}, \%psE);
+          list1 ($c2p{$secc}{$c}, \%psE, \%empty);
         }
       }
       $csE{$c}++;
@@ -61,11 +62,18 @@ for my $p1 (keys %p0){
 
 my @na = keys %csE;
 my %csA = ();
+my %psA = ();
+my %pIn;
 while (<STDIN>){
-  chop();
-  %cs2 = ();
+  chop();  
   my ($p, @x) = split(/\;/, $_, -1);
+  $pIn{$p}++;
+
+}
+
+for my $p (keys %pIn){
   next if !defined $psE{$p};
+  %cs2 = ();
   my $sec = 0;
   my $n = 0;
   $sec = sHash ($p, $split) if $split > 1;
@@ -73,9 +81,30 @@ while (<STDIN>){
     $n = listA ($p2c{$sec}{$p}, \%cs2, \%csE, \%csA);
   }
   my @nb = keys %cs2;
-  print "$p;$n;$ARGV[0];$#na;$#nb\n" if $#nb >= 0;
+  print "0;$p;$n;$ARGV[0];$#na;$#nb\n" if $#nb >= 0;
 }
-
+for my $c (keys %csA){
+  my $sec = segB ($c, $split);
+  list1 ($c2p{$sec}{$c}, \%psA, \%psE);
+}
+my %csA1;
+for my $p (keys %pIn){
+  next if !defined $psA{$p};
+  %cs2 = ();
+  my $sec = 0;
+  my $n = 0;
+  $sec = sHash ($p, $split) if $split > 1;
+  if (defined $p2c{$sec}{$p}){
+    $n = listA ($p2c{$sec}{$p}, \%cs2, \%csA, \%csA1);
+  }
+  my @nb = keys %cs2;
+  print "1;$p;$n;$ARGV[0];$#na;$#nb\n" if $#nb >= 0;
+}
+my $n = 0;
+for my $c (keys %csA1){
+  $n ++ if !defined $csA{$c} && !defined $csE{$c};
+}
+print STDERR "ncsA1=$n\n";
 
 for my $sec (0..($split-1)){
   untie %{$p2c{$sec}};
@@ -90,7 +119,7 @@ sub listA {
     my $c = substr ($v, 20*$i, 20);
     if (defined $csE ->{$c}){
       $cs ->{$c}++;
-    }else{
+    }else{	    
       $csA ->{$c}++;
     }
   }
@@ -108,10 +137,10 @@ sub list {
 }
 
 sub list1 {
-  my ($v, $p) = @_;
+  my ($v, $p, $pE) = @_;
   my $v1 = safeDecomp ($v);
   my @ps = split(/\;/, $v1, -1);
-  for my $p0 (@ps) { $p ->{$p0}++; };
+  for my $p0 (@ps) { $p ->{$p0}++ if !defined $pE ->{$p0}; };
 }
 
 
