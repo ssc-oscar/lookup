@@ -83,10 +83,13 @@ for my $p (keys %pIn){
   my @nb = keys %cs2;
   print "0;$p;$n;$ARGV[0];$#na;$#nb\n" if $#nb >= 0;
 }
-print STDERR "done0\n";
+print STDERR "done ncsA=".(scalar(keys %csA))."\n";
+my $ndone = 0;
 for my $c (keys %csA){
   my $secc = segB ($c, $split);
   list1 ($c2p{$secc}{$c}, \%psA, \%psE) if defined $c2p{$secc}{$c};
+  $ndone ++;
+  print STDERR "$ndone npsA=".(scalar(keys %psA))."\n" if !($ndone%1000);
 }
 print STDERR "done npsA=".(scalar(keys %psA))."\n";
 my %csA1;
