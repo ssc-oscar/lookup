@@ -27,46 +27,53 @@ for my $sec (0..($split-1)){
       or die "cant open $fname\n";
 }
 
-my $p1 = "";
-$p1 = $ARGV[0] if defined $ARGV[0];
+my %p0;
+open A, "$ARGV[0]";
+while (<A>){
+  chop();
+  $p0{$_}++;
+}
 
-my $sec1 = 0;
 my %ps = ();
+my %psE = ();
 my %cs2 = ();
-$sec1 = sHash ($p1, $split) if $split > 1;
-if (defined $p2c{$sec1}{$p1}){
-  list ($p2c{$sec1}{$p1}, \%cs2);
-  my @cs3 = keys %cs2;
-  for my $c (@cs3){
-    my $secc = segB ($c, $split);
-    if (defined $c2p{$secc}{$c}){
-      for my $p (split(/\;/, safeDecomp ($c2p{$secc}{$c}))){
-        $ps{$p}++;
+my %csE = ();
+for my $p1 (keys %p0){
+  my $sec1 = 0;
+  $sec1 = sHash ($p1, $split) if $split > 1;
+  if (defined $p2c{$sec1}{$p1}){
+    list ($p2c{$sec1}{$p1}, \%{$cs2{$p1}}, \%csE);
+    my @cs3 = keys %{$cs2{$p1}};
+    #print STDERR "$#cs3\n";
+    for my $c (@cs3){
+      if (!defined $csE{$c}){
+        my $secc = segB ($c, $split);
+        if (defined $c2p{$secc}{$c}){
+          list1 ($c2p{$secc}{$c}, \%psE);
+        }
       }
+      $csE{$c}++;
     }
   }
+  my $ncs2 = scalar (keys %{$cs2{$p1}});
+  print STDERR "$p1;$ncs2;csE=".(scalar (keys %csE)).";psE=".(scalar (keys %psE))."\n";
 }
-my $ncs2 = scalar (keys %cs2);
-print STDERR "$p1;$ncs2;".(scalar(keys %ps))."\n";
 
+my @na = keys %csE;
+my %csA = ();
 while (<STDIN>){
   chop();
+  %cs2 = ();
   my ($p, @x) = split(/\;/, $_, -1);
-  next if !defined $ps{$p};
-
+  next if !defined $psE{$p};
   my $sec = 0;
+  my $n = 0;
   $sec = sHash ($p, $split) if $split > 1;
   if (defined $p2c{$sec}{$p}){
-    my %cs = ();
-    list ($p2c{$sec}{$p}, \%cs);
-    my @cs1 = keys %cs;
-    my $ncs = $#cs1+1;
-    my $shared = 0;
-    for my $c (@cs1){
-      $shared++ if defined $cs2{$c};
-    }
-    print "$p;$ncs;$p1;$ncs2;$shared\n";
+    $n = listA ($p2c{$sec}{$p}, \%cs2, \%csE, \%csA);
   }
+  my @nb = keys %cs2;
+  print "$p;$n;$ARGV[0];$#na;$#nb\n" if $#nb >= 0;
 }
 
 
@@ -75,13 +82,28 @@ for my $sec (0..($split-1)){
   untie %{$c2p{$sec}};
 }
 
-
-sub list {
-  my ($v, $cs) = @_;
+sub listA {
+  my ($v, $cs, $csE, $csA) = @_;
   my $ns = length($v)/20;
+  #print STDERR "$ns\n";
   for my $i (0..($ns-1)){
     my $c = substr ($v, 20*$i, 20);
-    $cs ->{$c}++;
+    if (defined $csE ->{$c}){
+      $cs ->{$c}++;
+    }else{
+      $csA ->{$c}++;
+    }
+  }
+  $ns;
+}
+
+sub list {
+  my ($v, $cs, $csE) = @_;
+  my $ns = length($v)/20;
+  #print STDERR "$ns\n";
+  for my $i (0..($ns-1)){
+    my $c = substr ($v, 20*$i, 20);
+    $cs ->{$c}++ if !defined $csE ->{$c};
   }
 }
 
