@@ -27,50 +27,44 @@ for my $sec (0..($split-1)){
       or die "cant open $fname\n";
 }
 
+my $p1 = "";
+$p1 = $ARGV[0] if defined $ARGV[0];
 
-
-while (<STDIN>){
-  chop();
-  my ($p, $p1) = split(/\;/, $_, -1);
-  #my $sec = (unpack "C", substr ($p, 0, 1))%$split;
+my $sec1 = 0;
+my %ps = ();
+my %cs2 = ();
+$sec1 = sHash ($p1, $split) if $split > 1;
+if (defined $p2c{$sec1}{$p1}){
+  list ($p2c{$sec1}{$p1}, \%cs2);
+  my @cs3 = keys %cs2;
+  for my $c (@cs3){
+    my $secc = segB ($c, $split);
+    if (defined $c2p{$secc}{$c}){
+      list1 ($c2p{$secc}{$c}, \%ps);
+    }
+  }
+}
+my $nps = scalar (keys %ps);
+print "$p1;$nps\n";
+my %ps1;
+my %cs = ();
+for my $p (keys %ps){
   my $sec = 0;
   $sec = sHash ($p, $split) if $split > 1;
-  #print "$sec;$p\n";
   if (defined $p2c{$sec}{$p}){
-    my %cs = ();
     list ($p2c{$sec}{$p}, \%cs);
-    my %ps = ();
-    my @cs1 = keys %cs;
-    my $ncs = $#cs1+1;
-    if (defined $p1){
-      my $sec1 = sHash ($p1, $split) if $split > 1;
-      if (defined $p2c{$sec1}{$p1}){
-	 my %cs2 = ();
-	 list ($p2c{$sec1}{$p1}, \%cs2);
-	 my $shared = 0;
-	 for my $c (@cs1){
-           $shared++ if defined $cs2{$c};
-	 }
-	 my $ncs2 = scalar(keys %cs2);
-	 print "$p;$ncs;$p1;$ncs2;$shared\n";
-      }
-      next;
-    }
-    for my $c (@cs1){
-      my $sc = (unpack "C", substr ($c, 0, 1))%32;
-      list1 ($c2p{$sc}{$c}, \%ps);
-    }
-    my @ps1 = keys %ps; 
-    my $np = $#ps1+1;
-    #print "$p;$np";
-    for my $p0 (@ps1) { print "$p;$ncs;$p0;$ps{$p0}\n";}
-    #print "\n";
-  }else{
-    print STDERR "no $p in $sec\n";
   }
-  
 }
-
+for my $c (keys %cs){
+  my $secc = segB ($c, $split);
+  if (defined $c2p{$secc}{$c}){
+    for my $p (split(/\;/, safeDecomp ($c2p{$secc}{$c}))){
+       $ps1{$p}++ if !defined $ps{$p};
+    }
+  }
+}
+my $nps1 = scalar (keys %ps1);
+print "$nps1\n";
 
 for my $sec (0..($split-1)){
   untie %{$p2c{$sec}};
