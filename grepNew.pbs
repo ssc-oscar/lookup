@@ -36,6 +36,7 @@ if test $LA = 'Lua'; then grepStr='\.lua;'; fi
 if test $LA = 'Sql'; then grepStr='\.(sql|sqllite|sqllite3|mysql);'; fi
 if test $LA = 'Lisp'; then grepStr='\.(el|lisp|elc);'; fi
 if test $LA = 'Fml'; then grepStr='\.(fs|fsi|ml|mli|hs|lhs|sml|v);'; fi #https://en.wikipedia.org/wiki/Proof_assistant
+if test $LA = 'jl'; then grepStr='\.jl;'; fi #https://en.wikipedia.org/wiki/Proof_assistant
 #.COB (Program Source)
 #.CBL (Program Source)
 #.PCO (Recompilation Required Source Code)
@@ -189,6 +190,41 @@ done
 wait
 echo c2ta$ver$LA.$j.gz
 
+
+fi
+if test $part = seconda; then
+
+# add time/author attributes (mesed up for all)
+for j in {0..31}
+do zcat c2p$ver$LA.$j.gz | join -t\; - <(zcat c2ta$ver$LA.$j.gz) | gzip > c2pta$ver$LA.$j.gz &
+done
+wait
+echo c2pta$ver$LA.$j.gz
+
+for j in {0..31}
+do zcat c2bi$ver$LA.$j.s | join -t\; - <(zcat c2pta$ver$LA.$j.gz) | gzip > c2bpta$ver$LA.$j.gz &
+done
+wait
+echo c2bpta$ver$LA.$j.gz
+
+for j in {0..31}
+do zcat c2pta$ver$LA.$j.gz | join -t\; - <(zcat c2bPkg$ver$LA.$j.s) | gzip > c2bptaPkg$ver$LA.$j.gz &
+done
+wait
+echo c2bptaPkg$ver$LA.$j.gz
+
+fi
+if test $part = seconda1; then
+
+for j in {0..31}
+do zcat c2pta$ver$LA.$j.gz | join -t\; - <(zcat c2bPkg$ver$LA.$j.s) | gzip > c2bptaPkg$ver$LA.$j.gz &
+done
+wait
+echo c2bptaPkg$ver$LA.$j.gz
+
+fi
+if test $part = second; then
+
 # map projects based on forks
 #zcat c2pFull$ver.forks | lsort $(($maxM*32))G -t\; -k1b,1 | join -t\; - <(zcat p$ver$LA.gz) | gzip > p$ver$LA.forks
 zcat c2pFull$ver.forks.s | join -t\; - <(zcat p$ver$LA.gz) | gzip > p$ver$LA.forks
@@ -214,8 +250,8 @@ done
 wait
 echo c2bPta$ver$LA.$j.gz
 
-fi
-if test $part = second; then
+#fi
+#if test $part = second; then
 
 #################################################################
 ##########################SECOND##################################
@@ -289,17 +325,17 @@ echo m2nP$ver$LA
 #if test $part = third; then
 
 # create summaries for the evolution of top modules
-zcat m2nP$ver$LA | lsort $(($maxM*32))G -t\; -rnk2 |gzip > m2nP$ver$LA.s
+zcat m2nP$ver$LA | lsort $(($maxM*5))G -t\; -rnk2 |gzip > m2nP$ver$LA.s
 echo m2nP$ver$LA.s
 
 zcat m2nP$ver$LA.s | cut -d\; -f1 | head -30 > mods.$ver$LA
 echo mods.$ver$LA
 
 for mod in $(cat mods.$ver$LA) 
-do (for j in {0..31}; do zcat c2bPtaPkg$ver$LA.$j.gz; done | grep -E ";$mod$|;$mod;" | cut -d\; -f2,3 | lsort ${maxM}G -t\; -k1,2 | awk -F\; '{ if (p!=$1) print $1";"int($2/3600/365.25/24*12)/12+1970;p=$1}' | gzip > $ver$LA.$mod) &
+do m1=$(echo $mod|sed 's|/|_|g;s|"||g;s|[()]||g'); (for j in {0..31}; do zcat c2bPtaPkg$ver$LA.$j.gz; done | grep -E ";$mod$|;$mod;" | cut -d\; -f2,3 | lsort ${maxM}G -t\; -k1,2 | awk -F\; '{ if (p!=$1) print $1";"int($2/3600/365.25/24*12)/12+1970;p=$1}' | gzip > $ver$LA.$m1) &
 done   
 wait
-echo $ver$LA.$mod
+echo $ver$LA.$m1
 
 fi
 

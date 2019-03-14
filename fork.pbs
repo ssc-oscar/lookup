@@ -19,8 +19,11 @@ done
 wait
 echo c2pFull$ver$j.p2p
 
+fi
+if test 'a' = 'a'; then
+
 for j in {0..31}
-do zcat c2pFull$ver$j.p2p | awk '{print "id;"$0}' | perl $HOME/lookup/connectExportSrt.perl c2pFull$ver$j &
+do zcat c2pFull$ver$j.p2p | perl $HOME/lookup/connectExportSrt.perl c2pFull$ver$j &
 done
 wait
 echo c2pFull$ver$j
@@ -45,7 +48,7 @@ echo c2pFull$ver.clones
 
 perl $HOME/lookup/connectImport.perl c2pFull$ver | gzip > c2pFull$ver.forks
 echo c2pFull$ver.forks
-zcat c2pFull$ver.forks | $HOME/bin/lsort 100G -t\; -k1b,1 > c2pFull$ver.forks.s
+zcat c2pFull$ver.forks | $HOME/bin/lsort 100G -t\; -k1b,1 | gzip > c2pFull$ver.forks.s
 echo c2pFull$ver.forks.s
 
 for i in {0..31}; do zcat p$ver$i.s; done | awk '{print $1";"$1}' | perl mp.perl 0 c2pFull$ver.forks | gzip > p$ver.map

@@ -1,0 +1,161 @@
+#PBS -N WHAT
+#PBS -A ACF-UTK0011
+#PBS -l feature=MACHINE
+#PBS -l partition=MACHINE
+#PBS -l nodes=1,walltime=07:50:00
+#PBS -j oe
+#PBS -S /bin/bash
+LD_LIBRARY_PATH=$HOME/lib:$HOME/lib64:$LD_LIBRARY_PATH
+c=/lustre/haven/user/audris/c2fb
+cd $c
+
+what=WHAT
+
+declare -A NN
+NN[s3]={00..11}
+NN[s2]={00..33}
+NN[s1]={00..99}
+NN[s4]={00..88}
+NN[s5]={00..41}
+NN[s]={00..51}
+NN[Inc20180810]={00..33}
+NN[se]="00-05 06 07 08-09 10 11 12-14 15-19 20-24 25-28 29-31 32-34 35-39 40-49 50-51"
+NN[s5m]={0..31}
+NN[s6a]={00..22}
+NN[s6b]={00..30}
+NN[s6c]={00..38}
+NN[s6d]={00..38}
+NN[s7]={0..31}
+NN[s8]={0..31}
+NN[s9]={0..31}
+NN[s10]={0..31}
+
+
+maxM=6G
+machine=MACHINE
+[[ $machine == monster ]] && maxM=29G
+[[ $machine == rho ]] && maxM=900M
+[[ $machine == sigma ]] && maxM=2900M
+
+
+what=WHAT
+n=$(eval echo "${NN[WHAT]}")
+
+if test "y" = "n"; then
+
+for i in $n
+do zcat s10.$i.c2fb $i.try.c2fb | cut -d\; -f1-4 | sed 's|;/|;|' |\
+   perl -I $HOME/lib/perl5 -I $HOME/lookup -e 'use cmt; while(<STDIN>){ ($c, @r) = split(/;/); print $_ if ! defined $badCmt{$c};}' | \
+   $HOME/bin/lsort $maxM -t\; -k1b,2 | gzip > ${what}.c2f.$i.s &
+done
+wait
+echo ${what}.c2f.$i.s
+
+fi 
+
+if test "y" = "n"; then
+
+for i in $n 
+do zcat ${what}.$i.c2fb | cut -d\; -f1-4 | sed 's|;/|;|' |\
+   perl -I $HOME/lib/perl5 -I $HOME/lookup -e 'use cmt; while(<STDIN>){ ($c, @r) = split(/;/); print $_ if ! defined $badCmt{$c};}' | \
+   $HOME/bin/lsort $maxM -t\; -k1b,2 | gzip > ${what}.c2f.$i.s &
+done
+wait
+echo ${what}.c2f.$i.s
+
+fi
+if test "y" = "n"; then
+
+for j in $n
+do zcat $what.c2f.$j.s | cut -d\; -f1,2,3 | perl -ane 'print if m|^[0-f]{40};[^;]+;|' | awk -F\; '{ print $2";"$1";"$3}' |\
+    perl -I $HOME/lib/perl5 -I $HOME/lookup $HOME/lookup/splitSecCh.perl $what.f2c.$j. 32 &
+done
+wait
+echo $what.f2c.$j.
+
+for j in $n
+do zcat $what.c2f.$j.s | cut -d\; -f1,2,3 | perl -ane 'print if m|;[0-f]{40}$|' | awk -F\; '{ print $3";"$1";"$2}' |\
+    perl $HOME/lookup/splitSec.perl $what.b2c.$j. 32 &
+done
+wait
+echo $what.b2c.$j.
+
+for j in $n
+  do for i in {0..31} 
+  do $HOME/bin/lsort $maxM -t\; -k1b,2 <(zcat $what.f2c.$j.$i.gz) | gzip > $what.f2c.$j.$i.s &
+  done
+  wait
+done
+echo $what.f2c.$j.$i.s
+
+for j in $n
+  do for i in {0..31}
+    do $HOME/bin/lsort $maxM -t\; -k1b,2 <(zcat $what.b2c.$j.$i.gz) | gzip > $what.b2c.$j.$i.s &
+  done
+  wait
+done
+echo $what.b2c.$j.$i.s
+
+fi
+if test "y" = "n"; then
+
+for j in {0..31}
+do str="$HOME/bin/lsort $maxM -t\; -k1b,2 --merge"
+   for i in $n
+   do str="$str <(zcat $what.f2c.$i.$j.s)"
+   done
+   eval $str | gzip > $what.f2c.$j.s &
+done
+wait
+echo $what.f2c.$j.s
+
+
+for j in {0..31}
+do str="$HOME/bin/lsort $maxM -t\; -k1b,2 --merge"
+   for i in $n
+   do str="$str <(zcat $what.b2c.$i.$j.s)"
+   done
+   eval $str | gzip > $what.b2c.$j.s &
+done
+wait
+echo $what.b2c.$j.s
+
+fi
+if test "y" = "n"; then
+
+#obtain secondary maps
+for j in {0..31}
+  do zcat $what.b2c.$j.s | cut -d\; -f1,3 | grep -v ';$' | lsort $maxM -t\; -k1b,2 -u | gzip > $what.b2f.$j.s &
+done
+wait
+
+for j in {0..31}
+  do zcat $what.f2c.$j.s | cut -d\; -f1,3 | grep -v ';$' | lsort $maxM -t\; -k1b,2 -u | gzip > $what.f2b.$j.s &
+done
+wait
+
+for j in {0..31}
+  do zcat $what.c2f.$j.s | cut -d\; -f1,3 | grep -v ';$' | lsort $maxM -t\; -k1b,2 -u | gzip > $what.c2b.$j.s &
+done
+wait
+
+fi
+if test "y" = "y"; then
+
+#merge old with new: no need to recreate old
+#for t in c2f b2f b2c c2b f2c f2b
+for t in b2c f2c f2b
+do
+  for j in {0..31};
+  do
+    $HOME/bin/lsort $maxM -t\; -k1b,2 --merge -u <(zcat ${t}FullM$j.s) <(zcat $what.$t.$j.s|cut -d\; -f1,2) | gzip > ${t}FullN$j.s &
+  done
+  wait
+  echo $t
+done
+
+fi
+
+
+
+
