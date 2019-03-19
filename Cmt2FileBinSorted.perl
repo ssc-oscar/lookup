@@ -1,41 +1,10 @@
-#!/usr/bin/perl -I /home/audris/lib64/perl5 -I /home/audris/lib/x86_64-linux-gnu/perl
+#!/usr/bin/perl -I /home/audris/lookup -I /home/audris/lib64/perl5 -I /home/audris/lib/x86_64-linux-gnu/perl
 use strict;
 use warnings;
 use Error qw(:try);
 use Compress::LZF;
 use TokyoCabinet;
-
-sub toHex { 
-        return unpack "H*", $_[0]; 
-} 
-
-sub fromHex { 
-        return pack "H*", $_[0]; 
-} 
-
-sub safeComp {
-  my $code = $_[0];
-  try {
-    my $codeC = compress ($code);
-    return $codeC;
-  } catch Error with {
-    my $ex = shift;
-    print STDERR "Error: $ex\n$code\n";
-    return "";
-  }
-}
-sub safeDecomp {
-  my $code = $_[0];
-  try {
-    my $codeC = decompress ($code);
-    return $codeC;
-  } catch Error with {
-    my $ex = shift;
-    print STDERR "Error: $ex\n$code\n";
-    return "";
-  }
-}
-
+use cmt;
 
 my (%tmp, %c2p, %c2p1);
 my $sec;
@@ -60,7 +29,7 @@ while (<STDIN>){
   chop();
   $lines ++;
   my ($hc, $f, $hb, $p) = split (/\;/, $_);
-  if ($hc !~ m|^[0-9a-f]{40}$|){
+  if ($hc !~ m|^[0-9a-f]{40}$|i || defined $badCmt{$hc}){
     print STDERR "bad sha:$_\n";
     next;
   }
