@@ -1,18 +1,10 @@
-#!/usr/bin/perl -I /home/audris/lib64/perl5
+#!/usr/bin/perl -I /home/audris/lookup -I /home/audris/lib64/perl5
 use strict;
 use warnings;
 use Error qw(:try);
 use Compress::LZF;
 use TokyoCabinet;
-
-sub toHex { 
-        return unpack "H*", $_[0]; 
-} 
-
-sub fromHex { 
-        return pack "H*", $_[0]; 
-} 
-
+use cmt;
 
 
 my (%tmp, %c2p, %c2p1);
@@ -38,12 +30,12 @@ while (<STDIN>){
   chop();
   $lines ++;
   my ($hc, $f, $hb, $p) = split (/\;/, $_);
-  if ($hc !~ m|^[0-9a-f]{40}$|){
+  if ($hc !~ m|^[0-9a-f]{40}$| || defined $badCmt{$hc} || defined $badBlob{$hc}){
     print STDERR "bad sha:$_\n";
     next;
   }    
   my $c = fromHex ($hc);
-  if ($hb !~ m|^[0-9a-f]{40}$|){
+  if ($hb !~ m|^[0-9a-f]{40}$| || defined $badCmt{$hb} || defined $badBlob{$hb}){
     print STDERR "bad sha:$_\n";
   }
   if ($c ne $cp && $cp ne ""){
