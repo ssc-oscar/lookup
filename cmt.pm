@@ -94,7 +94,18 @@ our %badCmt = (
 our %badBlob  = (
   "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391" => 7826798, #\n 
   "9daeafb9864cf43055ae93beb0afd6c7d144bfa4" => 1524056, #test\n
-  
+  "654d0bfe943437d43242325b1fbcff5f400d84ee" => 1000000, #MIT license
+  "869ac71cf7e4d72d9ab52f86d630c1c3f0c017ce" => 1000000, #K 14\nsvn:executable\nV 1\n*\nEND
+  "e7af2f77107d73046421ef56c4684cbfdd3c1e89" => 1000000, #MIT license
+  "68c5ddb060ea2e1f46c8fdffcda5826f3e462cba" => 1000000, #import { IconDefinition } from "@fortawesome/fontawesome-common-types";\ndeclare const iconDef: IconDefinition;\nexport = iconDef;
+  "cc4dba29d959a2da7b97f9edd3c7c91384b2ee5b" => 1000000, #language: node_js\nnode_js:\n  - "0.8"\n  - "0.10"
+  "ee27ba4b4412b0e4a05af5e3d8a005bc6681fdf3" => 1000000, #MIT license
+  "f5e8cc6f41f19b931ec27412706eb7114c649d93" => 1000000, #[private]
+  "19129e315fe593965a2fdd50ec0d1253bcbd2ece" => 1000000, #The ISC License
+  "3c3629e647f5ddf82548912e337bea9826b434af" => 1000000, #node_modules
+  "9ce06a81ea45b2883a6faf07a0d2136bb2a4e647" => 1000000, ## dummy
+  "5e9587e658c3c3c18ab62ebc908568efd1226aed" => 1000000, #K 13\nsvn:mime-type\nV 24\napplication/octet-stream\nEND
+
   "8b137891791fe96927ad78e64b0aad7bded08bdc" => 957235, #\n\n
   "de6be7945c6a59798eb0ace177df38b05e98c2f0" => 650111,   #"module ApplicationHelpe\nend\n"
   "573541ac9702dd3969c9bc859d2b91ec1f7e6e56" => 100000, # more than that "0\n"
