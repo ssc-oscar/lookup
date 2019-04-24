@@ -75,7 +75,7 @@ while(<STDIN>){
   chop();
   $rev = $_;
   next if length($rev) ne 40; 
-  if ($rev eq "3759c6529b44b636b845fb1c8a0f42c4d14d7150" || defined $badCmt{$rev}){
+  if (defined $badCmt{$rev}){
     print STDERR "nasty test commit $rev: ignoring\n";
     next;
   }   	

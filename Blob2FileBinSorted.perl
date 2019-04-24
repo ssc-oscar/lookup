@@ -22,39 +22,34 @@ for $sec (0..($nsec -1)){
 my $lines = 0;
 my $f0 = "";
 my $cnn = 0;
-my $nc = 0;
+my $nb = 0;
 my $doDump = 0;
-my $cp = "";
+my $bp = "";
 while (<STDIN>){
   chop();
   $lines ++;
   my ($hc, $f, $hb, $p) = split (/\;/, $_);
-  if ($hc !~ m|^[0-9a-f]{40}$|i || defined $badCmt{$hc}){
+  if ($hb !~ m|^[0-9a-f]{40}$|i || defined $badBlob{$hb}){
     print STDERR "bad sha:$_\n";
     next;
   }
-  my $c = fromHex ($hc);
+  my $b = fromHex ($hb);
   $f =~ s/;/SEMICOLON/g;
   $f =~ s|^/*||;
   next if $f eq "";
-  if ($c ne $cp && $cp ne ""){
-    $sec = (unpack "C", substr ($cp, 0, 1))%$nsec;
-    #if (defined $c2p{$sec}{$shap}){
-    #  print STDERR "input not sorted at $lines pref $hc followed by seen ".(toHex($cp)).";$p\n";     
-    #  for my $p0 (split(/\;/, safeDecomp($c2p{$sec}{$shap}), -1)){
-    #  $tmp{$p0}++;
-    #}
-    $nc ++;
+  if ($b ne $bp && $bp ne ""){
+    $sec = (unpack "C", substr ($bp, 0, 1))%$nsec;
+    $nb ++;
     my $ps = join ';', sort keys %tmp;
     my $psC = safeComp ($ps);
-    $c2p{$sec}{$cp} = $psC;
+    $c2p{$sec}{$bp} = $psC;
     %tmp = ();
     if ($doDump){
       dumpData ();
       $doDump = 0;
     }
   }  
-  $cp = $c;
+  $bp = $b;
   $tmp{$f}++;
   if (!($lines%500000000)){
     print STDERR "$lines done\n";
@@ -64,8 +59,8 @@ while (<STDIN>){
 
 my $ps = join ';', sort keys %tmp;
 my $psC = safeComp ($ps);
-$sec = (unpack "C", substr ($cp, 0, 1))%$nsec;
-$c2p1{$sec}{$cp} = $psC;
+$sec = (unpack "C", substr ($bp, 0, 1))%$nsec;
+$c2p1{$sec}{$bp} = $psC;
 dumpData ();
 
 
@@ -82,5 +77,5 @@ for $sec (0..($nsec -1)){
   untie %{$c2p{$sec}};
 }
 
-print STDERR "read $lines dumping $nc commits\n";
+print STDERR "read $lines dumping $nb blobs\n";
 
