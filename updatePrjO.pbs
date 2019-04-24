@@ -1,0 +1,94 @@
+#PBS -N c2pFullO
+#PBS -A ACF-UTK0011
+#PBS -l feature=MACHINE
+#PBS -l partition=MACHINE
+#PBS -l nodes=1,walltime=23:50:00
+#PBS -j oe
+#PBS -S /bin/bash
+LD_LIBRARY_PATH=$HOME/lib:$HOME/lib64:$LD_LIBRARY_PATH
+c=/lustre/haven/user/audris/basemaps
+cd $c
+
+ver=O
+pVer=N
+machine=MACHINE
+maxM=6000
+[[ $machine == monster ]] && maxM=30000
+[[ $machine == rho ]] && maxM=900
+[[ $machine == sigma ]] && maxM=2900
+
+if test 'a' = 'b'; then
+
+for j in {0..31}
+do  $HOME/bin/lsort ${maxM}M -t\; -k1b,2 --merge -u <(zcat c2pFull$pVer$j.s) <(zcat c2p$ver$j.s) | perl -ane 'print if m|^[0-f]{40};.|' | gzip > c2pFull$ver$j.s &
+done
+wait
+echo c2pFull$ver$j.s
+
+
+for j in {0..31}
+do  $HOME/bin/lsort ${maxM}M -t\; -k1b,2 --merge -u <(zcat p2cFull$pVer$j.s) <(zcat p2c$ver$j.s) | perl -ane 'print if m|^.+;[0-f]{40}$|' | gzip > p2cFull$ver$j.s &
+done
+wait
+echo p2cFull$ver$j.s
+
+for j in {0..31}
+do  zcat p2cFull$ver$j.s | cut -d\; -f1 | uniq | gzip > p$ver$j.s &
+done
+wait
+echo p$ver$j.s
+
+
+fi
+if test 'a' = 'a'; then
+
+
+for j in {0..31}
+do zcat c2pFull$ver$j.s | join -t\; - <(zcat c2taF$ver.$j.s) | awk -F\; '{ print $4";"$2}' | uniq | $HOME/bin/lsort ${maxM}M -t\; -k1b,2 -u | gzip > a2p$ver$j.s &
+done  
+wait
+echo a2p$ver$j.s
+
+
+for j in {0..31}
+do zcat a2p$ver$j.s | perl -I$HOME/lookup -I $HOME/lib/perl5 $HOME/lookup/splitSecCh.perl a2p$ver.$j. 32 &
+done
+wait
+echo a2p$ver.$j.
+
+for j in {0..31}
+do str="$HOME/bin/lsort ${maxM}M -t\; -k1b,2 --merge -u"
+  for i in {0..31} 
+  do  str="$str <(zcat a2p$ver.$i.$j.gz)"
+  done
+  eval $str | gzip > a2p$ver.$j.gz &
+done
+wait
+echo a2p$ver.$j.gz
+
+for j in {0..31}
+do zcat a2p$ver$j.s |  awk -F\; '{ print $2";"$1}' | perl -I$HOME/lookup -I $HOME/lib/perl5 $HOME/lookup/splitSecCh.perl p2a$ver.$j. 32 &
+done
+wait
+echo p2a$ver.$j.
+
+for j in {0..31}
+do for i in {0..31}
+  do $HOME/bin/lsort ${maxM}M -t\; -k1b,2 <(zcat p2a$ver.$i.$j.gz) | gzip > p2a$ver.$i.$j.s &
+  done
+  wait
+done
+echo p2a$ver.$i.$j.s
+
+for j in {0..31}
+do str="$HOME/bin/lsort ${maxM}M -t\; -k1b,2 --merge -u"
+  for i in {0..31}
+  do  str="$str <(zcat p2a$ver.$i.$j.gz)"
+  done
+  eval $str | gzip > p2a$ver.$j.gz &
+done
+wait
+echo p2a$ver.$j.gz
+
+fi
+
