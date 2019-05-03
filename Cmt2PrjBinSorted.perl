@@ -55,7 +55,7 @@ while (<STDIN>){
     if (length ($psC) > 100000000*20){
         my $cpH = toHex ($cp);
         print STDERR "too large for $cpH: ".(length($psC))."\n";
-        open A, "$fname.large.$cpH";
+        open A, ">$fname.large.$cpH";
         print A $psC;
         close (A);
     }else{
