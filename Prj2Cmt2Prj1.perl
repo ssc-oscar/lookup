@@ -68,7 +68,6 @@ while (<STDIN>){
   chop();  
   my ($p, @x) = split(/\;/, $_, -1);
   $pIn{$p}++;
-
 }
 
 for my $p (keys %pIn){
@@ -89,7 +88,7 @@ for my $c (keys %csA){
   my $secc = segB ($c, $split);
   list1 ($c2p{$secc}{$c}, \%psA, \%psE) if defined $c2p{$secc}{$c};
   $ndone ++;
-  print STDERR "$ndone npsA=".(scalar(keys %psA))."\n" if !($ndone%1000);
+  print STDERR "$ndone npsA=".(scalar(keys %psA))."\n" if !($ndone%100000);
 }
 print STDERR "done npsA=".(scalar(keys %psA))."\n";
 my %csA1;
@@ -103,6 +102,7 @@ for my $p (keys %pIn){
     $n = listA ($p2c{$sec}{$p}, \%cs2, \%csA, \%csA1);
   }
   my @nb = keys %cs2;
+  my @na = keys %csA1;
   print "1;$p;$n;$ARGV[0];$#na;$#nb\n" if $#nb >= 0;
 }
 print STDERR "done1\n";

@@ -32,30 +32,84 @@ $p1 = $ARGV[0] if defined $ARGV[0];
 
 my $sec1 = 0;
 my %ps = ();
-my %cs2 = ();
+my %cs0 = ();
+my %csE = ();
+my %psE = ();
+my $nps = 0;
 $sec1 = sHash ($p1, $split) if $split > 1;
+$psE{$p1}++;
 if (defined $p2c{$sec1}{$p1}){
-  list ($p2c{$sec1}{$p1}, \%cs2);
-  my @cs3 = keys %cs2;
+  list ($p2c{$sec1}{$p1}, \%cs0, \%csE);
+  my @cs3 = keys %cs0;
   for my $c (@cs3){
+    $csE{$c}++;
     my $secc = segB ($c, $split);
     if (defined $c2p{$secc}{$c}){
-      list1 ($c2p{$secc}{$c}, \%ps);
+      list1 ($c2p{$secc}{$c}, \%ps, \%psE);
     }
+    my $ch= toHex($c);
+    my $n = scalar (keys %ps);
+    print "0;$p1;$ch;$n".($n-$nps)."\n" if $n > $nps;
+    $nps = $n;
   }
 }
-my $nps = scalar (keys %ps);
-print "$p1;$nps\n";
+
+$nps = scalar (keys %ps);
+my $ncs0 = scalar (keys %cs0);
+print STDERR "$p1;nps=$nps;ncs0=$ncs0\n";
 my %ps1;
-my %cs = ();
+my %cs1 = ();
 for my $p (keys %ps){
+  $psE{$p}++;
   my $sec = 0;
   $sec = sHash ($p, $split) if $split > 1;
   if (defined $p2c{$sec}{$p}){
-    list ($p2c{$sec}{$p}, \%cs);
+    list ($p2c{$sec}{$p}, \%cs1, \%csE);
   }
 }
-for my $c (keys %cs){
+my $nps1 = scalar (keys %ps1);
+for my $c (keys %cs1){
+  $csE{$c}++;
+  my $secc = segB ($c, $split);
+  if (defined $c2p{$secc}{$c}){
+    list1 ($c2p{$secc}{$c}, \%ps1, \%psE);
+  }
+  my $n = scalar (keys %ps1);  
+  my $ch= toHex($c);
+  print "1;$p1;$ch;$n".($n-$nps1)."\n" if $n > $nps1;
+  $nps1 = $n;
+}
+$nps1 = scalar (keys %ps1);
+my $ncs1 = scalar (keys %cs1);
+print STDERR "$p1;nps=$nps;ncs0=$ncs0;nps1=$nps1;ncs1=$ncs1\n";
+
+my %cs2 = ();
+for my $p (keys %ps1){ 
+  $ps{$p}++;
+  my $sec = 0;
+  $sec = sHash ($p, $split) if $split > 1;
+  list ($p2c{$sec}{$p}, \%cs2, \%csE);
+  my %psp = ();
+  for my $c (keys %cs2){
+    $csE{$c}++;
+    my $secc = segB ($c, $split);
+    if (defined $c2p{$secc}{$c}){
+      list1 ($c2p{$secc}{$c}, \%psp, \%psE);
+    }
+  }
+  my $npsp = scalar (keys %psp);
+  print "a;$p1;$p;$npsp\n";
+  for my $pa (keys %psp){ $psE{$pa}++};
+  %cs2 = ();
+}
+my $npsE = scalar(keys %psE);
+my $ncsE = scalar(keys %csE);
+print STDERR "npsE=$npsE;ncsE=$ncsE\n";
+
+exit();
+my %ps2;
+%ps1 = ();
+for my $c (keys %cs2){
   my $secc = segB ($c, $split);
   if (defined $c2p{$secc}{$c}){
     for my $p (split(/\;/, safeDecomp ($c2p{$secc}{$c}))){
@@ -63,8 +117,11 @@ for my $c (keys %cs){
     }
   }
 }
-my $nps1 = scalar (keys %ps1);
-print "$nps1\n";
+my $nps2 = scalar (keys %ps1);
+my $ncs2 = scalar (keys %cs2);
+print STDERR "$p1;$nps;$ncs0;$nps1;$ncs1\;$ncs2\n";
+
+
 
 for my $sec (0..($split-1)){
   untie %{$p2c{$sec}};
@@ -73,11 +130,11 @@ for my $sec (0..($split-1)){
 
 
 sub list {
-  my ($v, $cs) = @_;
+  my ($v, $cs, $csE) = @_;
   my $ns = length($v)/20;
   for my $i (0..($ns-1)){
     my $c = substr ($v, 20*$i, 20);
-    $cs ->{$c}++;
+    $cs ->{$c}++ if !defined $csE ->{$c};
   }
 }
 
