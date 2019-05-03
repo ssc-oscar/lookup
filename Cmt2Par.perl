@@ -1,4 +1,4 @@
-#!/usr/bin/perl -I /home/audris/lib64/perl5 -I /da3_data/lookup
+#!/usr/bin/perl -I /home/audris/lib64/perl5 -I /data/lookup -I /home/audris/lib/x86_64-linux-gnu/perl
 use strict;
 use warnings;
 use Error qw(:try);
@@ -23,19 +23,16 @@ sub extrPar {
 my $part = 0;
 $part = $ARGV[0] if defined $ARGV[0];
 
-my (%c2cc, %c2pc);
-for my $s (0..31){
-  tie %{$c2cc{$s}}, "TokyoCabinet::HDB", "/fast/All.sha1c/c2cc.$s.tch", TokyoCabinet::HDB::OREADER,
-        16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
-     or die "cant /fast/All.sha1c/c2cc.$s.tch\n";
-}
-tie %c2pc, "TokyoCabinet::HDB", "c2pc.$part.tch", TokyoCabinet::HDB::OWRITER | TokyoCabinet::HDB::OCREAT
-     or die "cant open c2pc.$part.tch\n";
+my (%c2pc);
+
+tie %c2pc, "TokyoCabinet::HDB", "/fast/c2pcO.$part.tch", TokyoCabinet::HDB::OWRITER | TokyoCabinet::HDB::OCREAT
+     or die "cant open /fast/c2pcO.$part.tch\n";
 
 my (%c2p);
 my $sections = 128;
 my $fbase="/data/All.blobs/commit_";
-for my $s ($part){
+
+for my $s ($part, $part + 32, $part + 64, $part + 96){
   print STDERR "reading $s\n";
   open A, "$fbase$s.idx";
   open FD, "$fbase$s.bin";
@@ -45,13 +42,9 @@ for my $s ($part){
     my ($nn, $of, $len, $hash) = split (/\;/, $_, -1);
     my $h = fromHex ($hash);
     my $sec = (unpack "C", substr ($h, 0, 1)) % 32;
-    if (!defined $c2cc{$sec}{$h}){
-      print "$hash\n"; #no child
-    } 
-    # seek (FD, $of, 0);
+    print STDERR "problem $sec $part\n" if $sec != $part;
     my $codeC = "";
     my $rl = read (FD, $codeC, $len);
-
     my ($parent) = extrPar ($codeC);
     if ($parent eq ""){
       print "$hash\n"; #no parent

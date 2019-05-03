@@ -26,7 +26,6 @@ for my $sec (0..($split-1)){
          16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
       or die "cant open $fname\n";
 }
-
 my %badC;
 open A, "zcat largeCmt|";
 while (<A>){
@@ -41,15 +40,14 @@ while (<A>){
   $badC{$c}++;
 }
 
-
 my %p0;
 open A, "$ARGV[0]";
 while (<A>){
   chop();
   $p0{$_}++;
 }
-
-
+my %pc = ();
+my %cp = ();
 my %ps = ();
 my %psE = ();
 my %cs2 = ();
@@ -59,22 +57,68 @@ for my $p1 (keys %p0){
   my $sec1 = 0;
   $sec1 = sHash ($p1, $split);
   if (defined $p2c{$sec1}{$p1}){
-    list ($p2c{$sec1}{$p1}, \%{$cs2{$p1}}, \%csE);
-    my @cs3 = keys %{$cs2{$p1}};
-    #print STDERR "$#cs3\n";
-    for my $c (@cs3){
-      if (!defined $csE{$c}){
-        my $secc = segB ($c, $split);
-        if (defined $c2p{$secc}{$c}){
-          list1 ($c2p{$secc}{$c}, \%psE, \%empty);
+    list ($p2c{$sec1}{$p1}, \%{$pc{$p1}}, \%empty);
+    for my $c (keys %{$pc{$p1}}) { $csE{$c}++};
+  }
+}
+print STDERR "ncsE=".(scalar(keys %csE))."\n";
+
+for my $c (keys %csE){
+  my $secc = segB ($c, $split);
+  if (defined $c2p{$secc}{$c}){
+    list1 ($c2p{$secc}{$c}, \%{$cp{$c}}, \%empty);
+    for my $p (keys %{$cp{$c}}) { $psE{$p}++};
+  }
+}
+print STDERR "npsE=".(scalar(keys %psE))."\n";
+
+sub diff {
+  my $p1 = $_[0];
+  my $n = 0;
+  my $np = 0;
+  
+  my %extra = ();
+  for my $c (keys %{$pc{$p1}}){
+    my @ps = keys %{$cp{$c}};
+    my $nn = 0;
+    for my $p (@ps){
+      if ($p ne $p1){
+        if (!defined $p0{$p}){
+	  $extra{$p}++;
+	} else {
+	  $nn++;
         }
       }
-      $csE{$c}++;
     }
+    $n ++ if $nn == 0;
   }
-  my $ncs2 = scalar (keys %{$cs2{$p1}});
-  print STDERR "$p1;$ncs2;csE=".(scalar (keys %csE)).";psE=".(scalar (keys %psE))."\n";
+  ($n, scalar (keys %extra));
+} 
+
+for my $p1 (keys %p0){
+  my ($dC, $dP) = diff ($p1);
+  print "$p1;$dC;$dP\n";
 }
+exit();
+
+for my $p1 (keys %p0){
+  my %psL = ();
+  for my $c (keys %{$pc{$p1}}){
+    if (!defined $csE{$c}){
+      my $secc = segB ($c, $split);
+       if (defined $c2p{$secc}{$c}){
+         list1 ($c2p{$secc}{$c}, \%psL, \%psE);
+       }
+     }
+     $csE{$c}++;
+   }
+   my $delta = scalar (keys %psL);
+    for my $p (keys %psL){ $psE{$p}++; }
+    my $npsE = scalar (keys %psE);	
+    #my $ncs2 = scalar (@cs3);
+    #print STDERR "$p1;uCs=$ncs2;uPs=$delta;csE=".(scalar (keys %csE)).";psE=$npsE\n";
+  }
+  #}
 
 my @na = keys %csE;
 my %csA = ();
@@ -99,6 +143,7 @@ for my $p (keys %pIn){
   my @nb = keys %cs2;
   print "0;$p;$n;$ARGV[0];$#na;$#nb\n" if $#nb >= 0;
 }
+
 print STDERR "done ncsA=".(scalar(keys %csA))."\n";
 my $ndone = 0;
 for my $c (keys %csA){
@@ -164,6 +209,7 @@ sub list1 {
   my ($v, $p, $pE) = @_;
   my $v1 = safeDecomp ($v);
   my @ps = split(/\;/, $v1, -1);
+  next if $#ps <= 0;
   for my $p0 (@ps) { $p ->{$p0}++ if !defined $pE ->{$p0}; };
 }
 
