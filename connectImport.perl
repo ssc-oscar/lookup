@@ -10,6 +10,7 @@ while(<A>){
 close (A);
 open B, "gunzip < $ARGV[0].clones|";
 
+print STDERR "$num2f[376508]\n";
 
 my $cn = "";
 my %cluster = ();
