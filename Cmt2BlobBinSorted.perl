@@ -50,7 +50,7 @@ while (<STDIN>){
     if (length($bs) >=  100000000*20){
       my $cpH = toHex ($cp);
       print STDERR "too large for $cpH: ".(length($bs))."\n";
-      open A, "$fname.large.$cpH";
+      open A, ">$fname.large.$cpH";
       print A $bs;
       close A;
     }else{
