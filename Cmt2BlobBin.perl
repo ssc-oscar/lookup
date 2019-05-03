@@ -10,7 +10,7 @@ use cmt;
 
 my %b2c;
 my $sec;
-my $nsec = 16;
+my $nsec = 32;
 $nsec = $ARGV[1] if defined $ARGV[1];
 
 for $sec (0..($nsec -1)){
