@@ -46,7 +46,7 @@ while (<STDIN>){
       #if (length($cs) >= 108894657*20){
       if (length($cs) >=  100000000*20){
         print STDERR "too large for $p1: ".(length($cs))."\n";
-        my $pH = toHex(sHashV ($p1));
+        my $pH = sprintf "%.8x", sHashV ($p1);
         open A, ">$fname.large.$pH";
         print A $cs;
         close A;
@@ -68,7 +68,7 @@ while (my ($p1, $v) = each %tmp){
   my $cs = join '', sort keys %{$v};
   if (length($cs) >= 100000000*20){
     print STDERR "too large for $p1: ".(length($cs))."\n";
-    my $pH = toHex (sHashV ($p1));
+    my $pH = sprintf "%.8x", sHashV ($p1);
     open A, ">$fname.large.$pH";
     print A $cs;
     close A;
