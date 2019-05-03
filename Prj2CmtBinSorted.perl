@@ -1,41 +1,10 @@
-#!/usr/bin/perl -I /home/audris/lib64/perl5
+#!/usr/bin/perl -I /home/audris/lookup -I /home/audris/lib64/perl5
 use strict;
 use warnings;
 use Error qw(:try);
 use Compress::LZF;
 use TokyoCabinet;
-
-sub toHex { 
-        return unpack "H*", $_[0]; 
-} 
-
-sub fromHex { 
-        return pack "H*", $_[0]; 
-} 
-
-sub safeComp {
-  my $code = $_[0];
-  try {
-    my $codeC = compress ($code);
-    return $codeC;
-  } catch Error with {
-    my $ex = shift;
-    print STDERR "Error: $ex\n$code\n";
-    return "";
-  }
-}
-sub safeDecomp {
-  my $code = $_[0];
-  try {
-    my $codeC = decompress ($code);
-    return $codeC;
-  } catch Error with {
-    my $ex = shift;
-    print STDERR "Error: $ex\n$code\n";
-    return "";
-  }
-}
-
+use cmt;
 
 my (%tmp, %c2p, %c2p1);
 
@@ -74,7 +43,16 @@ while (<STDIN>){
     $nc ++;
     while (my ($p1, $v) = each %tmp){
       my $cs = join '', sort keys %{$v};
-      $c2p{$p1} = $cs;
+      #if (length($cs) >= 108894657*20){
+      if (length($cs) >=  100000000*20){
+        print STDERR "too large for $p1: ".(length($cs))."\n";
+        my $pH = toHex(sHashV ($p1));
+        open A, "$fname.large.$pH";
+        print A $cs;
+        close A;
+      }else{
+        $c2p{$p1} = $cs;
+      }
     }
     %tmp = ();
     $doDump = 0;
@@ -88,7 +66,15 @@ while (<STDIN>){
 }
 while (my ($p1, $v) = each %tmp){
   my $cs = join '', sort keys %{$v};
-  $c2p{$p1} = $cs;
+  if (length($cs) >= 100000000*20){
+    print STDERR "too large for $p1: ".(length($cs))."\n";
+    my $pH = toHex (sHashV ($p1));
+    open A, "$fname.large.$pH";
+    print A $cs;
+    close A;
+  }else{
+    $c2p{$p1} = $cs;
+  }
 }
 untie %c2p;
 

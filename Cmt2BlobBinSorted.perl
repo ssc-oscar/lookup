@@ -11,9 +11,9 @@ my (%tmp, %c2p, %c2p1);
 my $sec;
 my $nsec = 8;
 $nsec = $ARGV[1] + 0 if defined $ARGV[1];
-
+my $fname = "$ARGV[0]";
 for $sec (0..($nsec -1)){
-  my $fname = "$ARGV[0].$sec.tch";
+  $fname = "$ARGV[0].$sec.tch";
   $fname = $ARGV[0] if $nsec == 1;
   tie %{$c2p{$sec}}, "TokyoCabinet::HDB", "$fname", TokyoCabinet::HDB::OWRITER | TokyoCabinet::HDB::OCREAT,   
       16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
@@ -30,13 +30,14 @@ while (<STDIN>){
   chop();
   $lines ++;
   my ($hc, $f, $hb, $p) = split (/\;/, $_);
-  if ($hc !~ m|^[0-9a-f]{40}$| || defined $badCmt{$hc} || defined $badBlob{$hc}){
-    print STDERR "bad sha:$_\n";
+  if ($hc !~ m|^[0-9a-f]{40}$|){ # || defined $badCmt{$hc} || defined $badBlob{$hc}){
+    print STDERR "bad c sha:$_\n";
     next;
   }    
   my $c = fromHex ($hc);
-  if ($hb !~ m|^[0-9a-f]{40}$| || defined $badCmt{$hb} || defined $badBlob{$hb}){
-    print STDERR "bad sha:$_\n";
+
+  if ($hb !~ m|^[0-9a-f]{40}$|){ # these are on the right side: should be ok || defined $badCmt{$hb} || defined $badBlob{$hb}){
+    print STDERR "bad b sha:$_\n";
   }
   if ($c ne $cp && $cp ne ""){
     $sec = (unpack "C", substr ($cp, 0, 1))%$nsec;
@@ -46,7 +47,15 @@ while (<STDIN>){
     #}
     $nc ++;
     my $bs = join '', sort keys %tmp;
-    $c2p1{$sec}{$cp} = $bs;
+    if (length($bs) >=  100000000*20){
+      my $cpH = toHex ($cp);
+      print STDERR "too large for $cpH: ".(length($bs))."\n";
+      open A, "$fname.large.$cpH";
+      print A $bs;
+      close A;
+    }else{
+      $c2p1{$sec}{$cp} = $bs;
+    }
     %tmp = ();
     if ($doDump){
       dumpData ();
@@ -64,6 +73,8 @@ while (<STDIN>){
 
 my $bs = join '', sort keys %tmp;
 $sec = (unpack "C", substr ($cp, 0, 1))%$nsec;
+
+#do size check as above
 $c2p1{$sec}{$cp} = $bs;
 dumpData ();
 

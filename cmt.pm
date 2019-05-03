@@ -6,7 +6,7 @@ use Compress::LZF;
 
 require Exporter;
 our @ISA = qw (Exporter);
-our @EXPORT = qw(%badCmt %badBlob %badTree splitSignature segB segH signature_error contains_angle_brackets extract_trimmed git_signature_parse extrCmt getTime cleanCmt safeDecomp safeComp toHex fromHex sHash);
+our @EXPORT = qw(%badCmt %badBlob %badTree splitSignature segB segH signature_error contains_angle_brackets extract_trimmed git_signature_parse extrCmt getTime cleanCmt safeDecomp safeComp toHex fromHex sHash sHashV);
 use vars qw(@ISA);
 
 our %badCmt = (
@@ -87,6 +87,7 @@ our %badCmt = (
   "dbe1fe4b27d9f381b3db94a1602e8a039cd4c0ef" => 909063, # tons of files
   "8ca6512ce8b15ddaf67c1a1a84b5ed837041b319" => 909063, # tons of files
   "7c1f7ccca7d02522a07a3249dd002af1eec824f5" => 900348, # tons of files
+  #719614 0e05305287c9697ecea4e32e6b097a96eba631f5
 );
 
 
@@ -219,6 +220,10 @@ sub sHash {
   #  otherwise use % $nseg
   my ($v, $nseg) = @_;
   Digest::FNV::XS::fnv1a_32 ($v) & ($nseg - 1);
+}
+sub sHashV {
+  my $v = $_[0];
+  Digest::FNV::XS::fnv1a_32 ($v);
 }
 
 sub toHex {
