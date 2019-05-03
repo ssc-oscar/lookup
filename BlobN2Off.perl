@@ -23,7 +23,7 @@ my $fbasei ="/data/All.blobs/blob_";
 my (%fhoso);
 #for my $sec (0 .. ($sections-1)){
 my $sec = $ARGV[0];
-my $pre = "/fast1";
+my $pre = "/fast";
 tie %{$fhoso{$sec}}, "TokyoCabinet::HDB", "$pre/${fbaseo}$sec.tch", TokyoCabinet::HDB::OWRITER | TokyoCabinet::HDB::OCREAT,
       16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
    or die "cant open $pre/$fbaseo$sec.tch\n";

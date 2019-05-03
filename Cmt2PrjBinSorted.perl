@@ -1,41 +1,10 @@
-#!/usr/bin/perl -I /home/audris/lib64/perl5
+#!/usr/bin/perl -I  /home/audris/lookup -I /home/audris/lib64/perl5
 use strict;
 use warnings;
 use Error qw(:try);
 use Compress::LZF;
 use TokyoCabinet;
-
-sub toHex { 
-        return unpack "H*", $_[0]; 
-} 
-
-sub fromHex { 
-        return pack "H*", $_[0]; 
-} 
-
-sub safeComp {
-  my $code = $_[0];
-  try {
-    my $codeC = compress ($code);
-    return $codeC;
-  } catch Error with {
-    my $ex = shift;
-    print STDERR "Error: $ex\n$code\n";
-    return "";
-  }
-}
-sub safeDecomp {
-  my $code = $_[0];
-  try {
-    my $codeC = decompress ($code);
-    return $codeC;
-  } catch Error with {
-    my $ex = shift;
-    print STDERR "Error: $ex\n$code\n";
-    return "";
-  }
-}
-
+use cmt;
 
 my (%tmp, %c2p, %c2p1);
 my $sec;
@@ -83,7 +52,15 @@ while (<STDIN>){
     $nc ++;
     my $ps = join ';', sort keys %tmp;
     my $psC = safeComp ($ps);
-    $c2p{$sec}{$cp} = $psC;
+    if (length ($psC) > 100000000*20){
+        my $cpH = toHex ($cp);
+        print STDERR "too large for $cpH: ".(length($psC))."\n";
+        open A, "$fname.large.$cpH";
+        print A $psC;
+        close (A);
+    }else{
+      $c2p{$sec}{$cp} = $psC;
+    }
     %tmp = ();
     if ($doDump){
       dumpData ();
