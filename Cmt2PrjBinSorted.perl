@@ -52,15 +52,7 @@ while (<STDIN>){
     $nc ++;
     my $ps = join ';', sort keys %tmp;
     my $psC = safeComp ($ps);
-    if (length ($psC) > 100000000*20){
-        my $cpH = toHex ($cp);
-        print STDERR "too large for $cpH: ".(length($psC))."\n";
-        open A, ">$fname.large.$cpH";
-        print A $psC;
-        close (A);
-    }else{
-      $c2p{$sec}{$cp} = $psC;
-    }
+    large ($psC, $cp);
     %tmp = ();
     if ($doDump){
       dumpData ();
@@ -78,8 +70,21 @@ while (<STDIN>){
 my $ps = join ';', sort keys %tmp;
 my $psC = safeComp ($ps);
 $sec = (unpack "C", substr ($cp, 0, 1))%$nsec;
-$c2p1{$sec}{$cp} = $psC;
+large($psC, $cp);
 dumpData ();
+
+sub large {
+  my ($psC, $cp) = @_;
+  if (length ($psC) > 10000000*20){
+    my $cpH = toHex ($cp);
+    print STDERR "too large for $cpH: ".(length($psC))."\n";
+    open A, ">$fname.large.$cpH";
+    print A $psC;
+    close (A);
+  }else{
+    $c2p{$sec}{$cp} = $psC;
+  } 
+}
 
 
 sub dumpData {
