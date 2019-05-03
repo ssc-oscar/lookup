@@ -59,7 +59,7 @@ for my $c (keys %cs){
   my $secc = segB ($c, $split);
   if (defined $c2p{$secc}{$c}){
     for my $p (split(/\;/, safeDecomp ($c2p{$secc}{$c}))){
-       $ps1{$p}++ if !defined $ps{$p};
+      $ps1{$p}++ if !defined $ps{$p};
     }
   }
 }
