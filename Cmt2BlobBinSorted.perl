@@ -70,7 +70,7 @@ dumpData ();
 
 sub large {
   my ($bs, $cp) = @_;
-  if (length ($psC) > 10000000*20){
+  if (length ($bs) > 10000000*20){
     my $cpH = toHex ($cp);
     print STDERR "too large for $cpH: ".(length($bs))."\n";
     open A, ">$fname.large.$cpH";
