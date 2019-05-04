@@ -30,7 +30,7 @@ while (<STDIN>){
     while (my ($p1, $v) = each %tmp){
       my $fs = join ';', sort keys %{$v};
       my $fsC = safeComp ($fs);
-      if (length ($fsC) > 100000000*20){
+      if (length ($fsC) > 10000000*20){
         print STDERR "too large for $p1: ".(length($fsC))."\n";
         my $pH = printf "%.8x", sHashV ($p1);
         open A, ">$fname.large.$pH";
@@ -50,10 +50,11 @@ while (<STDIN>){
     $doDump = 1;
   }
 }
+
 while (my ($p1, $v) = each %tmp){
   my $fs = join ';', sort keys %{$v};
   my $fsC = safeComp ($fs);
-  if (length ($fsC) > 100000000*20){
+  if (length ($fsC) > 10000000*20){
     print STDERR "too large for $p1: ".(length($fsC))."\n";
     my $pH = printf "%.8x", sHashV ($p1);
     open A, ">$fname.large.$pH";
