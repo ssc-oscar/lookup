@@ -17,42 +17,60 @@ sub fromHex {
 
 my $split = 32;
 
-my (%c2h, %c2pc);
-my $sec = $ARGV[1];
+my (%c2h, %c2cc);
+my $sec = $ARGV[0];
 
-my $fname = "$ARGV[0]";
-tie %{$c2h{$sec}}, "TokyoCabinet::HDB", "$fname", TokyoCabinet::HDB::OWRITER | TokyoCabinet::HDB::OCREAT,
+for my $s (0..($split-1)){
+  tie %{$c2h{$sec}}, "TokyoCabinet::HDB", "/fast/c2hFullO.$s.tch", TokyoCabinet::HDB::OWRITER | TokyoCabinet::HDB::OCREAT,
     16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
-    or die "cant open $fname\n";
+    or die "cant open /fast/c2hFullO.$s.tch\n";
+}
 
 for my $s (0..($split-1)){ 
-  tie %{$c2pc{$s}}, "TokyoCabinet::HDB", "/fast/c2pcO.$s.tch", TokyoCabinet::HDB::OREADER,
+  tie %{$c2cc{$s}}, "TokyoCabinet::HDB", "/fast/c2ccFullO.$s.tch", TokyoCabinet::HDB::OREADER,
       16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
-     or die "cant open /da4_data/basemaps/c2pcO.$s.tch\n";
+     or die "cant open /fast/c2ccFullO.$s.tch\n";
 }
 
 my $i = 0;
-while (my ($c, $v) = each %{$c2pc{$sec}}){
-  my $h = findHead ($v);
-  $c2h{$sec}{$c} = $h;
-  #print "".(toHex($c)).";".(toHex ($h))."\n";
-  #$i += 1;
-  #last if $i > 5;
+while (my ($c, $v) = each %{$c2cc{$sec}}){
+  if (!defined $c2h{$sec}{$c}){
+    my ($ch, $h, $d) = findHead (toHex ($c), $v, 0);
+    my $pd = pack 'w', $d;
+    $c2h{$sec}{$c} = $h.$pd;
+    print "$ch;".(toHex ($h)).";depth=$d\n";
+  }
 }
 
-untie %{$c2h{$sec}};
-for my $s (0..($split-1)){ untie %{$c2pc{$s}} };
+for my $s (0..($split-1)){ 
+  untie %{$c2h{$s}};
+  untie %{$c2cc{$s}} 
+};
 
 sub findHead {
-  my $v = $_[0];
+  my ($fr, $v, $d) = @_;
   my $n = length ($v)/20;
-  for my $i (0..($n-1)){
-    my $pc = substr ($v, ($n-1)*20, 20); 
-    my $s = (unpack "C", substr ($pc, 0, 1)) % $split;
-    my $v1 = defined $c2pc{$s}{$pc} ? $c2pc{$s}{$pc} : "";
-    return $pc if $v1 eq "";
-    return findHead ($v1);
+  #for my $i (0..($n-1)){
+  my $i = 0;
+  my $cc = substr ($v, $i*20, 20); 
+    
+  my $s = (unpack "C", substr ($cc, 0, 1)) % $split;
+  my $v1 = defined $c2cc{$s}{$cc} ? $c2cc{$s}{$cc} : "";
+  if ($v1 eq ""){
+    my $dp = pack 'w', 0;
+    $c2h{$s}{$cc} = $cc.$dp;
+    return ($fr, $cc, $d);
   }
+  if (defined $c2h{$s}{$v1}){
+    my $d1 = unpack "w", substr($c2h{$s}{$v1},20,length($c2h{$s}{$v1})-20);
+    return ($fr, substr($c2h{$s}{$v1}, 0,20), $d1+$d);
+  }
+  print "$fr at $d\n" if !(($d+1)%1000000);
+  my $h = "";
+  ($fr, $h, $d) = findHead ($fr, $v1, $d+1);
+  my $pd = pack 'w', $d;
+  $c2h{$s}{$cc} = $h . $pd;
+  return ($fr, $h, $d);
 }
 
 
