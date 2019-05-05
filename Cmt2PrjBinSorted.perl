@@ -45,11 +45,6 @@ while (<STDIN>){
   }
   if ($c ne $cp && $cp ne ""){
     $sec = (unpack "C", substr ($cp, 0, 1))%$nsec;
-    #if (defined $c2p{$sec}{$shap}){
-    #  print STDERR "input not sorted at $lines pref $hc followed by seen ".(toHex($cp)).";$p\n";     
-    #  for my $p0 (split(/\;/, safeDecomp($c2p{$sec}{$shap}), -1)){
-    #    $tmp{$p0}++;
-    #}
     $nc ++;
     my $ps = join ';', sort keys %tmp;
     my $psC = safeComp ($ps);
@@ -83,7 +78,7 @@ sub large {
     print A $psC;
     close (A);
   }else{
-    $c2p{$sec}{$cp} = $psC;
+    $c2p1{$sec}{$cp} = $psC;
   } 
 }
 

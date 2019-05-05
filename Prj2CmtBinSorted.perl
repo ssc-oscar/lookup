@@ -40,8 +40,8 @@ while (<STDIN>){
   }
   $p = "EMPTY" if $p eq "";
   if ($p ne $pp && $pp ne "" && $doDump){
-    $nc ++;
     while (my ($p1, $v) = each %tmp){
+      $nc ++;
       my $cs = join '', sort keys %{$v};
       #if (length($cs) >= 108894657*20){
       if (length($cs) >=  10000000*20){
