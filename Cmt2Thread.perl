@@ -20,12 +20,6 @@ my $split = 32;
 my (%c2h, %c2cc);
 my $sec = $ARGV[0];
 
-for my $s (0..($split-1)){
-  tie %{$c2h{$s}}, "TokyoCabinet::HDB", "/fast/c2hFullO.$s.tch", TokyoCabinet::HDB::OWRITER | TokyoCabinet::HDB::OCREAT,
-    16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
-    or die "cant open /fast/c2hFullO.$s.tch\n";
-}
-
 for my $s (0..($split-1)){ 
   tie %{$c2cc{$s}}, "TokyoCabinet::HDB", "/fast/c2ccFullO.$s.tch", TokyoCabinet::HDB::OREADER,
       16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
@@ -56,9 +50,17 @@ while (<STDIN>){
 }
 
 for my $s (0..($split-1)){ 
-  untie %{$c2h{$s}};
   untie %{$c2cc{$s}};
 };
+
+for my $s (0..($split-1)){
+  for my $c (keys %{$c2h{$s}}){
+    my $res = $c2h{$s}{$c};
+    my $h = toHex(substr($res, 0, 20));
+    my $d1 = unpack "w", substr($res, 20, length($res) - 20);
+    print "".(toHex($c)).";$h;$d1\n";
+  }
+}
 
 sub findHead {
   my ($fr, $cc, $d) = @_;
