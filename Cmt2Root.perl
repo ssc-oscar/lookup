@@ -13,7 +13,7 @@ sub toHex {
 sub fromHex { 
         return pack "H*", $_[0]; 
 } 
-
+BEGIN { $SIG{'__WARN__'} = sub { if (0) { print STDERR $_[0] } } };
 
 my $split = 32;
 
@@ -21,7 +21,7 @@ my (%c2r, %c2pc);
 my $sec = $ARGV[0];
 
 for my $s (0..($split-1)){
-   tie %{$c2r{$s}}, "TokyoCabinet::HDB", "/fast/c2rFullO.$s.tch", TokyoCabinet::HDB::OWRITER | TokyoCabinet::HDB::OCREAT,
+  tie %{$c2r{$s}}, "TokyoCabinet::HDB", "/fast/c2rFullO.$s.tch", TokyoCabinet::HDB::OWRITER | TokyoCabinet::HDB::OCREAT,
     16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
     or die "cant open /fast/c2rFullO.$s.tch\n";
 }
@@ -29,42 +29,69 @@ for my $s (0..($split-1)){
 for my $s (0..($split-1)){ 
   tie %{$c2pc{$s}}, "TokyoCabinet::HDB", "/fast/c2pcFullO.$s.tch", TokyoCabinet::HDB::OREADER,
       16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
-     or die "cant open /da4_data/basemaps/c2pcFullO.$s.tch\n";
+     or die "cant open /fast/c2pcFullO.$s.tch\n";
 }
 
-while (my ($c, $v) = each %{$c2pc{$sec}}){
-  if (!defined $c2r{$sec}{$c}){
-    my ($r, $d) = findRoot ($v, 0);
-    my $pd = pack 'w', $d;
-    $c2r{$sec}{$c} = $r.$pd;
+my $line = 0;
+while (<STDIN>){
+  chop();
+  my $ch = $_;
+  my $c = fromHex ($ch);
+  my $s = (unpack "C", substr ($c, 0, 1)) % $split;
+  if (defined $c2r{$s}{$c}){
+     #my $res = $c2r{$s}{$c};
+     #my $r = substr($res, 0, 20);
+     #my $d1 = unpack "w", substr($res, 20, length($res) - 20);
+     #print "F;$ch;".(toHex($r)).";$d1\n";
+  }else{
+    if (defined $c2pc{$s}{$c}){
+      my $v = substr($c2pc{$s}{$c}, 0, 20);
+      my ($ch, $r, $d) = findHead ($ch, $v, 1);
+      my $dp = pack 'w', $d;
+      $c2r{$s}{$c} = $r.$dp;
+      print "F:$ch;".(toHex($v)).";".(toHex($r)).";$d\n" if !(($line++)%10000);
+    }else{
+      #print "F:$ch;$ch;$ch;0\n;"
+    }
   }
 }
 
-untie %{$c2r{$sec}};
-for my $s (0..($split-1)){ untie %{$c2pc{$s}} };
+for my $s (0..($split-1)){ 
+  untie %{$c2r{$s}};
+  untie %{$c2pc{$s}};
+};
 
-sub findRoot {
-  my ($v, $d) = @_;
-  #my $n = length ($v)/20;
-  #for my $i (0..($n-1)){
-  my $i = 0;
-  {
-    my $pc = substr ($v, $i*20, 20); 
-    my $s = (unpack "C", substr ($pc, 0, 1)) % $split;
-    my $v1 = defined $c2pc{$s}{$pc} ? $c2pc{$s}{$pc} : "";
-    if ($v1 eq ""){
-      my $dp = pack 'w', 0;
-      $c2r{$s}{$pc} = $pc.$dp;
-      return ($pc, $d);
-    }
-    if (defined $c2r{$s}{$v1}){
-      return ($c2r{$s}{$v1}, $d);
-    }
-    my ($r, $d) = findRoot ($v1, $d+1);
-    my $pd = pack 'w', $d;
-    $c2r{$s}{$pc} = $r . $pd;
-    return ($r, $d);
+sub findHead {
+  my ($fr, $pc, $d) = @_;
+    
+  my $s = (unpack "C", substr ($pc, 0, 1)) % $split;
+  my $v1 = defined $c2pc{$s}{$pc} ? substr($c2pc{$s}{$pc}, 0, 20)  : "";
+  if ($v1 eq ""){
+    my $dp = pack 'w', 0;
+    $c2r{$s}{$pc} = $pc.$dp;
+    return ($fr, $pc, $d);
   }
+  my $s1 = (unpack "C", substr ($v1, 0, 1)) % $split;
+  #print "".(toHex($v1)).";".(defined $c2h{$s1}{$v1})."\n";
+  if (defined $c2r{$s1}{$v1}){
+    my $res = $c2r{$s1}{$v1};
+    my $r = substr($res, 0, 20);
+    my $d1 = unpack "w", substr($res, 20, length($res) - 20);
+    #print "--$fr;".(toHex($v1)).";".(toHex($r)).";d+d1=".($d+$d1).";d1=$d1\n";
+    my $dp = pack 'w', $d1+1;
+    $c2r{$s}{$pc} = $r.$dp;
+    return ($fr, $r, $d1+$d+1);
+  }
+  
+  #print "- $fr;".(toHex($pc)).";".(toHex($v1)).";$d\n";
+  my ($fr1, $r, $d1) = findHead ($fr, $v1, $d+1);
+  #print "+ $fr1;".(toHex($pc)).";".(toHex($v1)).";$d;$d1\n";
+  if (!defined ($c2r{$s}{$pc})){
+    my $dp = pack 'w', $d1-$d;
+    $c2r{$s}{$pc} = $r.$dp;
+  }
+  ($fr1, $r, $d1);
 }
+
 
 

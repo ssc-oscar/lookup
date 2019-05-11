@@ -14,6 +14,7 @@ sub fromHex {
         return pack "H*", $_[0]; 
 } 
 
+BEGIN { $SIG{'__WARN__'} = sub { if (0) { print STDERR $_[0]; } } };
 
 my $split = 32;
 
@@ -31,26 +32,26 @@ for my $s (0..($split-1)){
       16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
      or die "cant open /fast/c2ccFullO.$s.tch\n";
 }
-
+my $ncalc = 0;
 while (<STDIN>){
   chop();
   my $ch = $_;
   my $c = fromHex ($ch);
   my $s = (unpack "C", substr ($c, 0, 1)) % $split;
-  if (defined $c2h{$s}{$c}){
-     my $res = $c2h{$s}{$c};
-     my $h = substr($res, 0, 20);
-     my $d1 = unpack "w", substr($res, 20, length($res) - 20);
-     print "F;$ch;".(toHex($h)).";$d1\n";
-  }else{
+  if (!defined $c2h{$s}{$c}){	  
+     #my $res = $c2h{$s}{$c};
+     #my $h = substr($res, 0, 20);
+     #my $d1 = unpack "w", substr($res, 20, length($res) - 20);
+     #print "F;$ch;".(toHex($h)).";$d1\n";
+     #}else{
     if (defined $c2cc{$s}{$c}){
       my $v = substr($c2cc{$s}{$c}, 0, 20);
       my ($ch, $h, $d) = findHead ($ch, $v, 1);
       my $dp = pack 'w', $d;
       $c2h{$s}{$c} = $h.$dp;
-      print "F:$ch;".(toHex($v)).";".(toHex($h)).";$d\n";
+      print "F:$ch;".(toHex($v)).";".(toHex($h)).";$d\n" if !(($ncalc++)%1000);
     }else{
-      print "F:$ch;$ch;$ch;0\n;"
+      #print "F:$ch;$ch;$ch;0\n;"
     }
   }
 }
