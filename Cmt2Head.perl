@@ -33,11 +33,14 @@ for my $s (0..($split-1)){
      or die "cant open /fast/c2ccFullO.$s.tch\n";
 }
 my $ncalc = 0;
+my $nlook = 0;
+my $mdepth = 0;
 while (<STDIN>){
   chop();
   my $ch = $_;
   my $c = fromHex ($ch);
   my $s = (unpack "C", substr ($c, 0, 1)) % $split;
+  $nlook ++;
   if (!defined $c2h{$s}{$c}){	  
      #my $res = $c2h{$s}{$c};
      #my $h = substr($res, 0, 20);
@@ -49,12 +52,14 @@ while (<STDIN>){
       my ($ch, $h, $d) = findHead ($ch, $v, 1);
       my $dp = pack 'w', $d;
       $c2h{$s}{$c} = $h.$dp;
-      print "F:$ch;".(toHex($v)).";".(toHex($h)).";$d\n" if !(($ncalc++)%1000);
+      $mdepth = $d if $d > $mdepth;
+      print "F:$ch;".(toHex($v)).";".(toHex($h)).";$d;looked=$nlook;calculated=$ncalc;maxdep=$mdepth\n" if !(($ncalc++)%500000);
     }else{
       #print "F:$ch;$ch;$ch;0\n;"
     }
   }
 }
+print "looked=$nlook;calculated=$ncalc;maxdep=$mdepth\n";
 
 for my $s (0..($split-1)){ 
   untie %{$c2h{$s}};

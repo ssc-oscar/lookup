@@ -33,11 +33,14 @@ for my $s (0..($split-1)){
 }
 
 my $line = 0;
+my $mdepth = 0;
+my $nlook = 0;
 while (<STDIN>){
   chop();
   my $ch = $_;
   my $c = fromHex ($ch);
   my $s = (unpack "C", substr ($c, 0, 1)) % $split;
+  $nlook ++;
   if (defined $c2r{$s}{$c}){
      #my $res = $c2r{$s}{$c};
      #my $r = substr($res, 0, 20);
@@ -49,12 +52,14 @@ while (<STDIN>){
       my ($ch, $r, $d) = findHead ($ch, $v, 1);
       my $dp = pack 'w', $d;
       $c2r{$s}{$c} = $r.$dp;
-      print "F:$ch;".(toHex($v)).";".(toHex($r)).";$d\n" if !(($line++)%10000);
+      $mdepth = $d if $d > $mdepth;
+      print "F:$ch;".(toHex($v)).";".(toHex($r)).";$d;nlooked=$nlook;ncalc=$line;mdepth=$mdepth\n" if !(($line++)%500000);
     }else{
       #print "F:$ch;$ch;$ch;0\n;"
     }
   }
 }
+print "looked=$nlook;calculated=$line;maxdep=$mdepth\n";
 
 for my $s (0..($split-1)){ 
   untie %{$c2r{$s}};
