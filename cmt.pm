@@ -22,13 +22,13 @@ my %toUrlMap = ("bb" => "bitbucket.org","gl" => "gitlab.org",
 "kde.org" => "anongit.kde.org",
 "repo.or.cz" => "repo.or.cz",
 "salsa.debian.org" => "salsa.debian.org", 
-"sourceforge.net" => "git.code.sf.net/p/");
+"sourceforge.net" => "git.code.sf.net/p");
 
 sub toUrl {
   my $in = $_[0];
   my $found = 0;
   for my $p (keys %toUrlMap){
-    if ($in =~ /^${p}_/ && (scalar(split(/_/, $in)) > 2 || $in !~ /_/)){
+    if ($in =~ /^${p}_/ && (scalar(split(/_/, $in)) > 2 || $p eq "sourceforge.net")){
       $in =~ s|^${p}_|$toUrlMap{$p}\/|;
       $found ++;
       last;
