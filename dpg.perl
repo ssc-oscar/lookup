@@ -9,7 +9,25 @@ use cmt;
 use MongoDB;
 use Devel::Size qw(total_size);
 
-my %badProjects = ( "octocat_Spoon-Knife" => "forking tutorial", "cirosantilli_imagine-all-the-people" => "Commit email scraper" );
+my %badProjects = (
+  "bb_fusiontestaccount_fuse-2944" => "32400A",
+  "bb_fusiontestaccount_fuse1999v2" => "34007A", 
+  "octocat_Spoon-Knife" => "forking tutorial, 41176A", 
+  "cirosantilli_imagine-all-the-people" => "Commit email scraper, 389993A",
+  "marcelstoer_nodemcu-custom-build" => "97994A" ,
+  "jasperan_github-utils" => "4394779C", 
+  "avsm_ocaml-ci.logs" => "4283368C");
+my %badAuthors = ( 'one-million-repo <mikigal.acc@gmail.com>' => "1M commits", 
+   'scraped_page_archive gem 0.5.0 <scraped_page_archive-0.5.0@scrapers.everypolitician.org>' => "4243985C", 
+   'Your Name <you@example.com>' => "1829654C",
+   'Auto Pilot <noreply@localhost>' => "2063212C",
+   'GitHub Merge Button <merge-button@github.com>' => "109778A",
+   '= <=>' => "190490A",
+   'greenkeeper[bot] <greenkeeper[bot]@users.noreply.github.com>' => "2067354C", 
+   'Google Code Exporter <GoogleCodeExporter@users.noreply.github.com>' => "277+K projects",
+   'datakit <datakit@docker.com>' => "4400778 commits" );
+
+my %badCommits = ( "403ae9865be093b23abf36085dcb9bcd8cc4c108" => "head over 8M deep" );
 
 my $doBlob = 0;
 $doBlob = $ARGV[0] if defined $ARGV[0];
@@ -27,8 +45,13 @@ my %input;
 while ( my $doc = $result->next ) {
   my $a = $doc->{'selectedIds'};
   for my $id (@$a){
-    $input{$doc->{'_id'}}{$id}++;
-    print "$doc->{'_id'};$id\n";
+    if (ref $id eq "HASH"){
+      $input{$doc->{'_id'}}{$id->{id}}++;
+      print "$doc->{'_id'};$id->{id}\n";
+    }else{
+      $input{$doc->{'_id'}}{$id}++;
+      print "$doc->{'_id'};$id\n";
+    }
   }
 }
 
@@ -38,7 +61,7 @@ my $split = 32;
 ## get projects for a user
 my %p2c;
 for my $sec (0..($split-1)){
-  my $fname = "/fast/a2pO.$sec.tch";
+  my $fname = "/fast/a2pFullO.$sec.tch";
   tie %{$p2c{$sec}}, "TokyoCabinet::HDB", "$fname", TokyoCabinet::HDB::OREADER,   
         16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
       or die "cant open $fname\n";
@@ -58,7 +81,7 @@ for my $sec (0..($split-1)){
 ##get all authors for projects user worked on
 %p2c = ();
 for my $sec (0..($split-1)){
-  my $fname = "/fast/p2aO.$sec.tch";
+  my $fname = "/fast/p2aFullO.$sec.tch";
   tie %{$p2c{$sec}}, "TokyoCabinet::HDB", "$fname", TokyoCabinet::HDB::OREADER,
         16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
       or die "cant open $fname\n";
@@ -145,7 +168,7 @@ sub listB {
 #get blobs for a user
 %p2c = ();
 for my $sec (0..($split-1)){
-  my $fname = "/fast/c2bFullM.$sec.tch";
+  my $fname = "/fast/c2bFullO.$sec.tch";
   tie %{$p2c{$sec}}, "TokyoCabinet::HDB", "$fname", TokyoCabinet::HDB::OREADER,
         16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
       or die "cant open $fname\n";
@@ -243,11 +266,7 @@ for my $u (keys %input){
     for my $c (keys %{$a2c{$u}}){
       $nMyC += 1 if defined $p2c1{$u}{$c}{$p};
     }
-    my $url = $p;
-    $url =~ s/^bb_/bitbucket.org_/;
-    $url =~ s|^bitbucket.org_|bitbucket.org/|;
-    $url =~ s|_|/|;
-    $url = "github.com/$url" if $url !~ m|^bitbucket\.org|;
+    my $url = toUrl($p);
 
     push @P, { name => $p, nC => scalar(keys %{$p2nc{$p}}), nMyC => $nMyC, url => "https://$url" } if $#P < 30;
     push @Pf, { name => $p, nC => scalar(keys %{$p2nc{$p}}), nMyC => $nMyC, url => "https://$url" };
@@ -301,6 +320,19 @@ for my $u (keys %input){
     $la = "pl" if $f =~ /\.(pl|PL|pm|pod|perl)$/;
     $la = "html" if $f =~ /\.(html|css)$/;
     $la = "java" if $f =~ /(\.java|\.iml|\.class)$/;
+    $la = "scala" if $f =~ /\.scala$/;
+    $la = "rust" if $f =~ /\.(rs|rlib|rst)$/;
+    $la = "go" if $f =~ /\.go$/;
+    $la = "f" if $f =~ /\.(f[hi]|[fF]|[fF]77|[fF]9[0-9]|fortran|forth)$/;
+    $la = "rb" if $f =~ /\.(rb|erb|gem|gemspec)$/;
+    $la = "php" if $f =~ /\.php$/;
+    $la = "cs" if $f =~ /\.cs$/;
+    $la = "swift" if $f =~ /\.swift$/;
+    $la = "erl" if $f =~ /\.erl/;
+    $la = "sql" if $f =~ /\.(sql|sqllite|sqllite3|mysql)$/;
+    $la = "lsp" if $f =~ /\.(el|lisp|elc)$/;
+    $la = "lua" if $f =~ /\.lua$/;
+    $la = "jl" if $f =~ /\.jl$/;
     my @cs = keys %{$a2f{$u}{$f}};
     $F{$la} += $#cs + 1;
   }  
@@ -309,30 +341,60 @@ for my $u (keys %input){
   
 
   if ($doBlob){
+    my %c2ta = ();
+    for my $sec (0..($split-1)){
+    my $fname = "/fast/c2taFO.$sec.tch";
+      tie %{$c2ta{$sec}}, "TokyoCabinet::HDB", "$fname", TokyoCabinet::HDB::OREADER,
+        16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
+      or die "cant open $fname\n";
+    }
     my @B;
     my @bs = keys %{$a2b{$u}};
-    open A, '|ssh da0 "$HOME/lookup/Cmt2BlobShow.perl /data/basemaps/b2cFullM 0 32" > /tmp/zzz';
+    open A, '|ssh da0 "$HOME/lookup/Cmt2BlobShow.perl /data/basemaps/b2cFullM 1 32" > /tmp/zzz';
     for my $b (@bs){
       print A "$b\n";
     }
     close A;
     print STDERR "ran c2b\n";
     my %b2nc;
+    my %b2na;
     open A, "/tmp/zzz";
     while (<A>){
       chop();
-      my ($b, $nc, @csb) = split (/;/, $_, -1);
-      $b2nc{$b} = $nc;
-      #print "$b\;$nc\n";
+      my ($bl, $nc, @csb) = split (/;/, $_, -1);
+      my %bas = ();
+      for my $c (@csb){
+        my $s = segH ($c, $split);
+        my $cc = fromHex($c); 
+        if (defined $c2ta{$s}{$cc}){
+          my ($t, $au) = split (/;/, $c2ta{$s}{$cc});
+          $bas{$t}{$au}++;
+        }
+      }
+      my $first = (sort { $a+0 <=> $b+0 } keys %bas)[0];
+      my @aa = keys %{$bas{$first}};
+      my $own = 0; 
+      $own = 1 if defined $input{$u}{$aa[0]};
+      if ($own){
+        $b2nc{$bl} = $nc;
+        for my $t (keys %bas){
+          my @aa = keys %{$bas{$t}};
+          for my $au (@aa){
+            $b2na{$bl}{$au}++ !defined $input{$u}{$aa[0]};
+          } 
+        }
+      }
+      #print "$own;$bl\;$nc;@aa\n";
     } 
+    #exit();
     for my $b1 (sort {$b2nc{$b} <=> $b2nc{$a}} (keys %b2nc)){
-      push @B, { blob => $b1, nc => $b2nc{$b1} } if $#B < 20;
-      push @Bf, { blob => $b1, nc => $b2nc{$b1} };
+      push @B, { blob => $b1, nc => $b2nc{$b1}, users => { %{$b2na{$bl}} } } if $#B < 20;
+      push @Bf, { blob => $b1, nc => $b2nc{$b1}, users => { %{$b2na{$bl}} } };
     }
     print STDERR "done Blobs $#Bf\n";
     $result{blobs} = [ @B ];
   }
-  $result{stats} = { NFriends => $#as+1, NCommits => $#cs+1, NBlobs => $#bs+1, NFiles => $#fs+1, NProjects => $#fs+1 };
+  $result{stats} = { NFriends => $#as+1, NCommits => $#cs+1, NBlobs => $#bs+1, NFiles => $#fs+1, NProjects => $#ps+1 };
   my @objects = $prof ->find ({ user => $u }) ->all;
   if ($#objects >= 0){
     $prof ->update_one ({ user => $u }, { '$set' => { %result } } );

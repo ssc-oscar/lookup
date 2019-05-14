@@ -6,8 +6,39 @@ use Compress::LZF;
 
 require Exporter;
 our @ISA = qw (Exporter);
-our @EXPORT = qw(%badCmt %badBlob %badTree splitSignature segB segH signature_error contains_angle_brackets extract_trimmed git_signature_parse extrCmt getTime cleanCmt safeDecomp safeComp toHex fromHex sHash sHashV);
+our @EXPORT = qw(toUrl %badCmt %badBlob %badTree splitSignature segB segH signature_error contains_angle_brackets extract_trimmed git_signature_parse extrCmt getTime cleanCmt safeDecomp safeComp toHex fromHex sHash sHashV);
 use vars qw(@ISA);
+
+
+my %toUrlMap = ("bb" => "bitbucket.org","gl" => "gitlab.org",
+"android.googlesource.com" => "android.googlesource.com",
+"bioconductor.org" => "bioconductor.org",
+"drupal.com" => "git.drupal.org", "git.eclipse.org" => "git.eclipse.org",
+"git.kernel.org" => "git.kernel.org",
+"git.postgresql.org" => "git.postgresql.org" ,
+"git.savannah.gnu.org" => "git.savannah.gnu.org",
+"git.zx2c4.com" => "git.zx2c4.com" ,
+"gitlab.gnome.org" => "gitlab.gnome.org",
+"kde.org" => "anongit.kde.org",
+"repo.or.cz" => "repo.or.cz",
+"salsa.debian.org" => "salsa.debian.org", 
+"sourceforge.net" => "git.code.sf.net/p/");
+
+sub toUrl {
+  my $in = $_[0];
+  my $found = 0;
+  for my $p (keys %toUrlMap){
+    if ($in =~ /^${p}_/ && (scalar(split(/_/, $in)) > 2 || $in !~ /_/)){
+      $in =~ s|^${p}_|$toUrlMap{$p}\/|;
+      $found ++;
+      last;
+    }
+  }  
+  $in =~ s|^|github.com/| if (!$found);
+  $in =~ s|_|/|;
+  return "https://$in";
+}
+
 
 our %badCmt = (
   "c89423063a78259e6a7d13d9b00278a0c5e637b0" => 10000000005,
