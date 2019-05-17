@@ -91,4 +91,50 @@ for key, val in gA.items():
 	print(val)
 '''
 #####################
+## get commits for a user
+
+a2c = {}
+gA2C = {}
+
+for user in input.keys():
+	a2c[user] = []
+	for author in input[user]:
+		for commit in Author(author.encode('utf-8')).commit_shas:
+			a2c[user].append(commit)	
+
+'''
+for author in gA.keys():
+	gA2C[author] = []
+	for commit in Author(author).commits:
+		gA2C[author].append(commit)
+'''
+## ^^^ takes a LONG time, there are 5,174 authors in gA dictionary
+
+'''
+for key, val in a2c.items():
+	print(key),
+	print(":"),
+	print(val)
+'''
+#####################
+## get blobs for a user
+
+a2b = {}
+for user in input.keys():
+	a2b[user] = []
+	for commit in a2c[user]:
+		if Commit(commit).blob_shas_rel:
+			for blob in Commit(commit).blob_shas_rel:
+				a2b[user].append(blob) 
+
+'''
+for key, val in a2b.items():
+	print(key),
+	print(":"),
+	print(val)
+'''
+#####################
+## get files for a user
+
+
 			
