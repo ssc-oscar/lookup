@@ -29,8 +29,8 @@ my %badAuthors = ( 'one-million-repo <mikigal.acc@gmail.com>' => "1M commits",
 
 my %badCommits = ( "403ae9865be093b23abf36085dcb9bcd8cc4c108" => "head over 8M deep" );
 
-my $doBlob = 0;
-$doBlob = $ARGV[0] if defined $ARGV[0];
+my ($doPrj, $doFiles, $doBlobs) = (0, 0, 0);
+$doBlobs = $ARGV[0] if defined $ARGV[0];
 
 my $client = MongoDB::MongoClient->new(host => "mongodb://da1.eecs.utk.edu/");
 $client->connect();
@@ -54,10 +54,36 @@ while ( my $doc = $result->next ) {
       print "$doc->{'_id'};$id\n";
     }
   }
-  #last;
+  last;
 }
 
 my $split = 32;
+
+################
+### get torvalds paths for a user
+my %a2trp;
+{ my $fname = "/fast/a2trp.tch";
+  tie %a2trp, "TokyoCabinet::HDB", "$fname", TokyoCabinet::HDB::OREADER | TokyoCabinet::HDB::ONOLCK
+  or die "cant open $fname\n";
+};
+my %a2tr;
+for my $u (keys %input){
+  my %pa;
+  my $cncted = 0;
+  for my $id (keys %{$input{$u}}){
+    if (defined $a2trp{$id}){
+      my $str = safeDecomp($a2trp{$id});
+      my @path = ($id, split(/;/, $str));
+      $pa{$#path} = join ';', @path;
+      $cncted++;
+    }
+  }
+  if ($cncted){
+    my $ml = (sort { $a <=> $b } keys %pa)[0];
+    $a2tr{$u} = $pa{$ml};
+  }
+}
+untie %a2trp;
 
 ################
 ## get projects for a user
@@ -258,7 +284,14 @@ for my $u (keys %input){
   my @bs = keys %{$a2b{$u}};
   my @fs = keys %{$a2f{$u}};
   my @ps = keys %{$a2p{$u}};
-  my (@A, @Af, @P, @Pf, @B, @Bf); 
+  my (@A, @Af, @P, @Pf, @B, @Bf, %Ti);
+ 
+ 
+  my @path = split (/;/, $a2tr{$u}); 
+  $result{tridx} = { idx => $#path/2, path => [ @path ] };
+
+
+  if ($doPrj){
   my (%clb, %clb1);
   for my $p (@ps){
     for my $au (sort { scalar(keys %{$p2nc{$b}}) <=> scalar(keys %{$p2nc{$a}})  } keys %{$p2a{$u}}){
@@ -276,7 +309,7 @@ for my $u (keys %input){
     push @Pf, { name => $p, nC => scalar(keys %{$p2nc{$p}}), nMyC => $nMyC, url => $url };
   }
   $result{projects} =  [ @P ];
-  print STDERR "done Projects $#Pf\n";
+
   my @topP = sort { scalar(keys %{$clb1{$b}}) <=> scalar(keys %{$clb1{$a}}) } keys %clb1;
   my %lnk = ();
   for my $au (keys %{$input{$u}}){
@@ -285,6 +318,7 @@ for my $u (keys %input){
   my @ll = keys %lnk;
   print STDERR "$u project with most collaborators $topP[0]=".(scalar (keys %{$clb1{$topP[0]}}))." link by @ll\n"; 
   print STDERR "$u project with second most collaborators $topP[1]=".(scalar (keys %{$clb1{$topP[1]}}))."\n"; 
+
 
   for my $au (sort { scalar (keys $gA2C{$b}) <=> scalar (keys $gA2C{$a}) } keys %clb){
     my @pr;
@@ -311,7 +345,10 @@ for my $u (keys %input){
   }
   $result{friends} = [ @A ];  
   print STDERR "done Authors $#Af\n";
+  }
 
+
+  if ($doFiles){
   my %F;
   for my $f (@fs){
     my $la = "other";
@@ -339,11 +376,10 @@ for my $u (keys %input){
     my @cs = keys %{$a2f{$u}{$f}};
     $F{$la} += $#cs + 1;
   }  
-
   $result{files} = { %F };  
-  
+  }
 
-  if ($doBlob){
+  if ($doBlobs){
     my %c2ta = ();
     my %c2hF;
     for my $sec (0..($split-1)){
@@ -427,7 +463,11 @@ for my $u (keys %input){
     print STDERR "done Blobs $#Bf\n";
     $result{blobs} = [ @B ];
   }
-  $result{stats} = { NFriends => $#as+1, NCommits => $#cs+1, NBlobs => $#bs+1, NFiles => $#fs+1, NProjects => $#ps+1 };
+
+  if ($doPrj && $doFiles && $doBlobs){
+    $result{stats} = { NFriends => $#as+1, NCommits => $#cs+1, NBlobs => $#bs+1, NFiles => $#fs+1, NProjects => $#ps+1 };
+  }
+
   my @objects = $prof ->find ({ user => $u }) ->all;
   if ($#objects >= 0){
     $prof ->update_one ({ user => $u }, { '$set' => { %result } } );
@@ -435,7 +475,7 @@ for my $u (keys %input){
     $result{user} = $u;
     $prof ->insert_one ({ %result });
   }
-  if (total_size(\@Pf) < 10000000){
+  if ($doPrj && total_size(\@Pf) < 10000000){
     @objects = $PS ->find ({ user => $u }) ->all;
     if ($#objects >= 0){
       $PS ->update_one ({ user => $u }, { '$set' => { projects => [ @Pf ] } });
@@ -443,7 +483,7 @@ for my $u (keys %input){
       $PS ->insert_one ({ user => $u, projects => [ @Pf ] });
     }
   }
-  if (total_size(\@Bf) < 10000000){
+  if ($doBlobs && total_size(\@Bf) < 10000000){
     @objects = $BS ->find ({ user => $u }) ->all;
     if ($#objects >= 0){
       $BS ->update_one ({ user => $u }, { '$set' => { blobs => [ @Bf ] } });
@@ -451,7 +491,7 @@ for my $u (keys %input){
       $BS ->insert_one ({ user => $u, blobs => [ @Bf ] });
     }
   }
-  if (total_size(\@Af) < 10000000){ 
+  if ($doPrj && total_size(\@Af) < 10000000){ 
     @objects = $AS ->find ({ user => $u }) ->all;
     if ($#objects >= 0){
       $AS ->update_one ({ user => $u }, { '$set' => { friends => [ @Af ] } });
