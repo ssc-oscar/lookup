@@ -9,7 +9,7 @@ use cmt;
 
 my (%tmp, %c2p, %c2p1);
 my $sec;
-my $nsec = 8;
+my $nsec = 32;
 $nsec = $ARGV[1] + 0 if defined $ARGV[1];
 
 my $fname = "$ARGV[0]";
@@ -58,7 +58,7 @@ while (<STDIN>){
   }  
   $cp = $c;
   $tmp{$p}++; 
-  if (!($lines%500000000)){
+  if (!($lines%100000000)){
     print STDERR "$lines done\n";
     $doDump = 1;
   }
@@ -72,7 +72,7 @@ dumpData ();
 
 sub large {
   my ($psC, $cp) = @_;
-  if (length ($psC) > 10000000*20){
+  if (length ($psC) > 1000000*20){
     my $cpH = toHex ($cp);
     print STDERR "too large for $cpH: ".(length($psC))."\n";
     open A, ">$fname.large.$cpH";
@@ -82,7 +82,6 @@ sub large {
     $c2p1{$sec}{$cp} = $psC;
   } 
 }
-
 
 sub dumpData {
   for my $s (0..($nsec -1)){

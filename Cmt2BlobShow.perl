@@ -36,7 +36,7 @@ my %p2c;
 for my $sec (0..($split-1)){
   my $fname = "$ARGV[0].$sec.tch";
   $fname = $ARGV[0] if ($split == 1);
-  tie %{$p2c{$sec}}, "TokyoCabinet::HDB", "$fname", TokyoCabinet::HDB::OREADER,   
+  tie %{$p2c{$sec}}, "TokyoCabinet::HDB", "$fname", TokyoCabinet::HDB::OREADER | TokyoCabinet::HDB::ONOLCK,   
         16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
       or die "cant open $fname\n";
 }

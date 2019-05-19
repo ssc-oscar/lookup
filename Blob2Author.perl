@@ -27,18 +27,15 @@ for my $s (0..($split-1)){
      or die "cant open /fast/c2taFO.$s.tch\n";
 }
 my $bp = "";
+my ($bh, $ch) = ("","");
 my %as = (); 
 while (<STDIN>){
   chop();
-  my ($bh, $ch) = split(/\;/, $_, -1);
+  ($bh, $ch) = split(/\;/, $_, -1);
   my $bb = toHex($bh);
   if ($bp ne "" && $bp ne $bb){
-    my $f = (sort { $a+0 <=> $b +0 } keys %as)[0];
-    my @aa = sort keys %{$as{$f}};
-    print STDERR "same time $bh;$ch;@aa\n" if $#aa>0;
-    my ($ch0, $a) = split (/;/, $aa[0], -1);
-    print "$bh;$f;$a;$ch0\n";
-    %as = ();
+    output (\%as);
+    %as = (); 
   }
   my $c = fromHex ($ch);
   my $s = (unpack "C", substr ($c, 0, 1)) % $split;
@@ -48,7 +45,19 @@ while (<STDIN>){
   }else{
     print STDERR "no time for $ch in $bh\n";
   }
-  $bp = $bb;  
+  $bp = $bb;
+    
+}
+output (\%as);
+
+sub output {
+  my $asp = $_[0];
+  my %as = %{$asp};
+  my $f = (sort { $a+0 <=> $b +0 } keys %as)[0];
+  my @aa = sort keys %{$as{$f}};
+  print STDERR "same time $bh;$ch;@aa\n" if $#aa>0;
+  my ($ch0, $au) = split (/;/, $aa[0], -1);
+  print "$bh;$f;$au;$ch0\n";  
 }
 
 for my $s (0..($split-1)){ 

@@ -41,10 +41,6 @@ while (<STDIN>){
   }
   if ($c ne $cp && $cp ne ""){
     $sec = (unpack "C", substr ($cp, 0, 1))%$nsec;
-    #if (defined $c2p{$sec}{$shap}){
-    #  print STDERR "input not sorted at $lines pref $hsha followed by seen ".(toHex($shap)).";$p\n";
-    #  exit ();     
-    #}
     $nc ++;
     my $bs = join '', sort keys %tmp;
     large ($bs, $cp);
@@ -57,7 +53,7 @@ while (<STDIN>){
   $cp = $c;
   my $b = fromHex ($hb);
   $tmp{$b}++;
-  if (!($lines%50000000)){
+  if (!($lines%10000000)){
     print STDERR "$lines done\n";
     $doDump = 1;
   }
@@ -70,7 +66,7 @@ dumpData ();
 
 sub large {
   my ($bs, $cp) = @_;
-  if (length ($bs) > 10000000*20){
+  if (length ($bs) > 1000000*20){
     my $cpH = toHex ($cp);
     print STDERR "too large for $cpH: ".(length($bs))."\n";
     open A, ">$fname.large.$cpH";

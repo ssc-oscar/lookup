@@ -6,9 +6,27 @@ use Compress::LZF;
 
 require Exporter;
 our @ISA = qw (Exporter);
-our @EXPORT = qw(toUrl %badCmt %badBlob %badTree splitSignature segB segH signature_error contains_angle_brackets extract_trimmed git_signature_parse extrCmt getTime cleanCmt safeDecomp safeComp toHex fromHex sHash sHashV);
+our @EXPORT = qw(toUrl %badProjects %badAuthors %badCmt %badBlob %badTree splitSignature segB segH signature_error contains_angle_brackets extract_trimmed git_signature_parse extrCmt getTime cleanCmt safeDecomp safeComp toHex fromHex sHash sHashV);
 use vars qw(@ISA);
 
+our %badProjects = (
+  "bb_fusiontestaccount_fuse-2944" => "32400A",
+  "bb_fusiontestaccount_fuse1999v2" => "34007A", 
+  "octocat_Spoon-Knife" => "forking tutorial, 41176A", 
+  "cirosantilli_imagine-all-the-people" => "Commit email scraper, 389993A",
+  "marcelstoer_nodemcu-custom-build" => "97994A" ,
+  "jasperan_github-utils" => "4394779C", 
+  "avsm_ocaml-ci.logs" => "4283368C");
+
+our %badAuthors = ( 'one-million-repo <mikigal.acc@gmail.com>' => "1M commits", 
+   'scraped_page_archive gem 0.5.0 <scraped_page_archive-0.5.0@scrapers.everypolitician.org>' => "4243985C", 
+   'Your Name <you@example.com>' => "1829654C",
+   'Auto Pilot <noreply@localhost>' => "2063212C",
+   'GitHub Merge Button <merge-button@github.com>' => "109778A",
+   '= <=>' => "190490A",
+   'greenkeeper[bot] <greenkeeper[bot]@users.noreply.github.com>' => "2067354C", 
+   'Google Code Exporter <GoogleCodeExporter@users.noreply.github.com>' => "277+K projects",
+   'datakit <datakit@docker.com>' => "4400778 commits" );
 
 my %toUrlMap = ("bb" => "bitbucket.org","gl" => "gitlab.org",
 "android.googlesource.com" => "android.googlesource.com",

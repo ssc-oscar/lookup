@@ -44,7 +44,7 @@ while (<STDIN>){
       $nc ++;
       my $cs = join '', sort keys %{$v};
       #if (length($cs) >= 108894657*20){
-      if (length($cs) >=  10000000*20){
+      if (length($cs) >=  1000000*20){
         print STDERR "too large for $p1: ".(length($cs))."\n";
         my $pH = sprintf "%.8x", sHashV ($p1);
         open A, ">$fname.large.$pH";
@@ -59,14 +59,14 @@ while (<STDIN>){
   }  
   $pp = $p;
   $tmp{$p}{$c}++;
-  if (!($lines%100000000)){
+  if (!($lines%50000000)){
     print STDERR "$lines done\n";
     $doDump = 1;
   }
 }
 while (my ($p1, $v) = each %tmp){
   my $cs = join '', sort keys %{$v};
-  if (length($cs) >= 10000000*20){
+  if (length($cs) >= 1000000*20){
     print STDERR "too large for $p1: ".(length($cs))."\n";
     my $pH = sprintf "%.8x", sHashV ($p1);
     open A, ">$fname.large.$pH";

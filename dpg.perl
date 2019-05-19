@@ -44,6 +44,7 @@ my $result = $cursor->result;
 my %input;
 while ( my $doc = $result->next ) {
   my $a = $doc->{'selectedIds'};
+  next if $doc->{'_id'} ne "5cdecf2b8bd70a2d4ad38e02";
   for my $id (@$a){
     if (ref $id eq "HASH"){
       $input{$doc->{'_id'}}{$id->{id}}++;
@@ -53,16 +54,17 @@ while ( my $doc = $result->next ) {
       print "$doc->{'_id'};$id\n";
     }
   }
+  #last;
 }
 
 my $split = 32;
 
 ################
 ## get projects for a user
-my %p2c;
+my %a2pF;
 for my $sec (0..($split-1)){
   my $fname = "/fast/a2pFullO.$sec.tch";
-  tie %{$p2c{$sec}}, "TokyoCabinet::HDB", "$fname", TokyoCabinet::HDB::OREADER,   
+  tie %{$a2pF{$sec}}, "TokyoCabinet::HDB", "$fname", TokyoCabinet::HDB::OREADER | TokyoCabinet::HDB::ONOLCK,   
         16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
       or die "cant open $fname\n";
 }
@@ -70,19 +72,19 @@ my %a2p;
 for my $u (keys %input){
   for my $id (keys %{$input{$u}}){
     my $sec = sHash ($id, $split);
-    listP ($u, $id, $p2c{$sec}{$id}, \%a2p) if defined $p2c{$sec}{$id};
+    listP ($u, $id, $a2pF{$sec}{$id}, \%a2p) if defined $a2pF{$sec}{$id};
   }
 }
 for my $sec (0..($split-1)){
-  untie %{$p2c{$sec}};
+  untie %{$a2pF{$sec}};
 }
 
 #########################
 ##get all authors for projects user worked on
-%p2c = ();
+my %p2aF = ();
 for my $sec (0..($split-1)){
   my $fname = "/fast/p2aFullO.$sec.tch";
-  tie %{$p2c{$sec}}, "TokyoCabinet::HDB", "$fname", TokyoCabinet::HDB::OREADER,
+  tie %{$p2aF{$sec}}, "TokyoCabinet::HDB", "$fname", TokyoCabinet::HDB::OREADER | TokyoCabinet::HDB::ONOLCK,
         16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
       or die "cant open $fname\n";
 }
@@ -94,8 +96,8 @@ for my $u (keys %input){
     next if defined $badProjects{$p};
     my $sec = 0;
     $sec = sHash ($p, $split);
-    if (defined $p2c{$sec}{$p}){
-      listP ($u, $p, $p2c{$sec}{$p}, \%p2a);
+    if (defined $p2aF{$sec}{$p}){
+      listP ($u, $p, $p2aF{$sec}{$p}, \%p2a);
     
   
       for my $a (keys %{$p2a{$u}}){
@@ -105,7 +107,7 @@ for my $u (keys %input){
   }
 }
 for my $sec (0..($split-1)){
-  untie %{$p2c{$sec}};
+  untie %{$p2aF{$sec}};
 }
 
 sub listP {
@@ -121,10 +123,10 @@ sub listP {
 
 ###################
 #get commits for a user
-%p2c = ();
+my %a2cF = ();
 for my $sec (0..($split-1)){
   my $fname = "/fast/a2cFullO.$sec.tch";
-  tie %{$p2c{$sec}}, "TokyoCabinet::HDB", "$fname", TokyoCabinet::HDB::OREADER,   
+  tie %{$a2cF{$sec}}, "TokyoCabinet::HDB", "$fname", TokyoCabinet::HDB::OREADER | TokyoCabinet::HDB::ONOLCK,   
         16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
       or die "cant open $fname\n";
 }
@@ -135,24 +137,23 @@ for my $u (keys %input){
     my $p = $id;
     my $sec = 0;
     $sec = sHash ($p, $split) if $split > 1;
-    if (defined $p2c{$sec}{$p}){
-      listB ($u, $p, $p2c{$sec}{$p}, \%a2c);
+    if (defined $a2cF{$sec}{$p}){
+      listB ($u, $p, $a2cF{$sec}{$p}, \%a2c);
     }else{
       print STDERR "no $p in $sec\n";
     }
-    #listB ("$u, $p\n", $p2c{$sec}{"$p\n"}, \%a2c) if defined $p2c{$sec}{"$p\n"};
+    #listB ("$u, $p\n", $a2cF{$sec}{"$p\n"}, \%a2c) if defined $a2cF{$sec}{"$p\n"};
   }
 }
 for my $a (keys %gA){
-  my $p = $a;
   my $sec = 0;
-  $sec = sHash ($p, $split);
-  if (defined $p2c{$sec}{$p}){
-    listB ($p, $p, $p2c{$sec}{$p}, \%gA2C);
+  $sec = sHash ($a, $split);
+  if (defined $a2cF{$sec}{$a}){
+    listB ($a, $a, $a2cF{$sec}{$a}, \%gA2C);
   }
 }
 for my $sec (0..($split-1)){
-  untie %{$p2c{$sec}};
+  untie %{$a2cF{$sec}};
 }
 
 sub listB {
@@ -166,34 +167,37 @@ sub listB {
 
 #######################
 #get blobs for a user
-%p2c = ();
+my %a2bF;
+my %c2b = ();
 for my $sec (0..($split-1)){
   my $fname = "/fast/c2bFullO.$sec.tch";
-  tie %{$p2c{$sec}}, "TokyoCabinet::HDB", "$fname", TokyoCabinet::HDB::OREADER,
+  tie %{$c2b{$sec}}, "TokyoCabinet::HDB", "$fname", TokyoCabinet::HDB::OREADER | TokyoCabinet::HDB::ONOLCK,
         16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
       or die "cant open $fname\n";
 }
 my %a2b; 
+my %c2bG;
 for my $u (keys %input){
   my @cs = keys %{$a2c{$u}};
   for my $c1 (@cs){
     my $c = fromHex($c1);
     my $sec = (unpack "C", substr ($c, 0, 1))%$split;
-    if (defined $p2c{$sec}{$c}){
-      listB ($u, $c, $p2c{$sec}{$c}, \%a2b); 
+    if (defined $c2b{$sec}{$c}){
+      listB ($u, $c, $c2b{$sec}{$c}, \%a2b); 
+      listB ($c, $c, $c2b{$sec}{$c}, \%c2bG); 
     }
   }
 }
 for my $sec (0..($split-1)){
-  untie %{$p2c{$sec}};
+  untie %{$c2b{$sec}};
 }
 
 ######################
 # get files for a user
-%p2c = ();
+my %a2fF = ();
 for my $sec (0..($split-1)){
   my $fname = "/fast/c2fFullM.$sec.tch";
-  tie %{$p2c{$sec}}, "TokyoCabinet::HDB", "$fname", TokyoCabinet::HDB::OREADER,
+  tie %{$a2fF{$sec}}, "TokyoCabinet::HDB", "$fname", TokyoCabinet::HDB::OREADER | TokyoCabinet::HDB::ONOLCK,
         16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
       or die "cant open $fname\n";
 }
@@ -203,23 +207,23 @@ for my $u (keys %input){
   for my $c1 (@cs){
     my $c = fromHex($c1);
     my $sec = (unpack "C", substr ($c, 0, 1))%$split;
-    if (defined $p2c{$sec}{$c}){
-      listP ($u, $c, $p2c{$sec}{$c}, \%a2f);
+    if (defined $a2fF{$sec}{$c}){
+      listP ($u, $c, $a2fF{$sec}{$c}, \%a2f);
     }
   }
 }
 for my $sec (0..($split-1)){
-  untie %{$p2c{$sec}};
+  untie %{$a2fF{$sec}};
 }
 
 
 #########################
 #get commits for projects
-%p2c = ();
+my %p2c = ();
 my %p2nc = ();
 for my $sec (0..($split-1)){
   my $fname = "/fast/p2cFullO.$sec.tch";
-  tie %{$p2c{$sec}}, "TokyoCabinet::HDB", "$fname", TokyoCabinet::HDB::OREADER,
+  tie %{$p2c{$sec}}, "TokyoCabinet::HDB", "$fname", TokyoCabinet::HDB::OREADER | TokyoCabinet::HDB::ONOLCK,
         16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
       or die "cant open $fname\n";
 }
@@ -268,9 +272,8 @@ for my $u (keys %input){
     }
     my $url = toUrl($p);
 
-    push @P, { name => $p, nC => scalar(keys %{$p2nc{$p}}), nMyC => $nMyC, url => "https://$url" } if $#P < 30;
-    push @Pf, { name => $p, nC => scalar(keys %{$p2nc{$p}}), nMyC => $nMyC, url => "https://$url" };
-    #push @P, { name => $p, nMyC => $nMyC, url => "https://$url" };
+    push @P, { name => $p, nC => scalar(keys %{$p2nc{$p}}), nMyC => $nMyC, url => $url } if $#P < 30;
+    push @Pf, { name => $p, nC => scalar(keys %{$p2nc{$p}}), nMyC => $nMyC, url => $url };
   }
   $result{projects} =  [ @P ];
   print STDERR "done Projects $#Pf\n";
@@ -342,15 +345,20 @@ for my $u (keys %input){
 
   if ($doBlob){
     my %c2ta = ();
+    my %c2hF;
     for my $sec (0..($split-1)){
-    my $fname = "/fast/c2taFO.$sec.tch";
-      tie %{$c2ta{$sec}}, "TokyoCabinet::HDB", "$fname", TokyoCabinet::HDB::OREADER,
+      my $fname = "/fast/c2taFO.$sec.tch";
+      tie %{$c2ta{$sec}}, "TokyoCabinet::HDB", "$fname", TokyoCabinet::HDB::OREADER | TokyoCabinet::HDB::ONOLCK,
+        16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
+      or die "cant open $fname\n";
+      $fname = "/fast/c2hFullO.$sec.tch";
+      tie %{$c2hF{$sec}}, "TokyoCabinet::HDB", "$fname", TokyoCabinet::HDB::OREADER | TokyoCabinet::HDB::ONOLCK,
         16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
       or die "cant open $fname\n";
     }
     my @B;
     my @bs = keys %{$a2b{$u}};
-    open A, '|ssh da0 "$HOME/lookup/Cmt2BlobShow.perl /data/basemaps/b2cFullM 1 32" > /tmp/zzz';
+    open A, '|ssh da0 "$HOME/lookup/Cmt2BlobShow.perl /data/basemaps/b2cFullM 1 32" > /tmp/zzz1';
     for my $b (@bs){
       print A "$b\n";
     }
@@ -358,7 +366,8 @@ for my $u (keys %input){
     print STDERR "ran c2b\n";
     my %b2nc;
     my %b2na;
-    open A, "/tmp/zzz";
+    my %b2depth;
+    open A, "/tmp/zzz1";
     while (<A>){
       chop();
       my ($bl, $nc, @csb) = split (/;/, $_, -1);
@@ -368,7 +377,13 @@ for my $u (keys %input){
         my $cc = fromHex($c); 
         if (defined $c2ta{$s}{$cc}){
           my ($t, $au) = split (/;/, $c2ta{$s}{$cc});
-          $bas{$t}{$au}++;
+          $bas{$t}{$au} = $c;
+          my $cc = fromHex ($c);
+          if (defined $c2hF{$s}{$cc}){
+            my $depth = unpack "w", substr($c2hF{$s}{$cc}, 20, length($c2hF{$s}{$cc})-20);
+            $b2depth{$bl} = $depth if !defined $b2depth{$bl} || $b2depth{$bl} < $depth;
+            #print "a $bl;$c;$depth\n";
+          }
         }
       }
       my $first = (sort { $a+0 <=> $b+0 } keys %bas)[0];
@@ -376,20 +391,38 @@ for my $u (keys %input){
       my $own = 0; 
       $own = 1 if defined $input{$u}{$aa[0]};
       if ($own){
-        $b2nc{$bl} = $nc;
+        #$b2nc{$bl} = $nc;
         for my $t (keys %bas){
           my @aa = keys %{$bas{$t}};
           for my $au (@aa){
-            $b2na{$bl}{$au}++ !defined $input{$u}{$aa[0]};
+            if (!defined $input{$u}{$au}){
+              my $c = $bas{$t}{$au};
+              $b2na{$bl}{$au} = $c;
+              my $cc = fromHex ($c);
+              my $s0 = segH ($c, $split);
+              if (defined $c2hF{$s0}{$cc}){
+                my $depth = unpack "w", substr($c2hF{$s0}{$cc}, 20, length($c2hF{$s0}{$cc})-20);
+                #print "$bl;$c;$depth\n";
+                $b2depth{$bl} = $depth if !defined $b2depth{$bl} || $b2depth{$bl} < $depth;
+              }
+            }
           } 
         }
+        $b2nc{$bl} = $nc if defined $b2na{$bl};
+        #my @zz = keys %{$b2na{$bl}};
+        #$b2na{$bl} = \@zz;
       }
       #print "$own;$bl\;$nc;@aa\n";
     } 
     #exit();
     for my $b1 (sort {$b2nc{$b} <=> $b2nc{$a}} (keys %b2nc)){
-      push @B, { blob => $b1, nc => $b2nc{$b1}, users => { %{$b2na{$bl}} } } if $#B < 20;
-      push @Bf, { blob => $b1, nc => $b2nc{$b1}, users => { %{$b2na{$bl}} } };
+      my %val;
+      for my $au (keys %{$b2na{$b1}}){
+        my $c = $b2na{$b1}{$au};
+        $val{$c} = $au;
+      }
+      push @B, { blob => $b1, nc => $b2nc{$b1}, depth => $b2depth{$b1}, users => { %val }  } if $#B < 20;
+      push @Bf, { blob => $b1, nc => $b2nc{$b1}, depth => $b2depth{$b1}, users => { %val } };
     }
     print STDERR "done Blobs $#Bf\n";
     $result{blobs} = [ @B ];
