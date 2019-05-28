@@ -52,6 +52,31 @@ for key, val in input.items():
 '''
 
 #######################
+# get torvalds paths for a user
+a2tr = {}
+for user in input.keys():
+	pa = {}
+	connected = False
+	for author_id in input[user]:
+		#check for non-empty
+		if Author(author_id.encode('utf-8')).torvald:
+			path = []
+			path.append(author_id.encode('utf-8'))
+			for item in Author(author_id.encode('utf-8')).torvald:
+				path.append(item)
+			pa[len(path)] = ";".join(path)
+			connected = True
+		
+	if connected:
+		ml = sorted(pa.keys())[0]
+		a2tr[user] = pa[ml]
+'''
+for key, val in a2tr.items():
+	print(key),
+	print(":"),
+	print(val)
+'''
+#######################
 ## get projects for a user
 a2p = {}
 for user in input.keys():
@@ -85,9 +110,7 @@ gA = {}		## global authors
 u2a = {}
 for user in input.keys():
 	p2a = {}
-	i = 0
 	for proj in a2p[user]:
-		i += 1
 		if proj in badProjects.keys() or proj in p2a.keys():
 			continue 
 		p2a[proj] = []
@@ -342,8 +365,7 @@ for user in input.keys():
 						depth = int(c2h[c][1], 16)
 						if bl not in b2depth.keys() or b2depth[bl] < depth:
 							b2depth[bl] = depth
-			list = sorted(bas.keys())
-			first = list[0]
+			first = sorted(bas.keys())[0]
 			aa = bas[first]
 			first_auth = aa.keys()
 			if first_auth[0] in input[user]:
@@ -373,13 +395,14 @@ for user in input.keys():
 				if len(B) < 20:
 					B.append({'blob': b1, 'nc': b2nc[b1], 'depth': b2depth[b1], 'users': val})
 				Bf.append({'blob': b1, 'nc': b2nc[b1], 'depth': b2depth[b1], 'users': val})
-			print("done Blobs")
+			#print("done Blobs")
 			result['blobs'] = B
 
 	if doPrj and doFiles and doBlobs:
 		result['stats'] = { 'NFriends': len(authors)+1, 'NCommits': len(commits)+1, 'NBlobs': len(blobs)+1, 
 							'NFiles': len(files)+1, 'NProjects': len(projects)+1}
 	
+	#objects = prof.find({'user'.encode('utf-8'): str(user).encode('utf-8')})
 	objects = prof.find({'user': str(user)})
 	if objects.count() >= 0:
 		prof.update_one({'user': str(user)}, {"$set": {key: val for key,val in result.items()}})
