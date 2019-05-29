@@ -32,8 +32,7 @@ my %as = ();
 while (<STDIN>){
   chop();
   ($bh, $ch) = split(/\;/, $_, -1);
-  my $bb = toHex($bh);
-  if ($bp ne "" && $bp ne $bb){
+  if ($bp ne "" && $bp ne $bh){
     output (\%as);
     %as = (); 
   }
@@ -45,8 +44,7 @@ while (<STDIN>){
   }else{
     print STDERR "no time for $ch in $bh\n";
   }
-  $bp = $bb;
-    
+  $bp = $bh;
 }
 output (\%as);
 
@@ -57,7 +55,7 @@ sub output {
   my @aa = sort keys %{$as{$f}};
   print STDERR "same time $bh;$ch;@aa\n" if $#aa>0;
   my ($ch0, $au) = split (/;/, $aa[0], -1);
-  print "$bh;$f;$au;$ch0\n";  
+  print "$bp;$f;$au;$ch0\n";  
 }
 
 for my $s (0..($split-1)){ 
