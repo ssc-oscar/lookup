@@ -29,7 +29,7 @@ my %badAuthorsL = ( 'one-million-repo <mikigal.acc@gmail.com>' => "1M commits",
 
 my %badCommits = ( "403ae9865be093b23abf36085dcb9bcd8cc4c108" => "head over 8M deep" );
 
-my ($doPrj, $doFiles, $doBlobs) = (1, 1, 1);
+my ($doPrj, $doFiles, $doBlobs) = (0, 0, 0);
 
 $doBlobs = $ARGV[0] if defined $ARGV[0];
 
@@ -45,10 +45,18 @@ my $result = $cursor->result;
 my %input;
 while ( my $doc = $result->next ) {
   my $a = $doc->{'selectedIds'};
-  my $do = 0;
+  my $do = 1;
 #  $do++ if $doc->{'_id'} eq "5cd48b431b93640143c6edb1";#chris
-  $do++ if $doc->{'_id'} eq "5cd48c101b93640143c6edb2";#marat
+#  $do++ if $doc->{'_id'} eq "5cd48c101b93640143c6edb2";#marat
 #  $do++ if $doc->{'_id'} eq "";#
+#  $do++ if $doc->{'_id'} eq "";#
+#  $do++ if $doc->{'_id'} eq "";#
+#  $do++ if $doc->{'_id'} eq "";#
+#  $do++ if $doc->{'_id'} eq "";#
+#  $do++ if $doc->{'_id'} eq "5cd9c1bf1b93640143c6edba";# moh
+#  $do++ if $doc->{'_id'} eq "5cd9ea8f7e662355ba53e159";# dycz0fx
+#  $do++ if $doc->{'_id'} eq "5cee9a305ea3d86976bdce65";# dkennard
+#  $do++ if $doc->{'_id'} eq "5ceff9d95ea3d86976bdce66";# eduardo
 #  $do++ if $doc->{'_id'} eq "5cd353e5342977bdac3474ad";#audris
 #  $do++ if $doc->{'_id'} eq "5cdecf2b8bd70a2d4ad38e02";#drew
 #  $do++ if $doc->{'_id'} eq "5cea96251e729cb67f04078c";#dmg

@@ -13,9 +13,9 @@ close (A);
 while (<STDIN>){
   chop();
   my @x = split(/;/, $_, -1);
-  if (defined $isA{$x[$#x]}){
-    print "$num2f[$x[$#x]];".($#x+1);
-    for my $i (0..$#x) { print ";$num2f[$x[$i]]"; }
+  if (defined $isA{$x[0]}){
+    print "$num2f[$x[0]]";
+    for my $i (1..$#x) { print ";$num2f[$x[$i]]"; }
     print "\n";
   }	
 }
