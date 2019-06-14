@@ -6,7 +6,7 @@ use Compress::LZF;
 
 require Exporter;
 our @ISA = qw (Exporter);
-our @EXPORT = qw(toUrl %badProjects %badAuthors %badCmt %badBlob %badTree splitSignature segB segH signature_error contains_angle_brackets extract_trimmed git_signature_parse extrCmt getTime cleanCmt safeDecomp safeComp toHex fromHex sHash sHashV);
+our @EXPORT = qw(addForks toUrl %badProjects %badAuthors %badCmt %badBlob %badTree splitSignature segB segH signature_error contains_angle_brackets extract_trimmed git_signature_parse extrCmt getTime cleanCmt safeDecomp safeComp toHex fromHex sHash sHashV);
 use vars qw(@ISA);
 
 our %badProjects = (
@@ -19,8 +19,13 @@ our %badProjects = (
   "avsm_ocaml-ci.logs" => "4283368C", 
   "illacceptanything_illacceptanything" => "what it says", 
 "hjdivad_git"  => "git fork with extra comitters?",
+"08_git" => "renamed to iBeacons/git a fork of msysgit/git", 
 "00027jang27_git" => "git fork with extra comitters?",
+"git.kernel.org_linux_kernel/git/fdmanana/linux" => 'really common?',
 "bb_Kasreyn_linux-next" => "linux fork with extra comitters?",
+"broftkd_linux" => "suspicious",
+"1095811981_studyCode" => "suspicious",
+"szeder_all-git-forks" => "suspicious",
 "git.kernel.org_public-inbox_kvack.org/linux-mm/0" => "",
 "git.kernel.org_public-inbox_lists.infradead.org/linux-amlogic/0" => "",
 "git.kernel.org_public-inbox_lists.infradead.org/linux-arm-kernel/0" => "",
@@ -108,6 +113,15 @@ our %badProjects = (
 "zmap_zgrab2" => "single repo for torvalds alias",
 );
 
+sub addForks {
+  open A, "zcat /da0_data/github/ghReposForks.gz|";
+  while (<A>){ 
+    chop(); 
+    $badProjects{$_}++; 
+  }
+}
+
+
 our %badAuthors = ( 'one-million-repo <mikigal.acc@gmail.com>' => "1M commits", 
    'scraped_page_archive gem 0.5.0 <scraped_page_archive-0.5.0@scrapers.everypolitician.org>' => "4243985C", 
    'Your Name <you@example.com>' => "1829654C",
@@ -132,7 +146,7 @@ my %toUrlMap = ("bb" => "bitbucket.org","gl" => "gitlab.org",
 "android.googlesource.com" => "android.googlesource.com",
 "bioconductor.org" => "bioconductor.org",
 "drupal.com" => "git.drupal.org", "git.eclipse.org" => "git.eclipse.org",
-"git.kernel.org" => "git.kernel.org",
+"git.kernel.org" => "git.kernel.org/pub/scm/",
 "git.postgresql.org" => "git.postgresql.org" ,
 "git.savannah.gnu.org" => "git.savannah.gnu.org",
 "git.zx2c4.com" => "git.zx2c4.com" ,

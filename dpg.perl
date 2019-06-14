@@ -29,7 +29,7 @@ my %badAuthorsL = ( 'one-million-repo <mikigal.acc@gmail.com>' => "1M commits",
 
 my %badCommits = ( "403ae9865be093b23abf36085dcb9bcd8cc4c108" => "head over 8M deep" );
 
-my ($doPrj, $doFiles, $doBlobs) = (0, 0, 0);
+my ($doPrj, $doFiles, $doBlobs) = (1, 1, 1);
 
 $doBlobs = $ARGV[0] if defined $ARGV[0];
 
@@ -82,8 +82,9 @@ while ( my $doc = $result->next ) {
   #last;
 }
 
-my $split = 32;
+addForks();
 
+my $split = 32;
 ################
 ### get torvalds paths for a user
 my %a2trp;
@@ -318,7 +319,9 @@ for my $u (keys %input){
   my (@A, @Af, @P, @Pf, @B, @Bf, %Ti);
  
   my @path = split (/;/, $a2tr{$u}); 
-  $result{tridx} = { idx => $#path/2, path => [ @path ] };
+  my @p1 = @path;
+  for my $i (1..($#path-1)){ $p1[$i] = toUrl($path[$i]) if $i%2; }
+  $result{tridx} = { idx => $#path/2, path => [ @path ], url => [ @p1 ] };
 
   if ($doPrj){
     my (%clb, %clb1);
@@ -366,7 +369,7 @@ for my $u (keys %input){
             $na ++ if defined $p2a{$u}{$au1}{$p} && ! defined $input{$u}{$au1};
           }
         }
-        push @pr, { nc => $nc, name => $p, nAuth => $na };
+        push @pr, { nc => $nc, name => $p, url => toUrl($p), nAuth => $na };
       }
       push @A, { id => $au, projects => [ @pr ] } if $#A < 30;
       push @Af, { id => $au, projects => [ @pr ] };
@@ -382,10 +385,10 @@ for my $u (keys %input){
     for my $f (@fs){
       my $la = "other";
       $la = "js" if $f =~ /\.(js|iced|liticed|iced.md|coffee|litcoffee|coffee.md|ts|cs|ls|es6|es|jsx|sjs|co|eg|json|json.ls|json5)$/;
-      $la = "py" if $f =~ /\.(py|py3|pyx|pyo|pyw|pyc|whl)$/;
+      $la = "py" if $f =~ /\.(py|py3|pyx|pyo|pyw|pyc|whl|ipynb)$/;
       $la = "c" if $f =~ /(\.[Cch]|\.cpp|\.hh|\.cc|\.hpp|\.cxx)$/;
       $la = "r" if $f =~ /(\.Rd|\.[Rr]|\.Rprofile|\.RData|\.Rhistory|\.Rproj|^NAMESPACE|^DESCRIPTION|\/NAMESPACE|\/DESCRIPTION)$/;
-      $la = "sh" if $f =~ /\.(sh|shell|csh|zsh|bash)$/;
+      $la = "sh" if $f =~ /\.(sh|shell|csh|zsh|bash|pbs|bat|BAT)$/;
       $la = "pl" if $f =~ /\.(pl|PL|pm|pod|perl)$/;
       $la = "html" if $f =~ /\.(html|css)$/;
       $la = "java" if $f =~ /(\.java|\.iml|\.class)$/;
@@ -402,7 +405,14 @@ for my $u (keys %input){
       $la = "lsp" if $f =~ /\.(el|lisp|elc)$/;
       $la = "lua" if $f =~ /\.lua$/;
       $la = "jl" if $f =~ /\.jl$/;
+      $la = "obj" if $f =~ /\.(o|a|so|exe|bin)$/;
+      $la = "tex" if $f =~ /\.(tex|bib|sty|cls|ttf|TTF)$/;
+      $la = "markup" if $f =~ /(\.md|\.html|\.xml|\.css|README|AUTHORS|TODO|CHANGELOG|changelog|ChangeLog|COPYING)$/;
+      $la = "build" if $f =~ /(Makefile|Dockerfile|build\.xml|BUILD|\.cmake|Makefile.in|rake|CMakeLists\.txt|\.TXT|\.m4|\.am|vcproj|vcxproj|Imakefile)$/;
+      $la = "doc" if $f =~ /\.(txt|ps|eps|pdf|org|pptx|doc|ppt|xls|odp|odf|jpg|JPG|jpeg|png|pgm|gif|tif|tiff)$/;
       my @cs = keys %{$a2f{$u}{$f}};
+      #my @ext = split (/\./, $f, -1);
+      #$la = $ext[$#ext] if $la eq "other";
       $F{$la} += $#cs + 1;
     }  
     $result{files} = { %F };  
@@ -426,7 +436,6 @@ for my $u (keys %input){
       tie %{$b2c{$sec}}, "TokyoCabinet::HDB", "$fname", TokyoCabinet::HDB::OREADER | TokyoCabinet::HDB::ONOLCK,
         16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
       or die "cant open $fname\n";
-
     }
     my @B;
     my %b2c1;
@@ -459,15 +468,15 @@ for my $u (keys %input){
     #while (<A>){
     #  chop();
     #  my ($bl, $nc, @csb) = split (/;/, $_, -1);
-    my %bas = ();
-    my $nskip = 0;
+    my @nskip = ();
     for my $bl (keys %b2c1){
       my @csb = keys %{$b2c1{$bl}};
-      print "$bl;ncs=$#csb\n";
+      #print "$bl;ncs=$#csb\n";
       if ($#csb > 1000){
-        $nskip ++;
+        push @nskip, $bl;
         next;
       }
+      my %bas = ();
       for my $c (@csb){
         my $s = segH ($c, $split);
         my $cc = fromHex($c); 
@@ -487,6 +496,7 @@ for my $u (keys %input){
       $own = 1 if defined $input{$u}{$aa[0]};
       if ($own){
         #$b2nc{$bl} = $nc;
+        print "$aa[0];$bl\n";
         for my $t (keys %bas){
           my @aa = keys %{$bas{$t}};
           for my $au (@aa){
@@ -503,12 +513,15 @@ for my $u (keys %input){
             }
           } 
         }
-        delete $b2nc{$bl} if ! defined $b2na{$bl};
+        delete $b2nc{$bl} if ! defined $b2depth{$bl} || !defined $b2na{$bl};
+        
         #my @zz = keys %{$b2na{$bl}};
         #$b2na{$bl} = \@zz;
+      } else {
+        delete $b2nc{$bl};
       }
       #print "$own;$bl\;$nc;@aa\n";
-    } 
+    }
     #exit();
     for my $b1 (sort { $b2nc{$b} <=> $b2nc{$a}} (keys %b2nc)){
       my %val;
@@ -516,11 +529,18 @@ for my $u (keys %input){
         my $c = $b2na{$b1}{$au};
         $val{$c} = $au;
       }
-      push @B, { blob => $b1, nc => $b2nc{$b1}, depth => $b2depth{$b1}, users => { %val }  } if $#B < 20;
-      push @Bf, { blob => $b1, nc => $b2nc{$b1}, depth => $b2depth{$b1}, users => { %val } };
+      if (defined $b2depth{$b1}){
+        push @B, { blob => $b1, nc => $b2nc{$b1}, depth => $b2depth{$b1}, users => { %val }  } if $#B < 20;
+        push @Bf, { blob => $b1, nc => $b2nc{$b1}, depth => $b2depth{$b1}, users => { %val } };
+      }
     }
-    print STDERR "done Blobs $#Bf, skipped=$nskip\n";
+    print STDERR "done Blobs $#Bf, skipped=$#nskip\n";
     $result{blobs} = [ @B ];
+    if ($#B < 0){
+      undef $result{blobs};
+      my @objects = $prof ->find ({ user => $u }) ->all;
+      $prof ->update_one ({ user => $u }, { '$unset' => { 'blobs' => 1 } } );
+    }
   }
 
   if ($doPrj && $doFiles && $doBlobs){
