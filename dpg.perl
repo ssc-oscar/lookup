@@ -115,7 +115,7 @@ untie %a2trp;
 ## get projects for a user
 my %a2pF;
 for my $sec (0..($split-1)){
-  my $fname = "/fast/a2pFullO.$sec.tch";
+  my $fname = "/fast/a2pFullP.$sec.tch";
   tie %{$a2pF{$sec}}, "TokyoCabinet::HDB", "$fname", TokyoCabinet::HDB::OREADER | TokyoCabinet::HDB::ONOLCK,   
         16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
       or die "cant open $fname\n";
@@ -132,7 +132,7 @@ for my $u (keys %input){
 ##get all authors for projects user worked on
 my %p2aF = ();
 for my $sec (0..($split-1)){
-  my $fname = "/fast/p2aFullO.$sec.tch";
+  my $fname = "/fast/p2aFullP.$sec.tch";
   tie %{$p2aF{$sec}}, "TokyoCabinet::HDB", "$fname", TokyoCabinet::HDB::OREADER | TokyoCabinet::HDB::ONOLCK,
         16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
       or die "cant open $fname\n";
@@ -183,7 +183,7 @@ sub listP {
 #get commits for a user
 my %a2cF = ();
 for my $sec (0..($split-1)){
-  my $fname = "/fast/a2cFullO.$sec.tch";
+  my $fname = "/fast/a2cFullP.$sec.tch";
   tie %{$a2cF{$sec}}, "TokyoCabinet::HDB", "$fname", TokyoCabinet::HDB::OREADER | TokyoCabinet::HDB::ONOLCK,   
         16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
       or die "cant open $fname\n";
@@ -281,7 +281,7 @@ for my $sec (0..($split-1)){
 my %p2c = ();
 my %p2nc = ();
 for my $sec (0..($split-1)){
-  my $fname = "/fast/p2cFullO.$sec.tch";
+  my $fname = "/fast/p2cFullP.$sec.tch";
   tie %{$p2c{$sec}}, "TokyoCabinet::HDB", "$fname", TokyoCabinet::HDB::OREADER | TokyoCabinet::HDB::ONOLCK,
         16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
       or die "cant open $fname\n";
