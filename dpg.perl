@@ -422,7 +422,7 @@ for my $u (keys %input){
     my %c2ta = ();
     my (%c2hF, %b2c);
     for my $sec (0..($split-1)){
-      my $fname = "/fast/c2taFO.$sec.tch";
+      my $fname = "/fast/c2taFullP.$sec.tch";
       tie %{$c2ta{$sec}}, "TokyoCabinet::HDB", "$fname", TokyoCabinet::HDB::OREADER | TokyoCabinet::HDB::ONOLCK,
         16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
       or die "cant open $fname\n";
