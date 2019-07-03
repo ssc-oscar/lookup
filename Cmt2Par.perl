@@ -19,9 +19,11 @@ sub extrPar {
   $parent =~ s/^:// if defined $parent;
   return $parent;
 }
-
-my $part = 0;
-$part = $ARGV[0] if defined $ARGV[0];
+if (! defined $ARGV[1]){
+	print STDERR "usage: segment version\n";
+	exit (-1);
+}
+my $part = $ARGV[0];
 my $ver = $ARGV[1];
 
 my (%c2pc);
