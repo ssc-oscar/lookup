@@ -77,7 +77,7 @@ echo e4af89166a17785c1d741b8b1d5775f3223f510f | perl ~audris/bin/showCmt.perl [p
 ```
 echo f1b66dcca490b5c4455af319bc961a34f69c72c2 | perl ~audris/bin/showTree.perl
 ```
-## How to see conrent of a blob
+## How to see content of a blob
 ```
 echo 05fe634ca4c8386349ac519f899145c75fff4169 | perl ~audris/bin/showBlob.perl
 ```
