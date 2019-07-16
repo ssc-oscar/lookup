@@ -20,11 +20,12 @@ my $split = 32;
 
 my (%c2ta);
 my $sec = $ARGV[0];
+my $ver = $ARGV[1];
 
 for my $s (0..($split-1)){ 
-  tie %{$c2ta{$s}}, "TokyoCabinet::HDB", "/fast/c2taFO.$s.tch", TokyoCabinet::HDB::OREADER,
+  tie %{$c2ta{$s}}, "TokyoCabinet::HDB", "/fast/c2taFull$ver.$s.tch", TokyoCabinet::HDB::OREADER| TokyoCabinet::HDB::ONOLCK,
       16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
-     or die "cant open /fast/c2taFO.$s.tch\n";
+     or die "cant open /fast/c2taFull$ver.$s.tch\n";
 }
 my $bp = "";
 my ($bh, $ch) = ("","");

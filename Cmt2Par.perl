@@ -19,14 +19,17 @@ sub extrPar {
   $parent =~ s/^:// if defined $parent;
   return $parent;
 }
-
-my $part = 0;
-$part = $ARGV[0] if defined $ARGV[0];
+if (! defined $ARGV[1]){
+	print STDERR "usage: segment version\n";
+	exit (-1);
+}
+my $part = $ARGV[0];
+my $ver = $ARGV[1];
 
 my (%c2pc);
 
-tie %c2pc, "TokyoCabinet::HDB", "/fast/c2pcO.$part.tch", TokyoCabinet::HDB::OWRITER | TokyoCabinet::HDB::OCREAT
-     or die "cant open /fast/c2pcO.$part.tch\n";
+tie %c2pc, "TokyoCabinet::HDB", "/fast/c2pcFull$ver.$part.tch", TokyoCabinet::HDB::OWRITER | TokyoCabinet::HDB::OCREAT | TokyoCabinet::HDB::ONOLCK
+     or die "cant open /fast/c2pcFull$ver.$part.tch\n";
 
 my (%c2p);
 my $sections = 128;
