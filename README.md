@@ -1,10 +1,16 @@
+# Python APIs
+are in github.com/ssc-oscar/oscar.py
+
+Some rough info  on the structure and different update tasks is
+below
+
 # Available maps/tables and their locations 
 The tch are on da0:/data/basemaps/
 The flat files are on da0:/data/basemaps/gz
 
 
 The last letter denotes version (in alphabetical order)
-Currently the last version is M
+Currently the last version is P
 
 Notation in database names:
 ```
@@ -22,44 +28,44 @@ Full - means a complete set at that version
 N - 0-31: the databasebased on prehash
 ```
 
-1. author2commit: a2cFullM.N.tch
+1. author2commit: a2cFullO.{0..31}.tch
 Grab a list of authors
 ```
-echo "Audris Mockus <audris@utk.edu>" | /da3_data/lookup/Prj2CmtShow.perl /da0_data/basemaps/a2cFullM 1 32
+echo "Audris Mockus <audris@utk.edu>" | /da3_data/lookup/Prj2CmtShow.perl /da0_data/basemaps/a2cFullP 1 32
 ```
-2. author2file: a2fFullM.N.tch, tese are files for blobs created or deeted by the commit (see 6) - need to calculate for version M
+2. author2file: a2fFullP.{0..31}.tch, tese are files for blobs created or deeted by the commit (see 6) - need to calculate for version M
 ```
 echo "Audris Mockus <audris@utk.edu>" | /da3_data/lookup/Prj2FileShow.perl /da0_data/basemaps/a2fFullM.tch 1 32
 ```
 
-3. blob2commit: b2cFullM.{0..31}.tch
+3. blob2commit: b2cFullO.{0..31}.tch
 ```
-echo 05fe634ca4c8386349ac519f899145c75fff4169 | /da3_data/lookup/Cmt2BlobShow.perl /da0_data/basemaps/b2cFullF 1 32
-```
-
-4. commit2blob: c2bFullF.{0..15}.tch  # need fix
-```
-echo e4af89166a17785c1d741b8b1d5775f3223f510f | /da3_data/lookup/Cmt2BlobShow.perl /data/basemaps/c2bFullF 1 32
+echo 05fe634ca4c8386349ac519f899145c75fff4169 | /da3_data/lookup/Cmt2BlobShow.perl /da0_data/basemaps/b2cFullO 1 32
 ```
 
-5. commit2project: c2pFullM.{0..31}.tch 
+4. commit2blob: c2bFullN.{0..31}.tch  # need fix
 ```
-echo e4af89166a17785c1d741b8b1d5775f3223f510f |/da3_data/lookup/Cmt2PrjShow.perl /da0_data/basemaps/c2pFullM 1 32
-```
-
-6. file2commit: f2cFullM.{0..31}.tch, tese are files for blobs created or deeted by the commit
-```
-echo main.c |/da3_data/lookup/Prj2CmtShow.perl /d0_data/basemaps/f2cFullF 1 8
+echo e4af89166a17785c1d741b8b1d5775f3223f510f | /da3_data/lookup/Cmt2BlobShow.perl /data/basemaps/c2bFullN 1 32
 ```
 
-7. project2commit: p2cFullM.{0..31}.tch
+5. commit2project: c2pFullO.{0..31}.tch 
 ```
-echo ArtiiQ_PocketMine-MP |/da3_data/lookup/Prj2CmtShow.perl /da0_data/basemaps/p2cFullM 1 32
+echo e4af89166a17785c1d741b8b1d5775f3223f510f |/da3_data/lookup/Cmt2PrjShow.perl /da0_data/basemaps/c2pFullP 1 32
 ```
-8. Commit to child commit /da0_data/basemapsc2ccM.{0..31}.s
-9. Commit to time+author: /da0_data/basemapsc2taFullM{0..31}.s
-10. The extent of usage databases: for Go language in /da4_data/play/GothruMaps/m2nPMGo.s mo
-Details for PY, for example, are in c2bPtaPkgMPY.{0..31}.gz
+
+6. file2commit: f2cFullO.{0..31}.tch, tese are files for blobs created or deeted by the commit
+```
+echo main.c |/da3_data/lookup/Prj2CmtShow.perl /d0_data/basemaps/f2cFullO 1 8
+```
+
+7. project2commit: p2cFullP.{0..31}.tch
+```
+echo ArtiiQ_PocketMine-MP |/da3_data/lookup/Prj2CmtShow.perl /da0_data/basemaps/p2cFullO 1 32
+```
+8. Commit to child commit /da0_data/basemaps/c2ccO.{0..31}.s
+9. Commit to time+author: /da0_data/basemaps/c2taFullP.{0..31}.s
+10. The extent of usage databases: for Go language in /da0_data/play/GothruMaps/m2nPMGo.s mo
+Details for PY, for example, are in c2bPtaPkgOPY.{0..31}.gz
 also on /lustre/haven/user/audris/basemaps
 see grepNew.pbs for exact details.
 
@@ -85,7 +91,7 @@ echo 05fe634ca4c8386349ac519f899145c75fff4169 | perl ~audris/bin/showBlob.perl
 # Update process
 1. select a sample of repos (da0:/data/github/YearlyUpdate.sh)
 
-        i. the mongodb github-ghReposList2017/repos for overview
+        i. the mongodb githb-ghReposList2017/repos for overview
         i. github-ghUsers17/repos for detail on 61454771 repos
         i. Out of 67579431 repos on GH ghReposList2017
         i. 39247534 are not forks ghReposList2017.nofork
@@ -95,7 +101,239 @@ echo 05fe634ca4c8386349ac519f899145c75fff4169 | perl ~audris/bin/showBlob.perl
 1. extract olist.gz for each chunk
 1. extract blobs, commits, trees, tags based on the olist (see beacon scripts below)
 1. Extract c2p info from *.olist.gz, olist.gz is obtained first, then objects are extracted based on it
+
+Version P
+
 ```
+(t=tag; ls -f O.*/*$t.bin  | sed 's/\.bin$//' | while read i; do (echo $i; perl -I ~/lib64/perl5/ /da3_data/lookup/checkBin1in.perl $t $i)&>> O.$t.err; done) &
+(t=commit; ls -f O.*/*$t.bin  | sed 's/\.bin$//' | while read i; do (echo $i; perl -I ~/lib64/perl5/ /da3_data/lookup/checkBin1in.perl $t $i)&>> O.$t.err; done) &
+
+for r in {00..39} 
+for r in {40..67} 69 70 
+do cd /data/update/O.$r 
+ #time ls -f *.tag.bin | /da3_data/lookup/AllUpdateObj.perl tag
+ time ls -f *.commit.bin | /da3_data/lookup/AllUpdateObj.perl commit
+ #time ls -f *.tree.bin | /da3_data/lookup/AllUpdateObj.perl tree 
+ #time ls -f *.blob.bin | /da3_data/lookup/AllUpdateObj.perl blob
+done
+for i in {0..127}; do /da3_data/lookup/Obj2ContUpdt.perl commit $i $nmax; done
+for i in {0..127}; do /da3_data/lookup/Obj2ContUpdt.perl tree $i $nmax; done
+for i in {0..127}; do /da3_data/lookup/BlobN2Off.perl $i; done
+
+zcat c2pFullP$j.cs | lsort 5G -u --merge  <(zcat c2taFP$j.cs) |  join -v1 - <(zcat c2fFullO$j.cs) | join -v1 - <(zcat emptycsO.$j) | gzip > s12.$j.gz
+
+for j in {0..31}; do zcat c2taF$ver.$j.s | awk -F\; '{print $3 ";" $1}' | lsort 10G -t\; -k1b,2 | gzip > a2cF$ver$j.s & done
+for i in {0..31}; do zcat /data/basemaps/gz/c2taF$ver.$i.s | ~/lookup/Cmt2taBin.perl /fast/c2taFullP.$i.tch 1 & done
+wait
+
+for j in {0..31}
+do perl -I ~/lib/x86_64-linux-gnu/perl -I ~/lookup ~/lookup/Cmt2Chld.perl $j $ver | gzip > /data/basemaps/gz/cncFull$ver.$j &
+done
+for j in {0..31}
+do perl -I ~/lib/x86_64-linux-gnu/perl -I ~/lookup ~/lookup/Cmt2Head.perl $j $ver  &
+done
+
+for j in {0..31}
+do perl -I ~/lib/x86_64-linux-gnu/perl -I ~/lookup ~/lookup/Cmt2Par.perl $j $ver > /data/basemaps/gz/cnpFull$ver.$j &
+done
+for j in {0..31}
+do for i in $j $(($j+32)) $(($j+64))$(($j+96)); do cut -d\; -f4 /data/All.blobs/commit_$i.idx; done |  perl -I ~/lib/x86_64-linux-gnu/perl -I ~/lookup ~/lookup/Cmt2Root.perl $j $ver  &
+done
+
+pVer=O
+ver=P
+
+
+for LA in jl pl R #
+for LA in  ipy F Go Scala swift Cs C JS PY Rust java 
+do cd /da0_data/play/${LA}thruMaps
+ for int in "{0..31}" "{32..63}" "{64..95}" "{96..127}" 
+ do for j in $(eval "echo $int")
+  do zcat b$pVer${LA}.$j.gz | lsort 3G -u | join -v2 - <(zcat b$ver$LA.$j.gz | lsort 3G -u) | gzip > b$ver$LA.$j.s1 &
+  done
+  wait
+ done
+ for int in "{0..31}" "{32..63}" "{64..95}" "{96..127}" 
+ do for j in $(eval "echo $int")
+  do zcat b$ver${LA}.$j.s1 | ~/lookup/b2pkgsFast${LA}.perl $j 2> /dev/null | gzip > b$ver${LA}pkgs.$j.s1 &
+  done
+  wait
+ done
+ for int in "{0..31}" "{32..63}" "{64..95}" "{96..127}" 
+ do for j in $(eval "echo $int")
+  do zcat b$pVer${LA}pkgs.$j.gz b$ver${LA}pkgs.$j.s1 |gzip > b$ver${LA}pkgs.$j.gz &  
+ done; wait; done
+done
+
+```
+Version O
+```
+cd /data/update
+# 201903 add gitlab.com
+lst="android.googlesource.com bioconductor.org bitbucket.org drupal.com git.eclipse.org git.kernel.org git.postgresql.org git.savannah.gnu.org git.zx2c4.com gitlab.gnome.org kde.org repo.or.cz salsa.debian.org sourceforge.net"
+for r in {00..24}  $lst
+do cd /data/update/N.$r 
+ time ls -f *.tag.bin | /da3_data/lookup/AllUpdateObj.perl tag
+ time ls -f *.tree.bin | /da3_data/lookup/AllUpdateObj.perl tree
+ time ls -f *.blob.bin | /da3_data/lookup/AllUpdateObj.perl blob
+ time ls -f *.commit.bin | /da3_data/lookup/AllUpdateObj.perl commit
+
+ zcat *.olist.gz | ssh  dad2 '~/lookup/Prj2CmtChk.perl /fast/p2cFullN 32' | lsort 120G -u -t\; -k1b,2 | /da3_data/lookup/splitSecCh.perl p2c. 32 
+ for j in {0..31}; do gunzip -c p2c.$j.gz | awk -F\; '{print $2";"$1}'
+ done | lsort 120G -u -t\; -k1b,2 | /da3_data/lookup/splitSec.perl c2p. 3
+done 
+
+ver=O
+pVer=N
+for j in {0..31}; do str="$HOME/bin/lsort 120G -u --merge -t\; -k1b,2"; for i in {00..24} $lst; do str="$str <(zcat N.$i/p2c.$j.gz)"; done; eval $str | gzip > p2c$ver$j.s; done &
+for j in {0..31}; do str="$HOME/bin/lsort 120G -u --merge -t\; -k1b,2"; for i in {00..24} $lst; do str="$str <(zcat N.$i/c2p.$j.gz)"; done; eval $str | gzip > c2p$ver$j.s; done &
+
+for j in {0..127}; do $HOME/lookup/lstCmt.perl 1 $j | lsort 5G -t\; -k1b,2 | gzip > /data/basemaps/gz/c2taFull$ver$j.s & done
+wait
+for j in {0..31}; do zcat /data/basemaps/gz/c2taFull$ver$j.s | lsort 20G -t\; -k1b,2 --merge - <(zcat /data/basemaps/gz/c2taFull$ver$(($j+32)).s) <(zcat /data/basemaps/gz/c2taFull$ver$(($j+64)).s) <(zcat /data/basemaps/gz/c2taFull$ver$(($j+96)).s) | gzip > /data/basemaps/gz/c2taF$ver.$j.s & done 
+wait
+
+for i in {0..31}; do zcat s11.$i.c2fb | cut -d\; -f1 | uniq | gzip > s11.$i.got; zcat s11.$i.got | join -v2 - <(zcat s11.$i.gz) | gzip > s11.$i.left; grep ^identical s11.new.$i.err | sed 's/.* for //;s/ and.*//' | lsort 1G -u > s11.$i.empty; (zcat /data/basemaps/gz/badcs$pVer.$i; join -v1 <(zcat s11.$i.left) <(zcat s11.$i.got) | join -v1 - s11.$i.empty) | lsort 1G -u > s11.$i.try;
+cat s11.$i.try | /da3_data/lookup/cmputeDiff2.perl 2>  s11.$i.try.err | gzip > s11.$i.try.c2fb;
+(zcat  /data/basemaps/gz/emptycs$pVer.$i; cat s11.$i.empty; grep ^identical s11.$i.try.err | sed 's/.* for //;s/ and.*//')|lsort 1G -u | gzip > /data/basemaps/gz/emptycs$ver.$i;
+zcat s11.$i.try.c2fb | cut -d\; -f1 | uniq | gzip > s11.$i.try.got;
+zcat s11.$i.try.got | join -v2 - s11.$i.try | join -v1 - <(zcat  /data/basemaps/gz/emptycs$ver.$i) | gzip >  /data/basemaps/gz/badcs$ver.$i;
+done
+
+on dad2: 
+for j in {0..31}; do time zcat /data/c2pFullO$j.s | awk -F\; '{print $1 ";;;" $2}' | perl -I ~/lookup  -I ~/lib/x86_64-linux-gnu/perl ~/lookup/Cmt2PrjBinSorted.perl /fast/c2pFullO.$j.tch 1; done &
+for j in {0..31}; do time zcat /data/p2cFullO$j.s |perl -I ~/lookup -I ~/lib/x86_64-linux-gnu/perl  ~/lookup/Prj2CmtBinSorted.perl /fast/p2cFullO.$j.tch; done &
+for i in {0..31}; do zcat /data/a2pO.$i.gz | perl -I ~/lookup -I ~/lib/x86_64-linux-gnu/perl ~/lookup/Prj2FileBinSorted.perl a2pO.$i.tch; done &
+for i in {0..31}; do zcat /data/p2aO.$i.gz | perl -I ~/lookup -I ~/lib/x86_64-linux-gnu/perl ~/lookup/Prj2FileBinSorted.perl p2aO.$i.tch; done &
+for j in {1..31}; do time zcat /data/a2cFullO$j.gz |perl -I ~/lookup -I ~/lib/x86_64-linux-gnu/perl  ~/lookup/Prj2CmtBinSorted.perl /fast/a2cFullO.$j.tch; done
+for j in {1..31}; do time perl -I ~/lib/x86_64-linux-gnu/perl -I ~/lookup ~/lookup/Cmt2Chld.perl /fast/c2cc$ver $i | gzip > /store/cnp$ver.$i; done
+zcat a2cFull$ver*gz | cut -d\; -f1 | uniq | gzip > as$ver.gz
+zcat as$ver.gz | perl -I /home/audris/lib64/perl5 -I /home/audris/lib/x86_64-linux-gnu/perl -I /home/audris/lookup -ane 'use cmt; chop();@x=splitSignature($_);@n = split(/ /, $x[0]); @e = split(/\@/, $x[1]); print "$_;$x[0];$x[1];$n[0];$n[$#n];$e[0];$e[1]\n";' | gzip > as$ver.split
+#zcat as$ver.split | perl -ane 'chop();if ($_ !~ m/^;/){@x=split(/\;/, $_); for $i (0..$#x){ $x[$i] =~ s/"/'"'"'/g; } print "{ \"id\":\"$x[0]\", \"name\":\"$x[1]\", \"email\":\"$x[2]\", \"first\":\"$x[3]\", \"last\":\"$x[4]\", \"user\":\"$x[5]\",\"domain\":\"$x[6]\" }\n";} '| gzip > as$ver.split.json
+
+zcat as$ver.split | perl -ane 'chop();if ($_ !~ m/^;/){@x=split(/\;/, $_); for $i (0..$#x){ $x[$i] =~ s/"//g; } print "{ \"id\":\"$x[0]\", \"name\":\"$x[1]\", \"email\":\"$x[2]\", \"first\":\"$x[3]\", \"last\":\"$x[4]\", \"user\":\"$x[5]\",\"domain\":\"$x[6]\" }\n";} '| gzip > as$ver.split.json
+
+zcat as$ver.split.json  | python3 ~/docker/gather/authors.py WoC authors$ver > as$ver.split.json.bad
+
+
+pVer=N
+ver=O
+#on beacon
+for LA in jl F R PY JS C java Go Rust Cs pl Swift Erlang Scala Fml Lua rb sql php Cob 
+do sed "s/VER/$ver/;s/MACHINE/beacon/;s/PART/first/;s/LANG/$LA/" /nics/b/home/audris/lookup/grepNew.pbs | qsub
+done
+
+#on da4
+for LA in jl F R pl Scala Cs Rust Go PY JS C java  
+do cd /da0_data/play/${LA}thruMaps/
+for int in "{0..31}" "{32..63}" "{64..95}" "{96..127}" ; do for j in $(eval "echo $int"); do zcat b$pVer${LA}.$j.gz | lsort 3G -u | join -v2 - <(zcat b$ver$LA.$j.gz | lsort 3G -u) | gzip > b$ver$LA.$j.s1 & done; wait; done
+for int in "{0..31}" "{32..63}" "{64..95}" "{96..127}" ; do for j in $(eval "echo $int"); do zcat b$ver${LA}.$j.s1 | ~/lookup/b2pkgsFast${LA}.perl $j 2> /dev/null |gzip > b$ver${LA}pkgs.$j.s1 &  done; wait; done
+for int in "{0..31}" "{32..63}" "{64..95}" "{96..127}" ; do for j in $(eval "echo $int"); do zcat b$pVer${LA}pkgs.$j.gz b$ver${LA}pkgs.$j.s1 |gzip > b$ver${LA}pkgs.$j.gz &  done; wait; done
+done
+
+#on beacon
+pVer=N
+ver=O
+for LA in jl F R PY JS C java Go Rust Cs pl Swift Erlang Scala Fml Lua rb sql php Cob 
+do scp -p da0:/data/play/${LA}thruMaps/b$ver${LA}pkgs.*.gz .
+sed "s/VER/$ver/;s/MACHINE/beacon/;s/PART/second/;s/LANG/$LA/" /nics/b/home/audris/lookup/grepNew.pbs | qsub
+done
+
+for LA in jl F R pl Scala Cs Rust Go PY JS C java  
+do scp -p P2m$ver$LA m2nP$ver$LA.s c2bPtaPkg$ver$LA.*.gz da0:/data/play/${LA}thruMaps/
+done 
+
+
+
+#plot languages
+LNGS="JS java PY C php Lisp Rust Scala rb Erlang Swift Go Lua Sql Cs R F jl Fml Cob"
+for LA in $LNGS
+do zcat c2ta$ver$LA.*.gz|awk -F\; '{print int($2/3600/24/365.25+1970)}' | lsort 10G | uniq -c > ${LA}$ver.trend
+zcat c2ta$ver$LA.*.gz|awk -F\; '{print int($2/3600/24/365.25+1970)";"$3}' | lsort 10G | uniq | cut -d\; -f1 | uniq -c > ${LA}$ver.trendA
+done
+s="year";for LA in $LNGS; do s="$s;$LA";done; echo $s > cmts$ver.lng
+for y in {2010..2019}; do s="$y";for LA in  $LNGS
+do n=$(grep " $y$" ${LA}$ver.trend | awk '{print $1}'); s="$s;$n"; done; echo $s; done >> cmts$ver.lng
+s="year";for LA in $LNGS; do s="$s;$LA";done; echo $s > cmts$ver.lng1
+for y in {2010..2019}; do s="$y";for LA in $LNGS
+do n=$(grep " $y$" ${LA}$ver.trendA | awk '{print $1}'); s="$s;$n"; done; echo $s; done >> cmts$ver.lng1
+
+scp -p cmts$ver.{lng1,lng} *$ver.{trend,trendA}   da2:swsc/overview
+
+x=read.table("cmtsO.lng1",sep=";",header=T);
+y=read.table("cmtsO.lng",sep=";",header=T);
+x[10,-1]=4*x[10,-1];
+y[10,-1]=4*y[10,-1];
+png("AuthorsByLanguageO.png",width=1000,height=750);
+matplot(x[,1],x[,-1],type="o",lwd=1:3,lty=1:7,col=1:5,log="y",pch="0123456789abcdefghi",xlab="Years",ylab="Authors");
+N=dim(x)[2]-1;
+legend(2016.1,3e04,legend=names(x)[-1],lty=1:7,col=1:5,lwd=1:3,pch="0123456789abcdefghi",bg="white")
+dev.off()
+png("PrdByLanguageO.png",width=1000,height=750);
+matplot(x[,1],y[,-1]/x[,-1],type="o",lwd=1:3,lty=1:7,col=1:5,log="y",pch="0123456789abcdefghi",xlab="Years",ylab="Cmghi");
+legend(2016.1,1000,legend=names(x)[-1],lwd=1:3,lty=1:7,col=1:5,pch="0123456789abcdefghi",bg="white")
+dev.off();
+
+#most frequent reuse:
+see grepNew.pbs
+overview/deps/plot.r
+LNGS1="C Cs F Go JS PY R Rust Scala java jl pl rb"
+for LA in $LNGS1; do scp -p $ver$LA.* da0:/data/play/plots; done
+scp -p cmts$ver.lng1 cmts$ver.lng *N.trend *N.trendA da0:/data/play/plots/
+
+```
+
+Version N
+
+```
+cd /data/update
+# 2019025
+for r in {00..32} bioconductor.org bitbucket.org kde.org repo.or.cz sourceforge.net gitlab.com
+do cd /data/update/M.$r 
+   time ls -f *.tag.bin | /da3_data/lookup/AllUpdateObj.perl tag
+   time ls -f *.commit.bin | /da3_data/lookup/AllUpdateObj.perl commit
+   time ls -f *.tree.bin | /da3_data/lookup/AllUpdateObj.perl tree
+   time ls -f *.blob.bin | /da3_data/lookup/AllUpdateObj.perl blob
+
+   gunzip -c *.olist.gz | /da3_data/lookup/Prj2CmtChk.perl /da0_data/basemaps/p2cFullM 32 | lsort 120G -u -t\; -k1b,2 | /da3_data/lookup/splitSecCh.perl p2c. 32 
+   for j in {0..31}; do gunzip -c p2c.$j.gz | awk -F\; '{print $2";"$1}'
+   done | lsort 120G -u -t\; -k1b,2 | /da3_data/lookup/splitSec.perl c2p. 32
+done
+for i in {0..127}; do /da3_data/lookup/checkBin.perl commit /data/All.blobs/commit_$i 703111; done
+for i in {0..127}; do /da3_data/lookup/checkBin.perl tree /data/All.blobs/tree_$i 2579370; done
+for i in {0..127}; do /da3_data/lookup/checkBin.perl tag /data/All.blobs/tag_$i 30000; done
+for i in {0..127}; do /da3_data/lookup/checkBin.perl blob /data/All.blobs/blob_$i 2507276; done
+
+for i in {0..127}; do /da3_data/lookup/Obj2ContUpdt.perl commit $i 705111; done
+for i in {0..127}; do /da3_data/lookup/Obj2ContUpdt.perl tree $i 2579370; done
+
+#prepare for processing
+zcat asN.s | perl -I /home/audris/lib64/perl5 -I /home/audris/lib/x86_64-linux-gnu/perl -I /home/audris/lookup -ane 'use cmt; chop();@x=splitSignature($_);@n = split(/ /, $x[0]); @e = split(/\@/, $x[1]); print "$_;$x[0];$x[1];$n[0];$n[$#n];$e[0];$e[1]\n";' | gzip > asN.split
+zcat asN.split | perl -ane 'chop();if ($_ !~ m/^;/){@x=split(/\;/, $_); for $i (0..$#x){ $x[$i] =~ s/"/'"'"'/g; } print "{ \"id\":\"$x[0]\", \"name\":\"$x[1]\", \"email\":\"$x[2]\", \"first\":\"$x[3]\", \"last\":\"$x[4]\", \"user\":\"$x[5]\",\"domain\":\"$x[6]\" }\n";} '| gzip > asN.split.json
+zcat /home/audris/asN.split.json  | python3 ~/docker/gather/authors.py WoC authors > /home/audris/asN.split.json.bad
+for i in {0..127}; do ~/lookup/lstCmt.perl 2 $i | cut -d\; -f2,4 | lsort 5G -u | gzip > a2mN$i.s; done
+str="lsort 250G -t\; -k1b2 -u --merge"
+for i in {0..127}; do str="$str <(zcat a2mN$i.s)"; done
+eval $str | ~/lookup/splitSecCh.perl a2mN. 32
+#do some cleaning: exclude single commit ids
+zcat /data/basemaps/gz/a2mN.s| perl -e 'while(<STDIN>){chop();($a,$m)=split(/;/);$m2n{$m}++;}; while (($m,$v)=each %m2n){ print "$v;$m\n" if $v > 30; }' | gzip > /data/basemaps/gz/mFreqN.gz
+
+
+for i in {0..31}; do zcat s10.$i.gz | /da3_data/lookup/cmputeDiff2.perl 2> s10.new.$i.err | gzip > s10.$i.c2fb; done&
+for i in {0..31}
+do zcat s9.$i.c2fb | cut -d\; -f1 | uniq | gzip > s9.$i.got
+  zcat s10.$i.c2fb | cut -d\; -f1 | uniq | gzip > s10.$i.got
+  (zcat s9.$i.got| join -v2 - <(zcat s9.$i.gz); zcat s10.$i.got| join -v2 - <(zcat s10.$i.gz)) | lsort 1G -u > $i.left
+  grep ^identical s9.new.$i.err s10.new.$i.err | sed 's/.* for //;s/ and.*//' | lsort 1G -u > $i.empty
+  (zcat /data/basemaps/gz/badcs.$i; join -v1 $i.left $i.empty)  | lsort 1G -u > $i.try
+  cat $i.try | /da3_data/lookup/cmputeDiff2.perl 2>  $i.try.err | gzip > $i.try.c2fb
+  (zcat /data/basemaps/gz/emptycs.$i; cat $i.empty; grep ^identical $i.try.err | sed 's/.* for //;s/ and.*//') | lsort 1G -u | gzip > /data/basemaps/gz/emptycsN.$i
+  zcat $i.try.c2fb | cut -d\; -f1 | uniq | gzip > $i.try.got
+  zcat $i.try.got | join -v2 -  $i.try | join -v1 - <(zcat  /data/basemaps/gz/emptycsN.$i) | gzip >  /data/basemaps/gz/badcsN.$i
+  zcat /data/basemaps/gz/badcs.$i | join -v1 - <(zcat /data/basemaps/gz/badcsN.$i) | /da3_data/lookup/cmputeDiff2.perl > /dev/null 2> check$i
+  grep -v ^iden check$i |grep -v ^mdir | sed 's/.* for //' | uniq | gzip > /data/basemaps/gz/badcsPartialN.$i
+done   
+
 
 
 cd /data/update
@@ -148,42 +386,41 @@ for j in {96..127}; do $HOME/lookup/lstCmt.perl 1 $j | lsort 5G -t\; -k1b,2 | gz
 wait
 for j in {0..31}; do zcat c2taFull$ver$j.s | lsort 50G -t\; -k1b,2 --merge - <(zcat c2taFull$ver$(($j+32)).s) <(zcat c2taFull$ver$(($j+64)).s) <(zcat c2taFull$ver$(($j+96)).s) | gzip > c2taF$ver.$j.s; done 
 
-for j in {0..31}; do zcat c2taFull$ver$j.s | awk -F\; '{print $3 ";" $1}' | lsort 5G -t\; -k1b,2 | gzip > a2cFull$ver$j.s & done
-wait
-for j in {32..63}; do zcat c2taFull$ver$j.s | awk -F\; '{print $3 ";" $1}' | lsort 5G -t\; -k1b,2 | gzip > a2cFull$ver$j.s & done
-wait
-for j in {64..95}; do zcat c2taFull$ver$j.s | awk -F\; '{print $3 ";" $1}' | lsort 5G -t\; -k1b,2 | gzip > a2cFull$ver$j.s & done
-wait
-for j in {96..127}; do zcat c2taFull$ver$j.s | awk -F\; '{print $3 ";" $1}' | lsort 5G -t\; -k1b,2 | gzip > a2cFull$ver$j.s & done
+for j in {0..31}; do zcat c2taF$ver$j.s | awk -F\; '{print $3 ";" $1}' | lsort 5G -t\; -k1b,2 | gzip > a2cF$ver$j.s & done
 wait
 str="$HOME/bin/lsort 50G -u --merge -t\; -k1b,2"
-for j in {0..127}; do str="$str <(zcat a2cFull$ver$j.s)"; done
+for j in {0..31}; do str="$str <(zcat a2cFull$ver$j.s)"; done
 eval $str | perl -I ~/lookup -I ~/lib/x86_64-linux-gnu/perl  ~/lookup/splitSecCh.perl a2cFull$ver 32
-for j in {0..31..4}; do zcat a2cFull$ver$j.gz |perl -I ~/lookup -I ~/lib/x86_64-linux-gnu/perl  ~/lookup/Prj2CmtBinSorted.perl /fast/a2cFull$ver.$j.tch; done &
-for j in {1..31..4}; do zcat a2cFull$ver$j.gz |perl -I ~/lookup -I ~/lib/x86_64-linux-gnu/perl  ~/lookup/Prj2CmtBinSorted.perl /fast/a2cFull$ver.$j.tch; done &
-for j in {2..31..4}; do zcat a2cFull$ver$j.gz |perl -I ~/lookup -I ~/lib/x86_64-linux-gnu/perl  ~/lookup/Prj2CmtBinSorted.perl /fast/a2cFull$ver.$j.tch; done &
-for j in {3..31..4}; do zcat a2cFull$ver$j.gz |perl -I ~/lookup -I ~/lib/x86_64-linux-gnu/perl  ~/lookup/Prj2CmtBinSorted.perl /fast/a2cFull$ver.$j.tch; done &
+for j in {0..31}; do mv a2cFull$ver$j.gz a2cFull$ver$j.s; done
+zcat a2cFull$ver*.s | cut -d\; -f1 | uniq | gzip > as$ver.gz
+zcat as$ver.s | perl -I /home/audris/lib64/perl5 -I /home/audris/lib/x86_64-linux-gnu/perl -I /home/audris/lookup -ane 'use cmt; chop();@x=splitSignature($_);@n = split(/ /, $x[0]); @e = split(/\@/, $x[1]); print "$_;$x[0];$x[1];$n[0];$n[$#n];$e[0];$e[1]\n";' | gzip > as$ver.split
 
-for i in {0..31..4}; do perl -I ~/lib/x86_64-linux-gnu/perl -I ~/lookup ~/lookup/Cmt2Chld.perl c2ccM $i | gzip > cnpM.$i; done &
-for i in {1..31..4}; do perl -I ~/lib/x86_64-linux-gnu/perl -I ~/lookup ~/lookup/Cmt2Chld.perl c2ccM $i | gzip > cnpM.$i; done &
-for i in {2..31..4}; do perl -I ~/lib/x86_64-linux-gnu/perl -I ~/lookup ~/lookup/Cmt2Chld.perl c2ccM $i | gzip > cnpM.$i; done &
-for i in {3..31..4}; do perl -I ~/lib/x86_64-linux-gnu/perl -I ~/lookup ~/lookup/Cmt2Chld.perl c2ccM $i | gzip > cnpM.$i; done &
+for j in {0..31..4}; do zcat a2cFull$ver$j.s |perl -I ~/lookup -I ~/lib/x86_64-linux-gnu/perl  ~/lookup/Prj2CmtBinSorted.perl /fast/a2cFull$ver.$j.tch; done &
+for j in {1..31..4}; do zcat a2cFull$ver$j.s |perl -I ~/lookup -I ~/lib/x86_64-linux-gnu/perl  ~/lookup/Prj2CmtBinSorted.perl /fast/a2cFull$ver.$j.tch; done &
+for j in {2..31..4}; do zcat a2cFull$ver$j.s |perl -I ~/lookup -I ~/lib/x86_64-linux-gnu/perl  ~/lookup/Prj2CmtBinSorted.perl /fast/a2cFull$ver.$j.tch; done &
+for j in {3..31..4}; do zcat a2cFull$ver$j.s |perl -I ~/lookup -I ~/lib/x86_64-linux-gnu/perl  ~/lookup/Prj2CmtBinSorted.perl /fast/a2cFull$ver.$j.tch; done &
 
 
-for j in {0..31..4}; do zcat c2pFullM$j.s | join -t\; - <(zcat c2taFM.$j.s) | awk -F\; '{ print $4";"$2}' | uniq | $HOME/bin/lsort ${maxM}M -t\; -k1b,2 -u | gzip > a2pM$j.s; done &
-for j in {0..31}; do zcat a2pM$j.s | perl -I$HOME/lookup -I $HOME/lib/perl5 $HOME/lookup/splitSecCh.perl a2pM.$j. 32 & done
-for j in {0..31}; do str="$HOME/bin/lsort ${maxM}M -t\; -k1b,2 --merge -u";   for i in {0..31};   do  str="$str <(zcat a2pM.$i.$j.gz)";   done;   eval $str > a2pM.$j.gz; done
+for i in {0..31..4}; do perl -I ~/lib/x86_64-linux-gnu/perl -I ~/lookup ~/lookup/Cmt2Chld.perl /fast/c2cc$ver $i | gzip > cnp$ver.$i; done &
+for i in {1..31..4}; do perl -I ~/lib/x86_64-linux-gnu/perl -I ~/lookup ~/lookup/Cmt2Chld.perl c2cc$ver $i | gzip > cnp$ver.$i; done &
+for i in {2..31..4}; do perl -I ~/lib/x86_64-linux-gnu/perl -I ~/lookup ~/lookup/Cmt2Chld.perl c2cc$ver $i | gzip > cnp$ver.$i; done &
+for i in {3..31..4}; do perl -I ~/lib/x86_64-linux-gnu/perl -I ~/lookup ~/lookup/Cmt2Chld.perl c2cc$ver $i | gzip > cnp$ver.$i; done &
 
-for j in {0..31}; do zcat a2pM$j.s |  awk -F\; '{ print $2";"$1}' | perl -I$HOME/lookup -I $HOME/lib/perl5 $HOME/lookup/splitSecCh.perl p2aM.$j. 32 & done
+
+for j in {0..31..4}; do zcat c2pFull$ver$j.s | join -t\; - <(zcat c2taF$ver.$j.s) | awk -F\; '{ print $4";"$2}' | uniq | $HOME/bin/lsort ${maxM}M -t\; -k1b,2 -u | gzip > a2p$ver$j.s; done &
+for j in {0..31}; do zcat a2p$ver$j.s | perl -I$HOME/lookup -I $HOME/lib/perl5 $HOME/lookup/splitSecCh.perl a2p$ver.$j. 32 & done
+for j in {0..31}; do str="$HOME/bin/lsort ${maxM}M -t\; -k1b,2 --merge -u";   for i in {0..31};   do  str="$str <(zcat a2p$ver.$i.$j.gz)";   done;   eval $str > a2p$ver.$j.gz; done
+
+for j in {0..31}; do zcat a2p$ver$j.s |  awk -F\; '{ print $2";"$1}' | perl -I$HOME/lookup -I $HOME/lib/perl5 $HOME/lookup/splitSecCh.perl p2a$ver.$j. 32 & done
 wait
-for j in {0..31}; do for i in {0..31};   do $HOME/bin/lsort ${maxM}M -t\; -k1b,2 <(zcat p2aM.$i.$j.gz) | gzip > p2aM.$i.$j.s &   done;   wait; done
-for j in {0..31}; do str="lsort 8G -t\; -k1b,2 -u --merge"; for i in {0..31}; do str="$str <(zcat p2aM.$i.$j.s)"; done; eval $str | gzip > p2aM$j.s & done
+for j in {0..31}; do for i in {0..31};   do $HOME/bin/lsort ${maxM}M -t\; -k1b,2 <(zcat p2a$ver.$i.$j.gz) | gzip > p2a$ver.$i.$j.s &   done;   wait; done
+for j in {0..31}; do str="lsort 8G -t\; -k1b,2 -u --merge"; for i in {0..31}; do str="$str <(zcat p2a$ver.$i.$j.s)"; done; eval $str | gzip > p2a$ver$j.s & done
 
-for j in {0..31}; do zcat a2pM$j.s |  perl ~/lookup/mp.perl 1 c2pFullM.forks | lsort 30G -t\; -k1b,2 -u | gzip > a2PM$j.s; done
+for j in {0..31}; do zcat a2p$ver$j.s |  perl ~/lookup/mp.perl 1 c2pFull$ver.forks | lsort 30G -t\; -k1b,2 -u | gzip > a2P$ver$j.s; done
 
-for j in {0..31}; do zcat p2aM$j.s |  perl ~/lookup/mp.perl 0 c2pFullM.forks | perl -I$HOME/lookup -I $HOME/lib/perl5 $HOME/lookup/splitSecCh.perl P2aM.$j. 32; done
-for j in {0..31}; do for i in {0..31};   do $HOME/bin/lsort ${maxM}M -t\; -k1b,2 <(zcat P2aM.$i.$j.gz) | gzip > P2aM.$i.$j.s &   done;   wait; done
-for j in {0..31}; do str="lsort 8G -t\; -k1b,2 -u --merge"; for i in {0..31}; do str="$str <(zcat P2aM.$i.$j.s)"; done; eval $str | gzip > P2aM$j.s & done
+for j in {0..31}; do zcat p2a$ver$j.s |  perl ~/lookup/mp.perl 0 c2pFull$ver.forks | perl -I$HOME/lookup -I $HOME/lib/perl5 $HOME/lookup/splitSecCh.perl P2a$ver.$j. 32; done
+for j in {0..31}; do for i in {0..31};   do $HOME/bin/lsort ${maxM}M -t\; -k1b,2 <(zcat P2a$ver.$i.$j.gz) | gzip > P2a$ver.$i.$j.s &   done;   wait; done
+for j in {0..31}; do str="lsort 8G -t\; -k1b,2 -u --merge"; for i in {0..31}; do str="$str <(zcat P2a$ver.$i.$j.s)"; done; eval $str | gzip > P2a$ver$j.s & done
 
 
 # 201812
@@ -278,26 +515,37 @@ for j in {0..127}; do lsort 2G -t\; -k1b,2 <(zcat b$pVer${LA}pkgs.$j.gz) <(zcat 
 
 
 #plot languages
-for LA in JS java PY C php Lisp Rust Scala rb Swift Go Lua Sql Cs R F Cob
-do zcat c2taK$LA.*.gz|awk -F\; '{print int($2/3600/24/365.25+1970)}' | lsort 10G | uniq -c > ${LA}K.trend
-zcat c2taK$LA.*.gz|awk -F\; '{print int($2/3600/24/365.25+1970)";"$3}' | lsort 10G | uniq | cut -d\; -f1 | uniq -c > ${LA}K.trendA
+ver=N
+LNGS="JS java PY C php Lisp Rust Scala rb Swift Go Lua Sql Cs R F jl Fml Cob"
+for LA in $LNGS
+do zcat c2ta$ver$LA.*.gz|awk -F\; '{print int($2/3600/24/365.25+1970)}' | lsort 10G | uniq -c > ${LA}$ver.trend
+zcat c2ta$ver$LA.*.gz|awk -F\; '{print int($2/3600/24/365.25+1970)";"$3}' | lsort 10G | uniq | cut -d\; -f1 | uniq -c > ${LA}$ver.trendA
 done
-s="year";for LA in JS java PY C php Lisp Rust Scala rb Swift Go Lua Sql Cs R F Cob; do s="$s;$LA";done; echo $s > cmtsK.lng
-for y in {2010..2018}; do s="$y";for LA in JS java PY C php Lisp Rust Scala rb Swift Go Lua Sql Cs R F
-do n=$(grep " $y$" ${LA}K.trend | awk '{print $1}'); s="$s;$n"; done; echo $s; done >> cmtsK.lng
-s="year";for LA in JS java PY C php Lisp Rust Scala rb Swift Go Lua Sql Cs R F Cob; do s="$s;$LA";done; echo $s > cmtsK.lng1
-for y in {2010..2018}; do s="$y";for LA in JS java PY C php Lisp Rust Scala rb Swift Go Lua Sql Cs R F
-do n=$(grep " $y$" ${LA}K.trendA | awk '{print $1}'); s="$s;$n"; done; echo $s; done >> cmtsK.lng1
-x=read.table("../../../cmts.lng1",sep=";",header=T)
-png("trndA.png",width=1000,height=750);matplot(x[,1],x[,-1],type="o",lwd=1:3,lty=1:7,col=1:5,log="y",pch="0123456789abcdefghi",xlab="Years",ylab="Authors");off()
-png("trndPrd.png",width=1000,height=750);
-matplot(x[,1],y[,-1]/x[,-1],type="o",lwd=1:3,lty=1:7,col=1:5,log="y",pch="0123456789abcdefghi",xlab="Years",ylab="Cmghi");
+s="year";for LA in $LNGS; do s="$s;$LA";done; echo $s > cmts$ver.lng
+for y in {2010..2018}; do s="$y";for LA in  $LNGS
+do n=$(grep " $y$" ${LA}$ver.trend | awk '{print $1}'); s="$s;$n"; done; echo $s; done >> cmts$ver.lng
+s="year";for LA in $LNGS; do s="$s;$LA";done; echo $s > cmts$ver.lng1
+for y in {2010..2018}; do s="$y";for LA in $LNGS
+do n=$(grep " $y$" ${LA}$ver.trendA | awk '{print $1}'); s="$s;$n"; done; echo $s; done >> cmts$ver.lng1
+
+x=read.table("cmtsN.lng1",sep=";",header=T)
+y=read.table("cmtsN.lng",sep=";",header=T)
+png("AuthorsByLanguageN.png",width=1000,height=750);
+matplot(x[,1],x[,-1],type="o",lwd=1:3,lty=1:7,col=1:5,log="y",pch="0123456789abcdefghi",xlab="Years",ylab="Authors");
+N=dim(x)[2]-1;
+legend(2016.1,1e04,legend=names(x)[-1],lty=1:7,col=1:5,lwd=1:3,pch="0123456789abcdefghi",bg="white")
 dev.off()
+png("PrdByLanguageN.png",width=1000,height=750);
+matplot(x[,1],y[,-1]/x[,-1],type="o",lwd=1:3,lty=1:7,col=1:5,log="y",pch="0123456789abcdefghi",xlab="Years",ylab="Cmghi");
+legend(2016.1,1000,legend=names(x)[-1],lwd=1:3,lty=1:7,col=1:5,pch="0123456789abcdefghi",bg="white")
+dev.off();
 
-#nost frequent reuse:
-for LA in R C Cs Go Rust java; do  zcat m2nPK$LA |lsort 10G -rn -t\; -k2  | head -10 > m2npK$LA.10; done
-
-
+#most frequent reuse:
+see grepNew.pbs
+overview/deps/plot.r
+LNGS1="C Cs F Go JS PY R Rust Scala java jl pl rb"
+for LA in $LNGS1; do scp -p $ver$LA.* da0:/data/play/plots; done
+scp -p cmts$ver.lng1 cmts$ver.lng *N.trend *N.trendA da0:/data/play/plots/
 
 
 #fix blob.bin,idx,vs
