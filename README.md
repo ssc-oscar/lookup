@@ -18,14 +18,14 @@ a - author
 c - commit (cc - child commit)
 f - file
 b - blob
-p - project (P - after fork normaliation)
+p - project (P - after fork normalization)
 t - time 
 m - module
 
 
 Full - means a complete set at that version
 
-N - 0-31: the databasebased on prehash
+N - 0-31: the database based on prehash
 ```
 
 1. author2commit: a2cFullO.{0..31}.tch
