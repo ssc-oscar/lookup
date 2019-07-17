@@ -33,7 +33,7 @@ Grab a list of authors
 ```
 echo "Audris Mockus <audris@utk.edu>" | /da3_data/lookup/Prj2CmtShow.perl /da0_data/basemaps/a2cFullP 1 32
 ```
-2. author2file: a2fFullP.{0..31}.tch, tese are files for blobs created or deeted by the commit (see 6) - need to calculate for version M
+2. author2file: a2fFullP.{0..31}.tch, these are files for blobs created or deleted by the commit (see 6) - need to calculate for version M
 ```
 echo "Audris Mockus <audris@utk.edu>" | /da3_data/lookup/Prj2FileShow.perl /da0_data/basemaps/a2fFullM.tch 1 32
 ```
@@ -53,7 +53,7 @@ echo e4af89166a17785c1d741b8b1d5775f3223f510f | /da3_data/lookup/Cmt2BlobShow.pe
 echo e4af89166a17785c1d741b8b1d5775f3223f510f |/da3_data/lookup/Cmt2PrjShow.perl /da0_data/basemaps/c2pFullP 1 32
 ```
 
-6. file2commit: f2cFullO.{0..31}.tch, tese are files for blobs created or deeted by the commit
+6. file2commit: f2cFullO.{0..31}.tch, these are files for blobs created or deleted by the commit
 ```
 echo main.c |/da3_data/lookup/Prj2CmtShow.perl /d0_data/basemaps/f2cFullO 1 8
 ```
@@ -69,11 +69,11 @@ Details for PY, for example, are in c2bPtaPkgOPY.{0..31}.gz
 also on /lustre/haven/user/audris/basemaps
 see grepNew.pbs for exact details.
 
-## How to see a content of a commit
+## How to see content of a commit
 ```
 echo e4af89166a17785c1d741b8b1d5775f3223f510f | perl ~audris/bin/showCmt.perl [parameter]
 ```
-## How to see a content of a tree
+## How to see content of a tree
 ```
 echo f1b66dcca490b5c4455af319bc961a34f69c72c2 | perl ~audris/bin/showTree.perl
 ```
@@ -97,7 +97,7 @@ echo 05fe634ca4c8386349ac519f899145c75fff4169 | perl ~audris/bin/showBlob.perl
         i. 39247534 are not forks ghReposList2017.nofork
         i. 9774023 not seen before list2017.u
         i. 1287830 repos with detail in bbList2017
-1. clone repos in the list (breatk into 400Gb chunks based on size github.github-ghUsers17.repos.values.full_name.id.size.private.fork.forks.forks_count.watchers.watchers_count.stargazers_count.has_downloads.has_pages.open_issues.hompage.language.created_at.updated_at.pushed_at.default_branch.description)
+1. clone repos in the list (break into 400Gb chunks based on size github.github-ghUsers17.repos.values.full_name.id.size.private.fork.forks.forks_count.watchers.watchers_count.stargazers_count.has_downloads.has_pages.open_issues.hompage.language.created_at.updated_at.pushed_at.default_branch.description)
 1. extract olist.gz for each chunk
 1. extract blobs, commits, trees, tags based on the olist (see beacon scripts below)
 1. Extract c2p info from *.olist.gz, olist.gz is obtained first, then objects are extracted based on it
@@ -689,7 +689,7 @@ wait
 #use this to capture missing blobs
 zcat csC2BK$j.s | join -v2 - <(zcat csC2FK$j.s) > fNoB$j
 
-#Clean c2f: determine whats up with missuing commits
+#Clean c2f: determine whats up with missing commits
 
 perl join.perl b2fFullJ$j.s /da0_data/c2fbp/b2f.s.$j.s | gzip > /data/update/b2fFullJ$j.s.extra #need to finish b2c
 
