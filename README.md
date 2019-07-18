@@ -21,7 +21,7 @@ b - blob
 p - project (P - after fork normalization)
 t - time 
 m - module
-
+tr - torvalds index (For DRE)
 
 Full - means a complete set at that version
 
