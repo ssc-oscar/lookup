@@ -30,7 +30,8 @@ N - 0-31: the database based on prehash
 # Commands to get information #
 
 
-## 1 How to get a list of Author2Commit information - author2commit: a2cFullP.{0..31}.tch  
+## 1 How to get a list of Author2Commit information 
+### author2commit: a2cFullP.{0..31}.tch  
 ```
 This prints out the commit ID/Hash of all the author's git commits seperated by a semicolon ( ; )
 echo git-commit-ID | /da3_data/lookup/Prj2CmtShow.perl /da0_data/basemaps/a2cFullP 1 32
@@ -39,7 +40,8 @@ Examples:
 * echo "Adam Tutko <atutko@vols.utk.edu>" | /da3_data/lookup/Prj2CmtShow.perl /da0_data/basemaps/a2cFullP 1 32
 ```
 
-## 2. How to get a list of Author2File information - author2file: a2fFullP.{0..31}.tch, these are files for blobs created or deleted by the commit (see 6) - need to calculate for version M
+## 2. How to get a list of Author2File information
+### author2file: a2fFullP.{0..31}.tch, these are files for blobs created or deleted by the commit (see 6)
 ```
 Examples:
 * echo "Audris Mockus <audris@utk.edu>" | /da3_data/lookup/Prj2FileShow.perl /da0_data/basemaps/a2fFullO 1 32
