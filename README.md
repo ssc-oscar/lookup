@@ -43,7 +43,7 @@ echo "Audris Mockus <audris@utk.edu>" | /da3_data/lookup/Prj2FileShow.perl /da0_
 echo 05fe634ca4c8386349ac519f899145c75fff4169 | /da3_data/lookup/Cmt2BlobShow.perl /da0_data/basemaps/b2cFullO 1 32
 ```
 
-4. commit2blob: c2bFullO.{0..31}.tch  # Fixed by changing to c2bFullO from c2bFullN, the previous code did not run
+4. commit2blob: c2bFullO.{0..31}.tch   
 ```
 echo e4af89166a17785c1d741b8b1d5775f3223f510f | /da3_data/lookup/Cmt2BlobShow.perl /data/basemaps/c2bFullO 1 32
 ```
@@ -58,7 +58,7 @@ echo e4af89166a17785c1d741b8b1d5775f3223f510f |/da3_data/lookup/Cmt2PrjShow.perl
 echo main.c |/da3_data/lookup/Prj2CmtShow.perl /d0_data/basemaps/f2cFullO 1 8
 ```
 
-7. project2commit: p2cFullP.{0..31}.tch  # Fixed by changing to p2cFullP from p2cFullO, the previous code did not run
+7. project2commit: p2cFullP.{0..31}.tch  
 ```
 echo ArtiiQ_PocketMine-MP |/da3_data/lookup/Prj2CmtShow.perl /da0_data/basemaps/p2cFullP 1 32
 ```
