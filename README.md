@@ -28,7 +28,7 @@ Full - means a complete set at that version
 N - 0-31: the database based on prehash
 ```
 
-1. author2commit: a2cFullO.{0..31}.tch
+1. author2commit: a2cFullP.{0..31}.tch
 Grab a list of authors
 ```
 echo "Audris Mockus <audris@utk.edu>" | /da3_data/lookup/Prj2CmtShow.perl /da0_data/basemaps/a2cFullP 1 32
@@ -43,9 +43,9 @@ echo "Audris Mockus <audris@utk.edu>" | /da3_data/lookup/Prj2FileShow.perl /da0_
 echo 05fe634ca4c8386349ac519f899145c75fff4169 | /da3_data/lookup/Cmt2BlobShow.perl /da0_data/basemaps/b2cFullO 1 32
 ```
 
-4. commit2blob: c2bFullN.{0..31}.tch  # need fix
+4. commit2blob: c2bFullO.{0..31}.tch  # Fixed by changing to c2bFullO from c2bFullN, the previous code did not run
 ```
-echo e4af89166a17785c1d741b8b1d5775f3223f510f | /da3_data/lookup/Cmt2BlobShow.perl /data/basemaps/c2bFullN 1 32
+echo e4af89166a17785c1d741b8b1d5775f3223f510f | /da3_data/lookup/Cmt2BlobShow.perl /data/basemaps/c2bFullO 1 32
 ```
 
 5. commit2project: c2pFullO.{0..31}.tch 
@@ -58,9 +58,9 @@ echo e4af89166a17785c1d741b8b1d5775f3223f510f |/da3_data/lookup/Cmt2PrjShow.perl
 echo main.c |/da3_data/lookup/Prj2CmtShow.perl /d0_data/basemaps/f2cFullO 1 8
 ```
 
-7. project2commit: p2cFullP.{0..31}.tch
+7. project2commit: p2cFullP.{0..31}.tch  # Fixed by changing to p2cFullP from p2cFullO, the previous code did not run
 ```
-echo ArtiiQ_PocketMine-MP |/da3_data/lookup/Prj2CmtShow.perl /da0_data/basemaps/p2cFullO 1 32
+echo ArtiiQ_PocketMine-MP |/da3_data/lookup/Prj2CmtShow.perl /da0_data/basemaps/p2cFullP 1 32
 ```
 8. Commit to child commit /da0_data/basemaps/c2ccO.{0..31}.s
 9. Commit to time+author: /da0_data/basemaps/c2taFullP.{0..31}.s
