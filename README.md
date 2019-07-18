@@ -27,12 +27,14 @@ Full - means a complete set at that version
 
 N - 0-31: the database based on prehash
 ```
+# Commands to get information #
 
-1. author2commit: a2cFullP.{0..31}.tch
-Grab a list of authors
+
+## 1 How to get a list of Author2Commit information - author2commit: a2cFullP.{0..31}.tch ## 
 ```
 echo "Audris Mockus <audris@utk.edu>" | /da3_data/lookup/Prj2CmtShow.perl /da0_data/basemaps/a2cFullP 1 32
 ```
+
 2. author2file: a2fFullP.{0..31}.tch, these are files for blobs created or deleted by the commit (see 6) - need to calculate for version M
 ```
 echo "Audris Mockus <audris@utk.edu>" | /da3_data/lookup/Prj2FileShow.perl /da0_data/basemaps/a2fFullM.tch 1 32
