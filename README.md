@@ -27,31 +27,44 @@ Full - means a complete set at that version
 
 N - 0-31: the database based on prehash
 ```
-# Commands to get information #
+# Information Retrieval for Git 
 
-
-## 1 How to get a list of Author2Commit information 
-### author2commit formatting: a2cFullP.{0..31}.tch
+### 1. How to get a list of commits made by an author 
+#### author2commit formatting: a2cFullP.{0..31}.tch
 ```
-This prints out the commit ID/Hash of all the author's git commits seperated by a semicolon ( ; )
+This prints the total number of commit ID/Hash the author has made, 
+then this prints the commit ID/Hash of all the author's git commits seperated by a semicolon ( ; )
 
 Command:
    echo "git-commit-ID" | /da3_data/lookup/Prj2CmtShow.perl /da0_data/basemaps/a2cFullP 1 32
-   Examples: 
-     * echo "Audris Mockus <audris@utk.edu>" | /da3_data/lookup/Prj2CmtShow.perl /da0_data/basemaps/a2cFullP 1 32
-     * echo "Adam Tutko <atutko@vols.utk.edu>" | /da3_data/lookup/Prj2CmtShow.perl /da0_data/basemaps/a2cFullP 1 32
+
+Examples: 
+  * echo "Audris Mockus <audris@utk.edu>" | /da3_data/lookup/Prj2CmtShow.perl /da0_data/basemaps/a2cFullP 1 32
+  * echo "Adam Tutko <atutko@vols.utk.edu>" | /da3_data/lookup/Prj2CmtShow.perl /da0_data/basemaps/a2cFullP 1 32
+  
+Example Output:
+;5;3ea51a41a5e6f85ce695d4ea56e789a10c9817e9;7c637bbfe419a71df5de89f358aeebf92a096129
+;c21fb159cd8fcb2c1674d353b0a0aaad1f7ed822;c2c65a39879bf443a430ba056ea892c51f0ff12d
+;d2ee19fffa494a1f75333c89c09fb2137444f203
+
+This shows the total Number of Commit ID/Hash is 5, then all 5 id's seperated by semicolons
+
+
 ```
 
-## 2. How to get a list of Author2File information
-### author2file: a2fFullP.{0..31}.tch, these are files for blobs created or deleted by the commit (see 6)
+### 2. How to get a list of files made by an author
+#### author2file: a2fFullP.{0..31}.tch
 ```
-This prints out the name of any file 
+This prints out the total number of files created, then prints the file names of blobs (files) created or deleted by an author's commit
 
 Command:
    echo "git-commit-ID" | /da3_data/lookup/Prj2FileShow.perl /da0_data/basemaps/a2fFullO 1 32
-   Examples:
-     * echo "Audris Mockus <audris@utk.edu>" | /da3_data/lookup/Prj2FileShow.perl /da0_data/basemaps/a2fFullO 1 32
-     * echo "Adam Tutko <atutko@vols.utk.edu>" | /da3_data/lookup/Prj2FileShow.perl /da0_data/basemaps/a2fFullO 1 32
+   
+Examples:
+   * echo "Audris Mockus <audris@utk.edu>" | /da3_data/lookup/Prj2FileShow.perl /da0_data/basemaps/a2fFullO 1 32
+   * echo "Adam Tutko <atutko@vols.utk.edu>" | /da3_data/lookup/Prj2FileShow.perl /da0_data/basemaps/a2fFullO 1 32
+   
+Example Output: 
 ```
 
 3. blob2commit: b2cFullO.{0..31}.tch
