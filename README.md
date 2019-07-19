@@ -41,14 +41,6 @@ Command:
 Examples: 
   * echo "Audris Mockus <audris@utk.edu>" | /da3_data/lookup/Prj2CmtShow.perl /da0_data/basemaps/a2cFullP 1 32
   * echo "Adam Tutko <atutko@vols.utk.edu>" | /da3_data/lookup/Prj2CmtShow.perl /da0_data/basemaps/a2cFullP 1 32
-  
-Example Output:
-;5;3ea51a41a5e6f85ce695d4ea56e789a10c9817e9;7c637bbfe419a71df5de89f358aeebf92a096129
-;c21fb159cd8fcb2c1674d353b0a0aaad1f7ed822;c2c65a39879bf443a430ba056ea892c51f0ff12d
-;d2ee19fffa494a1f75333c89c09fb2137444f203
-
-This shows the total Number of Commit ID/Hash is 5, then all 5 id's seperated by semicolons
-
 
 ```
 
@@ -63,28 +55,50 @@ Command:
 Examples:
    * echo "Audris Mockus <audris@utk.edu>" | /da3_data/lookup/Prj2FileShow.perl /da0_data/basemaps/a2fFullO 1 32
    * echo "Adam Tutko <atutko@vols.utk.edu>" | /da3_data/lookup/Prj2FileShow.perl /da0_data/basemaps/a2fFullO 1 32
+
+```
+
+### 3. How to get a list of commit-IDs associated with a Blob-ID 
+#### blob2commit: b2cFullO.{0..31}.tch
+```
+This prints out the commits associated with a file based on it's Blob-ID.
+
+Command:
+   echo "Blob-ID" (no quotes) | /da3_data/lookup/Cmt2BlobShow.perl /da0_data/basemaps/b2cFullO 1 32
+
+Examples: 
+   echo 05fe634ca4c8386349ac519f899145c75fff4169 | /da3_data/lookup/Cmt2BlobShow.perl /da0_data/basemaps/b2cFullO 1 32
+   echo a7081031fc8f4fea0d35dd8486f8900febd2347e | /da3_data/lookup/Cmt2BlobShow.perl /da0_data/basemaps/b2cFullO 1 32
+
+```
+
+### 4. How to get a Blob-ID from a Commit-ID
+#### commit2blob: c2bFullO.{0..31}.tch   
+```
+This prints out the Blob-ID associated with the Commit-ID given. 
+
+Command:
+   echo "Commit-ID" (no quotes) | /da3_data/lookup/Cmt2BlobShow.perl /da0_data/basemaps/c2bFullO 1 32
    
-Example Output: 
+Examples:
+   * echo e4af89166a17785c1d741b8b1d5775f3223f510f | /da3_data/lookup/Cmt2BlobShow.perl /da0_data/basemaps/c2bFullO 1 32
+   * echo fe1ce9e5e8ebe83569c53ebe1f05f0688136ef2c | /da3_data/lookup/Cmt2BlobShow.perl /da0_data/basemaps/c2bFullO 1 32
+
+Output:
+   Formatting: Commit-ID;#;Blob-ID
+   Example: fe1ce9e5e8ebe83569c53ebe1f05f0688136ef2c;1;a7081031fc8f4fea0d35dd8486f8900febd2347e
+
 ```
 
-3. blob2commit: b2cFullO.{0..31}.tch
-```
-echo 05fe634ca4c8386349ac519f899145c75fff4169 | /da3_data/lookup/Cmt2BlobShow.perl /da0_data/basemaps/b2cFullO 1 32
-```
-
-4. commit2blob: c2bFullO.{0..31}.tch   
-```
-echo e4af89166a17785c1d741b8b1d5775f3223f510f | /da3_data/lookup/Cmt2BlobShow.perl /data/basemaps/c2bFullO 1 32
-```
-
-5. commit2project: c2pFullO.{0..31}.tch 
+### 5. How to 
+#### commit2project: c2pFullO.{0..31}.tch 
 ```
 echo e4af89166a17785c1d741b8b1d5775f3223f510f |/da3_data/lookup/Cmt2PrjShow.perl /da0_data/basemaps/c2pFullP 1 32
 ```
 
 6. file2commit: f2cFullO.{0..31}.tch, these are files for blobs created or deleted by the commit
 ```
-echo main.c |/da3_data/lookup/Prj2CmtShow.perl /d0_data/basemaps/f2cFullO 1 8
+echo main.c |/da3_data/lookup/Prj2CmtShow.perl /da0_data/basemaps/f2cFullO 1 32
 ```
 
 7. project2commit: p2cFullP.{0..31}.tch  
