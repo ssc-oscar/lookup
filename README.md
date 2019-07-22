@@ -196,7 +196,7 @@ Details for PY, for example, are in c2bPtaPkgOPY.{0..31}.gz
 also on /lustre/haven/user/audris/basemaps
 see grepNew.pbs for exact details.
 
-### 11. How to see content of a commit
+### 11. How to see the content of a Commit-ID
 ```
 This command prints out the content of a given Commit-ID.
 
@@ -246,7 +246,7 @@ Output:
 
 ```
 
-### How to see content of a tree
+### How to see the content of a Tree-ID
 ```
 This command prints out the content of a given Tree-ID.
 This command can only be run on servers with SSDS. To run this command, use the da4 server.
@@ -255,7 +255,8 @@ This command can only be run on servers with SSDS. To run this command, use the 
 echo f1b66dcca490b5c4455af319bc961a34f69c72c2 | perl ~audris/bin/showTree.perl
 
 ```
-### 13. How to see content of a blob 
+
+### 13. How to see the content of a Blob-ID 
 ```
 This command prints out the content of a giver Blob-ID.
 This command can only be run on servers with SSDS. To run this command, use the da4 server. 
