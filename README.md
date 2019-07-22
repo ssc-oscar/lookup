@@ -270,17 +270,18 @@ Examples:
    
 Output:
    Formatting: blob;#ofSections;rl;CurrentPosition;Offset;Length;"Blob-ID"
-   "Content of the blob"
-   Example:
-   blob;5;8529;54537521775;54537521775;8529;05fe634ca4c8386349ac519f899145c75fff4169
-   # Syllabus for "Fundamentals of Digital Archeology"
-   ## News
-      * Assignment1 due Monday Sep 8 before 2:30PM
-      * Be ready to present your findings from Assignment1 on Monday
-      * Project 1 teams are formed! You should see Team? where ? is 1-5 in your github page (on the right)
-      * Lecture slides are at [Data Discovery](https://github.com/fdac/presentations/dd.pdf)
-      * Sep 5 lecture recording failed as 323Link (host for the recording) went down
-      ......
+               "Content of the blob"
+   
+   Examples:
+              blob;5;8529;54537521775;54537521775;8529;05fe634ca4c8386349ac519f899145c75fff4169
+              # Syllabus for "Fundamentals of Digital Archeology"
+              ## News
+                 * Assignment1 due Monday Sep 8 before 2:30PM
+                 * Be ready to present your findings from Assignment1 on Monday
+                 * Project 1 teams are formed! You should see Team? where ? is 1-5 in your github page (on the right)
+                 * Lecture slides are at [Data Discovery](https://github.com/fdac/presentations/dd.pdf)
+                 * Sep 5 lecture recording failed as 323Link (host for the recording) went down
+                 ......
    
 ```
 
