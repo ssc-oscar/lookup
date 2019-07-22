@@ -124,14 +124,42 @@ Output:
             rroper1_news;tapjdey_news;taurytang_syllabus;tennisjohn21_news
 ```
 
-6. file2commit: f2cFullO.{0..31}.tch, these are files for blobs created or deleted by the commit
+### 6. How to get the Commit-IDs associated with a file
+#### file2commit: f2cFullO.{0..31}.tch
 ```
-echo main.c |/da3_data/lookup/Prj2CmtShow.perl /da0_data/basemaps/f2cFullO 1 32
+This prints out the Commit-IDs associated with a file name.
+
+Command:
+   echo "File Name" (no quotes) |/da3_data/lookup/Prj2CmtShow.perl /da0_data/basemaps/f2cFullO 1 32
+
+Examples:
+   * echo main.c |/da3_data/lookup/Prj2CmtShow.perl /da0_data/basemaps/f2cFullO 1 32
+   * echo atutko.md |/da3_data/lookup/Prj2CmtShow.perl /da0_data/basemaps/f2cFullO 1 32
+   
+Output:
+   Formatting: "File Name";#ofCommit-IDs;Commit-IDs
+   Example: atutko.md;5;0a26e5acd9444f97f1a9e903117d957772a59c1d;3fc5c3db76306440a43460ab0fb52b27a01a2ab9;
+            6176db8cb561292c5f0fdcd7d52eb3f1bca23b36;c21fb159cd8fcb2c1674d353b0a0aaad1f7ed822;
+            c9ec77f6434319f9f9c417cf7f9c95ff64540223
+            
 ```
 
-7. project2commit: p2cFullP.{0..31}.tch  
+### 7. How to get the Commit-IDs associated with a project
+#### project2commit: p2cFullP.{0..31}.tch  
 ```
-echo ArtiiQ_PocketMine-MP |/da3_data/lookup/Prj2CmtShow.perl /da0_data/basemaps/p2cFullP 1 32
+This print out the Commit-IDs associated with a project name.
+
+Command:
+   echo "Project Name" (no quotes) |/da3_data/lookup/Prj2CmtShow.perl /da0_data/basemaps/p2cFullP 1 32
+   
+Examples:
+   echo ArtiiQ_PocketMine-MP |/da3_data/lookup/Prj2CmtShow.perl /da0_data/basemaps/p2cFullP 1 32
+   
+Output: 
+   Formatting: "Project Name";#ofCommitIDs;Commit-IDs
+   Example: ArtiiQ_PocketMine-MP;4456;0000000bab11354f9a759332065be5f066c3398f;000a0dedd9364072cb0e64bc48f1fba82c9fba65;
+   000ba5de528b3ea9680124f4fbe670867eafd2f8;000dfc860134262a46d8942a3c3b453528d99da9;.......
+   
 ```
 8. Commit to child commit /da0_data/basemaps/c2ccO.{0..31}.s
 9. Commit to time+author: /da0_data/basemaps/c2taFullP.{0..31}.s
