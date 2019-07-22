@@ -36,7 +36,7 @@ This prints the total number of commit ID/Hash the author has made,
 then this prints the commit ID/Hash of all the author's git commits seperated by a semicolon ( ; )
 
 Command:
-   echo "git-commit-ID" | /da3_data/lookup/Prj2CmtShow.perl /da0_data/basemaps/a2cFullP 1 32
+   * echo "git-commit-ID" | /da3_data/lookup/Prj2CmtShow.perl /da0_data/basemaps/a2cFullP 1 32
 
 Examples: 
    * echo "Audris Mockus <audris@utk.edu>" | /da3_data/lookup/Prj2CmtShow.perl /da0_data/basemaps/a2cFullP 1 32
@@ -56,7 +56,7 @@ Output:
 This prints out the total number of files created, then prints the file names of blobs (files) created or deleted by an author's commit
 
 Command:
-   echo "git-commit-ID" | /da3_data/lookup/Prj2FileShow.perl /da0_data/basemaps/a2fFullO 1 32
+   * echo "git-commit-ID" | /da3_data/lookup/Prj2FileShow.perl /da0_data/basemaps/a2fFullO 1 32
    
 Examples:
    * echo "Audris Mockus <audris@utk.edu>" | /da3_data/lookup/Prj2FileShow.perl /da0_data/basemaps/a2fFullO 1 32
@@ -74,7 +74,7 @@ Output:
 This prints out the commits associated with a file based on it's Blob-ID.
 
 Command:
-   echo "Blob-ID" (no quotes) | /da3_data/lookup/Cmt2BlobShow.perl /da0_data/basemaps/b2cFullO 1 32
+   * echo "Blob-ID" (no quotes) | /da3_data/lookup/Cmt2BlobShow.perl /da0_data/basemaps/b2cFullO 1 32
 
 Examples: 
    * echo 05fe634ca4c8386349ac519f899145c75fff4169 | /da3_data/lookup/Cmt2BlobShow.perl /da0_data/basemaps/b2cFullO 1 32
@@ -93,7 +93,7 @@ Output:
 This prints out the Blob-ID associated with the Commit-ID given. 
 
 Command:
-   echo "Commit-ID" (no quotes) | /da3_data/lookup/Cmt2BlobShow.perl /da0_data/basemaps/c2bFullO 1 32
+   * echo "Commit-ID" (no quotes) | /da3_data/lookup/Cmt2BlobShow.perl /da0_data/basemaps/c2bFullO 1 32
    
 Examples:
    * echo e4af89166a17785c1d741b8b1d5775f3223f510f | /da3_data/lookup/Cmt2BlobShow.perl /da0_data/basemaps/c2bFullO 1 32
@@ -111,7 +111,7 @@ Output:
 This prints out the names of the projects assoicuated with the given Commit-ID.
 
 Command:
-   echo "Commit-ID" (no quotes) |/da3_data/lookup/Cmt2PrjShow.perl /da0_data/basemaps/c2pFullP 1 32 
+   * echo "Commit-ID" (no quotes) |/da3_data/lookup/Cmt2PrjShow.perl /da0_data/basemaps/c2pFullP 1 32 
 
 Examples:
    * echo e4af89166a17785c1d741b8b1d5775f3223f510f | /da3_data/lookup/Cmt2PrjShow.perl /da0_data/basemaps/c2pFullP 1 32
@@ -130,7 +130,7 @@ Output:
 This prints out the Commit-IDs associated with a file name.
 
 Command:
-   echo "File Name" (no quotes) |/da3_data/lookup/Prj2CmtShow.perl /da0_data/basemaps/f2cFullO 1 32
+   * echo "File Name" (no quotes) |/da3_data/lookup/Prj2CmtShow.perl /da0_data/basemaps/f2cFullO 1 32
 
 Examples:
    * echo main.c |/da3_data/lookup/Prj2CmtShow.perl /da0_data/basemaps/f2cFullO 1 32
@@ -150,10 +150,10 @@ Output:
 This print out the Commit-IDs associated with a project name.
 
 Command:
-   echo "Project Name" (no quotes) |/da3_data/lookup/Prj2CmtShow.perl /da0_data/basemaps/p2cFullP 1 32
+   * echo "Project Name" (no quotes) |/da3_data/lookup/Prj2CmtShow.perl /da0_data/basemaps/p2cFullP 1 32
    
 Examples:
-   echo ArtiiQ_PocketMine-MP |/da3_data/lookup/Prj2CmtShow.perl /da0_data/basemaps/p2cFullP 1 32
+   * echo ArtiiQ_PocketMine-MP |/da3_data/lookup/Prj2CmtShow.perl /da0_data/basemaps/p2cFullP 1 32
    
 Output: 
    Formatting: "Project Name";#ofCommitIDs;Commit-IDs
