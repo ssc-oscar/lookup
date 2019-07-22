@@ -180,7 +180,7 @@ Output:
    
 ```
 
-### 9. How to go from Commit-ID to Time and Author
+### 9. How to get the Author and Time from Commit-ID
 #### Commit to time+author: /da0_data/basemaps/c2taFullP.{0..31}.s
 ```
 
@@ -196,16 +196,68 @@ Details for PY, for example, are in c2bPtaPkgOPY.{0..31}.gz
 also on /lustre/haven/user/audris/basemaps
 see grepNew.pbs for exact details.
 
-## How to see content of a commit
+### 11. How to see content of a commit
 ```
-echo e4af89166a17785c1d741b8b1d5775f3223f510f | perl ~audris/bin/showCmt.perl [parameter]
+This command prints out the content of a given Commit-ID.
+
+This command has additional optional paremter that can be added to change the formatting of the output. 
+
+This command can only be run on servers with SSDS. To run this command, use the da4 server.
+
+Command:
+   * echo "Commit-ID" (no quotes) | perl ~audris/bin/showCmt.perl [optional formatting parameter]
+
+Examples:
+   * echo e4af89166a17785c1d741b8b1d5775f3223f510f | perl ~audris/bin/showCmt.perl
+   * echo fe1ce9e5e8ebe83569c53ebe1f05f0688136ef2c | perl ~audris/bin/showCmt.perl
+   
+   * echo e4af89166a17785c1d741b8b1d5775f3223f510f | perl ~audris/bin/showCmt.perl 1
+   * echo fe1ce9e5e8ebe83569c53ebe1f05f0688136ef2c | perl ~audris/bin/showCmt.perl 1
+
+   * echo e4af89166a17785c1d741b8b1d5775f3223f510f | perl ~audris/bin/showCmt.perl 2
+   * echo fe1ce9e5e8ebe83569c53ebe1f05f0688136ef2c | perl ~audris/bin/showCmt.perl 2
+
+Output:
+   Formatting:
+      * No Formatting Parameter: "Commit-ID";"Tree-ID";"Parent-ID";Author;Committer
+      * Parameter 1: "Commit Message";"Commit-ID"
+      * Parameter 2: 
+                    tree "Tree-ID"
+                    parent "Parent-ID"
+                    author "Author-ID"
+                    committer "Committer-ID"
+                    
+                    "Commit Message"
+                    "Commit Message";"Commit-ID"
+      
+   Examples:
+      * No Formatting: e4af89166a17785c1d741b8b1d5775f3223f510f;f1b66dcca490b5c4455af319bc961a34f69c72c2;
+                       c19ff598808b181f1ab2383ff0214520cb3ec659;Audris Mockus <audris@utk.edu>;
+                       Audris Mockus <audris@utk.edu>;1410029988 -0400;1410029988 -0400 
+      * Parameter 1: News for Sep 5;e4af89166a17785c1d741b8b1d5775f3223f510f
+      * Parameter 2: 
+                    tree f1b66dcca490b5c4455af319bc961a34f69c72c2
+                    parent c19ff598808b181f1ab2383ff0214520cb3ec659
+                    author Audris Mockus <audris@utk.edu> 1410029988 -0400
+                    committer Audris Mockus <audris@utk.edu> 1410029988 -0400
+                    
+                    News for Sep 5
+                    News for Sep 5;e4af89166a17785c1d741b8b1d5775f3223f510f
+
 ```
-## How to see content of a tree
+
+### How to see content of a tree
 ```
+This command prints out the content of a given Tree-ID.
+This command can only be run on servers with SSDS. To run this command, use the da4 server.
+
+
 echo f1b66dcca490b5c4455af319bc961a34f69c72c2 | perl ~audris/bin/showTree.perl
+
 ```
 ### 13. How to see content of a blob 
 ```
+This command prints out the content of a giver Blob-ID.
 This command can only be run on servers with SSDS. To run this command, use the da4 server. 
 
 Command:
