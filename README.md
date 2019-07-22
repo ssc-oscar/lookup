@@ -162,9 +162,35 @@ Output:
    
 ```
 
-8. Commit to child commit /da0_data/basemaps/c2ccO.{0..31}.s
-9. Commit to time+author: /da0_data/basemaps/c2taFullP.{0..31}.s
-10. The extent of usage databases: for Go language in /da0_data/play/GothruMaps/m2nPMGo.s mo
+### 8. How to get the Child-Commit-IDs associated with a Commit-ID
+#### Commit2ChildCommit: /da0_data/basemaps/c2ccO.{0..31}.s
+```
+This prints the Child-Commit-ID of a given Commit-ID
+
+Command:
+   * echo "Commit-ID" (no quotes) | /da3_data/lookup/Cmt2BlobShow.perl /da0_data/basemaps/c2ccFullO 1 32
+   
+Examples:
+   * echo e4af89166a17785c1d741b8b1d5775f3223f510f | /da3_data/lookup/Cmt2BlobShow.perl /da0_data/basemaps/c2ccFullO 1 32
+   * echo fe1ce9e5e8ebe83569c53ebe1f05f0688136ef2c | /da3_data/lookup/Cmt2BlobShow.perl /da0_data/basemaps/c2ccFullO 1 32
+
+Output:
+   Formatting: "Commit-ID";#ofCC;"Child-Commit-ID"
+   Example: fe1ce9e5e8ebe83569c53ebe1f05f0688136ef2c;1;65d49eee6fb6f0fa1d3a69af14ae43311da54907
+   
+```
+
+### 9. How to go from Commit-ID to Time and Author
+#### Commit to time+author: /da0_data/basemaps/c2taFullP.{0..31}.s
+```
+
+```
+
+### 10.
+#### The extent of usage databases: for Go language in /da0_data/play/GothruMaps/m2nPMGo.s mo
+```
+
+```
 
 Details for PY, for example, are in c2bPtaPkgOPY.{0..31}.gz
 also on /lustre/haven/user/audris/basemaps
