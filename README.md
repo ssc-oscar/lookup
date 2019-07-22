@@ -161,9 +161,11 @@ Output:
    000ba5de528b3ea9680124f4fbe670867eafd2f8;000dfc860134262a46d8942a3c3b453528d99da9;.......
    
 ```
+
 8. Commit to child commit /da0_data/basemaps/c2ccO.{0..31}.s
 9. Commit to time+author: /da0_data/basemaps/c2taFullP.{0..31}.s
 10. The extent of usage databases: for Go language in /da0_data/play/GothruMaps/m2nPMGo.s mo
+
 Details for PY, for example, are in c2bPtaPkgOPY.{0..31}.gz
 also on /lustre/haven/user/audris/basemaps
 see grepNew.pbs for exact details.
@@ -176,9 +178,31 @@ echo e4af89166a17785c1d741b8b1d5775f3223f510f | perl ~audris/bin/showCmt.perl [p
 ```
 echo f1b66dcca490b5c4455af319bc961a34f69c72c2 | perl ~audris/bin/showTree.perl
 ```
-## How to see content of a blob - Run this command on the da4 server (This command can only be run on servers with ssds.)
+### 13. How to see content of a blob 
 ```
-echo 05fe634ca4c8386349ac519f899145c75fff4169 | perl ~audris/bin/showBlob.perl
+This command can only be run on servers with SSDS. To run this command, use the da4 server. 
+
+Command:
+   * echo "Blob-ID" (no quotes) | perl ~audris/bin/showBlob.perl
+
+Examples:
+   * echo 05fe634ca4c8386349ac519f899145c75fff4169 | perl ~audris/bin/showBlob.perl
+   * echo a7081031fc8f4fea0d35dd8486f8900febd2347e | perl ~audris/bin/showBlob.perl
+   
+Output:
+   Formatting: blob;#ofSections;rl;CurrentPosition;Offset;Length;"Blob-ID"
+   "Content of the blob"
+   Example:
+   blob;5;8529;54537521775;54537521775;8529;05fe634ca4c8386349ac519f899145c75fff4169
+   # Syllabus for "Fundamentals of Digital Archeology"
+   ## News
+      * Assignment1 due Monday Sep 8 before 2:30PM
+      * Be ready to present your findings from Assignment1 on Monday
+      * Project 1 teams are formed! You should see Team? where ? is 1-5 in your github page (on the right)
+      * Lecture slides are at [Data Discovery](https://github.com/fdac/presentations/dd.pdf)
+      * Sep 5 lecture recording failed as 323Link (host for the recording) went down
+      ......
+   
 ```
 
 
