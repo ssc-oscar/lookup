@@ -261,30 +261,34 @@ Examples:
 
 Output:
    Formatting:
-      * No Formatting Parameter: "Commit-ID";"Tree-ID";"Parent-ID";Author;Committer
-      * Parameter 1: "Commit Message";"Commit-ID"
-      * Parameter 2: 
-                    tree "Tree-ID"
-                    parent "Parent-ID"
-                    author "Author-ID"
-                    committer "Committer-ID"
+      No Formatting Parameter: 
+         * "Commit-ID";"Tree-ID";"Parent-ID";Author;Committer
+      Parameter 1: 
+         * "Commit Message";"Commit-ID"
+      Parameter 2: 
+         * tree "Tree-ID"
+           parent "Parent-ID"
+           author "Author-ID"
+           committer "Committer-ID"
                     
-                    "Commit Message"
-                    "Commit Message";"Commit-ID"
+           "Commit Message"
+           "Commit Message";"Commit-ID"
       
    Examples:
-      * No Formatting: e4af89166a17785c1d741b8b1d5775f3223f510f;f1b66dcca490b5c4455af319bc961a34f69c72c2;
-                       c19ff598808b181f1ab2383ff0214520cb3ec659;Audris Mockus <audris@utk.edu>;
-                       Audris Mockus <audris@utk.edu>;1410029988 -0400;1410029988 -0400 
-      * Parameter 1: News for Sep 5;e4af89166a17785c1d741b8b1d5775f3223f510f
+      * No Formatting: 
+         * e4af89166a17785c1d741b8b1d5775f3223f510f;f1b66dcca490b5c4455af319bc961a34f69c72c2;
+           c19ff598808b181f1ab2383ff0214520cb3ec659;Audris Mockus <audris@utk.edu>;
+           Audris Mockus <audris@utk.edu>;1410029988 -0400;1410029988 -0400 
+      * Parameter 1: 
+         * News for Sep 5;e4af89166a17785c1d741b8b1d5775f3223f510f
       * Parameter 2: 
-                    tree f1b66dcca490b5c4455af319bc961a34f69c72c2
-                    parent c19ff598808b181f1ab2383ff0214520cb3ec659
-                    author Audris Mockus <audris@utk.edu> 1410029988 -0400
-                    committer Audris Mockus <audris@utk.edu> 1410029988 -0400
-                    
-                    News for Sep 5
-                    News for Sep 5;e4af89166a17785c1d741b8b1d5775f3223f510f
+         * tree f1b66dcca490b5c4455af319bc961a34f69c72c2
+           parent c19ff598808b181f1ab2383ff0214520cb3ec659
+           author Audris Mockus <audris@utk.edu> 1410029988 -0400
+           committer Audris Mockus <audris@utk.edu> 1410029988 -0400
+           
+           News for Sep 5
+           News for Sep 5;e4af89166a17785c1d741b8b1d5775f3223f510f
 
 ```
 
