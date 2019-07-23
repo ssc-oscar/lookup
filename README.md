@@ -27,6 +27,35 @@ Full - means a complete set at that version
 
 N - 0-31: the database based on prehash
 ```
+
+
+# Example on how to use the below commands
+```
+Below is an example on how to chain the commands to gather information. The below commands were all run on the da4 server
+due to SSDS requirements.
+
+Run Command 2:
+   echo "Adam Tutko <atutko@vols.utk.edu>" | /da3_data/lookup/Prj2FileShow.perl /da0_data/basemaps/a2fFullO 1 32
+Output: 
+Adam Tutko <atutko@vols.utk.edu>;4;diffences.md;diffences.txt;proposal.md;atutko.md
+
+Run Command 6 with one of the File Names:
+   echo atutko.md |/da3_data/lookup/Prj2CmtShow.perl /da0_data/basemaps/f2cFullO 1 32
+Output: 
+atutko.md;5;0a26e5acd9444f97f1a9e903117d957772a59c1d;3fc5c3db76306440a43460ab0fb52b27a01a2ab9;
+6176db8cb561292c5f0fdcd7d52eb3f1bca23b36;c21fb159cd8fcb2c1674d353b0a0aaad1f7ed822;
+c9ec77f6434319f9f9c417cf7f9c95ff64540223
+
+Run Command 5 using any of the Commit-IDs output:
+   echo 0a26e5acd9444f97f1a9e903117d957772a59c1d | /da3_data/lookup/Cmt2PrjShow.perl /da0_data/basemaps/c2pFullP 1 32
+Output: 
+0a26e5acd9444f97f1a9e903117d957772a59c1d;1;CS340-19_students
+
+
+
+```
+
+
 # Information Retrieval for Git 
 
 ### 1. How to get a list of commits made by an author 
