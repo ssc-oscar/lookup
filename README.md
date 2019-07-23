@@ -52,7 +52,7 @@ Output:
 ### 2. How to get a list of files made by an author
 #### author2file: a2fFullP.{0..31}.tch
 ```
-This prints out the total number of files created, then prints the file names of blobs (files) created or deleted by an author's commit
+This prints the file names of blobs (files) created or deleted by an author's commit.
 
 Command:
    * echo "git-commit-ID" | /da3_data/lookup/Prj2FileShow.perl /da0_data/basemaps/a2fFullO 1 32
@@ -164,7 +164,7 @@ Output:
 ### 8. How to get the Child-Commit-IDs associated with a Commit-ID
 #### Commit2ChildCommit: /da0_data/basemaps/c2ccO.{0..31}.s
 ```
-This prints the Child-Commit-ID of a given Commit-ID
+This prints the Child-Commit-ID of a given Commit-ID.
 
 Command:
    * echo "Commit-ID" (no quotes) | /da3_data/lookup/Cmt2BlobShow.perl /da0_data/basemaps/c2ccFullO 1 32
@@ -281,7 +281,6 @@ Examples:
 Output:
    Formatting: blob;#ofSections;rl;CurrentPosition;Offset;Length;"Blob-ID"
                "Content of the blob"
-   
    Examples:
               blob;5;8529;54537521775;54537521775;8529;05fe634ca4c8386349ac519f899145c75fff4169
               # Syllabus for "Fundamentals of Digital Archeology"
