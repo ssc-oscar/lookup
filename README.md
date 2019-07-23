@@ -182,7 +182,7 @@ Output:
 ### 9. How to get the Author and Time from Commit-ID
 #### Commit to time+author: /da0_data/basemaps/c2taFullP.{0..31}.s
 ```
-
+echo e4af89166a17785c1d741b8b1d5775f3223f510f | /da3_data/lookup/Cmt2BlobShow.perl /da0_data/basemaps/c2taFullP 1 32
 ```
 
 ### 10.
