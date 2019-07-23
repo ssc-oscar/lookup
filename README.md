@@ -32,8 +32,7 @@ N - 0-31: the database based on prehash
 ### 1. How to get a list of commits made by an author 
 #### author2commit formatting: a2cFullP.{0..31}.tch
 ```
-This prints the total number of commit ID/Hash the author has made, 
-then this prints the commit ID/Hash of all the author's git commits seperated by a semicolon ( ; )
+This prints the total number of commit ID/Hash the author has made.
 
 Command:
    * echo "git-commit-ID" | /da3_data/lookup/Prj2CmtShow.perl /da0_data/basemaps/a2cFullP 1 32
@@ -248,17 +247,28 @@ Output:
 
 ### How to see the content of a Tree-ID
 ```
-This command prints out the content of a given Tree-ID.
+This command prints out the Blob-IDs and File Names of a given Tree-ID.
+
 This command can only be run on servers with SSDS. To run this command, use the da4 server.
 
+Command:
+   * echo "Tree-ID" (no quotes) | perl ~audris/bin/showTree.perl
 
-echo f1b66dcca490b5c4455af319bc961a34f69c72c2 | perl ~audris/bin/showTree.perl
+Examples:
+   * echo f1b66dcca490b5c4455af319bc961a34f69c72c2 | perl ~audris/bin/showTree.perl
+   * echo 0f8d572eb262b0510788d3ee7445099a256be5cb | perl ~audris/bin/showTree.perl
+   
+Output:
+   Formatting: "Mode";"Blob-ID";"FileName"
+   Example: 100644;05fe634ca4c8386349ac519f899145c75fff4169;README.md
+            100644;dfcd0359bfb5140b096f69d5fad3c7066f101389;course.pdf
 
 ```
 
 ### 13. How to see the content of a Blob-ID 
 ```
 This command prints out the content of a giver Blob-ID.
+
 This command can only be run on servers with SSDS. To run this command, use the da4 server. 
 
 Command:
