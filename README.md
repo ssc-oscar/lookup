@@ -227,21 +227,23 @@ Output:
 
 ```
 
-### 11.
+### 11. How to determine what code dependdencies are in a Blob
 #### The extent of usage databases: for Go language in /da0_data/play/GothruMaps/m2nPMGo.s mo
 ```
-
-```
+These are summaries that specify for each blob of a specific language, what dependencies it has.
+For example, for Python a file that has the statement "import pandas", it will specify that the Blob depends on pandas in c2bPta.
 
 Details for PY, for example, are in c2bPtaPkgOPY.{0..31}.gz
 also on /lustre/haven/user/audris/basemaps
 see grepNew.pbs for exact details.
 
+```
+
 ### 12. How to see the content of a Commit-ID
 ```
 This command prints out the content of a given Commit-ID.
 
-This command has additional optional paremter that can be added to change the formatting of the output. 
+This command has an additional optional paremter that can be added to change the formatting of the output. 
 
 This command can only be run on servers with SSDS. To run this command, use the da4 server.
 
@@ -361,8 +363,8 @@ Output:
 1. extract blobs, commits, trees, tags based on the olist (see beacon scripts below)
 1. Extract c2p info from *.olist.gz, olist.gz is obtained first, then objects are extracted based on it
 
-Version P
 
+### Version P
 ```
 (t=tag; ls -f O.*/*$t.bin  | sed 's/\.bin$//' | while read i; do (echo $i; perl -I ~/lib64/perl5/ /da3_data/lookup/checkBin1in.perl $t $i)&>> O.$t.err; done) &
 (t=commit; ls -f O.*/*$t.bin  | sed 's/\.bin$//' | while read i; do (echo $i; perl -I ~/lib64/perl5/ /da3_data/lookup/checkBin1in.perl $t $i)&>> O.$t.err; done) &
@@ -425,7 +427,8 @@ do cd /da0_data/play/${LA}thruMaps
 done
 
 ```
-Version O
+
+### Version O
 ```
 cd /data/update
 # 201903 add gitlab.com
@@ -542,8 +545,7 @@ scp -p cmts$ver.lng1 cmts$ver.lng *N.trend *N.trendA da0:/data/play/plots/
 
 ```
 
-Version N
-
+### Version N
 ```
 cd /data/update
 # 2019025
