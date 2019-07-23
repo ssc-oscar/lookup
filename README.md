@@ -182,7 +182,22 @@ Output:
 ### 9. How to get the Author and Time from Commit-ID
 #### Commit to time+author: /da0_data/basemaps/c2taFullP.{0..31}.s
 ```
-echo e4af89166a17785c1d741b8b1d5775f3223f510f | /da3_data/lookup/Cmt2BlobShow.perl /da0_data/basemaps/c2taFullP 1 32
+This command is not complete and does not currently print out useful information.
+
+This command prints out the Author and Time of a commit based on Commit-ID.
+
+Command:
+   * echo "Commit-ID" (no quotes) | /da3_data/lookup/Cmt2BlobShow.perl /da0_data/basemaps/c2taFullP 1 32
+
+Examples:
+   * echo e4af89166a17785c1d741b8b1d5775f3223f510f | /da3_data/lookup/Cmt2BlobShow.perl /da0_data/basemaps/c2taFullP 1 32
+   * echo fe1ce9e5e8ebe83569c53ebe1f05f0688136ef2c | /da3_data/lookup/Cmt2BlobShow.perl /da0_data/basemaps/c2taFullP 1 32
+   
+Output:
+   Formatting:
+   Example:
+
+
 ```
 
 ### 10.
@@ -245,7 +260,7 @@ Output:
 
 ```
 
-### How to see the content of a Tree-ID
+### 12. How to see the content of a Tree-ID
 ```
 This command prints out the Blob-IDs and File Names of a given Tree-ID.
 
