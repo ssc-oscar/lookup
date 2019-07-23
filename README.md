@@ -179,28 +179,55 @@ Output:
    
 ```
 
-### 9. How to get the Author and Time from Commit-ID
-#### Commit to time+author: /da0_data/basemaps/c2taFullP.{0..31}.s
+### 9. How to get the exact .tch file a Blob-ID, Commit-ID, or Tree-ID is located in
 ```
-This command is not complete and does not currently print out useful information.
-
-This command prints out the Author and Time of a commit based on Commit-ID.
+This prints the file number of the .tch file associated with the passed ID.
 
 Command:
-   * echo "Commit-ID" (no quotes) | /da3_data/lookup/Cmt2BlobShow.perl /da0_data/basemaps/c2taFullP 1 32
+   * echo "Blob, Commit, or Tree-ID" (no quotes) | /da3_data/lookup/splitSec.perl a 32 1
+
+Examples: 
+   Commit-IDs:
+      * echo 000000000001b58ef4d6727f61f4d7f8625feb72 | /da3_data/lookup/splitSec.perl a 32 1
+      * echo e4af89166a17785c1d741b8b1d5775f3223f510f | /da3_data/lookup/splitSec.perl a 32 1
+   Tree-IDs:
+      * echo f1b66dcca490b5c4455af319bc961a34f69c72c2 | /da3_data/lookup/splitSec.perl a 32 1
+      * echo 0f8d572eb262b0510788d3ee7445099a256be5cb | /da3_data/lookup/splitSec.perl a 32 1
+   Blob-IDs:
+      * echo 05fe634ca4c8386349ac519f899145c75fff4169 | /da3_data/lookup/splitSec.perl a 32 1
+      * echo a7081031fc8f4fea0d35dd8486f8900febd2347e | /da3_data/lookup/splitSec.perl a 32 1
+
+Output:
+   Formatting: #of.tchfile;ID
+   Output: 5;05fe634ca4c8386349ac519f899145c75fff4169
+   
+   
+```
+
+### 10. How to get the Author and Time from Commit-ID
+#### Commit to time+author: /da0_data/basemaps/c2taFullP.{0..31}.s
+```
+This command prints out the Author and Time of a commit based on Commit-ID.
+
+This command requires you to know the exact .tch file that will be used to pull the information.
+In order to get the number of the .tch file, run command 9. The output will resemble 4;e4af89166a17785c1d741b8b1d5775f3223f510f.
+Take the number before the ( ; ) and replace the #oftchfile in "da0_data/basemaps/c2taFullP.#oftchfile.tch".
+
+Command:
+   * echo "Commit-ID" (no quotes) | /da3_data/lookup/show.perl /da0_data/basemaps/c2taFullP.#oftchfile.tch h s
 
 Examples:
-   * echo e4af89166a17785c1d741b8b1d5775f3223f510f | /da3_data/lookup/Cmt2BlobShow.perl /da0_data/basemaps/c2taFullP 1 32
-   * echo fe1ce9e5e8ebe83569c53ebe1f05f0688136ef2c | /da3_data/lookup/Cmt2BlobShow.perl /da0_data/basemaps/c2taFullP 1 32
+   * echo 000000000001b58ef4d6727f61f4d7f8625feb72 | /da3_data/lookup/show.perl /da0_data/basemaps/c2taFullP.0.tch h s
+   * echo e4af89166a17785c1d741b8b1d5775f3223f510f | /da3_data/lookup/show.perl /da0_data/basemaps/c2taFullP.4.tch h s
    
 Output:
-   Formatting:
-   Example:
+   Formatting: "Commit-ID";UnixTimestamp;"Author-ID"
+   Example: e4af89166a17785c1d741b8b1d5775f3223f510f;1410029988;Audris Mockus <audris@utk.edu>
 
 
 ```
 
-### 10.
+### 11.
 #### The extent of usage databases: for Go language in /da0_data/play/GothruMaps/m2nPMGo.s mo
 ```
 
@@ -210,7 +237,7 @@ Details for PY, for example, are in c2bPtaPkgOPY.{0..31}.gz
 also on /lustre/haven/user/audris/basemaps
 see grepNew.pbs for exact details.
 
-### 11. How to see the content of a Commit-ID
+### 12. How to see the content of a Commit-ID
 ```
 This command prints out the content of a given Commit-ID.
 
@@ -222,14 +249,15 @@ Command:
    * echo "Commit-ID" (no quotes) | perl ~audris/bin/showCmt.perl [optional formatting parameter]
 
 Examples:
-   * echo e4af89166a17785c1d741b8b1d5775f3223f510f | perl /home/audris/bin/showCmt.perl
-   * echo fe1ce9e5e8ebe83569c53ebe1f05f0688136ef2c | perl /home/audris/bin/showCmt.perl
-   
-   * echo e4af89166a17785c1d741b8b1d5775f3223f510f | perl /home/audris/bin/showCmt.perl 1
-   * echo fe1ce9e5e8ebe83569c53ebe1f05f0688136ef2c | perl /home/audris/bin/showCmt.perl 1
-
-   * echo e4af89166a17785c1d741b8b1d5775f3223f510f | perl /home/audris/bin/showCmt.perl 2
-   * echo fe1ce9e5e8ebe83569c53ebe1f05f0688136ef2c | perl /home/audris/bin/showCmt.perl 2
+   No Formatting Parameter:
+      * echo e4af89166a17785c1d741b8b1d5775f3223f510f | perl /home/audris/bin/showCmt.perl
+      * echo fe1ce9e5e8ebe83569c53ebe1f05f0688136ef2c | perl /home/audris/bin/showCmt.perl
+   Parameter 1:
+      * echo e4af89166a17785c1d741b8b1d5775f3223f510f | perl /home/audris/bin/showCmt.perl 1
+      * echo fe1ce9e5e8ebe83569c53ebe1f05f0688136ef2c | perl /home/audris/bin/showCmt.perl 1
+   Parameter 2:
+      * echo e4af89166a17785c1d741b8b1d5775f3223f510f | perl /home/audris/bin/showCmt.perl 2
+      * echo fe1ce9e5e8ebe83569c53ebe1f05f0688136ef2c | perl /home/audris/bin/showCmt.perl 2
 
 Output:
    Formatting:
@@ -260,7 +288,7 @@ Output:
 
 ```
 
-### 12. How to see the content of a Tree-ID
+### 13. How to see the content of a Tree-ID
 ```
 This command prints out the Blob-IDs and File Names of a given Tree-ID.
 
@@ -280,7 +308,7 @@ Output:
 
 ```
 
-### 13. How to see the content of a Blob-ID 
+### 14. How to see the content of a Blob-ID 
 ```
 This command prints out the content of a giver Blob-ID.
 
