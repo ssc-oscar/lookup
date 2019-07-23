@@ -227,11 +227,11 @@ Output:
 
 ```
 
-### 11. How to determine what code dependdencies are in a Blob
+### 11. How to determine what code dependencies are in a Blob
 #### The extent of usage databases: for Go language in /da0_data/play/GothruMaps/m2nPMGo.s mo
 ```
-These are summaries that specify for each blob of a specific language, what dependencies it has.
-For example, for Python a file that has the statement "import pandas", it will specify that the Blob depends on pandas in c2bPta.
+These are summaries that specify the specific language dependencies a blob has.
+For example, for Python a file that has the statement "import pandas" will specify that the Blob depends on pandas in c2bPta.
 
 Details for PY, for example, are in c2bPtaPkgOPY.{0..31}.gz
 also on /lustre/haven/user/audris/basemaps
