@@ -207,14 +207,14 @@ Command:
    * echo "Commit-ID" (no quotes) | perl ~audris/bin/showCmt.perl [optional formatting parameter]
 
 Examples:
-   * echo e4af89166a17785c1d741b8b1d5775f3223f510f | perl ~audris/bin/showCmt.perl
-   * echo fe1ce9e5e8ebe83569c53ebe1f05f0688136ef2c | perl ~audris/bin/showCmt.perl
+   * echo e4af89166a17785c1d741b8b1d5775f3223f510f | perl /home/audris/bin/showCmt.perl
+   * echo fe1ce9e5e8ebe83569c53ebe1f05f0688136ef2c | perl /home/audris/bin/showCmt.perl
    
-   * echo e4af89166a17785c1d741b8b1d5775f3223f510f | perl ~audris/bin/showCmt.perl 1
-   * echo fe1ce9e5e8ebe83569c53ebe1f05f0688136ef2c | perl ~audris/bin/showCmt.perl 1
+   * echo e4af89166a17785c1d741b8b1d5775f3223f510f | perl /home/audris/bin/showCmt.perl 1
+   * echo fe1ce9e5e8ebe83569c53ebe1f05f0688136ef2c | perl /home/audris/bin/showCmt.perl 1
 
-   * echo e4af89166a17785c1d741b8b1d5775f3223f510f | perl ~audris/bin/showCmt.perl 2
-   * echo fe1ce9e5e8ebe83569c53ebe1f05f0688136ef2c | perl ~audris/bin/showCmt.perl 2
+   * echo e4af89166a17785c1d741b8b1d5775f3223f510f | perl /home/audris/bin/showCmt.perl 2
+   * echo fe1ce9e5e8ebe83569c53ebe1f05f0688136ef2c | perl /home/audris/bin/showCmt.perl 2
 
 Output:
    Formatting:
