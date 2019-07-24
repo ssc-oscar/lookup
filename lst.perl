@@ -18,7 +18,7 @@ $f2 = $ARGV[2] if defined $ARGV[2];
 
 
 if(!tie(%clones, "TokyoCabinet::HDB", "$fname",
-                  TokyoCabinet::HDB::OREADER)){
+                  TokyoCabinet::HDB::OREADER | TokyoCabinet::HDB::ONOLCK)){
         print STDERR "tie error for $fname\n";
 }
 sub toHex { 
@@ -36,9 +36,9 @@ while (my ($c, $v) = each %clones){
     my $d = unpack 'w', (substr($v, 20, length($v) - 20));
     print "$offset\;$l\;$c\;$h\;$d\n";
   }else{
+    my $res = ";".$v;
     if ($f2 =~ /cs/){
-      $v = safeDecomp ($v);
-      print "$c;$v\n";
+      $res = ';'.safeDecomp ($v);
     }      
     if ($f2 =~ /h/){
       my $n = length($v)/20;
@@ -46,8 +46,8 @@ while (my ($c, $v) = each %clones){
       for my $i (0..($n-1)){
         $res .= ";" . toHex (substr($v, $i*20,20));
       }
-      print "$c$res\n";
     }
+    print "$c$res\n";
   }
   $offset++;
 }
