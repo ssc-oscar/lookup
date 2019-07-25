@@ -19,8 +19,7 @@ sub fromHex {
 my $split = 32;
 
 my (%c2ta);
-my $sec = $ARGV[0];
-my $ver = $ARGV[1];
+my $ver = $ARGV[0];
 
 for my $s (0..($split-1)){ 
   tie %{$c2ta{$s}}, "TokyoCabinet::HDB", "/fast/c2taFull$ver.$s.tch", TokyoCabinet::HDB::OREADER| TokyoCabinet::HDB::ONOLCK,
