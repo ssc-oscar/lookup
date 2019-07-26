@@ -433,8 +433,8 @@ for i in {0..127}; do /da3_data/lookup/BlobN2Off.perl $i; done
 
 zcat c2pFullP$j.cs | lsort 5G -u --merge  <(zcat c2taFP$j.cs) |  join -v1 - <(zcat c2fFullO$j.cs) | join -v1 - <(zcat emptycsO.$j) | gzip > s12.$j.gz
 
-for j in {0..31}; do zcat c2taF$ver.$j.s | awk -F\; '{print $3 ";" $1}' | lsort 10G -t\; -k1b,2 | gzip > a2cF$ver$j.s & done
-for i in {0..31}; do zcat /data/basemaps/gz/c2taF$ver.$i.s | ~/lookup/Cmt2taBin.perl /fast/c2taFullP.$i.tch 1 & done
+for j in {0..31}; do zcat c2taFull$ver.$j.s | awk -F\; '{print $3 ";" $1}' | lsort 10G -t\; -k1b,2 | gzip > a2cF$ver$j.s & done
+for i in {0..31}; do zcat /data/basemaps/gz/c2taFull$ver.$i.s | ~/lookup/Cmt2taBin.perl /fast/c2taFullP.$i.tch 1 & done
 wait
 
 for j in {0..31}
@@ -500,9 +500,9 @@ pVer=N
 for j in {0..31}; do str="$HOME/bin/lsort 120G -u --merge -t\; -k1b,2"; for i in {00..24} $lst; do str="$str <(zcat N.$i/p2c.$j.gz)"; done; eval $str | gzip > p2c$ver$j.s; done &
 for j in {0..31}; do str="$HOME/bin/lsort 120G -u --merge -t\; -k1b,2"; for i in {00..24} $lst; do str="$str <(zcat N.$i/c2p.$j.gz)"; done; eval $str | gzip > c2p$ver$j.s; done &
 
-for j in {0..127}; do $HOME/lookup/lstCmt.perl 1 $j | lsort 5G -t\; -k1b,2 | gzip > /data/basemaps/gz/c2taFull$ver$j.s & done
+for j in {0..127}; do $HOME/lookup/lstCmt.perl 1 $j | lsort 2G -t\; -k1b,2 | gzip > /data/basemaps/gz/c2taFull$ver$j.s & done
 wait
-for j in {0..31}; do zcat /data/basemaps/gz/c2taFull$ver$j.s | lsort 20G -t\; -k1b,2 --merge - <(zcat /data/basemaps/gz/c2taFull$ver$(($j+32)).s) <(zcat /data/basemaps/gz/c2taFull$ver$(($j+64)).s) <(zcat /data/basemaps/gz/c2taFull$ver$(($j+96)).s) | gzip > /data/basemaps/gz/c2taF$ver.$j.s & done 
+for j in {0..31}; do zcat /data/basemaps/gz/c2taFull$ver$j.s | lsort 9G -t\; -k1b,2 --merge - <(zcat /data/basemaps/gz/c2taFull$ver$(($j+32)).s) <(zcat /data/basemaps/gz/c2taFull$ver$(($j+64)).s) <(zcat /data/basemaps/gz/c2taFull$ver$(($j+96)).s) | gzip > /data/basemaps/gz/c2taFull$ver.$j.s & done 
 wait
 
 for i in {0..31}; do zcat s11.$i.c2fb | cut -d\; -f1 | uniq | gzip > s11.$i.got; zcat s11.$i.got | join -v2 - <(zcat s11.$i.gz) | gzip > s11.$i.left; grep ^identical s11.new.$i.err | sed 's/.* for //;s/ and.*//' | lsort 1G -u > s11.$i.empty; (zcat /data/basemaps/gz/badcs$pVer.$i; join -v1 <(zcat s11.$i.left) <(zcat s11.$i.got) | join -v1 - s11.$i.empty) | lsort 1G -u > s11.$i.try;
@@ -517,8 +517,8 @@ for j in {0..31}; do time zcat /data/c2pFullO$j.s | awk -F\; '{print $1 ";;;" $2
 for j in {0..31}; do time zcat /data/p2cFullO$j.s |perl -I ~/lookup -I ~/lib/x86_64-linux-gnu/perl  ~/lookup/Prj2CmtBinSorted.perl /fast/p2cFullO.$j.tch; done &
 for i in {0..31}; do zcat /data/a2pO.$i.gz | perl -I ~/lookup -I ~/lib/x86_64-linux-gnu/perl ~/lookup/Prj2FileBinSorted.perl a2pO.$i.tch; done &
 for i in {0..31}; do zcat /data/p2aO.$i.gz | perl -I ~/lookup -I ~/lib/x86_64-linux-gnu/perl ~/lookup/Prj2FileBinSorted.perl p2aO.$i.tch; done &
-for j in {1..31}; do time zcat /data/a2cFullO$j.gz |perl -I ~/lookup -I ~/lib/x86_64-linux-gnu/perl  ~/lookup/Prj2CmtBinSorted.perl /fast/a2cFullO.$j.tch; done
-for j in {1..31}; do time perl -I ~/lib/x86_64-linux-gnu/perl -I ~/lookup ~/lookup/Cmt2Chld.perl /fast/c2cc$ver $i | gzip > /store/cnp$ver.$i; done
+for j in {0..31}; do time zcat /data/a2cFullO$j.gz |perl -I ~/lookup -I ~/lib/x86_64-linux-gnu/perl  ~/lookup/Prj2CmtBinSorted.perl /fast/a2cFullO.$j.tch; done
+for j in {0..31}; do time perl -I ~/lib/x86_64-linux-gnu/perl -I ~/lookup ~/lookup/Cmt2Chld.perl /fast/c2cc$ver $i | gzip > /store/cnp$ver.$i; done
 zcat a2cFull$ver*gz | cut -d\; -f1 | uniq | gzip > as$ver.gz
 zcat as$ver.gz | perl -I /home/audris/lib64/perl5 -I /home/audris/lib/x86_64-linux-gnu/perl -I /home/audris/lookup -ane 'use cmt; chop();@x=splitSignature($_);@n = split(/ /, $x[0]); @e = split(/\@/, $x[1]); print "$_;$x[0];$x[1];$n[0];$n[$#n];$e[0];$e[1]\n";' | gzip > as$ver.split
 #zcat as$ver.split | perl -ane 'chop();if ($_ !~ m/^;/){@x=split(/\;/, $_); for $i (0..$#x){ $x[$i] =~ s/"/'"'"'/g; } print "{ \"id\":\"$x[0]\", \"name\":\"$x[1]\", \"email\":\"$x[2]\", \"first\":\"$x[3]\", \"last\":\"$x[4]\", \"user\":\"$x[5]\",\"domain\":\"$x[6]\" }\n";} '| gzip > as$ver.split.json
