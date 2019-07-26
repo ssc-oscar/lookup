@@ -10,7 +10,7 @@ The flat files are on da0:/data/basemaps/gz
 
 
 The last letter denotes version (in alphabetical order)
-Currently the last version is P
+Currently 'P' is the latest version
 
 Notation in database names:
 ```
@@ -29,55 +29,7 @@ N - 0-31: the database based on prehash
 ```
 
 
-# Example on how to use the below commands
-```
-Below is an example on how to chain the commands to gather information. The below commands were all run on the da4 server
-due to SSDS requirements.
-
-Run Command 2 to get a list of File Names made by an Author:
-   echo "Adam Tutko <atutko@vols.utk.edu>" | /da3_data/lookup/Prj2FileShow.perl /da0_data/basemaps/a2fFullO 1 32
-Output: 
-Adam Tutko <atutko@vols.utk.edu>;4;diffences.md;diffences.txt;proposal.md;atutko.md
-
-Run Command 6 with one of the File Names to get Commit-IDs associated with the chosen File Name:
-   echo atutko.md |/da3_data/lookup/Prj2CmtShow.perl /da0_data/basemaps/f2cFullO 1 32
-Output: 
-atutko.md;5;0a26e5acd9444f97f1a9e903117d957772a59c1d;3fc5c3db76306440a43460ab0fb52b27a01a2ab9;
-6176db8cb561292c5f0fdcd7d52eb3f1bca23b36;c21fb159cd8fcb2c1674d353b0a0aaad1f7ed822;
-c9ec77f6434319f9f9c417cf7f9c95ff64540223
-
-Run Command 5 using any of the Commit-IDs to get the Project Name associated with the Commit:
-   echo 0a26e5acd9444f97f1a9e903117d957772a59c1d | /da3_data/lookup/Cmt2PrjShow.perl /da0_data/basemaps/c2pFullP 1 32
-Output: 
-0a26e5acd9444f97f1a9e903117d957772a59c1d;1;CS340-19_students
-
-Run Command 12 to see the content of the Commit-ID:
-   echo 0a26e5acd9444f97f1a9e903117d957772a59c1d | perl /home/audris/bin/showCmt.perl 2
-Output:
-tree 8bd497df9b762ac0be8be0850089b9f915b31c7a
-parent fd422df135c11d927c9f54e656bc053879560092
-parent 43ca88b1f0cd438377c6cf4168995add79d35ce8
-author Audris Mockus <audris@utk.edu> 1550146565 -0500
-committer GitHub <noreply@github.com> 1550146565 -0500
-gpgsig -----BEGIN PGP SIGNATURE-----
-
-wsBcBAABCAAQBQJcZVwFCRBK7hj4Ov3rIwAAdHIIAE92LDq5k8AZnTyG0qxOQifn
-6PkW5hlfEdElM7WHKqkSnTPYtjIKGUeYdmycbUgtr19XwmoOIOORhnWtpdectK5/
-TnC61rLaT8uN9k4w788zGaxKylCi+Bgw44XxXSGq+7B3a9Kru+6iLQU1ftwAGIwf
-hXTs5WYKtAeKu/1dmx6+t7uyXc9QXnHF9as6BiAEndx97oZPpfIXdNffFa/JBPDb
-Ci3s34CzNADshyJXPTv0zWLwWNwAzNtMyi1VhsWtcixCccbCW9oyHoBnRepSO3wQ
-FuUVo9bRL6ysWkCS8qURh8pnJvcr+CtSfyFz48NfBQlV3PctXq4Wm2KukRv8i1o=
-=cy8t
------END PGP SIGNATURE-----
-
-Merge branch 'master' into master
-Merge branch 'master' into master;0a26e5acd9444f97f1a9e903117d957772a59c1d
-
-
-```
-
-
-# Information Retrieval for Git 
+# Commands for Information Retrieval 
 
 ### 1. How to get a list of commits made by an author 
 #### author2commit formatting: a2cFullP.{0..31}.tch
@@ -393,6 +345,56 @@ Output:
    
 ```
 
+
+# How to gather information
+```
+The below commands were all run on the da4 server due to SSDS requirements.
+
+
+Run Command 2 to get a list of File Names made by an Author:
+   echo "Adam Tutko <atutko@vols.utk.edu>" | /da3_data/lookup/Prj2FileShow.perl /da0_data/basemaps/a2fFullO 1 32
+Output: 
+Adam Tutko <atutko@vols.utk.edu>;4;diffences.md;diffences.txt;proposal.md;atutko.md
+
+
+Run Command 6 with one of the File Names to get Commit-IDs associated with the chosen File Name:
+   echo atutko.md |/da3_data/lookup/Prj2CmtShow.perl /da0_data/basemaps/f2cFullO 1 32
+Output: 
+atutko.md;5;0a26e5acd9444f97f1a9e903117d957772a59c1d;3fc5c3db76306440a43460ab0fb52b27a01a2ab9;
+6176db8cb561292c5f0fdcd7d52eb3f1bca23b36;c21fb159cd8fcb2c1674d353b0a0aaad1f7ed822;
+c9ec77f6434319f9f9c417cf7f9c95ff64540223
+
+
+Run Command 5 using any of the Commit-IDs to get the Project Name associated with the Commit:
+   echo 0a26e5acd9444f97f1a9e903117d957772a59c1d | /da3_data/lookup/Cmt2PrjShow.perl /da0_data/basemaps/c2pFullP 1 32
+Output: 
+0a26e5acd9444f97f1a9e903117d957772a59c1d;1;CS340-19_students
+
+
+Run Command 12 to see the content of the Commit-ID:
+   echo 0a26e5acd9444f97f1a9e903117d957772a59c1d | perl /home/audris/bin/showCmt.perl 2
+Output:
+tree 8bd497df9b762ac0be8be0850089b9f915b31c7a
+parent fd422df135c11d927c9f54e656bc053879560092
+parent 43ca88b1f0cd438377c6cf4168995add79d35ce8
+author Audris Mockus <audris@utk.edu> 1550146565 -0500
+committer GitHub <noreply@github.com> 1550146565 -0500
+gpgsig -----BEGIN PGP SIGNATURE-----
+
+wsBcBAABCAAQBQJcZVwFCRBK7hj4Ov3rIwAAdHIIAE92LDq5k8AZnTyG0qxOQifn
+6PkW5hlfEdElM7WHKqkSnTPYtjIKGUeYdmycbUgtr19XwmoOIOORhnWtpdectK5/
+TnC61rLaT8uN9k4w788zGaxKylCi+Bgw44XxXSGq+7B3a9Kru+6iLQU1ftwAGIwf
+hXTs5WYKtAeKu/1dmx6+t7uyXc9QXnHF9as6BiAEndx97oZPpfIXdNffFa/JBPDb
+Ci3s34CzNADshyJXPTv0zWLwWNwAzNtMyi1VhsWtcixCccbCW9oyHoBnRepSO3wQ
+FuUVo9bRL6ysWkCS8qURh8pnJvcr+CtSfyFz48NfBQlV3PctXq4Wm2KukRv8i1o=
+=cy8t
+-----END PGP SIGNATURE-----
+
+Merge branch 'master' into master
+Merge branch 'master' into master;0a26e5acd9444f97f1a9e903117d957772a59c1d
+
+
+```
 
 
 ##############################################
