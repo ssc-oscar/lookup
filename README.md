@@ -351,11 +351,11 @@ This command prints out the Blob-IDs and File Names of a given Tree-ID.
 This command can only be run on servers with SSDS. To run this command, use the da4 server.
 
 Command:
-   * echo "Tree-ID" (no quotes) | perl ~audris/bin/showTree.perl
+   * echo "Tree-ID" (no quotes) | perl /home/audris/bin/showTree.perl
 
 Examples:
-   * echo f1b66dcca490b5c4455af319bc961a34f69c72c2 | perl ~audris/bin/showTree.perl
-   * echo 0f8d572eb262b0510788d3ee7445099a256be5cb | perl ~audris/bin/showTree.perl
+   * echo f1b66dcca490b5c4455af319bc961a34f69c72c2 | perl /home/audris/bin/showTree.perl
+   * echo 0f8d572eb262b0510788d3ee7445099a256be5cb | perl /home/audris/bin/showTree.perl
    
 Output:
    Formatting: "Mode";"Blob-ID";"FileName"
@@ -371,11 +371,11 @@ This command prints out the content of a giver Blob-ID.
 This command can only be run on servers with SSDS. To run this command, use the da4 server. 
 
 Command:
-   * echo "Blob-ID" (no quotes) | perl ~audris/bin/showBlob.perl
+   * echo "Blob-ID" (no quotes) | perl /home/audris/bin/showBlob.perl
 
 Examples:
-   * echo 05fe634ca4c8386349ac519f899145c75fff4169 | perl ~audris/bin/showBlob.perl
-   * echo a7081031fc8f4fea0d35dd8486f8900febd2347e | perl ~audris/bin/showBlob.perl
+   * echo 05fe634ca4c8386349ac519f899145c75fff4169 | perl /home/audris/bin/showBlob.perl
+   * echo a7081031fc8f4fea0d35dd8486f8900febd2347e | perl /home/audris/bin/showBlob.perl
    
 Output:
    Formatting: blob;#ofSections;rl;CurrentPosition;Offset;Length;"Blob-ID"

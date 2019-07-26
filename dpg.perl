@@ -45,14 +45,14 @@ my $result = $cursor->result;
 my %input;
 while ( my $doc = $result->next ) {
   my $a = $doc->{'selectedIds'};
-  my $do = 1;
+  my $do = 0;
 #  $do++ if $doc->{'_id'} eq "5cd48b431b93640143c6edb1";#chris
 #  $do++ if $doc->{'_id'} eq "5cd48c101b93640143c6edb2";#marat
 #  $do++ if $doc->{'_id'} eq "";#
 #  $do++ if $doc->{'_id'} eq "";#
 #  $do++ if $doc->{'_id'} eq "";#
 #  $do++ if $doc->{'_id'} eq "";#
-#  $do++ if $doc->{'_id'} eq "";#
+  $do++ if $doc->{'_id'} eq "5d15fe22c420d377e4fdcd97";#mbernotas
 #  $do++ if $doc->{'_id'} eq "5cd9c1bf1b93640143c6edba";# moh
 #  $do++ if $doc->{'_id'} eq "5cd9ea8f7e662355ba53e159";# dycz0fx
 #  $do++ if $doc->{'_id'} eq "5cee9a305ea3d86976bdce65";# dkennard

@@ -6,14 +6,14 @@ use cmt;
 use TokyoCabinet;
 
 my $debug = 0;
-$debug = $ARGV[0]+0 if defined $ARGV[0];
+$debug = $ARGV[0]+0 if defined $ARGV[0]; #select output format based on the cleantCmt function in cmt.pm
 my $sections = 128;
-my $raw = "";
+my $raw = ""; #produce .idx/.bin database as in All.blobs
 $raw = $ARGV[2] if defined $ARGV[2];
 
 my $fbasec="All.sha1c/commit_";
 
-my $ss = -1;
+my $ss = -1; #input is from from any of the 128 databases; if $ss >= 0: opens only the corrresponding database
 $ss = $ARGV[1]+0 if defined $ARGV[1];
 my (%fhob, %fhost, %fhosc);
 for my $sec (0 .. ($sections-1)){
