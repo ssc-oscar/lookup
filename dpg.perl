@@ -45,14 +45,14 @@ my $result = $cursor->result;
 my %input;
 while ( my $doc = $result->next ) {
   my $a = $doc->{'selectedIds'};
-  my $do = 1;
+  my $do = 0;
 #  $do++ if $doc->{'_id'} eq "5cd48b431b93640143c6edb1";#chris
 #  $do++ if $doc->{'_id'} eq "5cd48c101b93640143c6edb2";#marat
 #  $do++ if $doc->{'_id'} eq "";#
 #  $do++ if $doc->{'_id'} eq "";#
 #  $do++ if $doc->{'_id'} eq "";#
 #  $do++ if $doc->{'_id'} eq "";#
-#  $do++ if $doc->{'_id'} eq "";#
+  $do++ if $doc->{'_id'} eq "5d15fe22c420d377e4fdcd97";#mbernotas
 #  $do++ if $doc->{'_id'} eq "5cd9c1bf1b93640143c6edba";# moh
 #  $do++ if $doc->{'_id'} eq "5cd9ea8f7e662355ba53e159";# dycz0fx
 #  $do++ if $doc->{'_id'} eq "5cee9a305ea3d86976bdce65";# dkennard
@@ -115,7 +115,7 @@ untie %a2trp;
 ## get projects for a user
 my %a2pF;
 for my $sec (0..($split-1)){
-  my $fname = "/fast/a2pFullO.$sec.tch";
+  my $fname = "/fast/a2pFullP.$sec.tch";
   tie %{$a2pF{$sec}}, "TokyoCabinet::HDB", "$fname", TokyoCabinet::HDB::OREADER | TokyoCabinet::HDB::ONOLCK,   
         16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
       or die "cant open $fname\n";
@@ -132,7 +132,7 @@ for my $u (keys %input){
 ##get all authors for projects user worked on
 my %p2aF = ();
 for my $sec (0..($split-1)){
-  my $fname = "/fast/p2aFullO.$sec.tch";
+  my $fname = "/fast/p2aFullP.$sec.tch";
   tie %{$p2aF{$sec}}, "TokyoCabinet::HDB", "$fname", TokyoCabinet::HDB::OREADER | TokyoCabinet::HDB::ONOLCK,
         16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
       or die "cant open $fname\n";
@@ -183,7 +183,7 @@ sub listP {
 #get commits for a user
 my %a2cF = ();
 for my $sec (0..($split-1)){
-  my $fname = "/fast/a2cFullO.$sec.tch";
+  my $fname = "/fast/a2cFullP.$sec.tch";
   tie %{$a2cF{$sec}}, "TokyoCabinet::HDB", "$fname", TokyoCabinet::HDB::OREADER | TokyoCabinet::HDB::ONOLCK,   
         16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
       or die "cant open $fname\n";
@@ -281,7 +281,7 @@ for my $sec (0..($split-1)){
 my %p2c = ();
 my %p2nc = ();
 for my $sec (0..($split-1)){
-  my $fname = "/fast/p2cFullO.$sec.tch";
+  my $fname = "/fast/p2cFullP.$sec.tch";
   tie %{$p2c{$sec}}, "TokyoCabinet::HDB", "$fname", TokyoCabinet::HDB::OREADER | TokyoCabinet::HDB::ONOLCK,
         16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
       or die "cant open $fname\n";
@@ -422,7 +422,7 @@ for my $u (keys %input){
     my %c2ta = ();
     my (%c2hF, %b2c);
     for my $sec (0..($split-1)){
-      my $fname = "/fast/c2taFO.$sec.tch";
+      my $fname = "/fast/c2taFullP.$sec.tch";
       tie %{$c2ta{$sec}}, "TokyoCabinet::HDB", "$fname", TokyoCabinet::HDB::OREADER | TokyoCabinet::HDB::ONOLCK,
         16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
       or die "cant open $fname\n";

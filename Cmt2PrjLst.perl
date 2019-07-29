@@ -31,7 +31,7 @@ my $detail = 0;
 $detail = $ARGV[1] if defined $ARGV[1];
 
 my %p2c;
-tie %p2c, "TokyoCabinet::HDB", "$ARGV[0]", TokyoCabinet::HDB::OREADER,   
+tie %p2c, "TokyoCabinet::HDB", "$ARGV[0]", TokyoCabinet::HDB::OREADER | TokyoCabinet::HDB::ONOLCK,   
         16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
      or die "cant open $ARGV[0]\n";
 

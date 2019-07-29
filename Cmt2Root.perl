@@ -19,23 +19,22 @@ my $split = 32;
 
 my (%c2r, %c2pc);
 my $sec = $ARGV[0];
-
-for my $s (0..($split-1)){
-  tie %{$c2r{$s}}, "TokyoCabinet::HDB", "/fast/c2rFullO.$s.tch", TokyoCabinet::HDB::OWRITER | TokyoCabinet::HDB::OCREAT,
-    16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
-    or die "cant open /fast/c2rFullO.$s.tch\n";
-}
+my $ver = $ARGV[1];
+tie %{$c2r{$sec}}, "TokyoCabinet::HDB", "/fast/c2rFull$ver.$sec.tch", TokyoCabinet::HDB::OWRITER | TokyoCabinet::HDB::OCREAT | TokyoCabinet::HDB::ONOLCK,
+   16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
+   or die "cant open /fast/c2rFull$ver.$sec.tch\n";
 
 for my $s (0..($split-1)){ 
-  tie %{$c2pc{$s}}, "TokyoCabinet::HDB", "/fast/c2pcFullO.$s.tch", TokyoCabinet::HDB::OREADER,
+  tie %{$c2pc{$s}}, "TokyoCabinet::HDB", "/fast/c2pcFull$ver.$s.tch", TokyoCabinet::HDB::OREADER| TokyoCabinet::HDB::ONOLCK,
       16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
-     or die "cant open /fast/c2pcFullO.$s.tch\n";
+     or die "cant open /fast/c2pcFull$ver.$s.tch\n";
 }
 
 my $line = 0;
 my $mdepth = 0;
 my $nlook = 0;
-while (<STDIN>){
+open A, 'cut -d\; -f4'." /data/All.blobs/commit_$sec.idx /data/All.blobs/commit_".($sec+32).".idx /data/All.blobs/commit_".($sec+64).".idx /data/All.blobs/commit_".($sec+96).".idx|"; 
+while (<A>){
   chop();
   my $ch = $_;
   my $c = fromHex ($ch);
