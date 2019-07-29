@@ -4,14 +4,14 @@
 ### da0 Server
 <relationship>.{0-31}.tch files in `/data/basemaps/`:  
 (.s) signifies that there are either .s or .gz versions of these files in gz/ subfolder, which can be opened with Python gzip module or Unix zcat  
-Keys for identifying letters:  
-	* a  = Author
-	* b  = Blob
-	* c  = Commit
+Keys for identifying letters:   
+	* a = Author
+	* b = Blob
+	* c = Commit
 	* cc = Child Commit
-	* f  = File
-	* h  = Head Commit
-	* p  = Project
+	* f = File
+	* h = Head Commit
+	* p = Project
 	* pc = Parent Commit
 	* ta = Time_Author
 	* trp = Torvald Path
