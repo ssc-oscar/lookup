@@ -39,30 +39,31 @@ $LANGthruMaps in `/data/play/`:
 
 ## OSCAR functions from oscar.py
 These are corresponding functions in oscar.py that open the .tch files listed above for a given entity:
+
 	Note: "/<function_name>" after a function name denotes the version of that function that 
 		  returns a Generator object  
 
-	1. `Author('...')`  - initialized with a combination of name and email
-		* `.commit_shas/commits`
-		* `.project_names`
-		* `.torvald` - returns the torvald path of an Author, i.e, who did this Author work
+	1. Author('...')  - initialized with a combination of name and email
+		* .commit_shas/commits
+		* .project_names
+		* .torvald - returns the torvald path of an Author, i.e, who did this Author work
 					 with that also worked with Linus Torvald
-	2. `Blob('...')` -  initialized with SHA of blob
-		* `.commit_shas/commits` - commits removing this blob are not included
-	3. `Commit('...')` - initialized with SHA of commit
-		* `.blob_shas/blobs`
-		* `.child_shas/children`
-		* `.changed_file_names/files_changed`
-		* `.parent_shas/parents`
-		* `.project_names/projects`
-	4. `Commit_info('...')` - initialized like Commit()
-		* `.head`
-		* `.time_author`
-	5. `File('...')` - initialized with a path, starting from a commit root tree
-		* `.commit_shas/commits`
-	6. `Project('...')` - initialized with project name/URI
-		* `.author_names`
-		* `.commit_shas/commits`
+	2. Blob('...') -  initialized with SHA of blob
+		* .commit_shas/commits - commits removing this blob are not included
+	3. Commit('...') - initialized with SHA of commit
+		* .blob_shas/blobs
+		* .child_shas/children
+		* .changed_file_names/files_changed
+		* .parent_shas/parents
+		* .project_names/projects
+	4. Commit_info('...') - initialized like Commit()
+		* .head
+		* .time_author
+	5. File('...') - initialized with a path, starting from a commit root tree
+		* .commit_shas/commits
+	6. Project('...') - initialized with project name/URI
+		* .author_names
+		* .commit_shas/commits
 
 	The non-Generator version of these functions will return a tuple of items which can 
 	then be iterated:
