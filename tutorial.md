@@ -4,17 +4,17 @@
 ### da0 Server
 <relationship>.{0-31}.tch files in `/data/basemaps/`:  
 (.s) signifies that there are either .s or .gz versions of these files in gz/ subfolder, which can be opened with Python gzip module or Unix zcat  
-Key for identifying letters:  
-* a  - Author
-* b  - Blob
-* c  - Commit
-* cc - Child Commit
-* f  - File
-* h  - Head Commit
-* p  - Project
-* pc - Parent Commit
-* ta - Time_Author
-* trp - Torvald Path
+Keys for identifying letters:  
+* a  = Author
+* b  = Blob
+* c  = Commit
+* cc = Child Commit
+* f  = File
+* h  = Head Commit
+* p  = Project
+* pc = Parent Commit
+* ta = Time_Author
+* trp = Torvald Path
 
 List of relationships:
 ```
@@ -80,7 +80,7 @@ for commit in Author(author_name).commit_shas:
 000045f6a3601be885b0b028011440dd5a5b89f2;yjernite_DeepCRF;1451682395;yacine <yacine.jernite@nyu.edu>;4aac89ae85b261dba185d5ee35d12f6939fc2e44;nn_defs;utils;tensorflow
 000069240776f2b94acb9420e042f5043ec869d0;tickleliu_tf_learn;1530460653;tickleliu <tickleliu@163.com>;493f0fc310765d62b03390ddd4a7a8be96c7d48c;np;tf;tensorflow
 ```
-* Get a list of commits made by a specific author:
+* Get a list of commits made by a specific author:  
 	On da0: `UNIX> zcat /data/basemaps/gz/a2cFullP0.s | grep "Albert Krawczyk" <pro-logic@optusnet.com.au>`  
 	Output:  
 ```
