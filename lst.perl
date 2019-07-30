@@ -36,15 +36,16 @@ while (my ($c, $v) = each %clones){
     my $d = unpack 'w', (substr($v, 20, length($v) - 20));
     print "$offset\;$l\;$c\;$h\;$d\n";
   }else{
-    my $res = ";".$v;
+    my $res = ";$v";
     if ($f2 =~ /cs/){
+      $res = ";".$v;
       $res = ';'.safeDecomp ($v);
     }      
     if ($f2 =~ /h/){
       my $n = length($v)/20;
-      my $res="";
+      $res="";
       for my $i (0..($n-1)){
-        $res .= ";" . toHex (substr($v, $i*20,20));
+        $res .= ";" . toHex (substr($v, $i*20, 20));
       }
     }
     print "$c$res\n";
