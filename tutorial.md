@@ -2,8 +2,9 @@
 
 ## List of relevant directories
 ### da0 Server
-<relationship>.{0-31}.tch files in `/data/basemaps/`:  
-(.s) signifies that there are either .s or .gz versions of these files in gz/ subfolder, which can be opened with Python gzip module or Unix zcat  
+#### <relationship>.{0-31}.tch files in `/data/basemaps/`:  
+(.s) signifies that there are either .s or .gz versions of these files in gz/ subfolder, which can be opened with Python gzip module or Unix zcat.  
+da0 is the only server with these .s/.gz files  
 Keys for identifying letters:   
 
 * a = Author
@@ -27,16 +28,16 @@ List of relationships:
 * p2a (.s)		* p2c (.s)
 ```	
 ------
-$LANGthruMaps in `/data/play/`:  
-These thruMaps files contain mappings of repositories with modules that were utilized at a given UNIX timestamp under a specific commit.  
+#### `/data/play/$LANGthruMaps/` on da0:  
+These thruMaps directories contain mappings of repositories with modules that were utilized at a given UNIX timestamp under a specific commit. The mappings are in c2bPtaPkg{N-O}{$LANG}.{0-31}.gz files. 
 Format: `commit;repo_name;timestamp;author;blob;module1;module2;...`  
-Each thruMaps file has a different language ($LANG) that contains modules relevant to that language.
+Each thruMaps directory has a different language ($LANG) that contains modules relevant to that language.
 ------
 ### da3 Server
-.tch files in `/fast/`:  
-da3 contains the same files located on da0, except for b2f, c2cc, f2b, and f2c.  
+#### .tch files in `/fast/`:  
+da3 contains the same files located on da0, except for b2f, c2cc, f2b, and f2c.
 This folder can be used for faster reading, hence the directory name.  
-The .s/.gz files are on da0 only.
+In the context of oscar.py, the dictionary values listed in the PATHS dictionary can be changed from `/da0_data/basemaps/...` to `/fast/...` when referencing oscar.py in another program.  
 ------
 ## OSCAR functions from oscar.py
 Note: "/<function_name>" after a function name denotes the version of that function that returns a Generator object  
@@ -80,6 +81,7 @@ for commit in Author(author_name).commit_shas:
 00034db68f89d3d2061b763deb7f9e5f81fef27;lucaskjaero_chinese-character-recognizer;1497547797;Lucas Kjaero <lucas@lucaskjaero.com>;0629a6caa45ded5f4a2774ff7a72738460b399d4;tensorflow;preprocessing;sklearn
 000045f6a3601be885b0b028011440dd5a5b89f2;yjernite_DeepCRF;1451682395;yacine <yacine.jernite@nyu.edu>;4aac89ae85b261dba185d5ee35d12f6939fc2e44;nn_defs;utils;tensorflow
 000069240776f2b94acb9420e042f5043ec869d0;tickleliu_tf_learn;1530460653;tickleliu <tickleliu@163.com>;493f0fc310765d62b03390ddd4a7a8be96c7d48c;np;tf;tensorflow
+.....
 ```
 * Get a list of commits made by a specific author:  
 	On da0: `UNIX> zcat /data/basemaps/gz/a2cFullP0.s | grep "Albert Krawczyk" <pro-logic@optusnet.com.au>`  
@@ -89,5 +91,21 @@ for commit in Author(author_name).commit_shas:
 "Albert Krawczyk" <pro-logic@optusnet.com.au>;9cdc918bfba1010de15d0c968af8ee37c9c300ff
 "Albert Krawczyk" <pro-logic@optusnet.com.au>;d9fc680a69198300d34bc7e31bbafe36e7185c76
 ```
-	
-## Implementing applications
+* Do the same thing above using oscar.py:  
+```
+UNIX> python
+>>> from oscar import Author
+>>> Author('"Albert Krawczyk" <pro-logic@optusnet.com.au>').commit_shas
+('17abdbdc90195016442a6a8dd8e38dea825292ae', '9cdc918bfba1010de15d0c968af8ee37c9c300ff', 'd9fc680a69198300d34bc7e31bbafe36e7185c76')
+```
+* Get the URL of a projects repository using the oscar.py `Project(...).toURL()` function:  
+```
+UNIX> python
+>>> from oscar import Project
+>>> Project('notcake_gcad').toURL()
+'https://github.com/notcake/gcad'
+```
+-------	
+## Examples of implementing applications  
+
+
