@@ -29,7 +29,7 @@ List of relationships:
 ```	
 ------
 #### `/data/play/$LANGthruMaps/` on da0:  
-These thruMaps directories contain mappings of repositories with modules that were utilized at a given UNIX timestamp under a specific commit. The mappings are in c2bPtaPkgO{$LANG}.{0-31}.gz files. 
+These thruMaps directories contain mappings of repositories with modules that were utilized at a given UNIX timestamp under a specific commit. The mappings are in c2bPtaPkgO{$LANG}.{0-31}.gz files.   
 Format: `commit;repo_name;timestamp;author;blob;module1;module2;...`  
 Each thruMaps directory has a different language ($LANG) that contains modules relevant to that language.
 ------
@@ -110,14 +110,16 @@ UNIX> python
 ### Finding 1st-time imports for AI modules  
 Given the data available, this is a fairly simple task. Making an application to detect the first time that a repo adopted an AI module would give you a better idea as to when it was first used, and also when it started to gain popularity.  
 
-A good example of this lies in [popmods.py](https://github.com/ssc-oscar/aiframeworks/blob/master/popmods.py). In this application, we can read all 32 c2bPtaPkgO.{0-31}.gz files of a given language and look for a given module with the earliest import times. The program then creates a <module_name>.first file, with each line formatted as `repo_name;UNIX_timestamp`.  
+A good example of this lies in [popmods.py](https://github.com/ssc-oscar/aiframeworks/blob/master/popmods.py). In this application, we can read all 32 c2bPtaPkgO$LANG.{0-31}.gz files of a given language and look for a given module with the earliest import times. The program then creates a <module_name>.first file, with each line formatted as `repo_name;UNIX_timestamp`.  
 
-Before anything else (and this can be applied to other programs), you want to know what your input looks like ahead of time and know how you are going to parse it. Since each line of the file has this format:  
+Usage: `UNIX> python popmods.py language_file_extension module_name`  
+
+Before anything else (and this can be applied to many other programs), you want to know what your input looks like ahead of time and know how you are going to parse it. Since each line of the file has this format:  
 `commit;repo_name;timestamp;author;blob;module1;module2;...`  
 We can use the `string.split()` method to turn this string into a list of words, split by a semicolon (;).  
 By turning this line into a list, and giving it a variable name, `entry = ['commit', 'repo_name', 'timestamp', ...]`, we can then grab the pieces of information we need with `repo, time = entry[1], entry[2]`. 
 
-An important idea to keep in mind is that we only want to count unique timestamps once. This is because we want to account for repositories that forked off of another repository with the exact timestamp of imports. An easy way to do this would be to keep a running list of the times we have come across, and if we have already seen that timestamp before, we will simply skip that line in the file.   
+An important idea to keep in mind is that we only want to count unique timestamps once. This is because we want to account for repositories that forked off of another repository with the exact timestamp of imports. An easy way to do this would be to keep a running list of the times we have come across, and if we have already seen that timestamp before, we will simply skip that line in the file:  
 ```
 ...
 if time in times:
@@ -126,7 +128,7 @@ else:
 	times.append(time)
 ...
 ```
-We also want to find the earliest timestamp for a repository importing a given module. Again, this is fairly simple.   
+We also want to find the earliest timestamp for a repository importing a given module. Again, this is fairly simple:  
 ```
 ...
 if repo not in dict.keys() or time < dict[repo]:
@@ -136,8 +138,20 @@ if repo not in dict.keys() or time < dict[repo]:
 			break
 ...
 ```
+#### Implementing the application
+Now that we have the .first files put together, we can take this one step further and graph a module`s first-time usage over time on a line graph, or even compare multiple modules to see how they stack up against each other. [modtrends.py](https://github.com/ssc-oscar/aiframeworks/blob/master/modtrends.py) accomplishes this by:  
+* reading 1 or more .first files  
+* converting each timestamp for each repository into a datetime date 
+* "rounding" those dates by year and month  
+* putting those dates in a dictionary with `dict["year-month"] += 1`
+* graphing the dates and frequencies using matplotlib.  
+If you want to compare first-time usage over time for Tensorflow and Keras for the .ipynb language .first files you created, run: `UNIX> python3.6 modtrends.py tensorflow.first keras.first`  
+The final graph should look something like this:  
+![](https://github.com/ssc-oscar/aiframeworks/blob/master/charts/ipynb_charts/Tensorflow-vs-Keras.png)
 -------
 ### Detecting percentage language use and changes over time  
+An application to calculate this would be useful for seeing how different authors changed languages over a range of years, based on the commits they have made to different files.  
+In order to accomplish this task, we will modify an existing program from the swsc/lookup repo (a2fBinSorted.perl) and create a new program that will get language counts per year per author.  
 
 
 
