@@ -1,5 +1,5 @@
 # Tutorial basics for Hackathon
-
+--------
 ## List of relevant directories
 ### da0 Server
 #### <relationship>.{0-31}.tch files in `/data/basemaps/`:  
@@ -20,7 +20,7 @@ Keys for identifying letters:
 
 List of relationships:
 ```
-* a2c (.s)		* a2f			* a2p (.s)			* a2trp0 (.s)
+* a2c (.s)		* a2f			* a2ft				* a2L (.s only)		* a2p (.s)			* a2trp0 (.s)
 * b2c (.s)		* b2f (.s)
 * c2b (.s)		* c2cc			* c2f (.s)		
 * c2h			* c2pc			* c2p (.s)			* c2ta (.s)
@@ -148,14 +148,62 @@ Now that we have the .first files put together, we can take this one step furthe
 * graphing the dates and frequencies using matplotlib.
 
 If you want to compare first-time usage over time for Tensorflow and Keras for the .ipynb language .first files you created, run: `UNIX> python3.6 modtrends.py tensorflow.first keras.first`  
-The final graph should look something like this:  
+The final graph looks something like this:  
 [![Tensorflow vs Keras](../ipynb_first/Tensorflow-vs-Keras.png "Tensorflow vs Keras")](https://github.com/ssc-oscar/aiframeworks/blob/master/charts/ipynb_charts/Tensorflow-vs-Keras.png)
 -------
 ### Detecting percentage language use and changes over time  
 An application to calculate this would be useful for seeing how different authors changed languages over a range of years, based on the commits they have made to different files.  
-In order to accomplish this task, we will modify an existing program from the swsc/lookup repo (a2fBinSorted.perl) and create a new program that will get language counts per year per author.  
+In order to accomplish this task, we will modify an existing program from the swsc/lookup repo ([a2fBinSorted.perl](https://bitbucket.org/swsc/lookup/src/master/a2fBinSorted.perl)) and create a new program ([a2L.py](https://bitbucket.org/swsc/lookup/src/master/a2L.py)) that will get language counts per year per author.  
 
+#### Part 1
+For the first part, we look at what a2fBinSorted.perl currently does: it takes one of the 32 a2cFullP{0-31}.s files thru STDIN, opens the 32 c2fFullO.{0-31}.tch files for reading, and writes a corresponding a2fFullP.{0-31}.tch file based on the a2c file number. The lines of the file being `author_id;file1;file2;file3...`  
 
+Example usage: `UNIX> zcat /da0_data/basemaps/gz/a2cFullP0.s | ./a2fBinSorted.perl 0`
+
+We can modify this program so that it will write the earliest commit dates made by that author for those files, which will become useful for a2L.py later on. To accomplish this, we will have the program additionally read from the c2taFullP.{0-31}.tch files so we can get the time of each commit made by a given author:  
+```
+my %c2ta;
+for my $s (0..($sections-1)){
+	tie %{$c2ta{$s}}, "TokyoCabinet::HDB", "/fast/c2taFullP.$s.tch", TokyoCabinet::HDB::OREADER |
+	TokyoCabinet::HDB::ONOLCK,
+	   16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
+	or die "cant open fast/c2taFullP.$s.tch\n";
+}
+```
+We will also ensure the files to be written will have the relationship a2ft as oppposed to a2f:  
+```
+my %a2ft;
+tie %a2ft, "TokyoCabinet::HDB", "/data/play/dkennard/a2ftFullP.$part.tch", TokyoCabinet::HDB::OWRITER | 
+     TokyoCabinet::HDB::OCREAT,
+	16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
+	or die "cant open /data/play/dkennard/a2ftFullP.$part.tch\n";
+```
+Another important part of the file we want to change is inside the `output` function:  
+```
+sub output {
+	my $a = $_[0];
+	my %fs;
+	for my $c (@cs){
+		my $sec =  segB ($c, $sections);
+		if (defined $c2f{$sec}{$c} and defined $c2ta{$sec}{$c}){
+			my @fs = split(/\;/, safeDecomp ($c2f{$sec}{$c}, $a), -1);
+			my ($time, $au) = split(/\;/, $c2ta{$sec}{$c}, -1);  #add this for grabbing the time
+			for my $f (@fs){
+				if (defined $time and (!defined $fs{$f} or $time < $fs{$f})){ #modify condition to grab earliest time
+					$fs{$f} = $time;
+				}
+			}
+		}
+	}
+	$a2ft{$a} = safeComp (join ';', %fs); #changed
+}
+```
+Now when we run the new program, it should write individual a2ftFullP.{0-31}.tch files with the format:  
+`author_id;file1;file1_timestamp;file2;file2_timestamp;...`  
+
+We can then make another function under the Author class in oscar.py to read our newly-created .tch files:
+
+#### Part 2
 
 -------
 ## Useful Python imports for applications
