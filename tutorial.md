@@ -15,7 +15,7 @@ Keys for identifying letters:
 * h = Head Commit
 * p = Project
 * pc = Parent Commit
-* ta = Time_Author
+* ta = Time Author
 * trp = Torvald Path
 
 List of relationships:
@@ -29,7 +29,7 @@ List of relationships:
 ```	
 ------
 #### `/data/play/$LANGthruMaps/` on da0:  
-These thruMaps directories contain mappings of repositories with modules that were utilized at a given UNIX timestamp under a specific commit. The mappings are in c2bPtaPkg{N-O}{$LANG}.{0-31}.gz files. 
+These thruMaps directories contain mappings of repositories with modules that were utilized at a given UNIX timestamp under a specific commit. The mappings are in c2bPtaPkgO{$LANG}.{0-31}.gz files. 
 Format: `commit;repo_name;timestamp;author;blob;module1;module2;...`  
 Each thruMaps directory has a different language ($LANG) that contains modules relevant to that language.
 ------
@@ -107,5 +107,40 @@ UNIX> python
 ```
 -------	
 ## Examples of implementing applications  
+### Finding 1st-time imports for AI modules  
+Given the data available, this is a fairly simple task. Making an application to detect the first time that a repo adopted an AI module would give you a better idea as to when it was first used, and also when it started to gain popularity.  
 
+A good example of this lies in [popmods.py](https://github.com/ssc-oscar/aiframeworks/blob/master/popmods.py). In this application, we can read all 32 c2bPtaPkgO.{0-31}.gz files of a given language and look for a given module with the earliest import times. The program then creates a <module_name>.first file, with each line formatted as `repo_name;UNIX_timestamp`.  
+
+Before anything else (and this can be applied to other programs), you want to know what your input looks like ahead of time and know how you are going to parse it. Since each line of the file has this format:  
+`commit;repo_name;timestamp;author;blob;module1;module2;...`  
+We can use the `string.split()` method to turn this string into a list of words, split by a semicolon (;).  
+By turning this line into a list, and giving it a variable name, `entry = ['commit', 'repo_name', 'timestamp', ...]`, we can then grab the pieces of information we need with `repo, time = entry[1], entry[2]`. 
+
+An important idea to keep in mind is that we only want to count unique timestamps once. This is because we want to account for repositories that forked off of another repository with the exact timestamp of imports. An easy way to do this would be to keep a running list of the times we have come across, and if we have already seen that timestamp before, we will simply skip that line in the file.   
+```
+...
+if time in times:
+	continue
+else:
+	times.append(time)
+...
+```
+We also want to find the earliest timestamp for a repository importing a given module. Again, this is fairly simple.   
+```
+...
+if repo not in dict.keys() or time < dict[repo]:
+	for word in entry[5:]:
+		if module in word:
+			dict[repo] = time
+			break
+...
+```
+-------
+### Detecting percentage language use and changes over time  
+
+
+
+-------
+## Useful Python imports for applications
 
