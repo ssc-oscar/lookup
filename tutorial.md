@@ -140,11 +140,12 @@ if repo not in dict.keys() or time < dict[repo]:
 ```
 #### Implementing the application
 Now that we have the .first files put together, we can take this one step further and graph a modules first-time usage over time on a line graph, or even compare multiple modules to see how they stack up against each other. [modtrends.py](https://github.com/ssc-oscar/aiframeworks/blob/master/modtrends.py) accomplishes this by:  
-	* reading 1 or more .first files  
-	* converting each timestamp for each repository into a datetime date  
-	* "rounding" those dates by year and month  
-	* putting those dates in a dictionary with `dict["year-month"] += 1`  
-	* graphing the dates and frequencies using matplotlib.  
+* reading 1 or more .first files  
+* converting each timestamp for each repository into a datetime date  
+* "rounding" those dates by year and month  
+* putting those dates in a dictionary with `dict["year-month"] += 1`  
+* graphing the dates and frequencies using matplotlib.  
+
 If you want to compare first-time usage over time for Tensorflow and Keras for the .ipynb language .first files you created, run: `UNIX> python3.6 modtrends.py tensorflow.first keras.first`  
 The final graph should look something like this:  
 [![Tensorflow vs Keras](../ipynb_first/Tensorflow-vs-Keras.png "Tensorflow vs Keras")](https://github.com/ssc-oscar/aiframeworks/blob/master/charts/ipynb_charts/Tensorflow-vs-Keras.png)
