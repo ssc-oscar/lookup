@@ -224,7 +224,8 @@ where the number after each year represents the number of languages used for tha
 
 There is a number of things that have to happen to get to this point, so lets break it down:  
 
-* Iterating Author().file_times and grouping timestamps into years   
+* Iterating Author().file_times and grouping timestamps into year 
+
 We will start by reading in a a2cFullP{0-31}.s file to get a list of authors, which we then hold as a tuple in memory and start building our dictionary:  
 ```
 a2L[author] = {}
