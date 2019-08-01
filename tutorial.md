@@ -223,6 +223,7 @@ Our next task involves creating a2LFullP{0-31}.s files utilizing the new .tch fi
 where the number after each year represents the number of languages used for that year, followed by pairs of languages and the number of files written in that language for that year. As an example, in the year 2015, Tim Bentley made initial commits to files in 2 languages, 31 of which were in Python, and 30 of which were in JavaScript.  
 
 There is a number of things that have to happen to get to this point, so lets break it down:  
+
 * Iterating Author().file_times and grouping timestamps into years
 We will start by reading in a a2cFullP{0-31}.s file to get a list of authors, which we then hold as a tuple in memory and start building our dictionary:  
 ```
