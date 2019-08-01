@@ -1,5 +1,5 @@
 # Tutorial basics for Hackathon
---------
+-------
 ## List of relevant directories
 ### da0 Server
 #### <relationship>.{0-31}.tch files in `/data/basemaps/`:  
@@ -263,6 +263,7 @@ for year, files in a2L[author].items():
 The simplest way to check for a language based on a file extension is to use the re module for regular expressions. If a given file matches a certain expression, like `.py`, then that file was written in Python. `la = other` if no matches were found in any of those searches. We then keep track of these languages and put each language in a list `build_list.append(la)`, and count how many of those languages occurred when we looped through the files `build_list.count(lang)`. The final format for an author in the a2L dictionary will be `a2L[author][year][lang] = lang_count`.  
 
 * Writing each authors information into the file
+
 See [a2L.py](https://bitbucket.org/swsc/lookup/src/master/a2L.py) for how the information is written into each file.  
 
 Usage: `UNIX> python a2L.py 2` for writing `a2LFullP2.s`  
