@@ -244,6 +244,7 @@ for j in range(0,len(file_times),2):
 	a2L[author][year].append(file_times[j])
 ```
 The datetime.fromtimestamp() function will turn this into a datetime format: `year-month-day hour-min-sec` which we split by a space to get the first half `year-month-day` of the string, and then split again to get `year`.  
+
 * Detecting the language of a file based on file extension
 ```
 for year, files in a2L[author].items():
