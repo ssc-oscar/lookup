@@ -106,8 +106,8 @@ UNIX> python
 'https://github.com/notcake/gcad'
 ```
 -------	
-## Examples of implementing applications  
-### Finding 1st-time imports for AI modules  
+## Examples of implementing applications -- Simple vs. Complex
+### Finding 1st-time imports for AI modules (Simple) 
 Given the data available, this is a fairly simple task. Making an application to detect the first time that a repo adopted an AI module would give you a better idea as to when it was first used, and also when it started to gain popularity.  
 
 A good example of this lies in [popmods.py](https://github.com/ssc-oscar/aiframeworks/blob/master/popmods.py). In this application, we can read all 32 c2bPtaPkgO$LANG.{0-31}.gz files of a given language and look for a given module with the earliest import times. The program then creates a <module_name>.first file, with each line formatted as `repo_name;UNIX_timestamp`.  
@@ -151,11 +151,11 @@ If you want to compare first-time usage over time for Tensorflow and Keras for t
 The final graph looks something like this:  
 [![Tensorflow vs Keras](../ipynb_first/Tensorflow-vs-Keras.png "Tensorflow vs Keras")](https://github.com/ssc-oscar/aiframeworks/blob/master/charts/ipynb_charts/Tensorflow-vs-Keras.png)
 -------
-### Detecting percentage language use and changes over time  
+### Detecting percentage language use and changes over time (Complex) 
 An application to calculate this would be useful for seeing how different authors changed languages over a range of years, based on the commits they have made to different files.  
 In order to accomplish this task, we will modify an existing program from the swsc/lookup repo ([a2fBinSorted.perl](https://bitbucket.org/swsc/lookup/src/master/a2fBinSorted.perl)) and create a new program ([a2L.py](https://bitbucket.org/swsc/lookup/src/master/a2L.py)) that will get language counts per year per author.  
 
-#### Part 1
+#### Part 1 -- Modifying a2fBinSorted.perl
 For the first part, we look at what a2fBinSorted.perl currently does: it takes one of the 32 a2cFullP{0-31}.s files thru STDIN, opens the 32 c2fFullO.{0-31}.tch files for reading, and writes a corresponding a2fFullP.{0-31}.tch file based on the a2c file number. The lines of the file being `author_id;file1;file2;file3...`  
 
 Example usage: `UNIX> zcat /da0_data/basemaps/gz/a2cFullP0.s | ./a2fBinSorted.perl 0`
@@ -201,9 +201,71 @@ sub output {
 Now when we run the new program, it should write individual a2ftFullP.{0-31}.tch files with the format:  
 `author_id;file1;file1_timestamp;file2;file2_timestamp;...`  
 
-We can then make another function under the Author class in oscar.py to read our newly-created .tch files:
+We can then create a new PATHS dictionary entry in oscar.py, as well as making another function under the Author class to read our newly-created .tch files:  
+```
+In PATHS dictionary:
+...
+'author_file_times': ('/data/play/dkennard/a2ftFullP.{key}.tch', 5)
+...
 
-#### Part 2
+In class Author(_Base):
+...
+@cached_property
+def file_times(self):
+	data = decomp(self.read_tch('author_file_times'))
+	return tuple(file for file in (data and data.split(";")))
+...
+```
+
+#### Part 2 -- Creating a2L.py
+Our next task involves creating a2LFullP{0-31}.s files utilizing the new .tch files we have just created. We want these files to have each line filled with the author name, each year, and the language counts for each year. A possible format could look something like this:  
+`"tim.bentley@gmail.com" <>;year2015;2;py;31;js;30;year2016;1;py;29;year2017;8;c;2;doc;1;py;386;html;6;sh;1;js;3;other;3;build;1`  
+where the number after each year represents the number of languages used for that year, followed by pairs of languages and the number of files written in that language for that year. As an example, in the year 2015, Tim Bentley made initial commits to files in 2 languages, 31 of which were in Python, and 30 of which were in JavaScript.  
+
+There is a number of things that have to happen to get to this point, so lets break it down:  
+* Iterating Author().file_times and grouping timestamps into years
+We will start by reading in a a2cFullP{0-31}.s file to get a list of authors, which we then hold as a tuple in memory and start building our dictionary:  
+```
+a2L[author] = {}
+file_times = Author(author).file_times
+for j in range(0,len(file_times),2):
+	try:
+		year = str(datetime.fromtimestamp(float(file_times[j+1]))).split(" ")[0].split("-")[0]
+	#have to skip years either in the 20th century or somewhere far in the future
+	except ValueError:
+		continue
+	#in case the last file listed doesnt have a time
+	except IndexError:
+		break
+	year = specifier + year #specifier is the string 'year'
+	if year not in a2L[author]:
+		a2L[author][year] = []
+	a2L[author][year].append(file_times[j])
+```
+The datetime.fromtimestamp() function will turn this into a datetime format: `year-month-day hour-min-sec` which we split by a space to get the first half `year-month-day` of the string, and then split again to get `year`.  
+* Detecting the language of a file based on file extension
+```
+for year, files in a2L[author].items():
+	build_list = []
+	for file in files:
+		la = "other"
+		if re.search("\.(js|iced|liticed|iced.md|coffee|litcoffee|coffee.md|ts|cs|ls|es6|es|jsx|sjs|co|eg|json|json.ls|json5)$",file):
+			la = "js"
+		elif re.search("\.(py|py3|pyx|pyo|pyw|pyc|whl|ipynb)$",file):
+			la = "py"
+		elif re.search("(\.[Cch]|\.cpp|\.hh|\.cc|\.hpp|\.cxx)$",file):
+			la = "c"
+	.......
+```
+The simplest way to check for a language based on a file extension is to use the re module for regular expressions. If a given file matches a certain expression, like `.py`, then that file was written in Python. `la = other` if no matches were found in any of those searches. We then keep track of these languages and put each language in a list `build_list.append(la)`, and count how many of those languages occurred when we looped through the files `build_list.count(lang)`. The final format for an author in the a2L dictionary will be `a2L[author][year][lang] = lang_count`.  
+
+* Writing each authors information into the file
+See [a2L.py](https://bitbucket.org/swsc/lookup/src/master/a2L.py) for how the information is written into each file.  
+
+Usage: `UNIX> python a2L.py 2` for writing `a2LFullP2.s`  
+
+### Implementing the application
+
 
 -------
 ## Useful Python imports for applications
