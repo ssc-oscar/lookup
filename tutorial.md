@@ -273,8 +273,10 @@ Now that we have our a2L files, we can run some interesting statistics as to how
 This p-value means the percentage chance that you would find another person (say out of 1000 people) that has this same extreme of change in language use, whether that be an increase or a decrease. For example, if a given author editied 300 different Python files in 2006, but then editied 500 different Java files in 2007, the percentage chance that you would see this extreme of a change in another author is very low. In fact, if this p-value is less than 0.001, then the change in language use between a pair of years is considered "significant".  
 
 In order for this p-value to be a more accurate approximation, we need a larger sample size of language counts. When reading the a2LFullP{0-31}.s files, you may want to rule out people who dont meet certain criteria:  
+
 * the author has at least 5 consecutive years of commits for files
 * the author has edited at least 100 different files for all of their years of commits
+
 If an author does not meet this criteria, we would not want to consider them for the chi-squared test simply because their results would be "uninteresting" and not worth investigating any further.  
 
 Heres one of the authors from the programs output:  
