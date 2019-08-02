@@ -338,10 +338,11 @@ Ben Niemann <pink@odahoda.de>
 	pfactors for js language
 		2018--2019 pfactor == 0.7989681687355706  no change
 ----------------------------------
-```
+```  
 
 Although it is currently not implemented, one could take this one step further and visually represent an authors language changes on a graph, which would be simpler to interpret as opposed to viewing a long list of pfactors such as the one shown above.  
--------
+
+--------
 ## Useful Python imports for applications
 * subprocess vs gzip vs zcat
 * re
