@@ -264,13 +264,84 @@ The simplest way to check for a language based on a file extension is to use the
 
 * Writing each authors information into the file
 
-See [a2L.py](https://bitbucket.org/swsc/lookup/src/master/a2L.py) for how the information is written into each file.  
+See [a2L.py](https://bitbucket.org/swsc/lookup/src/master/a2L.py) for how information is written into each file.  
 
 Usage: `UNIX> python a2L.py 2` for writing `a2LFullP2.s`  
 
-### Implementing the application
+#### Implementing the application
+Now that we have our a2L files, we can run some interesting statistics as to how significant language usage changes over time for different authors. The program [langtrend.py](https://bitbucket.org/swsc/lookup/src/master/langtrend.py) runs the chi-squared contingency test (via the stats.chi2_contingency() function from scipy module) for authors from an a2LFullP{0-31}.s file on STDIN and calculates a p-value for each pair of years for each language for each author.   
+This p-value means the percentage chance that you would find another person (say out of 1000 people) that has this same extreme of change in language use, whether that be an increase or a decrease. For example, if a given author editied 300 different Python files in 2006, but then editied 500 different Java files in 2007, the percentage chance that you would see this extreme of a change in another author is very low. In fact, if this p-value is less than 0.001, then the change in language use between a pair of years is considered "significant".  
 
+In order for this p-value to be a more accurate approximation, we need a larger sample size of language counts. When reading the a2LFullP{0-31}.s files, you may want to rule out people who dont meet certain criteria:  
+* the author has at least 5 consecutive years of commits for files
+* the author has edited at least 100 different files for all of their years of commits
+If an author does not meet this criteria, we would not want to consider them for the chi-squared test simply because their results would be "uninteresting" and not worth investigating any further.  
 
+Heres one of the authors from the programs output:  
+```
+----------------------------------
+Ben Niemann <pink@odahoda.de>
+{ '2015': {'doc': 3, 'markup': 2, 'obj': 1, 'other': 67, 'py': 127, 'sh': 1},
+	'2016': {'doc': 1, 'other': 23, 'py': 163},
+	'2017': {'build': 36, 'c': 116, 'lsp': 1, 'other': 81, 'py': 160},
+	'2018': { 'build': 12,
+		'c': 134,
+		'lsp': 2,
+		'markup': 2,
+		'other': 133,
+		'py': 182},
+	'2019': { 'build': 13,
+		'c': 30,
+		'doc': 8,
+		'html': 10,
+		'js': 1,
+		'lsp': 2,
+		'markup': 16,
+		'other': 67,
+		'py': 134}}
+	pfactors for obj language
+		2015--2016 pfactor == 0.9711606775110577  no change
+	pfactors for doc language
+		2015--2016 pfactor == 0.6669499228133753  no change
+		2016--2017 pfactor == 0.7027338745275937  no change
+		2018--2019 pfactor == 0.0009971248193242038  rise/drop
+	pfactors for markup language
+		2015--2016 pfactor == 0.5104066960256399  no change
+		2017--2018 pfactor == 0.5532258789014389  no change
+		2018--2019 pfactor == 1.756929555308731e-05  rise/drop
+	pfactors for py language
+		2015--2016 pfactor == 1.0629725495084215e-07  rise/drop
+		2016--2017 pfactor == 1.2847558344252341e-25  rise/drop
+		2017--2018 pfactor == 0.7125543569718793  no change
+		2018--2019 pfactor == 0.026914075872778477  no change
+	pfactors for sh language
+		2015--2016 pfactor == 0.9711606775110577  no change
+	pfactors for other language
+		2015--2016 pfactor == 1.7143130378377696e-06  rise/drop
+		2016--2017 pfactor == 0.020874234589765908  no change
+		2017--2018 pfactor == 0.008365948846657284  no change
+		2018--2019 pfactor == 0.1813919210757513  no change
+	pfactors for c language
+		2016--2017 pfactor == 2.770649054044977e-16  rise/drop
+		2017--2018 pfactor == 0.9002187643203734  no change
+		2018--2019 pfactor == 1.1559110387953382e-08  rise/drop
+	pfactors for lsp language
+		2016--2017 pfactor == 0.7027338745275937  no change
+		2017--2018 pfactor == 0.8855759560371912  no change
+		2018--2019 pfactor == 0.9944669523033288  no change
+	pfactors for build language
+		2016--2017 pfactor == 4.431916568235125e-05  rise/drop
+		2017--2018 pfactor == 5.8273175348446296e-05  rise/drop
+		2018--2019 pfactor == 0.1955154860787908  no change
+	pfactors for html language
+		2018--2019 pfactor == 0.0001652525618661536  rise/drop
+	pfactors for js language
+		2018--2019 pfactor == 0.7989681687355706  no change
+----------------------------------
+```
+Although it is currently not implemented, one could take this one step further and visually represent an authors language changes on a graph, which would be simpler to interpret as opposed to viewing a long list of pfactors such as the one shown above.  
 -------
 ## Useful Python imports for applications
-
+* subprocess vs gzip vs zcat
+* re
+* matplotlib
