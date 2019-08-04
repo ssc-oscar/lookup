@@ -363,8 +363,9 @@ for entry in str(output).rstrip('\n').split("\n"):
 	entry = str(entry).split(";")
 	repo, time = entry[1], entry[2]
 ```
+
 Additional documentation on subprocess can be found [here](https://docs.python.org/2/library/subprocess.html).  
----------
+----------
 ### re
 The re (Regular Expression) module is another useful import for pattern-matching in strings. 
 ### matplotlib
