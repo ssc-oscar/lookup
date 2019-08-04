@@ -47,7 +47,6 @@ for my $s (0..127){
 
   my ($parent) = extrPar ($codeC);
   if ($parent eq ""){
-    print "$hash\n"; #no parent
     next;
   }
   for my $p (split(/:/, $parent)){
