@@ -269,7 +269,7 @@ See [a2L.py](https://bitbucket.org/swsc/lookup/src/master/a2L.py) for how inform
 Usage: `UNIX> python a2L.py 2` for writing `a2LFullP2.s`  
 
 #### Implementing the application
-Now that we have our a2L files, we can run some interesting statistics as to how significant language usage changes over time for different authors. The program [langtrend.py](https://bitbucket.org/swsc/lookup/src/master/langtrend.py) runs the chi-squared contingency test (via the stats.chi2_contingency() function from scipy module) for authors from an a2LFullP{0-31}.s file on STDIN and calculates a p-value for each pair of years for each language for each author.   
+Now that we have our a2L files, we can run some interesting statistics as to how significant language usage changes over time for different authors. The program [langtrend.py](https://bitbucket.org/swsc/lookup/src/master/langtrend.py) runs the chi-squared contingency test (via the stats.chi2_contingency() function from scipy module) for authors from an a2LFullP{0-31}.s file and calculates a p-value for each pair of years for each language for each author.   
 This p-value means the percentage chance that you would find another person (say out of 1000 people) that has this same extreme of change in language use, whether that be an increase or a decrease. For example, if a given author editied 300 different Python files in 2006, but then editied 500 different Java files in 2007, the percentage chance that you would see this extreme of a change in another author is very low. In fact, if this p-value is less than 0.001, then the change in language use between a pair of years is considered "significant".  
 
 In order for this p-value to be a more accurate approximation, we need a larger sample size of language counts. When reading the a2LFullP{0-31}.s files, you may want to rule out people who dont meet certain criteria:  
@@ -346,6 +346,25 @@ Although it is currently not implemented, one could take this one step further a
 
 --------
 ## Useful Python imports for applications
-* subprocess vs gzip vs zcat
-* re
-* matplotlib
+### subprocess
+Simlar to the C version, system(), this module allows you to run UNIX processes, and also allows you to gather any input, output, or error from those processes, all from within a Python script. This module becomes especially useful when you are looking for specific lines out of a .s/.gz file, as opposed to reading the entire file which takes more time.  
+A good example usage for subprocess is when we read the c2bPtaPkgO$LANG.{0-31}.gz files for first-time AI module imports in popmods.py. Rather than reading one of these files in its entirety, we look for lines of the file that have a specific module we are looking for.  
+```
+for i in range(32):
+	print("Reading gz file number " + str(i))
+	command = "zcat /data/play/" + dir_lang + "thruMaps/c2bPtaPkgO" + dir_lang + "." + str(i) + ".gz"
+	p1 = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE)
+	p2 = subprocess.Popen("egrep -w " + module, shell=True, stdin=p1.stdout, stdout=subprocess.PIPE) 
+	output = p2.communicate()[0]
+```
+We can then iterate the lines of this output accordingly, and gather the pieces of information we need:  
+```
+for entry in str(output).rstrip('\n').split("\n"):
+	entry = str(entry).split(";")
+	repo, time = entry[1], entry[2]
+```
+Additional documentation on subprocess can be found [here](https://docs.python.org/2/library/subprocess.html).  
+---------
+### re
+The re (Regular Expression) module is another useful import for pattern-matching in strings. 
+### matplotlib
