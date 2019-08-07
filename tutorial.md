@@ -1,5 +1,32 @@
 # Tutorial basics for Hackathon
 -------
+## Getting started
+### Set up an account
+### Gain permissions and access to da server(s)
+In order to gain access to one of the da servers, you will need to generate a public key via the `ssh-keygen` command, and put the `id_rsa.pub` and `id_rsa` files inside your .ssh/ folder on your home terminal. Once finished, send the contents of `id_rsa.pub` (your public key) over to Dr. Mockus who will then grant you access to one or more of the da servers.  
+Optionally, you can also set up your `.ssh/config` file so that you can login to one of the da servers without having to fully specify the server name each time:  
+```
+Host da0
+	Hostname da0.eecs.utk.edu
+	Port 443
+	User {username}
+```
+
+Logging in then becomes as simple as `ssh da0`.  
+Once you are in a da server, you will have an empty directory under `/home/username` where you can store your programs and files:  
+```
+[username@da0]~% pwd
+/home/username
+[username@da0]~% 
+```
+
+### Clone the oscar.py and swsc/lookup repos
+oscar.py link: https://github.com/ssc-oscar/oscar.py
+swsc/lookup link: https://bitbucket.org/swsc/lookup/src/master/
+
+Run `git clone <link>` (no brackets) on a da server to get a copy of the given repository link.  
+
+-------
 ## List of relevant directories
 ### da0 Server
 #### <relationship>.{0-31}.tch files in `/data/basemaps/`:  
