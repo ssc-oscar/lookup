@@ -395,5 +395,11 @@ Additional documentation on subprocess can be found [here](https://docs.python.o
 
 ----------
 ### re
-The re (Regular Expression) module is another useful import for pattern-matching in strings. 
+The re (Regular Expression) module is another useful import for pattern-matching in strings.  
+Addtional re documentation can be found [here](https://docs.python.org/2/library/re.html).  
+
+----------
 ### matplotlib
+Useful graphing module for creating visual representations.  
+Extensive documentation can be found [here](https://matplotlib.org/).  
+
