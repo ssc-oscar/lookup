@@ -21,7 +21,7 @@ Once you are in a da server, you will have an empty directory under `/home/usern
 ```
 
 ### Clone the oscar.py and swsc/lookup repos
-oscar.py link: https://github.com/ssc-oscar/oscar.py
+oscar.py link: https://github.com/ssc-oscar/oscar.py  
 swsc/lookup link: https://bitbucket.org/swsc/lookup/src/master/
 
 Run `git clone <link>` (no brackets) on a da server to get a copy of the given repository link.  
