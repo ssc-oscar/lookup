@@ -1,7 +1,12 @@
 # Tutorial basics for Hackathon
 -------
 ## Getting started
-### Set up an account
+### Set up accounts for GitHub and BitBucket
+If you dont have these already, go ahead and setup an account on both GitHub and Bitbucket and give your GH nad BB ids and email to Dr. Mockus, who will then invite you to the oscar.py and swsc repositories.  
+GitHub: https://github.com/pricing  
+BitBucket: https://bitbucket.org/account/signup/  
+--------
+
 ### Gain permissions and access to da server(s)
 In order to gain access to one of the da servers, you will need to generate a public key via the `ssh-keygen` command, and put the `id_rsa.pub` and `id_rsa` files inside your .ssh/ folder on your home terminal. Once finished, send the contents of `id_rsa.pub` (your public key) over to Dr. Mockus who will then grant you access to one or more of the da servers.  
 Optionally, you can also set up your `.ssh/config` file so that you can login to one of the da servers without having to fully specify the server name each time:  
@@ -19,7 +24,7 @@ Once you are in a da server, you will have an empty directory under `/home/usern
 /home/username
 [username@da0]~% 
 ```
-
+---------
 ### Clone the oscar.py and swsc/lookup repos
 oscar.py link: https://github.com/ssc-oscar/oscar.py  
 swsc/lookup link: https://bitbucket.org/swsc/lookup/src/master/
