@@ -1,8 +1,8 @@
 # Tutorial basics for Hackathon
 -------
 ## Getting started
-### Set up accounts for GitHub and BitBucket
-If you dont have these already, go ahead and setup an account on both GitHub and Bitbucket and give your GH nad BB ids and email to Dr. Mockus, who will then invite you to the oscar.py and swsc repositories.  
+### Set up accounts for GitHub and Bitbucket
+If you dont have these already, go ahead and setup an account on both GitHub and Bitbucket and give your GH and BB ids and email to Dr. Mockus, who will then invite you to the oscar.py and swsc repositories via email.  
 GitHub: https://github.com/pricing  
 BitBucket: https://bitbucket.org/account/signup/  
 --------
