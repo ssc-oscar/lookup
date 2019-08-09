@@ -407,4 +407,15 @@ Addtional re documentation can be found [here](https://docs.python.org/2/library
 ### matplotlib
 Useful graphing module for creating visual representations.  
 Extensive documentation can be found [here](https://matplotlib.org/).  
-
+----------
+## oscar.py vs. Perl scripts
+When it comes to creating new relationship files (.tch/.s files), using Perl over Python for large data-reading is more time-saving overall. This situation occurred in the complex application we covered where we modified an existing Perl file to get the initial commit times of each file for each author, rather than using Python to accomplish this task.  
+Before making this decision, one of our team members decided to run a test between 2 programs, a2ft.py and a2fBinSorted.perl. These programs were run at the same time for a period of 10 minutes. Both programs had the same task of retrieving the earliest commit times for each file under each author from a2cFullP{0-31}.s files. The Python version calls the `Commit_info().time_author` and `Commit().changed_file_names` functions from oscar.py. The Perl version ties each of the 32 c2fFullO.{0-31}.tch (Commit().changed_file_names) and c2taFullP.{0-31}.tch (Commit_info().time_author) files into 2 different Perl hashes (Python dictionary equivalent), %c2f and %c2ta. The speed difference between Perl and Python was quite surprising:  
+```
+[dkennard@da3]/data/play/dkennard% ll a2ftFullP0TEST1.s
+-rw-rw-r--. 1 dkennard dkennard 980606 Jul 22 11:56 a2ftFullP0TEST1.s
+[dkennard@da3]/data/play/dkennard% ll a2ftFullPTEST2.0.tch
+-rw-r--r--. 1 dkennard dkennard 663563424 Jul 22 11:56 a2ftFullPTEST2.0.tch
+```  
+Within this 10 minute period, the Python version only wrote 980,606 bytes of data into the TEST1 file shown above, whereas the Perl version wrote 663,563,424 bytes into the TEST2 file. The main reason oscar.py is slower, in theory, is because oscar.py has more private function calls that it has to perform in order to calculate the key (0-31) where the requested information is stored. Upon further inspection of the [oscar.py](https://github.com/ssc-oscar/oscar.py/blob/master/oscar.py) functions that are called, we can see that there are between 6-7 function calls for each lookup.  
+This is not to say that oscar.py is inefficient and should not be utilized, but rather as a word of caution for creating new .tch or .s relationship files. 
