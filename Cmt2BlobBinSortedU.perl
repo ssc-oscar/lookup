@@ -85,8 +85,9 @@ sub dumpData {
       if (defined $c2p{$s}{$c}){
         my $v1 = $c2p{$s}{$c};
         my $len = length ($v1)/20-1;
-        for my $i (0..$len){ $c2p1{$s}{$c}{substr($v1,$i*20,20)}++ }
-        my $bsC = join '', sort keys %{$c2p1{$s}{$c}};
+        for my $i (0..$len){ $c2p1{$s}{$c}{substr($v1,$i*20,20)}++; };
+      }
+      my $bsC = join '', sort keys %{$c2p1{$s}{$c}};
       $c2p{$s}{$c} = $bsC;
     }
     %{$c2p1{$s}} = ();
