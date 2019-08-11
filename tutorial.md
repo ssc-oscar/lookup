@@ -1,5 +1,37 @@
 # Tutorial basics for Hackathon
 -------
+## Getting started
+### Set up accounts for GitHub and Bitbucket
+If you dont have these already, go ahead and setup an account on both GitHub and Bitbucket and give your GH and BB ids and email to Dr. Mockus, who will then invite you to the oscar.py and swsc repositories via email.  
+GitHub: https://github.com/pricing  
+BitBucket: https://bitbucket.org/account/signup/  
+--------
+
+### Gain permissions and access to da server(s)
+In order to gain access to one of the da servers, you will need to generate a public key via the `ssh-keygen` command, and put the `id_rsa.pub` and `id_rsa` files inside your .ssh/ folder on your home terminal. Once finished, send the contents of `id_rsa.pub` (your public key) over to Dr. Mockus who will then grant you access to one or more of the da servers.  
+Optionally, you can also set up your `.ssh/config` file so that you can login to one of the da servers without having to fully specify the server name each time:  
+```
+Host da0
+	Hostname da0.eecs.utk.edu
+	Port 443
+	User {username}
+```
+
+Logging in then becomes as simple as `ssh da0`.  
+Once you are in a da server, you will have an empty directory under `/home/username` where you can store your programs and files:  
+```
+[username@da0]~% pwd
+/home/username
+[username@da0]~% 
+```
+---------
+### Clone the oscar.py and swsc/lookup repos
+oscar.py link: https://github.com/ssc-oscar/oscar.py  
+swsc/lookup link: https://bitbucket.org/swsc/lookup/src/master/
+
+Run `git clone <link>` (no brackets) on a da server to get a copy of the given repository link.  
+
+-------
 ## List of relevant directories
 ### da0 Server
 #### <relationship>.{0-31}.tch files in `/data/basemaps/`:  
@@ -279,7 +311,7 @@ In order for this p-value to be a more accurate approximation, we need a larger 
 
 If an author does not meet this criteria, we would not want to consider them for the chi-squared test simply because their results would be "uninteresting" and not worth investigating any further.  
 
-Heres one of the authors from the programs output:  
+Here is one of the authors from the programs output:  
 ```
 ----------------------------------
 Ben Niemann <pink@odahoda.de>
@@ -342,7 +374,7 @@ Ben Niemann <pink@odahoda.de>
 ----------------------------------
 ```  
 
-Although it is currently not implemented, one could take this one step further and visually represent an authors language changes on a graph, which would be simpler to interpret as opposed to viewing a long list of pfactors such as the one shown above.  
+Although it is currently not implemented, one could take this one step further and visually represent an authors language changes on a graph, which would be simpler to interpret as opposed to viewing a long list of p values such as the one shown above.  
 
 --------
 ## Useful Python imports for applications
@@ -368,5 +400,40 @@ Additional documentation on subprocess can be found [here](https://docs.python.o
 
 ----------
 ### re
-The re (Regular Expression) module is another useful import for pattern-matching in strings. 
+The re (Regular Expression) module is another useful import for pattern-matching in strings.  
+Addtional re documentation can be found [here](https://docs.python.org/2/library/re.html).  
+
+----------
 ### matplotlib
+Useful graphing module for creating visual representations.  
+Extensive documentation can be found [here](https://matplotlib.org/).  
+----------
+## oscar.py vs. Perl scripts
+When it comes to creating new relationship files (.tch/.s files), using Perl over Python for large data-reading is more time-saving overall. This situation occurred in the complex application we covered where we modified an existing Perl file to get the initial commit times of each file for each author, rather than using Python to accomplish this task.  
+Before making this decision, one of our team members decided to run a test between 2 programs, [a2ft.py](https://bitbucket.org/swsc/lookup/src/master/a2ft.py) and [a2ft.perl](https://bitbucket.org/swsc/lookup/src/master/a2ft.perl). These programs were run at the same time for a period of 10 minutes. Both programs had the same task of retrieving the earliest commit times for each file under each author from a2cFullP{0-31}.s files. The Python version calls the `Commit_info().time_author` and `Commit().changed_file_names` functions from oscar.py. The Perl version ties each of the 32 c2fFullO.{0-31}.tch (Commit().changed_file_names) and c2taFullP.{0-31}.tch (Commit_info().time_author) files into 2 different Perl hashes (Python dictionary equivalent), %c2f and %c2ta. The speed difference between Perl and Python was quite surprising:  
+```
+[dkennard@da3]/data/play/dkennard% ll a2ftFullP0TEST1.s
+-rw-rw-r--. 1 dkennard dkennard 980606 Jul 22 11:56 a2ftFullP0TEST1.s
+[dkennard@da3]/data/play/dkennard% ll a2ftFullPTEST2.0.tch
+-rw-r--r--. 1 dkennard dkennard 663563424 Jul 22 11:56 a2ftFullPTEST2.0.tch
+```  
+Within this 10 minute period, the Python version only wrote 980,606 bytes of data into the TEST1 file shown above, whereas the Perl version wrote 663,563,424 bytes into the TEST2 file.  
+The main reason oscar.py is slower, in theory, is because oscar.py has more private function calls that it has to perform in order to calculate the key (0-31) and locate where the requested information is stored. Upon further inspection of the [oscar.py](https://github.com/ssc-oscar/oscar.py/blob/master/oscar.py) functions that are called, we can see that there are between 6-7 function calls for each lookup. All of these function calls cause function overhead and thus increase the amount of time to retrieve data for multiple entities.  
+In the Perl version of a2ft, the program simply calls `segB()`, which calculates the key of where the information is stored. The function takes a string and the number 32 as arguments (ex. segB(commit_sha, 32)):   
+```
+sub segB {
+	my ($s, $n) = @_;
+	return (unpack "C", substr ($s, 0, 1))%$n;
+}
+```  
+Because the %c2f and %c2ta Perl hashes are tied to their respective .tch files, we can then check if a specific commit in a specific number section is defined:  
+```
+for my $c (@cs){	#where cs is a list of commits for an author and c is one of those commits
+	my $sec =  segB ($c, $sections);
+	if (defined $c2f{$sec}{$c} and defined $c2ta{$sec}{$c}){
+		...
+	}
+	...
+}
+```
+This is not to say that oscar.py is inefficient and should not be utilized, but it is not the optimal solution for creating new .tch or .s relationship files. oscar.py solely provides a Python interface for gathering requested data out of the respective .tch files and not for mass-reading all 32 files. It also provides simple function calls that were mentioned earlier in the tutorial for retrieving bits of information at a time in a more convenient way.
