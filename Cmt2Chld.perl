@@ -22,7 +22,12 @@ sub extrPar {
 }
 
 my $part = -1;
-$part = $ARGV[1] if defined $ARGV[1];
+if (! defined $ARGV[0]){
+	print STDERR "usage: segment version\n";
+	exit (-1);
+}
+$part = $ARGV[0];
+my $ver = $ARGV[1];
 
 my (%fhos, %fhoc, %fhoc1);
 my $sections = 128;
@@ -42,7 +47,6 @@ for my $s (0..127){
 
   my ($parent) = extrPar ($codeC);
   if ($parent eq ""){
-    print "$hash\n"; #no parent
     next;
   }
   for my $p (split(/:/, $parent)){
@@ -58,9 +62,9 @@ for my $s (0..127){
 }
 for my $s (0..($npar-1)){
   next if $part >= 0 && $s != $part; 
-  tie %{$fhoc1{$s}}, "TokyoCabinet::HDB", "$ARGV[0].$s.tch", TokyoCabinet::HDB::OWRITER | TokyoCabinet::HDB::OCREAT,
+  tie %{$fhoc1{$s}}, "TokyoCabinet::HDB", "/fast/c2ccFull$ver.$s.tch", TokyoCabinet::HDB::OWRITER | TokyoCabinet::HDB::OCREAT | TokyoCabinet::HDB::ONOLCK,
         16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
-     or die "cant open $ARGV[0].$s.tch\n";
+     or die "cant open /fast/c2ccFull$ver.$s.tch\n";
 }
 my $ndone = 0;
 while (my ($c, $v) = each %fhoc){

@@ -1,4 +1,4 @@
-#!/usr/bin/perl -I /home/audris/lib64/perl5 -I /home/audris/lib/perl5 -I /home/audris/lookup
+#!/usr/bin/perl -I /home/audris/lib64/perl5 -I /home/audris/lib/perl5 -I /home/audris/lookup -I /home/audris/lib/x86_64-linux-gnu/perl
 use IO::File;  
 use strict;
 use warnings;

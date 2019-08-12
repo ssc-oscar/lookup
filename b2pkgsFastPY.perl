@@ -34,13 +34,19 @@ while (<STDIN>){
   my %matches = ();
   for my $l (split(/\n/, $code, -1)){
     if ($l =~ m/^\s*import\s+(.*)/) {
-      my @mds = $1 =~ m/(\w[\w.]*[\,\s]*)*/;
+      my $rest = $1;
+      $rest =~ s/\s+as\s+.*//;
+      my @mds = $rest =~ m/(\w[\w.]*[\,\s]*)*/;
       #old my @mds = $1 =~ m/(\w+[\,\s]*)*/;
       for my $m (@mds) { $matches{$m}++ if defined $m};
     }
-     if ($l =~ m/^\s*from\s+(\w[\w.]*)/) {
-     #old if ($l =~ m/^\s*from\s+(\w+)/) {
-      $matches{$1} = 1;
+     if ($l =~ m/^\s*from\s+(\w[\w.]*)\s+import\s+(\w*)/) {
+       if ($2 ne ""){
+         $matches{"$1.$2"} = 1;
+#old if ($l =~ m/^\s*from\s+(\w+)/) {
+       }else{
+          $matches{$1} = 1;
+       }
     }
   }
   if (%matches){

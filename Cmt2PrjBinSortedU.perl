@@ -1,4 +1,5 @@
-#!/usr/bin/perl -I /home/audris/lookup -I /home/audris/lib64/perl5
+#!/usr/bin/perl -I  /home/audris/lookup -I /home/audris/lib64/perl5 -I /home/audris/lib/x86_64-linux-gnu/perl
+
 use strict;
 use warnings;
 use Error qw(:try);
@@ -6,16 +7,16 @@ use Compress::LZF;
 use TokyoCabinet;
 use cmt;
 
-
 my (%tmp, %c2p, %c2p1);
 my $sec;
-my $nsec = 8;
+my $nsec = 32;
 $nsec = $ARGV[1] + 0 if defined $ARGV[1];
+
 my $fname = "$ARGV[0]";
 for $sec (0..($nsec -1)){
   $fname = "$ARGV[0].$sec.tch";
   $fname = $ARGV[0] if $nsec == 1;
-  tie %{$c2p{$sec}}, "TokyoCabinet::HDB", "$fname", TokyoCabinet::HDB::OWRITER | TokyoCabinet::HDB::OCREAT,   
+  tie %{$c2p{$sec}}, "TokyoCabinet::HDB", "$fname", TokyoCabinet::HDB::OWRITER | TokyoCabinet::HDB::OCREAT | TokyoCabinet::HDB::ONOLCK,   
       16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
      or die "cant open $fname\n";
 }
@@ -29,21 +30,18 @@ my $cp = "";
 while (<STDIN>){
   chop();
   $lines ++;
-  my ($hc, $f, $hb, $p) = split (/\;/, $_);
-  if ($hc !~ m|^[0-9a-f]{40}$|){ # || defined $badCmt{$hc} || defined $badBlob{$hc}){
-    print STDERR "bad c sha:$_\n";
+  my ($hc, $f) = split (/\;/, $_);
+  if ($hc !~ m|^[0-9a-f]{40}$|){
+    print STDERR "bad sha:$_\n";
     next;
-  }    
-  my $c = fromHex ($hc);
-
-  if ($hb !~ m|^[0-9a-f]{40}$|){ # these are on the right side: should be ok || defined $badCmt{$hb} || defined $badBlob{$hb}){
-    print STDERR "bad b sha:$_\n";
   }
+  my $c = fromHex ($hc);
   if ($c ne $cp && $cp ne ""){
     $sec = (unpack "C", substr ($cp, 0, 1))%$nsec;
     $nc ++;
-    my $bs = join '', sort keys %tmp;
-    large ($bs, $cp);
+    #my $ps = join ';', sort keys %tmp;
+    #my $psC = safeComp ($ps);
+    large (\%tmp, $cp);
     %tmp = ();
     if ($doDump){
       dumpData ();
@@ -51,38 +49,44 @@ while (<STDIN>){
     }
   }  
   $cp = $c;
-  my $b = fromHex ($hb);
-  $tmp{$b}++;
-  if (!($lines%10000000)){
+  $tmp{$f}++; 
+  if (!($lines%100000000)){
     print STDERR "$lines done\n";
     $doDump = 1;
   }
 }
 
-my $bs = join '', sort keys %tmp;
 $sec = (unpack "C", substr ($cp, 0, 1))%$nsec;
-large ($bs, $cp);
+large(\%tmp, $cp);
 dumpData ();
 
 sub large {
-  my ($bs, $cp) = @_;
-  if (length ($bs) > 1000000*20){
+  my ($ps, $cp) = @_;
+  my $len = length (keys %{$ps});
+  if ($len > 1000000){
     my $cpH = toHex ($cp);
-    print STDERR "too large for $cpH: ".(length($bs))."\n";
+    print STDERR "too large for $cpH: $len\n";
     open A, ">$fname.large.$cpH";
-    print A $bs;
+    my $psC = safeComp(join ';', sort keys %{$ps});
+    print A $psC;
     close (A);
   }else{
-    $c2p1{$sec}{$cp} = $bs;
-  }
+    for my $v (keys %{$ps}){
+      $c2p1{$sec}{$cp}{$v}++;
+    }
+  } 
 }
 
 sub dumpData {
   for my $s (0..($nsec -1)){
     while (my ($c, $v) = each %{$c2p1{$s}}){
-      $c2p{$s}{$c} = $v;
+      my @v1 = ();
+      @v1 = split(/;/, safeDecomp ($c2p{$s}{$c}), -1) if defined $c2p{$s}{$c};
+      for my $f (@v1){ $c2p1{$s}{$c}{$f} ++; }
+      my $psC = safeComp (join ';', sort keys %{$c2p1{$s}{$c}});
+      $c2p{$s}{$c} = $psC;
     }
-    %{$c2p1{$s}} = ();         
+    %{$c2p1{$s}} = ();
   }
 }
 

@@ -29,7 +29,7 @@ my $cp = "";
 while (<STDIN>){
   chop();
   $lines ++;
-  my ($hc, $f, $hb, $p) = split (/\;/, $_);
+  my ($hc, $hb) = split (/\;/, $_);
   if ($hc !~ m|^[0-9a-f]{40}$|){ # || defined $badCmt{$hc} || defined $badBlob{$hc}){
     print STDERR "bad c sha:$_\n";
     next;
@@ -42,8 +42,7 @@ while (<STDIN>){
   if ($c ne $cp && $cp ne ""){
     $sec = (unpack "C", substr ($cp, 0, 1))%$nsec;
     $nc ++;
-    my $bs = join '', sort keys %tmp;
-    large ($bs, $cp);
+    large (\%tmp, $cp);
     %tmp = ();
     if ($doDump){
       dumpData ();
@@ -59,30 +58,39 @@ while (<STDIN>){
   }
 }
 
-my $bs = join '', sort keys %tmp;
 $sec = (unpack "C", substr ($cp, 0, 1))%$nsec;
-large ($bs, $cp);
+large (\%tmp, $cp);
 dumpData ();
 
 sub large {
   my ($bs, $cp) = @_;
-  if (length ($bs) > 1000000*20){
+  my $len = length (keys %{$bs});
+  if ($len > 1000000){
     my $cpH = toHex ($cp);
-    print STDERR "too large for $cpH: ".(length($bs))."\n";
+    print STDERR "too large for $cpH: $len\n";
     open A, ">$fname.large.$cpH";
-    print A $bs;
+    my $bsC = join '', sort keys %{$bs};
+    print A $bsC;
     close (A);
   }else{
-    $c2p1{$sec}{$cp} = $bs;
+    for my $v (keys %{$bs}){
+      $c2p1{$sec}{$cp}{$v}++;
+    }
   }
 }
 
 sub dumpData {
   for my $s (0..($nsec -1)){
     while (my ($c, $v) = each %{$c2p1{$s}}){
-      $c2p{$s}{$c} = $v;
+      if (defined $c2p{$s}{$c}){
+        my $v1 = $c2p{$s}{$c};
+        my $len = length ($v1)/20-1;
+        for my $i (0..$len){ $c2p1{$s}{$c}{substr($v1,$i*20,20)}++; };
+      }
+      my $bsC = join '', sort keys %{$c2p1{$s}{$c}};
+      $c2p{$s}{$c} = $bsC;
     }
-    %{$c2p1{$s}} = ();         
+    %{$c2p1{$s}} = ();
   }
 }
 

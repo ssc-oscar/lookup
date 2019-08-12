@@ -6,8 +6,171 @@ use Compress::LZF;
 
 require Exporter;
 our @ISA = qw (Exporter);
-our @EXPORT = qw(%badCmt %badBlob %badTree splitSignature segB segH signature_error contains_angle_brackets extract_trimmed git_signature_parse extrCmt getTime cleanCmt safeDecomp safeComp toHex fromHex sHash sHashV);
+our @EXPORT = qw(addForks toUrl %badProjects %badAuthors %badCmt %badBlob %badTree splitSignature segB segH signature_error contains_angle_brackets extract_trimmed git_signature_parse extrCmt getTime cleanCmt safeDecomp safeComp toHex fromHex sHash sHashV);
 use vars qw(@ISA);
+
+our %badProjects = (
+  "bb_fusiontestaccount_fuse-2944" => "32400A",
+  "bb_fusiontestaccount_fuse1999v2" => "34007A", 
+  "octocat_Spoon-Knife" => "forking tutorial, 41176A", 
+  "cirosantilli_imagine-all-the-people" => "Commit email scraper, 389993A",
+  "marcelstoer_nodemcu-custom-build" => "97994A" ,
+  "jasperan_github-utils" => "4394779C", 
+  "avsm_ocaml-ci.logs" => "4283368C", 
+  "illacceptanything_illacceptanything" => "what it says", 
+"hjdivad_git"  => "git fork with extra comitters?",
+"08_git" => "renamed to iBeacons/git a fork of msysgit/git", 
+"00027jang27_git" => "git fork with extra comitters?",
+"git.kernel.org_linux_kernel/git/fdmanana/linux" => 'really common?',
+"bb_Kasreyn_linux-next" => "linux fork with extra comitters?",
+"broftkd_linux" => "suspicious",
+"1095811981_studyCode" => "suspicious",
+"szeder_all-git-forks" => "suspicious",
+"git.kernel.org_public-inbox_kvack.org/linux-mm/0" => "",
+"git.kernel.org_public-inbox_lists.infradead.org/linux-amlogic/0" => "",
+"git.kernel.org_public-inbox_lists.infradead.org/linux-arm-kernel/0" => "",
+"git.kernel.org_public-inbox_lists.infradead.org/linux-i3c/0" => "",
+"git.kernel.org_public-inbox_lists.infradead.org/linux-mtd/0" => "",
+"git.kernel.org_public-inbox_lists.infradead.org/linux-riscv/0" => "",
+"git.kernel.org_public-inbox_lists.kernelnewbies.org/kernelnewbies/0" => "",
+"git.kernel.org_public-inbox_lists.ozlabs.org/linuxppc-dev/0" => "",
+"git.kernel.org_public-inbox_lists.zx2c4.com/wireguard/0" => "",
+"git.kernel.org_public-inbox_systeme.lip6.fr/cocci/0" => "",
+"git.kernel.org_public-inbox_vger.kernel.org/backports/0" => "",
+"git.kernel.org_public-inbox_vger.kernel.org/bpf/0" => "",
+"git.kernel.org_public-inbox_vger.kernel.org/git" => "",
+"git.kernel.org_public-inbox_vger.kernel.org/linux-block/0" => "",
+"git.kernel.org_public-inbox_vger.kernel.org/linux-bluetooth/0" => "",
+"git.kernel.org_public-inbox_vger.kernel.org/linux-btrfs/0" => "",
+"git.kernel.org_public-inbox_vger.kernel.org/linux-cifs/0" => "",
+"git.kernel.org_public-inbox_vger.kernel.org/linux-clk/0" => "",
+"git.kernel.org_public-inbox_vger.kernel.org/linux-crypto/0" => "",
+"git.kernel.org_public-inbox_vger.kernel.org/linux-ext4/0" => "",
+"git.kernel.org_public-inbox_vger.kernel.org/linux-fsdevel/0" => "",
+"git.kernel.org_public-inbox_vger.kernel.org/linux-hwmon/0" => "",
+"git.kernel.org_public-inbox_vger.kernel.org/linux-iio/0" => "",
+"git.kernel.org_public-inbox_vger.kernel.org/linux-integrity/0" => "",
+"git.kernel.org_public-inbox_vger.kernel.org/linux-media/0" => "",
+"git.kernel.org_public-inbox_vger.kernel.org/linux-mips/0" => "",
+"git.kernel.org_public-inbox_vger.kernel.org/linux-modules/0" => "",
+"git.kernel.org_public-inbox_vger.kernel.org/linux-nfs/0" => "",
+"git.kernel.org_public-inbox_vger.kernel.org/linux-parisc/0" => "",
+"git.kernel.org_public-inbox_vger.kernel.org/linux-pci/0" => "",
+"git.kernel.org_public-inbox_vger.kernel.org/linux-renesas-soc/0" => "",
+"git.kernel.org_public-inbox_vger.kernel.org/linux-rtc/0" => "",
+"git.kernel.org_public-inbox_vger.kernel.org/linux-security-module/0" => "",
+"git.kernel.org_public-inbox_vger.kernel.org/linux-sgx/0" => "",
+"git.kernel.org_public-inbox_vger.kernel.org/linux-trace-devel/0" => "",
+"git.kernel.org_public-inbox_vger.kernel.org/linux-trace-users/0" => "",
+"git.kernel.org_public-inbox_vger.kernel.org/linux-watchdog/0" => "",
+"git.kernel.org_public-inbox_vger.kernel.org/linux-wireless/0" => "",
+"git.kernel.org_public-inbox_vger.kernel.org/lkml/0" => "",
+"git.kernel.org_public-inbox_vger.kernel.org/lkml/1" => "",
+"git.kernel.org_public-inbox_vger.kernel.org/lkml/2" => "",
+"git.kernel.org_public-inbox_vger.kernel.org/lkml/3" => "",
+"git.kernel.org_public-inbox_vger.kernel.org/lkml/4" => "",
+"git.kernel.org_public-inbox_vger.kernel.org/lkml/5" => "",
+"git.kernel.org_public-inbox_vger.kernel.org/lkml/6" => "",
+"git.kernel.org_public-inbox_vger.kernel.org/lkml/7" => "",
+"git.kernel.org_public-inbox_vger.kernel.org/netdev/0" => "",
+"git.kernel.org_public-inbox_vger.kernel.org/netdev/1" => "",
+"git.kernel.org_public-inbox_vger.kernel.org/netfilter-devel/0" => "",
+"git.kernel.org_public-inbox_vger.kernel.org/rcu/0" => "",
+"git.kernel.org_public-inbox_vger.kernel.org/selinux-refpolicy/0" => "",
+"git.kernel.org_public-inbox_vger.kernel.org/selinux/0" => "",
+"git.kernel.org_public-inbox_vger.kernel.org/stable/0" => "",
+"git.kernel.org_public-inbox_vger.kernel.org/util-linux/0" => "",
+  "Tomoms_kernel_laptop" => "seems like that may have multiple repos pushed here",
+  "gh-_c-spoof" => "", "adob_print-stmt" => "", "adob_dnsserv" => "",  
+  "ArtKuz_team4" => "", "gridsane_team4" => "", "saneiros_team4" => "", "yandex-shri-ekb-2014/team4" => "", 
+  "IonicaBizauKitchen_I-Love-Octocats" => "", "IonicaBizau_I-Love-Octocats" => "",
+  "taliaga_tsct-demo1" => "inus Torvalds authored and taliaga committed on May 13, 2016",
+   "BIGJosher_Pattern-Recognition" => 'has fake commit',
+   "gl_learn-git-fast_rock-paper-scissors" => "",
+   "uselesscomputer_uselesscomputer.github.io" => 'torvalds@yandex.ru', 
+   "cktricky_funfun" => 'torvalds <linus@linux.com>', 
+   "docker_docker.github.io" => "", "0theRookie_hello-world" => "", "everyonehelp_helpmeplz" => "",
+   "juanmanuelcata_proyectoSGT" => "single repo for torvalds alias",
+"gh-_c-spoof" => "single repo for torvalds alias",
+"ElieJacquelin_CommitFromGoogleApps" => "single repo for torvalds alias",
+"r1p_tinyBlog" => "single repo for torvalds alias",
+"mrcolts_active-users" => "single repo for torvalds alias",
+"ajorquera_git-workshop" => "single repo for torvalds alias",
+"hwhollywu_gomoku" => "single repo for torvalds alias",
+"xNerdRage_IntroToGit" => "single repo for torvalds alias",
+"thachmai_mobiliPlay" => "single repo for torvalds alias",
+"stephenreay_testrepo" => "single repo for torvalds alias",
+"zyw327_okgoes" => "single repo for torvalds alias",
+"society765_hello-world" => "single repo for torvalds alias",
+"Christopherbikie_Osmium" => "single repo for torvalds alias",
+"stultus_vinpoc" => "single repo for torvalds alias",
+"rubarax_git" => "single repo for torvalds alias",
+"alisaifee_jquery" => "single repo for torvalds alias",
+"spirit986_AdminScripts" => "single repo for torvalds alias",
+"taliaga_tsct-demo1" => "single repo for torvalds alias",
+"ghtest3_test1" => "single repo for torvalds alias",
+"veterolf_fluar.github.io" => "single repo for torvalds alias",
+"zmap_zgrab2" => "single repo for torvalds alias",
+);
+
+sub addForks {
+  open A, "zcat /da0_data/github/ghReposForks.gz|";
+  while (<A>){ 
+    chop(); 
+    $badProjects{$_}++; 
+  }
+}
+
+
+our %badAuthors = ( 'one-million-repo <mikigal.acc@gmail.com>' => "1M commits", 
+   'scraped_page_archive gem 0.5.0 <scraped_page_archive-0.5.0@scrapers.everypolitician.org>' => "4243985C", 
+   'Your Name <you@example.com>' => "1829654C",
+   'Auto Pilot <noreply@localhost>' => "2063212C",
+   'GitHub Merge Button <merge-button@github.com>' => "109778A",
+   '= <=>' => "190490A",
+   'greenkeeper[bot] <greenkeeper[bot]@users.noreply.github.com>' => "2067354C", 
+   'Google Code Exporter <GoogleCodeExporter@users.noreply.github.com>' => "277+K projects",
+   'datakit <datakit@docker.com>' => "4400778 commits", 
+   'The Octocat <octocat@nowhere.com>' => 'forking tutorial',
+   'The Gitter Badger <badger@gitter.im>' => 'The Gitter Badger',
+   'root <root@localhost.localdomain>' => 'homonym',
+   'root <you@example.com>' => 'homonym', 
+   'testuser <testuser>'  => 'homonym',
+   'Linus Torvalds <linus@git.org>' => "singingwolfboy_cookbook",
+   'torvals <torvalds@osdl.org>' => 'Feminist-Software-Foundation_C-plus-Equality',  
+   'Deleted user <ghost@github.com>' => "",'root <root@localhost.localdomain>' => "", 
+   'tip-bot for Linus Torvalds <torvalds@linux-foundation.org>' => "",
+   'root <root@ubuntu.(none)>' => '');
+
+my %toUrlMap = ("bb" => "bitbucket.org","gl" => "gitlab.org",
+"android.googlesource.com" => "android.googlesource.com",
+"bioconductor.org" => "bioconductor.org",
+"drupal.com" => "git.drupal.org", "git.eclipse.org" => "git.eclipse.org",
+"git.kernel.org" => "git.kernel.org/pub/scm/",
+"git.postgresql.org" => "git.postgresql.org" ,
+"git.savannah.gnu.org" => "git.savannah.gnu.org",
+"git.zx2c4.com" => "git.zx2c4.com" ,
+"gitlab.gnome.org" => "gitlab.gnome.org",
+"kde.org" => "anongit.kde.org",
+"repo.or.cz" => "repo.or.cz",
+"salsa.debian.org" => "salsa.debian.org", 
+"sourceforge.net" => "git.code.sf.net/p");
+
+sub toUrl {
+  my $in = $_[0];
+  my $found = 0;
+  for my $p (keys %toUrlMap){
+    if ($in =~ /^${p}_/ && (scalar(split(/_/, $in)) > 2 || $p eq "sourceforge.net")){
+      $in =~ s|^${p}_|$toUrlMap{$p}\/|;
+      $found ++;
+      last;
+    }
+  }  
+  $in =~ s|^|github.com/| if (!$found);
+  $in =~ s|_|/|;
+  return "https://$in";
+}
+
 
 our %badCmt = (
   "c89423063a78259e6a7d13d9b00278a0c5e637b0" => 10000000005,
