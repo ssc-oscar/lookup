@@ -10,6 +10,8 @@ c=/lustre/haven/user/audris/c2fb
 cd $c
 
 what=WHAT
+ver=VER
+pVer=PVE
 
 declare -A NN
 NN[s3]={00..11}
@@ -30,6 +32,7 @@ NN[s8]={0..31}
 NN[s9]={0..31}
 NN[s10]={0..31}
 NN[s11]={0..31}
+NN[s12]={0..31}
 
 
 maxM=6G
@@ -136,6 +139,10 @@ done
 wait
 echo $what.f2b.$j.s
 
+fi
+if test "y" = "n"; then
+
+
 for j in {0..31}
   do zcat $what.c2f.$j.s | cut -d\; -f1,3 | grep -v ';$' | lsort $maxM -t\; -k1b,2 -u | gzip > $what.c2b.$j.s &
 done
@@ -148,11 +155,11 @@ if test "y" = "y"; then
 #merge old with new: no need to recreate old
 #for t in c2f b2f b2c c2b f2c f2b
 #for t in c2f b2c b2f
-for t in c2b f2c f2b
+for t in f2b
 do
   for j in {0..31};
   do
-    $HOME/bin/lsort $maxM -t\; -k1b,2 --merge -u <(zcat ${t}FullN$j.s) <(zcat $what.$t.$j.s|cut -d\; -f1,2) | gzip > ${t}FullO$j.s &
+    $HOME/bin/lsort $maxM -t\; -k1b,2 --merge -u <(zcat ${t}Full${pVer}$j.s|uniq) <(zcat $what.$t.$j.s|cut -d\; -f1,2) | gzip > ${t}Full${ver}$j.s &
   done
   wait
   echo $t
