@@ -33,6 +33,29 @@ Run `git clone <link>` (no brackets) on a da server to get a copy of the given r
 
 -------
 ## List of relevant directories
+
+The folder structure on any server follows the following convention:
+    - Raw blobs are located in files that are appended as new
+      objects are discovered and extracted
+      /data/All.blobs/{commit,tree,tag,blob}_Num.{idx,bin}  where
+      Num is in {0..127}
+   - Folder /fast is preferably mounted on an array of SSDs that
+     so that the data can be read in parallel, but for servers that
+     do not have SSDs, a regular disk is used. The maps (e.g.,
+     c2fFull$Ver.Num.tch are typically stored there and, as a
+     backup, on /da0_data/basemaps
+	 /fast has subfolders: All.sha1, All.sha1c, and
+     All.sha1o. All.sha1/sha1.{commit,tree,tag,blob}_Num.tch holds
+     object content offsets in the raw files stored /data/All.blobs
+     and are used to check if the object is in the database and, if
+     so, which record. All.sha1c/{commit,tree}_Num.tch maps commit
+     and tree sha1s to the object content. All.sha1o/blob_Num.tch
+     maps blob sha1 to the file ofset (and object size) that can be
+     read directly from /data/All.blobs/blob_Num.bin
+
+Not all files are stored on all servers due to limited disk sizes.
+The description below goes over what is stored on each server. 
+
 ### da0 Server
 #### <relationship>.{0-31}.tch files in `/data/basemaps/`:  
 (.s) signifies that there are either .s or .gz versions of these files in gz/ subfolder, which can be opened with Python gzip module or Unix zcat.  
