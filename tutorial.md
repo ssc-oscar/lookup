@@ -53,8 +53,16 @@ The folder structure on any server follows the following convention:
      maps blob sha1 to the file ofset (and object size) that can be
      read directly from /data/All.blobs/blob_Num.bin
 
+
 Not all files are stored on all servers due to limited disk sizes.
 The description below goes over what is stored on each server. 
+
+In order for SSDs to be fast they need to be mounted in parallel,
+for example id 7ssds is a volume group that has seven SSDs as
+physical volumes, LV 7ssds can be created via
+```
+lvcreate --extents 100%FREE --name 7ssds --stripes 7 --stripesize 256 7ssds
+```
 
 ### da0 Server
 #### <relationship>.{0-31}.tch files in `/data/basemaps/`:  
