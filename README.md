@@ -456,6 +456,15 @@ done
 pVer=O
 ver=P
 
+#update b2a from version O - each takes 10-30 days
+# ver O  zcat /da0_data/basemaps/gz/b2cFull$ver$i.s | ~/lookup/Blob2Author.perl $ver 2> /data/update/b2aFull$ver$i.err | gzip > /data/update/b2aFull$ver$i.s
+# following update quite fast
+zcat /da0_data/basemaps/gz/b2cFull$ver$i.s | join -t\; -v1 - <(zcat /da0_data/basemaps/gz/b2cFull$pVer$i.s) | gzip > b2cFull$ver$pVerO$i.s
+zcat b2cFull$ver$pVer$i.s| ~/lookup/Blob2Author.perl P 2> b2aFull$ver$pVer$i.err | gzip > b2aFull$ver$Pver$i.s
+~/lookup/Blob2AuthorJoin.perl  /da0_data/basemaps/gz/b2aFull$pVer$i.s b2aFull$ver$pVer$i.s | gzip > /da0_data/basemaps/gz/b2aFull$ver$i.s
+
+
+
 
 for LA in jl pl R #
 for LA in  ipy F Go Scala swift Cs C JS PY Rust java 
@@ -520,7 +529,7 @@ for j in {0..31}; do time zcat /data/p2cFullO$j.s |perl -I ~/lookup -I ~/lib/x86
 for i in {0..31}; do zcat /data/a2pO.$i.gz | perl -I ~/lookup -I ~/lib/x86_64-linux-gnu/perl ~/lookup/Prj2FileBinSorted.perl a2pO.$i.tch; done &
 for i in {0..31}; do zcat /data/p2aO.$i.gz | perl -I ~/lookup -I ~/lib/x86_64-linux-gnu/perl ~/lookup/Prj2FileBinSorted.perl p2aO.$i.tch; done &
 for j in {0..31}; do time zcat /data/a2cFullO$j.gz |perl -I ~/lookup -I ~/lib/x86_64-linux-gnu/perl  ~/lookup/Prj2CmtBinSorted.perl /fast/a2cFullO.$j.tch; done
-for j in {0..31}; do time perl -I ~/lib/x86_64-linux-gnu/perl -I ~/lookup ~/lookup/Cmt2Chld.perl /fast/c2cc$ver $i | gzip > /store/cnp$ver.$i; done
+for j in {0..31}; do time perl -I ~/lib/x86_64-linux-gnu/perl -I ~/lookup ~/lookup/Cmt2Chld.perl  $j $ver | gzip > /da0_data/basemaps/gz/cnpFull$ver.$j; done
 zcat a2cFull$ver*gz | cut -d\; -f1 | uniq | gzip > as$ver.gz
 zcat as$ver.gz | perl -I /home/audris/lib64/perl5 -I /home/audris/lib/x86_64-linux-gnu/perl -I /home/audris/lookup -ane 'use cmt; chop();@x=splitSignature($_);@n = split(/ /, $x[0]); @e = split(/\@/, $x[1]); print "$_;$x[0];$x[1];$n[0];$n[$#n];$e[0];$e[1]\n";' | gzip > as$ver.split
 #zcat as$ver.split | perl -ane 'chop();if ($_ !~ m/^;/){@x=split(/\;/, $_); for $i (0..$#x){ $x[$i] =~ s/"/'"'"'/g; } print "{ \"id\":\"$x[0]\", \"name\":\"$x[1]\", \"email\":\"$x[2]\", \"first\":\"$x[3]\", \"last\":\"$x[4]\", \"user\":\"$x[5]\",\"domain\":\"$x[6]\" }\n";} '| gzip > as$ver.split.json
