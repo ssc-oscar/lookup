@@ -8,21 +8,21 @@ use Compress::LZF;
 use cmt;
 
 my $part = $ARGV[0];
-
+my $ver = $ARGV[1];
 my $sections = 32;
 
 
 my %c2f;
 for my $s (0..($sections-1)){
-  tie %{$c2f{$s}}, "TokyoCabinet::HDB", "/fast/c2fFullO.$s.tch", TokyoCabinet::HDB::OREADER | TokyoCabinet::HDB::ONOLCK,   
+  tie %{$c2f{$s}}, "TokyoCabinet::HDB", "/fast/c2fFull$ver.$s.tch", TokyoCabinet::HDB::OREADER | TokyoCabinet::HDB::ONOLCK,   
         16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
-     or die "cant open fast/c2fFullO.$s.tch\n";
+     or die "cant open /fast/c2fFull$ver.$s.tch\n";
 }
 
 my %a2f;
-tie %a2f, "TokyoCabinet::HDB", "/fast/a2fFullO.$part.tch", TokyoCabinet::HDB::OWRITER | TokyoCabinet::HDB::OCREAT,
+tie %a2f, "TokyoCabinet::HDB", "/fast/a2fFull$ver.$part.tch", TokyoCabinet::HDB::OWRITER | TokyoCabinet::HDB::OCREAT,
         16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
-     or die "cant open /fast/a2fFullO.$part.tch\n";
+     or die "cant open /fast/a2fFull$ver.$part.tch\n";
 
 my %badC;
 for my $c (keys %badCmt){
