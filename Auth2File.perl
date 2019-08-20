@@ -49,8 +49,8 @@ while (my ($a, $v) = each %a2c){
         $a2f{$a}{$f}++;
       }
     }else{
-      my $c1 = toHex($c);
-      print STDERR "no commit $c1 for $a\n";
+      #my $c1 = toHex($c);
+      #print STDERR "no commit $c1 for $a\n";
     }
   }
   $line ++;
