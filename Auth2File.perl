@@ -8,20 +8,19 @@ use Compress::LZF;
 use cmt;
 
 
-my $sections = 8;
-my $fbase="/fast1/All.sha1c/";
+my $sections = 32;
 
 
 my $a2cf = $ARGV[0];
 my %a2c;
-tie %a2c, "TokyoCabinet::HDB", "$a2cf", TokyoCabinet::HDB::OREADER,   
+tie %a2c, "TokyoCabinet::HDB", "$a2cf", TokyoCabinet::HDB::OREADER | TokyoCabinet::HDB::ONOLCK,   
         16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
      or die "cant open $a2cf\n";
 
 my $c2ff = $ARGV[1];
 my %c2f;
 for my $sec (0..($sections-1)){
-  tie %{$c2f{$sec}}, "TokyoCabinet::HDB", "$c2ff.$sec.tch", TokyoCabinet::HDB::OREADER,   
+  tie %{$c2f{$sec}}, "TokyoCabinet::HDB", "$c2ff.$sec.tch", TokyoCabinet::HDB::OREADER | TokyoCabinet::HDB::ONOLCK,   
         16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
      or die "cant open $c2ff.$sec.tch\n";
 }
