@@ -1,4 +1,4 @@
-#!/usr/bin/perl -I /home/audris/lib64/perl5 -I /da3_data/lookup
+#!/usr/bin/perl -I /home/audris/lib/x86_64-linux-gnu/perl -I /home/audris/lib64/perl5 -I /home/audris/lookup
 
 use strict;
 use warnings;
@@ -50,11 +50,11 @@ while (my ($a, $v) = each %a2c){
       }
     }else{
       my $c1 = toHex($c);
-      print STDERR "no commit $c1\n";
+      print STDERR "no commit $c1 for $a\n";
     }
   }
   $line ++;
-  if (!($line%1000000)){
+  if (!($line%100000)){
     print STDERR "dumping $line\n";
     dumpData();
     %a2f = ();
