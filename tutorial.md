@@ -35,39 +35,55 @@ Run `git clone <link>` (no brackets) on a da server to get a copy of the given r
 ## List of relevant directories
 
 The folder structure on any server follows the following convention:
-    - Raw blobs are located in files that are appended as new
-      objects are discovered and extracted
-      /data/All.blobs/{commit,tree,tag,blob}_Num.{idx,bin}  where
-      Num is in {0..127}
-   - Folder /fast is preferably mounted on an array of SSDs that
+
+   - Raw blobs (that is, the actual file contents of the git repositories)
+      are located in files 
+      '/data/All.blobs/{commit,tree,tag,blob}_Num.{idx,bin}'  where
+      'Num' is in {0..127}.  These are appended to periodically as new
+      objects are discovered and extracted.
+   - Folder '/fast' is preferably mounted on an array of SSDs that
      so that the data can be read in parallel, but for servers that
-     do not have SSDs, a regular disk is used. The maps (e.g.,
-     c2fFull$Ver.Num.tch are typically stored there and, as a
-     backup, on /da0_data/basemaps
-	 /fast has subfolders: All.sha1, All.sha1c, and
-     All.sha1o. All.sha1/sha1.{commit,tree,tag,blob}_Num.tch holds
-     object content offsets in the raw files stored /data/All.blobs
+     do not have SSDs, a regular disk is used. It contains maps (e.g.
+     'c2fFull$Ver.Num.tch') that index the blobs by features such
+     as commit or file name (see below for details).  They are also
+     backed up '/da0_data/basemaps'.
+   - '/fast' has subfolders: 'All.sha1', 'All.sha1c', and
+     'All.sha1o'. 
+       - 'All.sha1/sha1.{commit,tree,tag,blob}_Num.tch' holds
+     object content offsets in the raw files stored in '/data/All.blobs'
      and are used to check if the object is in the database and, if
-     so, which record. All.sha1c/{commit,tree}_Num.tch maps commit
-     and tree sha1s to the object content. All.sha1o/blob_Num.tch
-     maps blob sha1 to the file ofset (and object size) that can be
-     read directly from /data/All.blobs/blob_Num.bin
+     so, which record. 
+       - 'All.sha1c/{commit,tree}_Num.tch' maps commit
+     and tree sha1s to the object content. 
+       - 'All.sha1o/blob_Num.tch'
+     maps blob sha1 to the file offset (and object size) that can be
+     read directly from '/data/All.blobs/blob_Num.bin'
 
 
 Not all files are stored on all servers due to limited disk sizes.
 The description below goes over what is stored on each server. 
 
 In order for SSDs to be fast they need to be mounted in parallel,
-for example id 7ssds is a volume group that has seven SSDs as
-physical volumes, LV 7ssds can be created via
+for example id `7ssds` is a volume group that has seven SSDs as
+physical volumes.  Logical volume `7ssds` can be created via
 ```
 lvcreate --extents 100%FREE --name 7ssds --stripes 7 --stripesize 256 7ssds
 ```
 
 ### da0 Server
 #### <relationship>.{0-31}.tch files in `/data/basemaps/`:  
-(.s) signifies that there are either .s or .gz versions of these files in gz/ subfolder, which can be opened with Python gzip module or Unix zcat.  
+The following relationship files are indexes that allow you to map different metadata values to each 
+other; for example files `c2pc0.s` through 
+`c2pc31.s` together constitute an index mapping commits to their parents.  They contain all commits across all 
+repositories in World of Code,
+so this is a very comprehensive index.  .tch files are
+are indexes in the TokyoCabinet format; use software described below such as oscar.py to consult them.  The indexes
+are divided up according to a hashing scheme into many files (some power of 2) for efficiency reasons.
+
+In the following table, (.s) signifies that there are either .s or .gz versions of these files in gz/ subfolder, 
+which can be opened with Python gzip module or Unix zcat.  
 da0 is the only server with these .s/.gz files  
+
 Keys for identifying letters:   
 
 * a = Author
@@ -78,7 +94,7 @@ Keys for identifying letters:
 * h = Head Commit
 * p = Project
 * pc = Parent Commit
-* ta = Time Author
+* ta = Time and Author
 * trp = Torvald Path
 
 List of relationships:
@@ -89,12 +105,16 @@ List of relationships:
 * c2h			* c2pc			* c2p (.s)			* c2ta (.s)
 * f2b (.s)		* f2c (.s)		
 * p2a (.s)		* p2c (.s)
-```	
+```
+
 ------
 #### `/data/play/$LANGthruMaps/` on da0:  
-These thruMaps directories contain mappings of repositories with modules that were utilized at a given UNIX timestamp under a specific commit. The mappings are in c2bPtaPkgO{$LANG}.{0-31}.gz files.   
+These thruMaps directories contain mappings that list repositories and the modules they depended on, at a given UNIX timestamp under a specific commit. The mappings are in c2bPtaPkgO{$LANG}.{0-31}.gz files.   
 Format: `commit;repo_name;timestamp;author;blob;module1;module2;...`  
-Each thruMaps directory has a different language ($LANG) that contains modules relevant to that language.
+Each thruMaps directory has a different language ($LANG) that contains modules relevant to that language;
+Modules are typically libraries written in the same language and installed automatically through a
+repository manager.  For example the Rust thruMaps list Rust-language projects and the crates they
+depend on and install through their build process from `http://crates.io`.
 ------
 ### da3 Server
 #### .tch files in `/fast/`:  
@@ -102,29 +122,40 @@ da3 contains the same files located on da0, except for b2f, c2cc, f2b, and f2c.
 This folder can be used for faster reading, hence the directory name.  
 In the context of oscar.py, the dictionary values listed in the PATHS dictionary can be changed from `/da0_data/basemaps/...` to `/fast/...` when referencing oscar.py in another program.  
 ------
-## OSCAR functions from oscar.py
-Note: "/<function_name>" after a function name denotes the version of that function that returns a Generator object  
+### Scratch space on a da server 
+Instead of creating new files from reading data on your home directory, you're allowed to have a scratch
+directory under `/data/play/<username>`. A distinct advantage of doing so is so you won't fail any
+high throughput reading and writing in /home/<username> because of nfs limitations. Additionally, 
+it is advised that you create your files on the same machine you're reading data from, in order to 
+avoid network latency and read errors.  
+------
+## OSCAR classes from oscar.py and their methods
+The Python classes in oscar.py are a convenient way to look up individual items in the .tch
+indexes and blob files.  The most important methods are listed below.  Where two
+methods are listed with a slash, the first returns a list of identifiers,
+and the second returns a generator of *objects* build from that identifier; e.g.
+Author.commit_shas() returns a list of the SHAs of commits that the person authored;
+Author.commits() returns a generator of Commit objects built from those SHAs.
 
-These are corresponding functions in oscar.py that open the .tch files listed above for a given entity:
-
-1. `Author('...')`  - initialized with a combination of name and email
-	* `.commit_shas/commits`
-	* `.project_names`
+1. `Author('...')`  - initialized with a combination of name and email, e.g. `"Albert Krawczyk" <pro-logic@optusnet.com.au>`
+	* `.commit_shas/commits` - all commits by this author
+	* `.project_names` - all projects this author has committed to
 	* `.torvald` - returns the torvald path of an Author, i.e, who did this Author work
 				 with that also worked with Linus Torvald
 2. `Blob('...')` -  initialized with SHA of blob
-	* `.commit_shas/commits` - commits removing this blob are not included
+	* `.commit_shas/commits` - commits creating or modifying (but not removing) this blob 
 3. `Commit('...')` - initialized with SHA of commit
-	* `.blob_shas/blobs`
-	* `.child_shas/children`
+	* `.blob_shas/blobs`  - all blobs in the commit
+	* `.child_shas/children`  
 	* `.changed_file_names/files_changed`
 	* `.parent_shas/parents`
-	* `.project_names/projects`
+	* `.project_names/projects`  - projects this commit appears in
 4. `Commit_info('...')` - initialized like Commit()
-	* `.head`
+	* `.head`  
 	* `.time_author`
-5. `File('...')` - initialized with a path, starting from a commit root tree
-	* `.commit_shas/commits`
+5. `File('...')` - initialized with a path, starting from a commit root tree. This
+represents a filename, regardless of content or repository; e.g. `File(".gitignore")` represents all `.gitignore` files in all repositories.
+	* `.commit_shas/commits`  - All commits that include a file with this name
 6. `Project('...')` - initialized with project name/URI
 	* `.author_names`
 	* `.commit_shas/commits`
@@ -171,18 +202,32 @@ UNIX> python
 -------	
 ## Examples of implementing applications -- Simple vs. Complex
 ### Finding 1st-time imports for AI modules (Simple) 
-Given the data available, this is a fairly simple task. Making an application to detect the first time that a repo adopted an AI module would give you a better idea as to when it was first used, and also when it started to gain popularity.  
+
+Making an application to detect the first time that a repo adopted an AI module would give you a better idea as to when it was first used, and also when it started to gain popularity.  
+
+Given the data available, this is a fairly simple task. 
 
 A good example of this lies in [popmods.py](https://github.com/ssc-oscar/aiframeworks/blob/master/popmods.py). In this application, we can read all 32 c2bPtaPkgO$LANG.{0-31}.gz files of a given language and look for a given module with the earliest import times. The program then creates a <module_name>.first file, with each line formatted as `repo_name;UNIX_timestamp`.  
 
 Usage: `UNIX> python popmods.py language_file_extension module_name`  
 
-Before anything else (and this can be applied to many other programs), you want to know what your input looks like ahead of time and know how you are going to parse it. Since each line of the file has this format:  
+Before anything else (and this can be applied to many other programs), you want to know what your 
+input looks like ahead of time and know how you are going to parse it. See the documentation
+above for the format, or just take a quick look at, say, the first five lines of it like this:
+
+`UNIX> zcat /data/play/PYthruMaps/c2bPtaPkgOPY.0.gz | head -5`
+
+Each line of the file has this format:  
 `commit;repo_name;timestamp;author;blob;module1;module2;...`  
 We can use the `string.split()` method to turn this string into a list of words, split by a semicolon (;).  
 By turning this line into a list, and giving it a variable name, `entry = ['commit', 'repo_name', 'timestamp', ...]`, we can then grab the pieces of information we need with `repo, time = entry[1], entry[2]`. 
 
-An important idea to keep in mind is that we only want to count unique timestamps once. This is because we want to account for repositories that forked off of another repository with the exact timestamp of imports. An easy way to do this would be to keep a running list of the times we have come across, and if we have already seen that timestamp before, we will simply skip that line in the file:  
+An important idea to keep in mind is that we only want to count unique timestamps once. 
+This is because we want don't want to double-count commits that appear multiple times, 
+in repositories that forked off of another repository, since these will contain the
+same commits with the exact timestamps. 
+An easy way to do this would be to keep a running list of the times we have come across, 
+and if we have already seen that timestamp before, we will simply skip that line in the file:  
 ```
 ...
 if time in times:
@@ -202,11 +247,13 @@ if repo not in dict.keys() or time < dict[repo]:
 ...
 ```
 #### Implementing the application
-Now that we have the .first files put together, we can take this one step further and graph a modules first-time usage over time on a line graph, or even compare multiple modules to see how they stack up against each other. [modtrends.py](https://github.com/ssc-oscar/aiframeworks/blob/master/modtrends.py) accomplishes this by:  
+Now that we have the .first files put together, we can take this one step further and graph a modules' 
+first-time usage over time on a line graph, or even compare multiple modules to see how they stack up 
+against each other. [modtrends.py](https://github.com/ssc-oscar/aiframeworks/blob/master/modtrends.py) accomplishes this by:  
 
 * reading 1 or more .first files 
 * converting each timestamp for each repository into a datetime date
-* "rounding" those dates by year and month
+* "binning" those dates by year and month
 * putting those dates in a dictionary with `dict["year-month"] += 1`
 * graphing the dates and frequencies using matplotlib.
 
@@ -216,14 +263,20 @@ The final graph looks something like this:
 -------
 ### Detecting percentage language use and changes over time (Complex) 
 An application to calculate this would be useful for seeing how different authors changed languages over a range of years, based on the commits they have made to different files.  
-In order to accomplish this task, we will modify an existing program from the swsc/lookup repo ([a2fBinSorted.perl](https://bitbucket.org/swsc/lookup/src/master/a2fBinSorted.perl)) and create a new program ([a2L.py](https://bitbucket.org/swsc/lookup/src/master/a2L.py)) that will get language counts per year per author.  
+In order to accomplish this task, we will modify an existing program from the `swsc/lookup` repo ([a2fBinSorted.perl](https://bitbucket.org/swsc/lookup/src/master/a2fBinSorted.perl)) and create a new program ([a2L.py](https://bitbucket.org/swsc/lookup/src/master/a2L.py)) that will get language counts per year per author.  
 
 #### Part 1 -- Modifying a2fBinSorted.perl
-For the first part, we look at what a2fBinSorted.perl currently does: it takes one of the 32 a2cFullP{0-31}.s files thru STDIN, opens the 32 c2fFullO.{0-31}.tch files for reading, and writes a corresponding a2fFullP.{0-31}.tch file based on the a2c file number. The lines of the file being `author_id;file1;file2;file3...`  
+For the first part, we look at what `a2fBinSorted.perl` currently does: it takes one of the 
+32 `a2cFullP{0-31}.s` files thru STDIN, opens the 32 `c2fFullO.{0-31}.tch` files for reading, 
+and writes a corresponding local `a2fFullP.{0-31}.tch` file based on the a2c file number. 
+The lines of the file being `author_id;file1;file2;file3...`  
 
 Example usage: `UNIX> zcat /da0_data/basemaps/gz/a2cFullP0.s | ./a2fBinSorted.perl 0`
 
-We can modify this program so that it will write the earliest commit dates made by that author for those files, which will become useful for a2L.py later on. To accomplish this, we will have the program additionally read from the c2taFullP.{0-31}.tch files so we can get the time of each commit made by a given author:  
+We can modify this program so that it will write the earliest commit dates made by that author 
+for those files, which will become useful for a2L.py later on. To accomplish this, we will 
+have the program additionally read from the `c2taFullP.{0-31}.tch` files so we can get 
+the time of each commit made by a given author:  
 ```
 my %c2ta;
 for my $s (0..($sections-1)){
@@ -323,7 +376,12 @@ for year, files in a2L[author].items():
 			la = "c"
 	.......
 ```
-The simplest way to check for a language based on a file extension is to use the re module for regular expressions. If a given file matches a certain expression, like `.py`, then that file was written in Python. `la = other` if no matches were found in any of those searches. We then keep track of these languages and put each language in a list `build_list.append(la)`, and count how many of those languages occurred when we looped through the files `build_list.count(lang)`. The final format for an author in the a2L dictionary will be `a2L[author][year][lang] = lang_count`.  
+The simplest way to check for a language based on a file extension is to use the `re` module 
+for regular expressions. If a given file matches a certain expression, like `.py`, then 
+that file was written in Python. `la = "other"` if no matches were found in any of those searches. 
+We then keep track of these languages and put each language in a 
+list `build_list.append(la)`, and count how many of those languages occurred when we looped 
+through the files `build_list.count(lang)`. The final format for an author in the a2L dictionary will be `a2L[author][year][lang] = lang_count`.  
 
 * Writing each authors information into the file
 
@@ -333,6 +391,7 @@ Usage: `UNIX> python a2L.py 2` for writing `a2LFullP2.s`
 
 #### Implementing the application
 Now that we have our a2L files, we can run some interesting statistics as to how significant language usage changes over time for different authors. The program [langtrend.py](https://bitbucket.org/swsc/lookup/src/master/langtrend.py) runs the chi-squared contingency test (via the stats.chi2_contingency() function from scipy module) for authors from an a2LFullP{0-31}.s file and calculates a p-value for each pair of years for each language for each author.   
+
 This p-value means the percentage chance that you would find another person (say out of 1000 people) that has this same extreme of change in language use, whether that be an increase or a decrease. For example, if a given author editied 300 different Python files in 2006, but then editied 500 different Java files in 2007, the percentage chance that you would see this extreme of a change in another author is very low. In fact, if this p-value is less than 0.001, then the change in language use between a pair of years is considered "significant".  
 
 In order for this p-value to be a more accurate approximation, we need a larger sample size of language counts. When reading the a2LFullP{0-31}.s files, you may want to rule out people who dont meet certain criteria:  
@@ -343,8 +402,8 @@ In order for this p-value to be a more accurate approximation, we need a larger 
 If an author does not meet this criteria, we would not want to consider them for the chi-squared test simply because their results would be "uninteresting" and not worth investigating any further.  
 
 Here is one of the authors from the programs output:  
-```
 ----------------------------------
+```
 Ben Niemann <pink@odahoda.de>
 { '2015': {'doc': 3, 'markup': 2, 'obj': 1, 'other': 67, 'py': 127, 'sh': 1},
 	'2016': {'doc': 1, 'other': 23, 'py': 163},
@@ -402,16 +461,15 @@ Ben Niemann <pink@odahoda.de>
 		2018--2019 pfactor == 0.0001652525618661536  rise/drop
 	pfactors for js language
 		2018--2019 pfactor == 0.7989681687355706  no change
-----------------------------------
 ```  
-
+----------------------------------
 Although it is currently not implemented, one could take this one step further and visually represent an authors language changes on a graph, which would be simpler to interpret as opposed to viewing a long list of p values such as the one shown above.  
 
 --------
 ## Useful Python imports for applications
 ### subprocess
-Simlar to the C version, system(), this module allows you to run UNIX processes, and also allows you to gather any input, output, or error from those processes, all from within a Python script. This module becomes especially useful when you are looking for specific lines out of a .s/.gz file, as opposed to reading the entire file which takes more time.  
-A good example usage for subprocess is when we read the c2bPtaPkgO$LANG.{0-31}.gz files for first-time AI module imports in popmods.py. Rather than reading one of these files in its entirety, we look for lines of the file that have a specific module we are looking for.  
+Simlar to the C version, `system()`, this module allows you to run UNIX processes, and also allows you to gather any input, output, or error from those processes, all from within a Python script. This module becomes especially useful when you are looking for specific lines out of a .s/.gz file, as opposed to reading the entire file and filtering it in Python, which may be less efficient or more complicated to program than well-known UNIX commands.  
+A good example usage for subprocess is when we read the `c2bPtaPkgO$LANG.{0-31}.gz` files for first-time AI module imports in popmods.py. Rather than reading one of these files in its entirety, we look for lines of the file that have a specific module we are looking for.  
 ```
 for i in range(32):
 	print("Reading gz file number " + str(i))
