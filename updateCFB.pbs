@@ -61,7 +61,7 @@ if test "y" = "n"; then
 for i in $n 
 do zcat ${what}.$i.c2fb | cut -d\; -f1-4 | sed 's|;/|;|' |\
    perl -I $HOME/lib/perl5 -I $HOME/lookup -e 'use cmt; while(<STDIN>){ ($c, @r) = split(/;/); print $_ if ! defined $badCmt{$c};}' | \
-   $HOME/bin/lsort $maxM -t\; -k1b,2 | gzip > ${what}.c2f.$i.s &
+   $HOME/bin/lsort $maxM -t\; -k1,2 | gzip > ${what}.c2f.$i.s &
 done
 wait
 echo ${what}.c2f.$i.s
@@ -85,7 +85,7 @@ echo $what.b2c.$j.
 
 for j in $n
   do for i in {0..31} 
-  do $HOME/bin/lsort $maxM -t\; -k1b,2 <(zcat $what.f2c.$j.$i.gz) | gzip > $what.f2c.$j.$i.s &
+  do $HOME/bin/lsort $maxM -t\; -k1,2 <(zcat $what.f2c.$j.$i.gz) | gzip > $what.f2c.$j.$i.s &
   done
   wait
 done
@@ -93,7 +93,7 @@ echo $what.f2c.$j.$i.s
 
 for j in $n
   do for i in {0..31}
-    do $HOME/bin/lsort $maxM -t\; -k1b,2 <(zcat $what.b2c.$j.$i.gz) | gzip > $what.b2c.$j.$i.s &
+    do $HOME/bin/lsort $maxM -t\; -k1,2 <(zcat $what.b2c.$j.$i.gz) | gzip > $what.b2c.$j.$i.s &
   done
   wait
 done
@@ -103,7 +103,7 @@ echo $what.b2c.$j.$i.s
 #if test "y" = "y"; then
 
 for j in {0..31}
-do str="$HOME/bin/lsort $maxM -t\; -k1b,2 --merge"
+do str="$HOME/bin/lsort $maxM -t\; -k1,2 --merge"
    for i in $n
    do str="$str <(zcat $what.f2c.$i.$j.s)"
    done
@@ -114,7 +114,7 @@ echo $what.f2c.$j.s
 
 
 for j in {0..31}
-do str="$HOME/bin/lsort $maxM -t\; -k1b,2 --merge"
+do str="$HOME/bin/lsort $maxM -t\; -k1,2 --merge"
    for i in $n
    do str="$str <(zcat $what.b2c.$i.$j.s)"
    done
@@ -128,13 +128,13 @@ echo $what.b2c.$j.s
 
 #obtain secondary maps
 for j in {0..31}
-  do zcat $what.b2c.$j.s | cut -d\; -f1,3 | grep -v ';$' | lsort $maxM -t\; -k1b,2 -u | gzip > $what.b2f.$j.s &
+  do zcat $what.b2c.$j.s | cut -d\; -f1,3 | grep -v ';$' | lsort $maxM -t\; -k1,2 -u | gzip > $what.b2f.$j.s &
 done
 wait
 echo $what.b2f.$j.s
 
 for j in {0..31}
-  do zcat $what.f2c.$j.s | cut -d\; -f1,3 | grep -v ';$' | lsort $maxM -t\; -k1b,2 -u | gzip > $what.f2b.$j.s &
+  do zcat $what.f2c.$j.s | cut -d\; -f1,3 | grep -v ';$' | lsort $maxM -t\; -k1,2 -u | gzip > $what.f2b.$j.s &
 done
 wait
 echo $what.f2b.$j.s
@@ -144,7 +144,7 @@ if test "y" = "n"; then
 
 
 for j in {0..31}
-  do zcat $what.c2f.$j.s | cut -d\; -f1,3 | grep -v ';$' | lsort $maxM -t\; -k1b,2 -u | gzip > $what.c2b.$j.s &
+  do zcat $what.c2f.$j.s | cut -d\; -f1,3 | grep -v ';$' | lsort $maxM -t\; -k1,2 -u | gzip > $what.c2b.$j.s &
 done
 wait
 echo $what.c2b.$j.s
@@ -159,7 +159,7 @@ for t in f2b
 do
   for j in {0..31};
   do
-    $HOME/bin/lsort $maxM -t\; -k1b,2 --merge -u <(zcat ${t}Full${pVer}$j.s|uniq) <(zcat $what.$t.$j.s|cut -d\; -f1,2) | gzip > ${t}Full${ver}$j.s &
+    $HOME/bin/lsort $maxM -t\; -k1,2 --merge -u <(zcat ${t}Full${pVer}$j.s|uniq) <(zcat $what.$t.$j.s|cut -d\; -f1,2) | gzip > ${t}Full${ver}$j.s &
   done
   wait
   echo $t
