@@ -122,6 +122,13 @@ da3 contains the same files located on da0, except for b2f, c2cc, f2b, and f2c.
 This folder can be used for faster reading, hence the directory name.  
 In the context of oscar.py, the dictionary values listed in the PATHS dictionary can be changed from `/da0_data/basemaps/...` to `/fast/...` when referencing oscar.py in another program.  
 ------
+### Scratch space on a da server 
+Instead of creating new files from reading data on your home directory, you're allowed to have a scratch
+directory under `/data/play/<username>`. A distinct advantage of doing so is so you won't fail any
+high throughput reading and writing in /home/<username> because of nfs limitations. Additionally, 
+it is advised that you create your files on the same machine you're reading data from, in order to 
+avoid network latency and read errors.  
+------
 ## OSCAR classes from oscar.py and their methods
 The Python classes in oscar.py are a convenient way to look up individual items in the .tch
 indexes and blob files.  The most important methods are listed below.  Where two
