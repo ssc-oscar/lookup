@@ -1,0 +1,32 @@
+#PBS -N CreateUpdate
+#PBS -A ACF-UTK0011
+#PBS -l feature=beacon
+#PBS -l partition=beacon
+#PBS -l nodes=1,walltime=05:50:00
+#PBS -j oe
+#PBS -S /bin/bash
+LD_LIBRARY_PATH=$HOME/lib:$HOME/lib64:$LD_LIBRARY_PATH
+c=/lustre/haven/user/audris/c2fb
+cd $c
+
+pVer=O
+ver=P
+
+
+for what in f2c f2b c2f c2b b2c b2f
+do 
+for j in {0..15}
+do #(time ~/lookup/Diff.perl ${what}Full$ver$j.s ${what}Full$pVer$j.s | gzip > ${what}Full$pVer$ver$j.s) &
+  (time zcat ${what}Full$ver$j.s1 | join -t $'\0x00' -v1 - <(zcat ${what}Full$pVer$j.s1) | gzip > ${what}Full$pVer$ver$j.s1) &
+done
+wait
+echo  ${what}Full$pVer$ver$j.s
+for j in {16..31}
+do #(time ~/lookup/Diff.perl ${what}Full$ver$j.s ${what}Full$pVer$j.s | gzip > ${what}Full$pVer$ver$j.s) &
+   (time zcat ${what}Full$ver$j.s1 | join -t $'\0x00' -v1 - <(zcat ${what}Full$pVer$j.s1) | gzip > ${what}Full$pVer$ver$j.s1) &
+done
+wait
+echo  ${what}Full$pVer$ver$j.s
+
+done
+
