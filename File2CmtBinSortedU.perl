@@ -9,7 +9,7 @@ use cmt;
 
 my (%tmp, %c2p, %c2p1);
 my $fname = "$ARGV[0]";
-tie %$c2p, "TokyoCabinet::HDB", "$fname", TokyoCabinet::HDB::OWRITER | TokyoCabinet::HDB::OCREAT,   
+tie %c2p, "TokyoCabinet::HDB", "$fname", TokyoCabinet::HDB::OWRITER | TokyoCabinet::HDB::OCREAT,   
       16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
      or die "cant open $fname\n";
 
@@ -55,7 +55,7 @@ dumpData ();
 
 sub large {
   my ($bs, $cp) = @_;
-  my $len = length (keys %{$bs});
+  my $len = length (keys %{$bs})/20;
   if ($len > 1000000){
     my $cpH = sHashV ($cp);
     print STDERR "too large for $cpH: $len\n";
@@ -65,7 +65,7 @@ sub large {
     close (A);
   }else{
     for my $v (keys %{$bs}){
-      $c2p1{$sec}{$cp}{$v}++;
+      $c2p1{$cp}{$v}++;
     }
   }
 }
@@ -79,8 +79,8 @@ sub dumpData {
     }
     my $bsC = join '', sort keys %{$c2p1{$c}};
     $c2p{$c} = $bsC;
-    %c2p1 = ();
   }
+  %c2p1 = ();
 }
 
 untie %c2p;
