@@ -58,23 +58,23 @@ while (<A>){
   my $ch = $_;
   $hasC{$ch}++;
   $nlook ++;
-  print STDERR "0:$ch\n" if $ch eq "000000494c369dd62894e1703f5fa1b616996ee3";
+  #print STDERR "0:$ch\n" if $ch eq "000000494c369dd62894e1703f5fa1b616996ee3";
   if (defined $mapHeads{$ch}){
     my $c = fromHex ($ch);
     my $s = (unpack "C", substr ($c, 0, 1)) % $split;
-    print STDERR "1:$s:$ch\n" if $ch eq "000000494c369dd62894e1703f5fa1b616996ee3";
+    #print STDERR "1:$s:$ch\n" if $ch eq "000000494c369dd62894e1703f5fa1b616996ee3";
     my $dp0 = pack 'w', 0+0;
     if (!defined $c2h{$s}{$c} || $c2h{$s}{$c} eq $c.$dp0){
-      print STDERR "2:$s:$ch\n" if $ch eq "000000494c369dd62894e1703f5fa1b616996ee3";
+	    #print STDERR "2:$s:$ch\n" if $ch eq "000000494c369dd62894e1703f5fa1b616996ee3";
       if (defined $c2cc{$s}{$c}){
-        print STDERR "3:$s:$ch\n" if $ch eq "000000494c369dd62894e1703f5fa1b616996ee3";
+	      #print STDERR "3:$s:$ch\n" if $ch eq "000000494c369dd62894e1703f5fa1b616996ee3";
         my $v = substr($c2cc{$s}{$c}, 0, 20);
         my ($ch, $h, $d) = findHead ($ch, $v, 1);
         my $dp = pack 'w', $d;
         $c2h{$s}{$c} = $h.$dp;
         $mapHeads{$c} = $h.$dp;
         my $hh = toHex ($h);	
-        print STDERR "4:$s:$ch\n" if $ch eq "000000494c369dd62894e1703f5fa1b616996ee3";
+	#print STDERR "4:$s:$ch\n" if $ch eq "000000494c369dd62894e1703f5fa1b616996ee3";
         $ncalc ++;	
       }
     } 
@@ -95,7 +95,7 @@ for my $s (0..($split-1)){
       my $dp = pack 'w', $d0+$dAdd;
       $c2h{$s}{$c} = $hr.$dp;  
       $nfix ++;
-      print STDERR "nfix=$nfix\n" if (!($nfix % 10000));   
+      print STDERR "nfix=$nfix\n" if (!($nfix % 500000));   
     }else{
       #print "F:$ch;$ch;$ch;0\n;"
     }
