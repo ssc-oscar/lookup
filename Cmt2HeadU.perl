@@ -36,7 +36,7 @@ for my $s (0..($split-1)){
 }
 my $ncalc = 0;
 my $nlook = 0;
-my $mdepth x= 0;
+my $mdepth = 0;
 
 
 #first get heads for the previous version
@@ -50,27 +50,40 @@ while (<A>){ chop(); $mapHeads{$_} = "1"; };
 #for i in {0..31..4}; do time ./lst.perl /data/basemaps/c2ccFull$ver.$i.tch h h | cut -d\; -f1 | gzip > /data/basemaps/gz/cHasCcFull$ver.$i; done &
 
 my %hasC;
-open A, "zcat /data/basemaps/gz/cHasCcFull$ver.$i|";
-while (<A>){ chop();
+open A, "zcat /data/basemaps/gz/cHasCcFull$ver.$sec|";
+my $ncalc = 0;
+my $nlook = 0;
+while (<A>){ 
   chop();
   my $ch = $_;
   $hasC{$ch}++;
+  $nlook ++;
+  print STDERR "0:$ch\n" if $ch eq "000000494c369dd62894e1703f5fa1b616996ee3";
   if (defined $mapHeads{$ch}){
     my $c = fromHex ($ch);
     my $s = (unpack "C", substr ($c, 0, 1)) % $split;
-    if (!defined $c2h{$s}{$c}){
+    print STDERR "1:$s:$ch\n" if $ch eq "000000494c369dd62894e1703f5fa1b616996ee3";
+    my $dp0 = pack 'w', 0+0;
+    if (!defined $c2h{$s}{$c} || $c2h{$s}{$c} eq $c.$dp0){
+      print STDERR "2:$s:$ch\n" if $ch eq "000000494c369dd62894e1703f5fa1b616996ee3";
       if (defined $c2cc{$s}{$c}){
+        print STDERR "3:$s:$ch\n" if $ch eq "000000494c369dd62894e1703f5fa1b616996ee3";
         my $v = substr($c2cc{$s}{$c}, 0, 20);
         my ($ch, $h, $d) = findHead ($ch, $v, 1);
         my $dp = pack 'w', $d;
         $c2h{$s}{$c} = $h.$dp;
-        $mapHeads{$c} = $h.$dp;        
+        $mapHeads{$c} = $h.$dp;
+        my $hh = toHex ($h);	
+        print STDERR "4:$s:$ch\n" if $ch eq "000000494c369dd62894e1703f5fa1b616996ee3";
+        $ncalc ++;	
       }
     } 
   }
 };
 
+print STDERR "nlooked=$nlook ncalc=$ncalc\n";
 
+my $nfix = 0;
 # now fix all instances of problems
 for my $s (0..($split-1)){
   while (my ($c, $h) = each %{$c2h{$s}}){
@@ -80,12 +93,17 @@ for my $s (0..($split-1)){
       my $hr = substr($mapHeads{$hh}, 0, 20);
       my $dAdd = unpack "w", substr($mapHeads{$hh}, 20, length($mapHeads{$hh}) - 20);
       my $dp = pack 'w', $d0+$dAdd;
-      $c2h{$s}{$c} = $hr.$dp;     
+      $c2h{$s}{$c} = $hr.$dp;  
+      $nfix ++;
+      print STDERR "nfix=$nfix\n" if (!($nfix % 10000));   
     }else{
       #print "F:$ch;$ch;$ch;0\n;"
     }
   }
 }
+
+print STDERR "nfixed=$nfix\n";
+
 for my $s (0..($split-1)){ 
   untie %{$c2h{$s}};
   untie %{$c2cc{$s}};
