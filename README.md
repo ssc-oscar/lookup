@@ -57,11 +57,11 @@ Output:
 This prints the file names of blobs (files) created or deleted by an author's commit.
 
 Command:
-   * echo "git-commit-ID" | /da3_data/lookup/Prj2FileShow.perl /da0_data/basemaps/a2fFullO 1 32
+   * echo "git-commit-ID" | /da3_data/lookup/Prj2FileShow.perl /da0_data/basemaps/a2fFullP 1 32
    
 Examples:
-   * echo "Audris Mockus <audris@utk.edu>" | /da3_data/lookup/Prj2FileShow.perl /da0_data/basemaps/a2fFullO 1 32
-   * echo "Adam Tutko <atutko@vols.utk.edu>" | /da3_data/lookup/Prj2FileShow.perl /da0_data/basemaps/a2fFullO 1 32
+   * echo "Audris Mockus <audris@utk.edu>" | /da3_data/lookup/Prj2FileShow.perl /da0_data/basemaps/a2fFullP 1 32
+   * echo "Adam Tutko <atutko@vols.utk.edu>" | /da3_data/lookup/Prj2FileShow.perl /da0_data/basemaps/a2fFullP 1 32
 
 Output:
    Formatting: ;#ofFiles;FileNames
@@ -75,11 +75,11 @@ Output:
 This prints out the commits associated with a file based on it's Blob-ID.
 
 Command:
-   * echo "Blob-ID" (no quotes) | /da3_data/lookup/Cmt2BlobShow.perl /da0_data/basemaps/b2cFullO 1 32
+   * echo "Blob-ID" (no quotes) | /da3_data/lookup/Cmt2BlobShow.perl /da0_data/basemaps/b2cFullP 1 32
 
 Examples: 
-   * echo 05fe634ca4c8386349ac519f899145c75fff4169 | /da3_data/lookup/Cmt2BlobShow.perl /da0_data/basemaps/b2cFullO 1 32
-   * echo a7081031fc8f4fea0d35dd8486f8900febd2347e | /da3_data/lookup/Cmt2BlobShow.perl /da0_data/basemaps/b2cFullO 1 32
+   * echo 05fe634ca4c8386349ac519f899145c75fff4169 | /da3_data/lookup/Cmt2BlobShow.perl /da0_data/basemaps/b2cFullP 1 32
+   * echo a7081031fc8f4fea0d35dd8486f8900febd2347e | /da3_data/lookup/Cmt2BlobShow.perl /da0_data/basemaps/b2cFullP 1 32
 
 Output:
    Formatting: "Blob-ID";#ofCommits;"Commit-IDs"
@@ -97,8 +97,8 @@ Command:
    * echo "Commit-ID" (no quotes) | /da3_data/lookup/Cmt2BlobShow.perl /da0_data/basemaps/c2bFullO 1 32
    
 Examples:
-   * echo e4af89166a17785c1d741b8b1d5775f3223f510f | /da3_data/lookup/Cmt2BlobShow.perl /da0_data/basemaps/c2bFullO 1 32
-   * echo fe1ce9e5e8ebe83569c53ebe1f05f0688136ef2c | /da3_data/lookup/Cmt2BlobShow.perl /da0_data/basemaps/c2bFullO 1 32
+   * echo e4af89166a17785c1d741b8b1d5775f3223f510f | /da3_data/lookup/Cmt2BlobShow.perl /da0_data/basemaps/c2bFullP 1 32
+   * echo fe1ce9e5e8ebe83569c53ebe1f05f0688136ef2c | /da3_data/lookup/Cmt2BlobShow.perl /da0_data/basemaps/c2bFullP 1 32
 
 Output:
    Formatting: Commit-ID;#ofBlob-IDs;Blob-ID
@@ -131,11 +131,11 @@ Output:
 This prints out the Commit-IDs associated with a file name.
 
 Command:
-   * echo "File Name" (no quotes) |/da3_data/lookup/Prj2CmtShow.perl /da0_data/basemaps/f2cFullO 1 32
+   * echo "File Name" (no quotes) |/da3_data/lookup/Prj2CmtShow.perl /da0_data/basemaps/f2cFullP 1 32
 
 Examples:
-   * echo main.c |/da3_data/lookup/Prj2CmtShow.perl /da0_data/basemaps/f2cFullO 1 32
-   * echo atutko.md |/da3_data/lookup/Prj2CmtShow.perl /da0_data/basemaps/f2cFullO 1 32
+   * echo main.c |/da3_data/lookup/Prj2CmtShow.perl /da0_data/basemaps/f2cFullP 1 32
+   * echo atutko.md |/da3_data/lookup/Prj2CmtShow.perl /da0_data/basemaps/f2cFullP 1 32
    
 Output:
    Formatting: "File Name";#ofCommit-IDs;Commit-IDs
@@ -169,11 +169,11 @@ Output:
 This prints the Child-Commit-ID of a given Commit-ID.
 
 Command:
-   * echo "Commit-ID" (no quotes) | /da3_data/lookup/Cmt2BlobShow.perl /da0_data/basemaps/c2ccFullO 1 32
+   * echo "Commit-ID" (no quotes) | /da3_data/lookup/Cmt2BlobShow.perl /da0_data/basemaps/c2ccFullP 1 32
    
 Examples:
-   * echo e4af89166a17785c1d741b8b1d5775f3223f510f | /da3_data/lookup/Cmt2BlobShow.perl /da0_data/basemaps/c2ccFullO 1 32
-   * echo fe1ce9e5e8ebe83569c53ebe1f05f0688136ef2c | /da3_data/lookup/Cmt2BlobShow.perl /da0_data/basemaps/c2ccFullO 1 32
+   * echo e4af89166a17785c1d741b8b1d5775f3223f510f | /da3_data/lookup/Cmt2BlobShow.perl /da0_data/basemaps/c2ccFullP 1 32
+   * echo fe1ce9e5e8ebe83569c53ebe1f05f0688136ef2c | /da3_data/lookup/Cmt2BlobShow.perl /da0_data/basemaps/c2ccFullP 1 32
 
 Output:
    Formatting: "Commit-ID";#ofCC;"Child-Commit-ID"
