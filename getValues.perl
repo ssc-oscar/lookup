@@ -36,6 +36,10 @@ $f2 = "cs" if ($t2 =~ /^[afp]$/);
 $f1 = "h" if ($t1 =~ /^[cb]$/);
 $f2 = "h" if ($t2 =~ /^[cb]$/ || $t2 =~ /^(cc|pc)$/);
 
+$f2 = "s" if $types eq "b2a";
+$f2 = "s" if $t2 eq "ta";
+$f2 = "r" if $types =~ /^c2[hr]$/;
+
 $f1 = $ARGV[1] if defined $ARGV[1];
 $f2 = $ARGV[2] if defined $ARGV[2];
 
