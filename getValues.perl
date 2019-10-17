@@ -14,8 +14,6 @@ my $hdb = TokyoCabinet::HDB->new();
 
 my $f1 = "h";
 my $f2 = "h";
-$f1 = $ARGV[1] if defined $ARGV[1];
-$f2 = $ARGV[2] if defined $ARGV[2];
 
 my $split = 32;
 
@@ -28,6 +26,20 @@ for my $s (0..($split-1)){
 
 
 my $offset = 0;
+my $types = $fname;
+$types =~ s|.*/||;
+$types =~ s|Full[A-Z]$||;
+my ($t1, $t2) = split(/2/, $types);
+$f1 = "s" if ($t1 =~ /^[afp]$/);
+$f2 = "cs" if ($t2 =~ /^[afp]$/);
+
+$f1 = "h" if ($t1 =~ /^[cb]$/);
+$f2 = "h" if ($t2 =~ /^[cb]$/ || $t2 =~ /^(cc|pc)$/);
+
+$f1 = $ARGV[1] if defined $ARGV[1];
+$f2 = $ARGV[2] if defined $ARGV[2];
+
+
 
 while (<STDIN>){
   chop();
