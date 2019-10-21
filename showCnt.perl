@@ -34,7 +34,7 @@ while (<STDIN>){
 	  getBlob($cmt);
      next;
   }
-  if ($type eq "blob"){
+  if ($type eq "tree"){
     getTree ($cmt, "");
     next;
   }
@@ -43,15 +43,7 @@ while (<STDIN>){
   if (! defined $fhosc{$sec}{$cB}){
      print STDERR "no $type $cmt in $sec\n";
   }else{
-    if ($raw ne ""){
-      my $cont = safeDecomp ($fhosc{$sec}{$cB});
-      my $len = length($cont);
-      print A "$cmt;$rest;$off;$len\n";
-      $off+= $len;
-      print B "$cont";
-    }else{
-      cleanCmt ($fhosc{$sec}{$cB}, $cmt, $debug);
-    }
+    cleanCmt ($fhosc{$sec}{$cB}, $cmt, $debug);
   }
 }
 
@@ -77,22 +69,11 @@ sub getTree {
   my ($tree, $off) = @_;
   my $sec = hex (substr($tree, 0, 2)) % $sections;
   my $tB = fromHex ($tree);
-  if ($debug < 0){
-    print "$tree\n" if defined $fhos{$sec}{$tB};
-    next;
-  }
-  if (! defined $fhos{$sec}){
-    my $pre = "/fast/";
-    $pre = "/fast" if $sec % $parts;
-    tie %{$fhos{$sec}}, "TokyoCabinet::HDB", "$pre/${fbase}$sec.tch", TokyoCabinet::HDB::OREADER,
-       16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
-      or die "cant open $pre/$fbase$sec.tch\n";
-  }
-  if (! defined $fhos{$sec}{$tB}){
+  if (! defined $fhosc{$sec}{$tB}){
     print STDERR "no tree $tree\n";
     next;
   }
-  my $codeC = $fhos{$sec}{$tB};
+  my $codeC = $fhosc{$sec}{$tB};
   my $code = safeDecomp ($codeC);
   my $len = length ($code);
   my $treeobj = $code;
