@@ -9,15 +9,19 @@ for i in a2b a2c a2f a2p b2a b2f c2b c2f c2p c2ta f2c p2a p2c
 do da3[$i]=1
 done
 
-
-if [[ -f /fast/${t}FullP.0.tch ]] 
+if [[ $h == da5.eecs.utk.edu ]] 
 then 
   ~/lookup/getValues.perl /fast/${t}FullP
 else
+ if [[ -f /fast/${t}FullP.0.tch ]] 
+ then 
+   ~/lookup/getValues.perl /fast/${t}FullP
+ else
   if [[ ${da3[$t]} == 1 ]] 
-	then ssh da3 ~/lookup/getValues.perl /fast/${t}FullP
-	else 
-		[[ $h == da0.eecs.utk.edu ]] && ~/lookup/getValues.perl /data/basemaps/${t}FullP
-		[[ $h != da0.eecs.utk.edu ]] && ssh da0 ~/lookup/getValues.perl /data/basemaps/${t}FullP	
-  fi
+   then ssh da3 ~/lookup/getValues.perl /fast/${t}FullP
+   else 
+    [[ $h == da0.eecs.utk.edu ]] && ~/lookup/getValues.perl /data/basemaps/${t}FullP
+	[[ $h != da0.eecs.utk.edu ]] && ssh da0 ~/lookup/getValues.perl /data/basemaps/${t}FullP	
+   fi
+ fi
 fi

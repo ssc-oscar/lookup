@@ -1,13 +1,18 @@
 #!/bin/bash
 
 h=$(hostname)
-
 t=$1
-if [[ $t == 'commit' ]] 
+
+if [[ $h == da5.eecs.utk.edu ]] 
 then 
+  ~/lookup/showCnt.perl $t
+else
+ if [[ $t == 'commit' ]] 
+ then 
   [[ $h == da3.eecs.utk.edu ]] && ~/lookup/showCnt.perl commit
   [[ $h != da3.eecs.utk.edu ]] && ssh da3 ~/lookup/showCnt.perl commit
-else
-	[[ $h != da4.eecs.utk.edu ]] && ssh da4 ~/lookup/showCnt.perl $t
-	[[ $h == da4.eecs.utk.edu ]] && ~/lookup/showCnt.perl $t
+ else
+  [[ $h != da4.eecs.utk.edu ]] && ssh da4 ~/lookup/showCnt.perl $t
+  [[ $h == da4.eecs.utk.edu ]] && ~/lookup/showCnt.perl $t
+ fi
 fi
