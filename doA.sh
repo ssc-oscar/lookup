@@ -1,7 +1,8 @@
 #!/bin/bash
 k=$1
-ver=P
-pre=list201910.$ver
+ver=Q
+DT=201910
+pre=list$DT.$ver
 cd $ver.$k
 tac $pre.$k | while read i; do j=$(echo $i|sed 's|/|_|;s/^gh://'); [[ -d $j ]] || git clone --mirror gh:$i $j; done &
 tac $pre.$k | while read i; do j=$(echo $i|sed 's|/|_|;s/^gh://'); [[ -d $j ]] || git clone --mirror gh:$i $j; done &
