@@ -1,32 +1,51 @@
-# Tutorial basics for Hackathon
+# Tutorial basics for the Hackathon
 -------
 ## Getting started
 ### Set up accounts for GitHub and Bitbucket
-If you dont have these already, go ahead and setup an account on both GitHub and Bitbucket and give your GH and BB ids and email to Dr. Mockus, who will then invite you to the oscar.py and swsc repositories via email.  
-GitHub: https://github.com/pricing  
-BitBucket: https://bitbucket.org/account/signup/  
+To obtain access to many of the resources you will be using during the Hackathon, you will need a Github and a Bitbucket account. 
+If you don't have these already, you can setup an account through the links below. Once you have created these accounts, you should fill out the registration form (see below). 
+In this form you will need to provide your GitHub Handle, BitBucket Handle, preferred World of Code Handle, and a public ssh key. Below is a tutorial on how to generate a public ssh key if needed.
+
+GitHub: https://github.com/
+
+BitBucket: https://bitbucket.org/account/signup/
+
+Registration Form: http://bit.ly/WoC-Signup
+
 --------
 
-### Gain permissions and access to da server(s)
-In order to gain access to one of the da servers, you will need to generate a public key via the `ssh-keygen` command, and put the `id_rsa.pub` and `id_rsa` files inside your .ssh/ folder on your home terminal. Once finished, send the contents of `id_rsa.pub` (your public key) over to Dr. Mockus who will then grant you access to one or more of the da servers.  
+### Gaining access and permissions to the da server(s)
+In order to gain access to the da servers, you will need to generate a public ssh key. This can be done via the `ssh-keygen` command on the terminal. Place the `id_rsa.pub` and `id_rsa` files inside your .ssh/ folder in the home directory. The`id_rsa.pub` file is your public key. You will need to provide this in the Registration Form.  
 Optionally, you can also set up your `.ssh/config` file so that you can login to one of the da servers without having to fully specify the server name each time:  
 ```
 Host da0
 	Hostname da0.eecs.utk.edu
 	Port 443
 	User {username}
+    
 ```
 
-Logging in then becomes as simple as `ssh da0`.  
-Once you are in a da server, you will have an empty directory under `/home/username` where you can store your programs and files:  
+For a more in depth explanation of ssh, you can visit ( https://confluence.atlassian.com/bitbucketserver/creating-ssh-keys-776639788.html ).
+ 
+
+
+Note: The below commands can only be run once you have been granted access to the servers and have been invited to the Github and BitBucket Repositories. 
+      Expect a delay from when you submit the form and when you are granted access.
+
+If you set up an .ssh/config as shown above, then, to log in, simply run `ssh da0`. Otherwise, you can run `ssh -p443 username@da0.eecs.utk.edu`.
+
+Once you are connected to a da server, you will have an empty directory under `/home/username` where you can store your programs and files:  
 ```
 [username@da0]~% pwd
 /home/username
 [username@da0]~% 
 ```
 ---------
-### Clone the oscar.py and swsc/lookup repos
+### Cloning useful reposotories
+The oscar.py and swsc/lookup repos will help streamline working in WoC. You will likely want to clone them into your home directory.
+
 oscar.py link: https://github.com/ssc-oscar/oscar.py  
+
 swsc/lookup link: https://bitbucket.org/swsc/lookup/src/master/
 
 Run `git clone <link>` (no brackets) on a da server to get a copy of the given repository link.  
