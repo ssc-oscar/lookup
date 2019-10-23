@@ -12,9 +12,17 @@ off=${7:-0}
 cd $cloneDir
 #[[ -e All.sha1 ]] || ln -s /lustre/haven/user/audris/All.sha1 .
 
+echo "k=$k"
+echo "m=$m"
+echo "cloneDir=$cloneDir"
+echo "list=$list"
+echo "base=$base"
+
+
 if [[ -f CopyList.$k.$m.00 ]]; then
  echo "Do Nothing"
 else
+echo $list$Y.$k.$m
 cat $list$Y.$k.$m  | while read l
 do [[ -d $cloneDir/$l ]] && echo $l
 done > CopyList.$k.$m 
