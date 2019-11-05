@@ -33,15 +33,16 @@ N - 0-31: the database based on prehash
 
 ### 1. How to get a list of commits made by an author 
 #### author2commit formatting: a2cFullP.{0..31}.tch
+------------
 ```
 This prints the total number of commit ID/Hash the author has made.
 
 Command:
-   * echo "git-commit-ID" | /da3_data/lookup/Prj2CmtShow.perl /da0_data/basemaps/a2cFullP 1 32
+   * echo "git-commit-ID" | ~/lookup/getValues a2c
 
 Examples: 
-   * echo "Audris Mockus <audris@utk.edu>" | /da3_data/lookup/Prj2CmtShow.perl /da0_data/basemaps/a2cFullP 1 32
-   * echo "Adam Tutko <atutko@vols.utk.edu>" | /da3_data/lookup/Prj2CmtShow.perl /da0_data/basemaps/a2cFullP 1 32
+   * echo "Audris Mockus <audris@utk.edu>" | ~/lookup/getValues a2c
+   * echo "Adam Tutko <atutko@vols.utk.edu>" | ~/lookup/getValues a2c
 
 Output:
    Formatting: ;#ofCommitIds;CommitIds
@@ -50,36 +51,40 @@ Output:
             d2ee19fffa494a1f75333c89c09fb2137444f203
 
 ```
+-------------
 
 ### 2. How to get a list of files made by an author
 #### author2file: a2fFullP.{0..31}.tch
+------------
 ```
 This prints the file names of blobs (files) created or deleted by an author's commit.
 
 Command:
-   * echo "git-commit-ID" | /da3_data/lookup/Prj2FileShow.perl /da0_data/basemaps/a2fFullP 1 32
+   * echo "git-commit-ID" | ~/lookup/getValues a2f
    
 Examples:
-   * echo "Audris Mockus <audris@utk.edu>" | /da3_data/lookup/Prj2FileShow.perl /da0_data/basemaps/a2fFullP 1 32
-   * echo "Adam Tutko <atutko@vols.utk.edu>" | /da3_data/lookup/Prj2FileShow.perl /da0_data/basemaps/a2fFullP 1 32
+   * echo "Audris Mockus <audris@utk.edu>" | ~/lookup/getValues a2f
+   * echo "Adam Tutko <atutko@vols.utk.edu>" | ~/lookup/getValues a2f
 
 Output:
    Formatting: ;#ofFiles;FileNames
-   Example: ;4;diffences.md;diffences.txt;proposal.md;atutko.md
+   Example: Adam Tutko <atutko@vols.utk.edu>;Adam Tutko <atutko@vols.utk.edu>;atutko.md;diffences.md;diffences.txt;proposal.md
    
 ```
+-------------
 
 ### 3. How to get a list of commit-IDs associated with a Blob-ID 
 #### blob2commit: b2cFullO.{0..31}.tch
+------------
 ```
 This prints out the commits associated with a file based on it's Blob-ID.
 
 Command:
-   * echo "Blob-ID" (no quotes) | /da3_data/lookup/Cmt2BlobShow.perl /da0_data/basemaps/b2cFullP 1 32
+   * echo "Blob-ID" (no quotes) | ~/lookup/getValues b2c
 
 Examples: 
-   * echo 05fe634ca4c8386349ac519f899145c75fff4169 | /da3_data/lookup/Cmt2BlobShow.perl /da0_data/basemaps/b2cFullP 1 32
-   * echo a7081031fc8f4fea0d35dd8486f8900febd2347e | /da3_data/lookup/Cmt2BlobShow.perl /da0_data/basemaps/b2cFullP 1 32
+   * echo 05fe634ca4c8386349ac519f899145c75fff4169 | ~/lookup/getValues b2c
+   * echo a7081031fc8f4fea0d35dd8486f8900febd2347e | ~/lookup/getValues b2c
 
 Output:
    Formatting: "Blob-ID";#ofCommits;"Commit-IDs"
@@ -87,36 +92,39 @@ Output:
             7365d601788017bb065c960cde2235f8ced27082;fe1ce9e5e8ebe83569c53ebe1f05f0688136ef2c
    
 ```
+------------
 
 ### 4. How to get a Blob-ID from a Commit-ID
 #### commit2blob: c2bFullO.{0..31}.tch   
+------------
 ```
 This prints out the Blob-ID associated with the Commit-ID given. 
 
 Command:
-   * echo "Commit-ID" (no quotes) | /da3_data/lookup/Cmt2BlobShow.perl /da0_data/basemaps/c2bFullO 1 32
+   * echo "Commit-ID" (no quotes) | ~/lookup/getValues c2b
    
 Examples:
-   * echo e4af89166a17785c1d741b8b1d5775f3223f510f | /da3_data/lookup/Cmt2BlobShow.perl /da0_data/basemaps/c2bFullP 1 32
-   * echo fe1ce9e5e8ebe83569c53ebe1f05f0688136ef2c | /da3_data/lookup/Cmt2BlobShow.perl /da0_data/basemaps/c2bFullP 1 32
+   * echo e4af89166a17785c1d741b8b1d5775f3223f510f | ~/lookup/getValues c2b
+   * echo fe1ce9e5e8ebe83569c53ebe1f05f0688136ef2c | ~/lookup/getValues c2b
 
 Output:
    Formatting: Commit-ID;#ofBlob-IDs;Blob-ID
    Example: fe1ce9e5e8ebe83569c53ebe1f05f0688136ef2c;1;a7081031fc8f4fea0d35dd8486f8900febd2347e
 
 ```
+-----------
 
 ### 5. How to get the project names associated with a Commit-ID
 #### commit2project: c2pFullO.{0..31}.tch 
+------------
 ```
 This prints out the names of the projects assoicuated with the given Commit-ID.
 
 Command:
-   * echo "Commit-ID" (no quotes) |/da3_data/lookup/Cmt2PrjShow.perl /da0_data/basemaps/c2pFullP 1 32 
-
+   * echo "Commit-ID" (no quotes) | ~/lookup/getValues c2p
 Examples:
-   * echo e4af89166a17785c1d741b8b1d5775f3223f510f | /da3_data/lookup/Cmt2PrjShow.perl /da0_data/basemaps/c2pFullP 1 32
-   * echo fe1ce9e5e8ebe83569c53ebe1f05f0688136ef2c | /da3_data/lookup/Cmt2PrjShow.perl /da0_data/basemaps/c2pFullP 1 32
+   * echo e4af89166a17785c1d741b8b1d5775f3223f510f | ~/lookup/getValues c2p
+   * echo fe1ce9e5e8ebe83569c53ebe1f05f0688136ef2c | ~/lookup/getValues c2p
    
 Output: 
    Formatting: "Commit-ID";#ofProjects;ProjectNames
@@ -124,18 +132,20 @@ Output:
             fdac_syllabus;igorwiese_syllabus;jaredmichaelsmith_news;jking018_news;milanjpatel_news;
             rroper1_news;tapjdey_news;taurytang_syllabus;tennisjohn21_news
 ```
+------------
 
 ### 6. How to get the Commit-IDs associated with a file
 #### file2commit: f2cFullO.{0..31}.tch
+-----------
 ```
 This prints out the Commit-IDs associated with a file name.
 
 Command:
-   * echo "File Name" (no quotes) |/da3_data/lookup/Prj2CmtShow.perl /da0_data/basemaps/f2cFullP 1 32
+   * echo "File Name" (no quotes) | ~/lookup/getValues f2c
 
 Examples:
-   * echo main.c |/da3_data/lookup/Prj2CmtShow.perl /da0_data/basemaps/f2cFullP 1 32
-   * echo atutko.md |/da3_data/lookup/Prj2CmtShow.perl /da0_data/basemaps/f2cFullP 1 32
+   * echo main.c | ~/lookup/getValues f2c
+   * echo atutko.md | ~/lookup/getValues f2c
    
 Output:
    Formatting: "File Name";#ofCommit-IDs;Commit-IDs
@@ -144,17 +154,19 @@ Output:
             c9ec77f6434319f9f9c417cf7f9c95ff64540223
             
 ```
+------------
 
 ### 7. How to get the Commit-IDs associated with a project
 #### project2commit: p2cFullP.{0..31}.tch  
+------------
 ```
 This print out the Commit-IDs associated with a project name.
 
 Command:
-   * echo "Project Name" (no quotes) |/da3_data/lookup/Prj2CmtShow.perl /da0_data/basemaps/p2cFullP 1 32
+   * echo "Project Name" (no quotes) | ~/lookup/getValues p2c 
    
 Examples:
-   * echo ArtiiQ_PocketMine-MP |/da3_data/lookup/Prj2CmtShow.perl /da0_data/basemaps/p2cFullP 1 32
+   * echo ArtiiQ_PocketMine-MP | ~/lookup/getValues p2c 
    
 Output: 
    Formatting: "Project Name";#ofCommitIDs;Commit-IDs
@@ -162,26 +174,30 @@ Output:
    000ba5de528b3ea9680124f4fbe670867eafd2f8;000dfc860134262a46d8942a3c3b453528d99da9;.......
    
 ```
+------------
 
 ### 8. How to get the Child-Commit-IDs associated with a Commit-ID
 #### Commit2ChildCommit: /da0_data/basemaps/c2ccO.{0..31}.s
+-----------
 ```
 This prints the Child-Commit-ID of a given Commit-ID.
 
 Command:
-   * echo "Commit-ID" (no quotes) | /da3_data/lookup/Cmt2BlobShow.perl /da0_data/basemaps/c2ccFullP 1 32
+   * echo "Commit-ID" (no quotes) | ~/lookup/getValues c2cc
    
 Examples:
-   * echo e4af89166a17785c1d741b8b1d5775f3223f510f | /da3_data/lookup/Cmt2BlobShow.perl /da0_data/basemaps/c2ccFullP 1 32
-   * echo fe1ce9e5e8ebe83569c53ebe1f05f0688136ef2c | /da3_data/lookup/Cmt2BlobShow.perl /da0_data/basemaps/c2ccFullP 1 32
+   * echo e4af89166a17785c1d741b8b1d5775f3223f510f | ~/lookup/getValues c2cc
+   * echo fe1ce9e5e8ebe83569c53ebe1f05f0688136ef2c | ~/lookup/getValues c2cc
 
 Output:
    Formatting: "Commit-ID";#ofCC;"Child-Commit-ID"
    Example: fe1ce9e5e8ebe83569c53ebe1f05f0688136ef2c;1;65d49eee6fb6f0fa1d3a69af14ae43311da54907
    
 ```
+----------
 
 ### 9. How to get the exact .tch file a Blob-ID, Commit-ID, or Tree-ID is located in
+-----------
 ```
 This prints the file number of the .tch file associated with the passed ID.
 
@@ -205,9 +221,11 @@ Output:
    
    
 ```
+------------
 
 ### 10. How to get the Author and Time from Commit-ID
 #### Commit to time+author: /da0_data/basemaps/c2taFullP.{0..31}.s
+-----------
 ```
 This command prints out the Author and Time of a commit based on Commit-ID.
 
@@ -216,11 +234,11 @@ In order to get the number of the .tch file, run command 9. The output will rese
 Take the number before the ( ; ) and replace the #oftchfile in "da0_data/basemaps/c2taFullP.#oftchfile.tch".
 
 Command:
-   * echo "Commit-ID" (no quotes) | /da3_data/lookup/show.perl /da0_data/basemaps/c2taFullP.#oftchfile.tch h s
+   * echo "Commit-ID" (no quotes) | ~/lookup/getValues c2ta
 
 Examples:
-   * echo 000000000001b58ef4d6727f61f4d7f8625feb72 | /da3_data/lookup/show.perl /da0_data/basemaps/c2taFullP.0.tch h s
-   * echo e4af89166a17785c1d741b8b1d5775f3223f510f | /da3_data/lookup/show.perl /da0_data/basemaps/c2taFullP.4.tch h s
+   * echo 000000000001b58ef4d6727f61f4d7f8625feb72 | ~/lookup/getValues c2ta
+   * echo e4af89166a17785c1d741b8b1d5775f3223f510f | ~/lookup/getValues c2ta
    
 Output:
    Formatting: "Commit-ID";UnixTimestamp;"Author-ID"
@@ -228,9 +246,11 @@ Output:
 
 
 ```
+------------
 
 ### 11. How to determine what code dependencies are in a Blob
 #### The extent of usage databases: for Go language in /da0_data/play/GothruMaps/m2nPMGo.s mo
+----------
 ```
 These are summaries that specify the specific language dependencies a blob has.
 For example, for Python a file that has the statement "import pandas" will specify that the Blob depends on pandas in c2bPta.
@@ -240,8 +260,10 @@ also on /lustre/haven/user/audris/basemaps
 see grepNew.pbs for exact details.
 
 ```
+-----------
 
 ### 12. How to see the content of a Commit-ID
+----------
 ```
 This command prints out the content of a given Commit-ID.
 
@@ -250,18 +272,11 @@ This command has an additional optional paremter that can be added to change the
 This command can only be run on servers with SSDS. To run this command, use the da4 server.
 
 Command:
-   * echo "Commit-ID" (no quotes) | perl ~audris/bin/showCmt.perl [optional formatting parameter]
+   * echo "Commit-ID" (no quotes) | ~/lookup/showCnt commit
 
 Examples:
-   No Formatting Parameter:
-      * echo e4af89166a17785c1d741b8b1d5775f3223f510f | perl /home/audris/bin/showCmt.perl
-      * echo fe1ce9e5e8ebe83569c53ebe1f05f0688136ef2c | perl /home/audris/bin/showCmt.perl
-   Parameter 1:
-      * echo e4af89166a17785c1d741b8b1d5775f3223f510f | perl /home/audris/bin/showCmt.perl 1
-      * echo fe1ce9e5e8ebe83569c53ebe1f05f0688136ef2c | perl /home/audris/bin/showCmt.perl 1
-   Parameter 2:
-      * echo e4af89166a17785c1d741b8b1d5775f3223f510f | perl /home/audris/bin/showCmt.perl 2
-      * echo fe1ce9e5e8ebe83569c53ebe1f05f0688136ef2c | perl /home/audris/bin/showCmt.perl 2
+      * echo e4af89166a17785c1d741b8b1d5775f3223f510f | ~/lookup/showCnt commit
+      * echo fe1ce9e5e8ebe83569c53ebe1f05f0688136ef2c | ~/lookup/showCnt commit
 
 Output:
    Formatting:
@@ -295,19 +310,19 @@ Output:
            News for Sep 5;e4af89166a17785c1d741b8b1d5775f3223f510f
 
 ```
+------------
 
 ### 13. How to see the content of a Tree-ID
+---------
 ```
 This command prints out the Blob-IDs and File Names of a given Tree-ID.
 
-This command can only be run on servers with SSDS. To run this command, use the da4 server.
-
 Command:
-   * echo "Tree-ID" (no quotes) | perl /home/audris/bin/showTree.perl
+   * echo "Tree-ID" (no quotes) | ~/lookup/showCnt tree
 
 Examples:
-   * echo f1b66dcca490b5c4455af319bc961a34f69c72c2 | perl /home/audris/bin/showTree.perl
-   * echo 0f8d572eb262b0510788d3ee7445099a256be5cb | perl /home/audris/bin/showTree.perl
+   * echo f1b66dcca490b5c4455af319bc961a34f69c72c2 | ~/lookup/showCnt tree
+   * echo 0f8d572eb262b0510788d3ee7445099a256be5cb | ~/lookup/showCnt tree
    
 Output:
    Formatting: "Mode";"Blob-ID";"FileName"
@@ -315,19 +330,20 @@ Output:
             100644;dfcd0359bfb5140b096f69d5fad3c7066f101389;course.pdf
 
 ```
+----------
 
 ### 14. How to see the content of a Blob-ID 
+
+-----------
 ```
 This command prints out the content of a giver Blob-ID.
 
-This command can only be run on servers with SSDS. To run this command, use the da4 server. 
-
 Command:
-   * echo "Blob-ID" (no quotes) | perl /home/audris/bin/showBlob.perl
+   * echo "Blob-ID" (no quotes) | ~/lookup/showCnt blob
 
 Examples:
-   * echo 05fe634ca4c8386349ac519f899145c75fff4169 | perl /home/audris/bin/showBlob.perl
-   * echo a7081031fc8f4fea0d35dd8486f8900febd2347e | perl /home/audris/bin/showBlob.perl
+   * echo 05fe634ca4c8386349ac519f899145c75fff4169 | ~/lookup/showCnt blob
+   * echo a7081031fc8f4fea0d35dd8486f8900febd2347e | ~/lookup/showCnt blob
    
 Output:
    Formatting: blob;#ofSections;rl;CurrentPosition;Offset;Length;"Blob-ID"
@@ -344,7 +360,7 @@ Output:
                  ......
    
 ```
-
+-----------
 
 # How to gather information
 ```
