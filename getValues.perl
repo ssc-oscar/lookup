@@ -58,6 +58,10 @@ while (<STDIN>){
 		$c = safeComp ($ch) if $f1 =~ /c/;
 	}
   my $v = $clones{$s}{$c};
+  if (!defined $v){
+    print STDERR "no $ch in $fname\n";
+    next;
+  }
   if ($f2 =~ /r/){
     my $h = toHex (substr($v, 0, 20));
     my $d = unpack 'w', (substr($v, 20, length($v) - 20));
