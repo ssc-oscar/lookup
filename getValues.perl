@@ -60,6 +60,7 @@ while (<STDIN>){
   my $v = $clones{$s}{$c};
 	if (!defined $v){
 		print "$ch\n";
+    print STDERR "no $ch in $fname\n";
 		next;
 	}
   if ($f2 =~ /r/){
