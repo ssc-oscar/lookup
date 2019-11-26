@@ -2,6 +2,16 @@
 
 h=$(hostname)
 
+flat=n
+while getopts ":f" option
+do 
+ case $option in
+   f)
+    flat=y
+   ;;
+ esac
+done
+
 t=$1
 
 declare -A da3
@@ -11,17 +21,17 @@ done
 
 if [[ $h == da5.eecs.utk.edu ]] 
 then 
-  ~/lookup/getValues.perl /fast/${t}FullP
+  ~/lookup/getValues.perl --flat=$flat /fast/${t}FullP
 else
  if [[ -f /fast/${t}FullP.0.tch ]] 
  then 
-   ~/lookup/getValues.perl /fast/${t}FullP
+   ~/lookup/getValues.perl --flat=$flat /fast/${t}FullP
  else
   if [[ ${da3[$t]} == 1 ]] 
-   then ssh da3 ~/lookup/getValues.perl /fast/${t}FullP
+   then ssh da3 ~/lookup/getValues.perl --flat=$flat /fast/${t}FullP
    else 
-    [[ $h == da0.eecs.utk.edu ]] && ~/lookup/getValues.perl /data/basemaps/${t}FullP
-	[[ $h != da0.eecs.utk.edu ]] && ssh da0 ~/lookup/getValues.perl /data/basemaps/${t}FullP	
+    [[ $h == da0.eecs.utk.edu ]] && ~/lookup/getValues.perl --flat=$flat /data/basemaps/${t}FullP
+	[[ $h != da0.eecs.utk.edu ]] && ssh da0 ~/lookup/getValues.perl --flat=$flat /data/basemaps/${t}FullP	
    fi
  fi
 fi
