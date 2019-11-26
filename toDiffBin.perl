@@ -52,25 +52,25 @@ out();
 
 sub out {
 	my $l = length ($tmp);
-	$tmp = safeComp ($tmp);
-    my $h = sha1_hex ("bdiff $l\0$tmp");
-	my $lc = length($tmp);
+	my $tmpC = safeComp ($tmp);
+    my $h = sha1_hex ("bdiff $l\0$tmpC");
+	my $lc = length($tmpC);
 	print A "$off;$lc;$l;$h;$pc\n";
 	$off += $lc;
-	syswrite B, $tmp, $lc;
+	syswrite B, $tmpC, $lc;
 	$tmp = "";
 }
 
 sub safeComp {
  my ($code, @rest) = @_;
  try {
-                my $len = length($code);
+  my $len = length($code);
   if ($len >= 2147483647){
-   print STDERR "Too long to compress: $len\n";
-   return $code;
+    print STDERR "Too large to compress: $len\n";
+    return $code;
+  }else{
+    return Compress::LZF::compress ($code);
   }
-  my $codeC = Compress::LZF::compress ($code);
-  return $codeC;
  } catch Error with {
   my $ex = shift;
   print STDERR "Error: $ex, for parameters @rest\n";
