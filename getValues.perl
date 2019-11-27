@@ -11,6 +11,8 @@ use Compress::LZF;
 my $flat="n"; 
 GetOptions('flat=s' => \$flat);
 
+
+
 my $fname="$ARGV[0]";
 my (%clones);
 my $hdb = TokyoCabinet::HDB->new();
@@ -50,7 +52,9 @@ $f2 = $ARGV[2] if defined $ARGV[2];
 
 while (<STDIN>){
   chop();
-  my $ch = $_;
+  my ($ch, @rest) = split(/;/, $_, -1);
+  my $extra = "";
+  $extra = join ';', @rest if $#rest >= 0;
   my $l = length($ch);
   my $c = $ch;
   my $s = segH ($c, $split);
@@ -84,9 +88,14 @@ while (<STDIN>){
       }
     }
 	if ($flat eq "n"){
-      print "$ch$res\n";
+      if ($extra eq  ""){
+		print "$ch$res\n";
+	  }else{ 
+        print "$ch;$extra$res\n";
+      }
     }else{
       $res =~ s/^;//;
+	  $ch .= ";$extra" if $extra ne "";
       for my $vv (split(/;/, $res, -1)){
         print "$ch;$vv\n";
       }

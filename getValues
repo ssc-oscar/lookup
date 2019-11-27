@@ -8,6 +8,7 @@ do
  case $option in
    f)
     flat=y
+	shift
    ;;
  esac
 done
