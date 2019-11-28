@@ -4,9 +4,14 @@ use strict;
 use warnings;
 use Error qw(:try);
 use cmt;
+use Getopt::Long qw(GetOptions);
 
 use TokyoCabinet;
 use Compress::LZF;
+my $flat="n"; 
+GetOptions('flat=s' => \$flat);
+
+
 
 my $fname="$ARGV[0]";
 my (%clones);
@@ -47,17 +52,24 @@ $f2 = $ARGV[2] if defined $ARGV[2];
 
 while (<STDIN>){
   chop();
-  my $ch = $_;
+  my ($ch, @rest) = split(/;/, $_, -1);
+  my $extra = "";
+  $extra = join ';', @rest if $#rest >= 0;
   my $l = length($ch);
   my $c = $ch;
-	my $s = segH ($c, $split);
+  my $s = segH ($c, $split);
   if ($f1 =~ /h/){
-		$c = fromHex($ch);
+    $c = fromHex($ch);
   }else{
     $s = sHash ($c, $split);
-		$c = safeComp ($ch) if $f1 =~ /c/;
-	}
+    $c = safeComp ($ch) if $f1 =~ /c/;
+  }
   my $v = $clones{$s}{$c};
+  if (!defined $v){
+    print "$ch\n";
+    print STDERR "no $ch in $fname\n";
+    next;
+  }
   if ($f2 =~ /r/){
     my $h = toHex (substr($v, 0, 20));
     my $d = unpack 'w', (substr($v, 20, length($v) - 20));
@@ -75,7 +87,19 @@ while (<STDIN>){
         $res .= ";" . toHex (substr($v, $i*20, 20));
       }
     }
-    print "$ch$res\n";
+	if ($flat eq "n"){
+      if ($extra eq  ""){
+		print "$ch$res\n";
+	  }else{ 
+        print "$ch;$extra$res\n";
+      }
+    }else{
+      $res =~ s/^;//;
+	  $ch .= ";$extra" if $extra ne "";
+      for my $vv (split(/;/, $res, -1)){
+        print "$ch;$vv\n";
+      }
+	}
   }
   $offset++;
 }
