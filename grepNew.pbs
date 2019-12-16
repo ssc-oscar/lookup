@@ -16,6 +16,7 @@ cd $c
 LA=LANG
 if test $LA = 'JS'; then grepStr='\.(js|iced|liticed|iced.md|coffee|litcoffee|coffee.md|ts|cs|ls|es6|es|jsx|sjs|co|eg|json|json.ls|json5);'; fi
 if test $LA = 'PY'; then grepStr='\.(py|py3|pyx|pyo|pyw|pyc|whl);'; fi
+if test $LA = 'ipy'; then grepStr='\.(ipynb|IPYNB);'; fi
 
 if test $LA = 'C'; then grepStr='(\.[Cch]|\.cpp|\.hh|\.cc|\.hpp|\.cxx);'; fi
 if test $LA = 'java'; then grepStr='(\.java|\.iml|\.class);'; fi
@@ -223,7 +224,49 @@ wait
 echo c2bptaPkg$ver$LA.$j.gz
 
 fi
+if test $part = nofork; then
+
+if test 'a' = 'b'; then
+#no map by forks
+for j in {0..31}
+do zcat c2p$ver$LA.$j.gz | join -t\; - <(zcat c2ta$ver$LA.$j.gz) | gzip > c2pta$ver$LA.$j.gz &
+done
+wait
+echo c2pta$ver$LA.$j.gz
+
+for j in {0..31}
+do zcat c2bi$ver$LA.$j.s | join -t\; - <(zcat c2pta$ver$LA.$j.gz) | gzip > c2bpta$ver$LA.$j.gz &
+done
+wait
+echo c2bpta$ver$LA.$j.gz
+
+# add blob and package info to pta
+for j in {0..31}
+do zcat c2pta$ver$LA.$j.gz | join -t\; - <(zcat c2bPkg$ver$LA.$j.s) | gzip > c2bptaPkg$ver$LA.$j.gz &
+done
+wait
+echo c2bptaPkg$ver$LA.$j.gz
+
+fi
+
+for j in {0..31}
+do zcat c2bptaPkg$ver$LA.$j.gz
+done | cut -d\; -f2,6-| \
+  perl -e 'while(<STDIN>){chop();($p,@m)=split(/;/);for $mm (@m){$p2m{$p}{$mm}++;}}; for $p (keys %p2m){@ms=sort keys %{$p2m{$p}}; print "$p;",(join ";", @ms)."\n"; }' |gzip > p2m$ver$LA &
+wait
+echo p2m$ver$LA
+
+#zcat p2m$ver$LA |\
+#   perl -e 'while(<STDIN>){chop();($p,@ms)=split(/;/);for $m (@ms){$mp{$m}{$p}++}};while (($m,$p) = each %mp){@ps=keys %$p;print "$m\;$#ps\n"}' | \
+#   gzip > m2np$ver$LA &
+#wait
+#echo m2nP$ver$LA
+
+
+
+fi
 if test $part = second; then
+
 
 # map projects based on forks
 #zcat c2pFull$ver.forks | lsort $(($maxM*32))G -t\; -k1b,1 | join -t\; - <(zcat p$ver$LA.gz) | gzip > p$ver$LA.forks
