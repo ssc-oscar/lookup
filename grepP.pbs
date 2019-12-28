@@ -1,0 +1,51 @@
+#PBS -N LANG.PART.VER
+#PBS -A ACF-UTK0011
+#PBS -l feature=beacon
+#PBS -l partition=beacon
+#PBS -l nodes=1,walltime=23:50:00
+#PBS -j oe
+#PBS -S /bin/bash
+LD_LIBRARY_PATH=$HOME/lib:$HOME/lib64:$LD_LIBRARY_PATH
+c=/lustre/haven/user/audris/basemaps
+cd $c
+
+#https://github.com/luislobo/common-js-file-extensions/blob/master/index.js
+#'js|iced|liticed|iced.md|coffee|litcoffee|coffee.md|ts|cs|ls|es6|es|jsx|sjs|co|eg|json|json.ls|json5'
+#R extensions: r|R|S|s
+#py extensions: py|py3|pyx|pyo|pyw|pyc
+
+machine=beacon
+maxM=6
+[[ $machine == monster ]] && maxM=30
+
+ver=L
+
+# find commits that modify files of the relevant language
+# look for c2f, b2f pattern
+grepStr='OSEHRA|MRS|EHR|AHLTA|osehra|mrs|ehr|ahlta'
+
+
+#################################################################
+##########################FIRST##################################
+#################################################################
+
+#find bobs of the relevant language, exclude generic blobs
+for j in {0..31}
+do zcat $ver$j.s | grep -E "$grepStr" | perl -I $HOME/lib/perl5 -I $HOME/lookup -e 'use cmt; while(<STDIN>){ ($b, @r) = split(/;/); print $_ if ! defined $badBlob{$b};}' | gzip > b2f$ver$LA.$j.gz &
+if test $part = first; then
+if test $part = first; then
+done
+wait
+echo b2f$ver$LA.$j.gz
+
+#extract a unique list of blobs for the relevant language
+for j in {0..31}
+do zcat b2f$ver$LA.$j.gz | cut -d\; -f1 | uniq | lsort ${maxM}G -u | gzip > b2f$ver$LA.$j.bs &
+done
+wait
+echo b2f$ver$LA.$j.bs
+
+#redo C from here
+#get blob to commit map for blobs related to relevant language files
+for j in {0..31}
+do zcat ../c2fb/b2cFull$ver$j.s |grep -v '^;' | join -t\; - <(zcat b2f$ver$LA.$j.bs) |perl -I $HOME/lib/perl5 -I $HOME/lookup -e 'use cmt; while(<STDIN>){ ($b, $c, @r) = split(/;/); print $_ if ! defined $badCmt{$c} && ! defined $badBlob{$b};}'| gzip > b2c$ver$LA.$j.gz &

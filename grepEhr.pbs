@@ -1,0 +1,64 @@
+#PBS -N EHR
+#PBS -A ACF-UTK0011
+#PBS -l feature=beacon
+#PBS -l partition=beacon
+#PBS -l nodes=1,walltime=01:50:00
+#PBS -j oe
+#PBS -S /bin/bash
+LD_LIBRARY_PATH=$HOME/lib:$HOME/lib64:$LD_LIBRARY_PATH
+c=/lustre/haven/user/audris/basemaps
+cd $c
+
+
+machine=beacon
+maxM=6
+[[ $machine == monster ]] && maxM=30
+
+ver=VER
+part=PART
+
+LA=EHR
+
+
+#################################################################
+##########################FIRST##################################
+#################################################################
+    
+#determine projects for the relevant commits
+for j in {0..31}
+do zcat c2pFull$ver$j.s | perl ~/bin/grepField.perl P.ehr 2 | gzip > c2p$ver$LA.$j.s &
+done
+wait
+echo c2p$ver$LA.$j.s
+
+for j in {0..31}
+do zcat c2p$ver$LA$j.s | cut -d\; -f1 | uniq | gzip > c2p$ver$LA.$j.cs &
+done
+wait
+echo c2p$ver$LA.$j.cs
+
+
+for j in {0..31}
+do zcat ../c2fb/c2fFull$ver$j.s | join -t\; - <(zcat c2p$ver$LA.$j.cs) | gzip > c2f$ver$LA.$j.s &
+done
+wait
+echo c2f$ver$LA.$j.s
+
+for j in {0..31}
+do zcat ../c2fb/c2bFull$ver$j.s | join -t\; - <(zcat c2p$ver$LA.$j.s) | gzip > c2bp$ver$LA.$j.s &
+done
+wait
+echo c2bp$ver$LA.$j.s
+
+
+# get time/author attributes for relevant commits 
+for j in {0..31}
+do zcat c2taF$ver.$j.s | join -t\; - <(zcat c2bp$ver$LA.$j.s) | gzip > c2tabp$ver$LA.$j.s &
+done
+wait
+echo c2tabp$ver$LA.$j.gz
+
+# map projects based on forks
+zcat c2pFull$ver.forks | lsort $(($maxM*32))G -t\; -k1b,1 | join -t\; - <(zcat P.ehr) | gzip > p$ver$LA.forks
+
+

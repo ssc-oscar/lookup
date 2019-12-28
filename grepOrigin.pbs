@@ -1,0 +1,62 @@
+#PBS -N rtrn
+#PBS -A ACF-UTK0011
+#PBS -l feature=MACHINE
+#PBS -l partition=MACHINE
+#PBS -l nodes=1,walltime=07:50:00
+#PBS -j oe
+#PBS -S /bin/bash
+LD_LIBRARY_PATH=$HOME/lib:$HOME/lib64:$LD_LIBRARY_PATH
+c=/lustre/haven/user/audris/basemaps
+cd $c
+
+
+what=WHAT 
+ver=VER
+
+for j in {0..31}
+do zcat b2f${ver}R.$j.gz  | grep -E 'NAMESPACE|DESCRIPTION' | gzip >  b2f${ver}Rn.$j.gz &
+done
+wait
+echo b2f${ver}Rn.$j.gz
+#scp -p b2f${ver}Rn.*.gz da0:/data/play/Rth*Maps/
+#ond da4
+#zcat b2f${ver}Rn.*.gz | ~/lookup/splitSec.perl b2f${ver}Rn128. 128
+#for j in {0..127}; do zcat b2f${ver}Rn128.$j.gz | ~/lookup/b2pkgsFastRn.perl $j; done | ~/lookup/splitSec.perl b2pkgf${ver}Rn. 32
+#back on beacon
+#scp -p da0:/data/play/Rth*Maps/b2pkgf${ver}Rn.* .
+
+for j in {0..31}
+do zcat c2bpta${ver}R.$j.gz | awk -F\; '{print $2";"$0 }' | $HOME/bin/lsort 1G -t\; | gzip > b2p${ver}R.$j.s &
+done
+wait
+echo b2p${ver}R.$j.s 
+
+for j in {0..31}
+do zcat b2p${ver}R.$j.s
+done | $HOME/lookup/splitSec.perl b2p${ver}R. 32 
+echo b2p${ver}R.
+
+for j in {0..31}
+do zcat b2p${ver}R.$j.gz | $HOME/bin/lsort 1G -t\; -k1 | gzip > b2p${ver}R$j.s &
+done
+wait
+echo b2p${ver}R$j.s
+
+for j in {0..31}
+do zcat b2pkgf${ver}Rn.$j.gz | $HOME/bin/lsort 1G -t\; -k1 | join -t\; - <(zcat b2p${ver}R$j.s) | gzip > b2pkgf${ver}R$j.s &
+done
+wait
+echo  b2pkgf${ver}R$j.s
+
+for j in {0..31}
+do zcat b2pkgf${ver}R$j.s| cut -d\; -f2,6 | grep -v '^;' | $HOME/bin/lsort 1G -u | gzip > pkg2repo${ver}R$j.s &
+done
+wait
+ 
+
+for j in {0..31}
+do zcat pkg2repo${ver}R$j.s
+done | $HOME/bin/lsort 3G -t\; -k1b,2 -u | gzip > pkg2repo${ver}R.s
+
+
+#scp -p b2pkgf${ver}R[0-9]*.s pkg2repo${ver}R.s da0:/data/play/Rth*Maps/
