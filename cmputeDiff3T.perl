@@ -33,6 +33,7 @@ my $sections = 128;
 # need to update the tree_$sec.tch first ... for new data. like update0 and update1...
 my (%fhos);
 my (%fhoc);
+my (%fhob);
 
 for my $sec (0 .. ($sections-1)){
   tie %{$fhos{$sec}}, "TokyoCabinet::HDB", "$preO/sha1.tree_$sec.tch", TokyoCabinet::HDB::OREADER,  
@@ -41,6 +42,7 @@ for my $sec (0 .. ($sections-1)){
   tie %{$fhoc{$sec}}, "TokyoCabinet::HDB", "$pre/commit_$sec.tch", TokyoCabinet::HDB::OREADER,  
         16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
      or die "cant open $pre/commit_$sec.tch\n";
+  open $fhob{$sec}, "/data/All.blobs/tree_$sec.bin" or die "$!"
 }
 
 
@@ -308,6 +310,10 @@ sub getTO {
   my $t1 = $_[0];
   my $sec = hex (substr($t1, 0, 2)) % $sections;
   my $tB = fromHex ($t1);
+  if (!defined $fhos{$sec} || !defined $fhos{$sec}{$tB}){
+    print STDERR "no tree $sec $t1\n";
+    return "";
+  }
   my ($off, $len) = unpack ("w w", $fhos{$sec}{$tB});
   my $f = $fhob{$sec};
   seek ($f, $off, 0);
