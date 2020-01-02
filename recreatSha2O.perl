@@ -21,13 +21,14 @@ my $parts = 2;
 my $type = $ARGV[0];
 my $sec = $ARGV[1];
 
-my $fbase="/data/All.sha1/sha1.${type}_";
+my $fbase="/fast/All.sha1/sha1.${type}_new_";
 my $fbasei ="/data/All.blobs/${type}_";
 
 
 my (%fhos, %fhoi);
-tie %fhos, "TokyoCabinet::HDB", "${fbase}$sec.tch", TokyoCabinet::HDB::OWRITER |
-   TokyoCabinet::HDB::OCREAT, 16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
+tie %fhos, "TokyoCabinet::HDB", "${fbase}$sec.tch", TokyoCabinet::HDB::OWRITER | TokyoCabinet::HDB::OCREAT
+  , 16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
+#  , 37777217, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
       or die "cant open $fbase$sec.tch\n";
 open INI, "$fbasei$sec.idx" or die ($!);
 while (<INI>){
