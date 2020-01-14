@@ -34,10 +34,10 @@ my (%fhos);
 my (%fhoc);
 
 for my $sec (0 .. ($sections-1)){
-  tie %{$fhos{$sec}}, "TokyoCabinet::HDB", "$pre/tree_$sec.tch", TokyoCabinet::HDB::OREADER,  
+  tie %{$fhos{$sec}}, "TokyoCabinet::HDB", "$pre/tree_$sec.tch", TokyoCabinet::HDB::OREADER | TokyoCabinet::HDB::ONOLCK,  
         16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
      or die "cant open $pre/tree_$sec.tch\n";
-  tie %{$fhoc{$sec}}, "TokyoCabinet::HDB", "$pre/commit_$sec.tch", TokyoCabinet::HDB::OREADER,  
+  tie %{$fhoc{$sec}}, "TokyoCabinet::HDB", "$pre/commit_$sec.tch", TokyoCabinet::HDB::OREADER | TokyoCabinet::HDB::ONOLCK,  
         16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
      or die "cant open $pre/commit_$sec.tch\n";
 }
