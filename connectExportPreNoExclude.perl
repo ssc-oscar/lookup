@@ -8,7 +8,7 @@ my $n = 0;
 my $i = 0;
 my ($pid, $pv) = ("", "");
 my ($pa, $pb) = (-1, -1);
-my %tmp;
+my %tmp = ();
 while(<STDIN>){
   chop();
   my ($id, $v) = split(/\;/, $_, -1);
@@ -17,6 +17,7 @@ while(<STDIN>){
     $tmp{$v}++;
   }else{
     prt ($pid);
+    %tmp = ();
   }
   $tmp{$v}++;
   ($pid, $pv) = ($id, $v);
@@ -25,10 +26,12 @@ prt($pid);
 
 sub prt {
   my $pid = $_[0];
-  my @vs = keys %tmp;
-  %tmp = ();
+  my @vs = sort keys %tmp;
+  return if $#vs < 1;
   my $v0 = shift @vs;
-  print "$pid;$v0" if $#vs >=0; # print only if commit connects two or more projects
+  my $pre = "$v0";
+  $pre = "$pid;$v0" if (!defined $tmp{$pid});
+  print "$pre" if $#vs >=0; # print only if commit connects two or more projects
   for my $v1 (@vs){ print ";$v1"; }
   print "\n" if $#vs >=0;
 }

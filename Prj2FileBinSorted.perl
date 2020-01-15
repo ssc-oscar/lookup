@@ -32,7 +32,7 @@ while (<STDIN>){
       my $fsC = safeComp ($fs);
       if (length ($fsC) > 1000000*20){
         print STDERR "too large for $p1: ".(length($fsC))."\n";
-        my $pH = printf "%.8x", sHashV ($p1);
+        my $pH = sprintf "%.8x", sHashV ($p1);
         open A, ">$fname.large.$pH";
         print A $fsC;
         close (A);
@@ -56,7 +56,7 @@ while (my ($p1, $v) = each %tmp){
   my $fsC = safeComp ($fs);
   if (length ($fsC) > 1000000*20){
     print STDERR "too large for $p1: ".(length($fsC))."\n";
-    my $pH = printf "%.8x", sHashV ($p1);
+    my $pH = sprintf "%.8x", sHashV ($p1);
     open A, ">$fname.large.$pH";
     print A $fsC;
     close (A);

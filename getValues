@@ -20,19 +20,22 @@ done
 
 if [[ $h == da5.eecs.utk.edu ]] 
 then 
-  [[ -f /fast/${t}Full$ver.0.tch ]] || ver=Q
+  [[ -f /fast/${t}Full$ver.0.tch ]] || ([[ /fast/${t}FullQ.0.tch ]] && ver=Q)
   ~/lookup/getValues.perl --flat=$flat /fast/${t}Full$ver
 else
- [[ -f /fast/${t}Full$ver.0.tch ]] || ver=Q
+ [[ -f /fast/${t}Full$ver.0.tch ]] || ([[ /fast/${t}FullQ.0.tch ]] && ver=Q)
  if [[ -f /fast/${t}Full$ver.0.tch ]] 
  then 
    ~/lookup/getValues.perl --flat=$flat /fast/${t}Full$ver
  else
   if [[ ${da3[$t]} == 1 && $h != da3.eecs.utk.edu ]]
-   then ssh da3 ~/lookup/getValues $pass /fast/${t}Full$ver
-   else 
-    [[ $h == da0.eecs.utk.edu ]] && ~/lookup/getValues.perl --flat=$flat /data/basemaps/${t}Full$ver
-	[[ $h != da0.eecs.utk.edu ]] && ssh da0 ~/lookup/getValues.perl --flat=$flat /data/basemaps/${t}Full$ver
+   then ssh da3 ~/lookup/getValues $pass ${t}
+   else
+    if [[ ${da3[$t]} == 1 && $h == da3.eecs.utk.edu ]]
+    then echo here /fast/${t}Full$ver; ~/lookup/getValues.perl --flat=$flat /fast/${t}Full$ver
+    else [[ $h == da0.eecs.utk.edu ]] && ~/lookup/getValues.perl --flat=$flat /data/basemaps/${t}Full$ver
+	     [[ $h != da0.eecs.utk.edu ]] && ssh da0 ~/lookup/getValues.perl --flat=$flat /data/basemaps/${t}Full$ver
+    fi
    fi
  fi
 fi
