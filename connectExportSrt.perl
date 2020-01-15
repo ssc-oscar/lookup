@@ -5,8 +5,8 @@ use strict;
 use File::Temp qw/ :POSIX /;
 
 
-
-print STDERR "starting ".(localtime())."\n";
+my $t0 = time();
+print STDERR "starting at $t0\n";
 open A, "|gzip>$ARGV[0].names";
 open B, "|gzip>$ARGV[0].versions";
 my (%f2num);
@@ -30,7 +30,8 @@ while(<STDIN>){
     print B "$f2num{$v0} $f2num{$v1}\n";
   } 
   $n ++;
-  if (!($n%100000000)) { print STDERR "$n lines in $ARGV[0] done\n";}
+  if (!($n%100000000)) { print STDERR "$n lines and $i nodes in $ARGV[0] done\n";}
 }
 print B "".($i-1)." ".($i-1)."\n";#ensure a complete list of vertices
-
+my $t1 = time();
+print STDERR "finished at $t1 over ".($t1-$t0)."\n"; 
