@@ -7,31 +7,48 @@ use Compress::LZF;
 use TokyoCabinet;
 use cmt;
 
-my (%tmp, %b2a);
+my ($tmp, %b2a);
 
 my $fname = "$ARGV[0]";
 tie %b2a, "TokyoCabinet::HDB", "$fname", TokyoCabinet::HDB::OWRITER | TokyoCabinet::HDB::OCREAT,   
     507377777, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
    or die "cant open $fname\n";
 
+my $tt = 2000000000;   
 my $lines = 0;
 my $phb = "";
+my $l = <STDIN>;
+chop($l);
+my ($hb, $t, $a, $hc) = split (/\;/, $l);
+$phb = $hb;
+$tmp = "$a;".fromHex($hc);
+if ($t ne ""){
+  $tt = $t;
+}
 
 while (<STDIN>){
   chop();
   $lines ++;
-  my ($hb, $t, $a, $hc) = split (/\;/, $_);
+  ($hb, $t, $a, $hc) = split (/\;/, $_);
   if ($hb !~ m|^[0-9a-f]{40}$|){
     print STDERR "bad sha:$_\n";
     next;
   }
-  if ($phb ne $hb && $phb ne ""){
+  if ($phb ne $hb){
     output();
-    %tmp = ();
+    if ($t ne ""){
+      $tt = $t + 0;
+    }else{
+      $tt = 2000000000;
+    }
+    $tmp = "$a;".fromHex($hc);
+    $phb = $hb;
+  }else{   
+    if ($t ne "" && $tt > $t){
+      $tmp = "$a;".fromHex($hc);
+      $tt = $t;
+    }
   }
-  my $ps = "$t;$a;$hc";
-  $tmp{$t}{$ps}++;
-  $phb = $hb; 
   if (!($lines%100000000)){
     print STDERR "$lines done\n";
   }
@@ -39,19 +56,12 @@ while (<STDIN>){
 output();
 
 sub output {
-  my @ts = sort { $a+0 <=> $b+0 } (keys %tmp);
-  my $t0 = "";
-  #get first nonempty time
-  while ($t0 eq "" && $#ts >= 0) { $t0 = shift @ts };
-  if ($t0 eq ""){
-    print STDERR "no time for $phb\n";
+  if ($tt == 2000000000){
+    print STDERR "zero time for $phb\n";
+    $tt = "";
   }
-  my @ps = sort keys %{$tmp{$t0}};
-  if ($#ps > 0){
-    print STDERR "several=$#ps first=$t0 for $phb: @ps\n";
-  }  
   my $b = fromHex($phb);
-  $b2a{$b} = $ps[0];
+  $b2a{$b} = "$tt;$tmp";
 }
 
 untie %b2a;
