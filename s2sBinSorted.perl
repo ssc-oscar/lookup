@@ -10,7 +10,7 @@ use cmt;
 my ($tmp, %c2p, %c2p1);
 my $fname = $ARGV[0];
 tie %c2p, "TokyoCabinet::HDB", "$fname", TokyoCabinet::HDB::OWRITER | TokyoCabinet::HDB::OCREAT,   
-  507377777, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
+  16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
   or die "cant open $fname\n";
 
 my $lines = 0;
