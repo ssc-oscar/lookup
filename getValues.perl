@@ -21,6 +21,7 @@ my $f1 = "h";
 my $f2 = "h";
 
 my $split = 32;
+$split = $ARGV[3] if defined $ARGV[3];
 
 for my $s (0..($split-1)){
   if(!tie(%{$clones{$s}}, "TokyoCabinet::HDB", "$fname.$s.tch",
@@ -41,7 +42,7 @@ $f2 = "cs" if ($t2 =~ /^[afp]$/);
 $f1 = "h" if ($t1 =~ /^[cb]$/);
 $f2 = "h" if ($t2 =~ /^[cb]$/ || $t2 =~ /^(cc|pc)$/);
 
-$f2 = "s" if $types eq "b2a";
+$f2 = "sh" if $types eq "b2a";
 $f2 = "s" if $t2 eq "ta";
 $f2 = "r" if $types =~ /^c2[hr]$/;
 
@@ -80,17 +81,22 @@ while (<STDIN>){
       $res = ";".$v;
       $res = ';'.safeDecomp ($v);
     }      
-    if ($f2 =~ /h/){
+    if ($f2 eq "h"){
       my $n = length($v)/20;
       $res="";
       for my $i (0..($n-1)){
         $res .= ";" . toHex (substr($v, $i*20, 20));
       }
     }
-	if ($flat eq "n"){
+    if ($f2 eq "sh"){
+      my $c = toHex(substr($v, length($v)-20, 20));
+      my ($t, $a) = split(/;/, substr($v, 0, length($v)-20));
+      $res = ";$t;$a;$c"; 
+    }
+	  if ($flat eq "n"){
       if ($extra eq  ""){
-		print "$ch$res\n";
-	  }else{ 
+		    print "$ch$res\n";
+	    }else{ 
         print "$ch;$extra$res\n";
       }
     }else{
@@ -99,8 +105,8 @@ while (<STDIN>){
       for my $vv (split(/;/, $res, -1)){
         print "$ch;$vv\n";
       }
+    }
 	}
-  }
   $offset++;
 }
 for my $s (0..($split-1)){
