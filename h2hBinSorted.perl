@@ -45,7 +45,7 @@ while (<STDIN>){
   $cp = $c;
   my $b = fromHex ($hb);
   $tmp .= $b;
-  if (!($lines%10000000)){
+  if (!($lines%100000000)){
 #my $dd = time() - $pt;
     $pt = time();
     my $diff = $lines*3600/($pt - $p0);

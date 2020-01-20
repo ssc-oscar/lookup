@@ -35,7 +35,7 @@ while (<STDIN>){
     $ps =~ s/^;//;
     my $psC = safeComp ($ps);
     large ($psC, $cp);
-    $tmp = ";
+    $tmp = "";
     if ($doDump){
       dumpData ();
       $doDump = 0;
@@ -43,7 +43,7 @@ while (<STDIN>){
   }  
   $cp = $c;
   $tmp .=";$p"; 
-  if (!($lines%10000000)){
+  if (!($lines%100000000)){
     $pt = time();
     my $diff = $lines*3600/($pt - $p0);
     my $all = (1058016728/$lines) * ($pt - $p0) / 3600;
@@ -78,7 +78,7 @@ sub dumpData {
   %c2p1 = ();
 }
 
-untie %{$c2p{$sec}};
+untie %c2p;
 
 print STDERR "read $lines dumping $nc commits\n";
 
