@@ -1,5 +1,4 @@
-#!/usr/bin/perl -I  /home/audris/lookup -I /home/audris/lib64/perl5 -I /home/audris/lib/x86_64-linux-gnu/perl
-
+#!/usr/bin/perl -I /home/audris/lookup -I /home/audris/lib64/perl5
 use strict;
 use warnings;
 use Error qw(:try);
@@ -7,10 +6,11 @@ use Compress::LZF;
 use TokyoCabinet;
 use cmt;
 
+
 my ($tmp, %c2p, %c2p1);
 my $fname = $ARGV[0];
 tie %c2p, "TokyoCabinet::HDB", "$fname", TokyoCabinet::HDB::OWRITER | TokyoCabinet::HDB::OCREAT,   
-   16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
+  507377777, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
   or die "cant open $fname\n";
 
 my $lines = 0;
@@ -23,15 +23,16 @@ my $p0 = $pt;
 while (<STDIN>){
   chop();
   $lines ++;
-  my ($hc, $p) = split (/\;/, $_);
-  if ($hc !~ m|^[0-9a-f]{40}$|){
-    print STDERR "bad sha:$_\n";
+  my ($c, $hb) = split (/\;/, $_);
+  if ($c eq ""){ # || defined $badCmt{$hc} || defined $badBlob{$hc}){
+    print STDERR "empty project for $hb\n";
     next;
+  }    
+  if ($hb !~ m|^[0-9a-f]{40}$|){ # these are on the right side: should be ok || defined $badCmt{$hb} || defined $badBlob{$hb}){
+    print STDERR "bad b sha:$_\n";
   }
-  my $c = fromHex ($hc);
   if ($c ne $cp && $cp ne ""){
     $nc ++;
-    $tmp =~ s/^;//;
     large ($tmp, $cp);
     $tmp = "";
     if ($doDump){
@@ -40,7 +41,8 @@ while (<STDIN>){
     }
   }  
   $cp = $c;
-  $tmp .=";$p"; 
+  my $b = fromHex ($hb);
+  $tmp .= $b;
   if (!($lines%100000000)){
     $pt = time();
     my $diff = $lines*3600/($pt - $p0);
@@ -50,28 +52,28 @@ while (<STDIN>){
   }
 }
 
-$tmp =~ s/^;//;
 large ($tmp, $cp);
 dumpData ();
 
 sub large {
-  my ($psC, $cp) = @_;
-  if (length ($psC) > 1000000*20){
-    my $cpH = toHex ($cp);
-    print STDERR "too large for $cpH: ".(length($psC))."\n";
+  my ($bs, $cp) = @_;
+  if (length ($bs) > 10000000*20){
+    my $cpH = sprintf "%.8x", sHashV ($cp);
+    print STDERR "too large for $cp $cpH: ".(length($bs))."\n";
     open A, ">$fname.large.$cpH";
-    print A $psC;
+    print A "$cp\n";
+    print A $bs;
     close (A);
   }else{
-    $c2p1{$cp} = safeCmp ($psC);
-  } 
+    $c2p1{$cp} = $bs;
+  }
 }
 
 sub dumpData {
   while (my ($c, $v) = each %c2p1){
     $c2p{$c} = $v;
   }
-  %c2p1 = ();
+  %c2p1 = ();         
 }
 
 untie %c2p;
