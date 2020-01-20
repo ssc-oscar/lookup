@@ -63,7 +63,7 @@ sub large {
     print A $psC;
     close (A);
   }else{
-    $c2p1{$cp} = safeCmp ($psC);
+    $c2p1{$cp} = safeComp ($psC);
   } 
 }
 
