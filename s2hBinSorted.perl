@@ -33,8 +33,7 @@ while (<STDIN>){
   }
   if ($c ne $cp && $cp ne ""){
     $nc ++;
-    my $bs = $tmp;
-    large ($bs, $cp);
+    large ($tmp, $cp);
     $tmp = "";
     if ($doDump){
       dumpData ();
@@ -53,8 +52,7 @@ while (<STDIN>){
   }
 }
 
-my $bs = $tmp;
-large ($bs, $cp);
+large ($tmp, $cp);
 dumpData ();
 
 sub large {

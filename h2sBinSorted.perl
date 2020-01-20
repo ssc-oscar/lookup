@@ -31,9 +31,8 @@ while (<STDIN>){
   my $c = fromHex ($hc);
   if ($c ne $cp && $cp ne ""){
     $nc ++;
-    my $ps = $tmp;
-    $ps =~ s/^;//;
-    large ($ps, $cp);
+    $tmp =~ s/^;//;
+    large ($tmp, $cp);
     $tmp = "";
     if ($doDump){
       dumpData ();
@@ -51,9 +50,8 @@ while (<STDIN>){
   }
 }
 
-my $ps = $tmp;
-$ps =~ s/^;//;
-large ($ps, $cp);
+$tmp =~ s/^;//;
+large ($tmp, $cp);
 dumpData ();
 
 sub large {

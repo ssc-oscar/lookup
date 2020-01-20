@@ -34,8 +34,7 @@ while (<STDIN>){
   if ($c ne $cp && $cp ne ""){
     $nc ++;
     $tmp =~ s/^;//;
-    my $bs = $tmp;
-    large ($bs, $cp);
+    large ($tmp, $cp);
     $tmp = "";
     if ($doDump){
       dumpData ();
@@ -43,8 +42,7 @@ while (<STDIN>){
     }
   }  
   $cp = $c;
-  my $b = fromHex ($hb);
-  $tmp .= $b;
+  $tmp .= ";$hb";
   if (!($lines%100000000)){
     $pt = time();
     my $diff = $lines*3600/($pt - $p0);
@@ -55,7 +53,7 @@ while (<STDIN>){
 }
 
 $tmp =~ s/^;//;
-large ($bs, $cp);
+large ($tmp, $cp);
 dumpData ();
 
 sub large {
@@ -64,7 +62,7 @@ sub large {
     my $cpH = sprintf "%.8x", sHashV ($cp);
     print STDERR "too large for $cp $cpH: ".(length($bs))."\n";
     open A, ">$fname.large.$cpH";
-    print A $cp\n"
+    print A "$cp\n";
     print A $bs;
     close (A);
   }else{
