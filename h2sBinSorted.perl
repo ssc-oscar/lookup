@@ -35,7 +35,7 @@ while (<STDIN>){
     $ps =~ s/^;//;
     my $psC = safeComp ($ps);
     large ($psC, $cp);
-    $tmp = ";
+    $tmp = "";
     if ($doDump){
       dumpData ();
       $doDump = 0;
@@ -78,7 +78,7 @@ sub dumpData {
   %c2p1 = ();
 }
 
-untie %{$c2p{$sec}};
+untie %c2p;
 
 print STDERR "read $lines dumping $nc commits\n";
 
