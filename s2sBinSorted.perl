@@ -58,7 +58,7 @@ dumpData ();
 
 sub large {
   my ($bs, $cp) = @_;
-  if (length ($bs) > 1000000*20){
+  if (length ($bs) > 10000000*20){
     my $cpH = sprintf "%.8x", sHashV ($cp);
     print STDERR "too large for $cp $cpH: ".(length($bs))."\n";
     open A, ">$fname.large.$cpH";
