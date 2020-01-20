@@ -41,12 +41,19 @@ while (my ($c, $v) = each %clones){
       $res = ";".$v;
       $res = ';'.safeDecomp ($v);
     }      
-    if ($f2 =~ /h/){
+    if ($f2 eq "h"){
       my $n = length($v)/20;
       $res="";
       for my $i (0..($n-1)){
         $res .= ";" . toHex (substr($v, $i*20, 20));
       }
+    }
+    if ($f2 eq "w"){
+      $res = ";". (unpack 'w', $v);
+    }
+    if ($f2 eq "sh"){
+
+      $res = ";". (substr ($v, 0, length($v)-20)).toHex(substr($v, length($v)-20, 20));
     }
     print "$c$res\n";
   }
