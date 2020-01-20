@@ -34,7 +34,7 @@ while (<STDIN>){
   if ($c ne $cp && $cp ne ""){
     $nc ++;
     $tmp =~ s/^;//;
-    my $bs = safeComp($tmp);
+    my $bs = $tmp;
     large ($bs, $cp);
     $tmp = "";
     if ($doDump){
@@ -55,7 +55,6 @@ while (<STDIN>){
 }
 
 $tmp =~ s/^;//;
-my $bs = safeComp($tmp);
 large ($bs, $cp);
 dumpData ();
 
@@ -65,10 +64,11 @@ sub large {
     my $cpH = sprintf "%.8x", sHashV ($cp);
     print STDERR "too large for $cp $cpH: ".(length($bs))."\n";
     open A, ">$fname.large.$cpH";
+    print A $cp\n"
     print A $bs;
     close (A);
   }else{
-    $c2p1{$cp} = $bs;
+    $c2p1{$cp} = safeComp($bs);
   }
 }
 

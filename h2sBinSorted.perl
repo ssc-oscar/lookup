@@ -33,8 +33,7 @@ while (<STDIN>){
     $nc ++;
     my $ps = $tmp;
     $ps =~ s/^;//;
-    my $psC = safeComp ($ps);
-    large ($psC, $cp);
+    large ($ps, $cp);
     $tmp = "";
     if ($doDump){
       dumpData ();
@@ -54,8 +53,7 @@ while (<STDIN>){
 
 my $ps = $tmp;
 $ps =~ s/^;//;
-my $psC = safeComp ($ps);
-large ($psC, $cp);
+large ($ps, $cp);
 dumpData ();
 
 sub large {
@@ -67,7 +65,7 @@ sub large {
     print A $psC;
     close (A);
   }else{
-    $c2p1{$cp} = $psC;
+    $c2p1{$cp} = safeCmp ($psC);
   } 
 }
 
