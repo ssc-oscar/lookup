@@ -43,7 +43,7 @@ while (<STDIN>){
   }  
   $cp = $c;
   $tmp .=";$p"; 
-  if (!($lines%10000000)){
+  if (!($lines%100000000)){
     $pt = time();
     my $diff = $lines*3600/($pt - $p0);
     my $all = (1058016728/$lines) * ($pt - $p0) / 3600;
