@@ -61,7 +61,7 @@ sub large {
   if (length ($bs) > 10000000*20){
     my $cpH = sprintf "%.8x", sHashV ($cp);
     print STDERR "too large for $cp $cpH: ".(length($bs))."\n";
-    open A, ">$fname.large.$cpH";
+    open A, "|gzip > $fname.large.$cpH";
     print A "$cp\n";
     print A $bs;
     close (A);

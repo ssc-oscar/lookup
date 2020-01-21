@@ -59,7 +59,7 @@ sub large {
   if (length ($psC) > 10000000*20){
     my $cpH = toHex ($cp);
     print STDERR "too large for $cpH: ".(length($psC))."\n";
-    open A, ">$fname.large.$cpH";
+    open A, "| gzip >$fname.large.$cpH";
     print A $psC;
     close (A);
   }else{
