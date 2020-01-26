@@ -1,7 +1,7 @@
 #!/bin/bash
 
 h=$(hostname)
-ver=P
+ver=Q
 flat=n
 pass=""
 while getopts "fv:" option
@@ -13,26 +13,36 @@ done
 shift $((OPTIND-1))
 t=$1
 
+if [[ $t == "" ]]; then
+ echo "Usage: getValue [OPTIONS] map";
+ exit 1;
+fi
+
 declare -A da3
-for i in a2b a2c a2f a2p b2a b2f c2b c2f c2p c2ta f2c p2a p2c c2cc c2pc c2h c2r
+#for i in a2c a2f a2fb a2p b2a b2c b2f c2b c2cc c2f c2h c2p c2pc c2r c2ta f2a f2b f2c p2a p2c
+for i in c2b c2f c2p f2b p2c
 do da3[$i]=1
 done
+declare -A da4
+for i in b2a f2a p2a a2c a2f a2fb a2p
+do da4[$i]=1
+done
 
-if [[ $h == da5.eecs.utk.edu ]] 
+if [[ $h == 'da5.eecs.utk.edu' ]] 
 then 
-  [[ -f /fast/${t}Full$ver.0.tch ]] || ([[ /fast/${t}FullQ.0.tch ]] && ver=Q)
+  [[ -f /fast/${t}Full$ver.0.tch ]] || ([[ /fast/${t}FullP.0.tch ]] && ver=P)
   ~/lookup/getValues.perl --flat=$flat /fast/${t}Full$ver
 else
- [[ -f /fast/${t}Full$ver.0.tch ]] || ([[ /fast/${t}FullQ.0.tch ]] && ver=Q)
+ [[ -f /fast/${t}Full$ver.0.tch ]] || ([[ /fast/${t}FullP.0.tch ]] && ver=P)
  if [[ -f /fast/${t}Full$ver.0.tch ]] 
  then 
    ~/lookup/getValues.perl --flat=$flat /fast/${t}Full$ver
  else
-  if [[ ${da3[$t]} == 1 && $h != da3.eecs.utk.edu ]]
+  if [[ ${da3[$t]} == 1 && $h != 'da3.eecs.utk.edu' ]]
    then ssh da3 ~/lookup/getValues $pass ${t}
    else
-    if [[ ${da3[$t]} == 1 && $h == da3.eecs.utk.edu ]]
-    then echo here /fast/${t}Full$ver; ~/lookup/getValues.perl --flat=$flat /fast/${t}Full$ver
+    if [[ ${da3[$t]} == 1 && $h == 'da3.eecs.utk.edu' ]]
+    then ~/lookup/getValues.perl --flat=$flat /fast/${t}Full$ver
     else [[ $h == da0.eecs.utk.edu ]] && ~/lookup/getValues.perl --flat=$flat /data/basemaps/${t}Full$ver
 	     [[ $h != da0.eecs.utk.edu ]] && ssh da0 ~/lookup/getValues.perl --flat=$flat /data/basemaps/${t}Full$ver
     fi

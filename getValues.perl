@@ -40,7 +40,7 @@ $f1 = "s" if ($t1 =~ /^[afp]$/);
 $f2 = "cs" if ($t2 =~ /^[afp]$/);
 
 $f1 = "h" if ($t1 =~ /^[cb]$/);
-$f2 = "h" if ($t2 =~ /^[cb]$/ || $t2 =~ /^(cc|pc)$/);
+$f2 = "h" if ($t2 =~ /^[cb]$/ || $t2 =~ /^(cc|pc|fb)$/);
 
 $f2 = "sh" if $types eq "b2a";
 $f2 = "s" if $t2 eq "ta";
