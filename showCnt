@@ -12,7 +12,7 @@ then
   ~/lookup/showCnt.perl $t $cfmt
 else
  if [[ $h == 'da3.eecs.utk.edu' || $h == 'da4.eecs.utk.edu' ]] 
- then ~/lookup/showCnt.perl commit $cfmt
- else ssh da4 ~/lookup/showCnt.perl commit $cfmt
+ then ~/lookup/showCnt.perl $t $cfmt
+ else ssh da4 ~/lookup/showCnt.perl $t $cfmt
  fi
 fi
