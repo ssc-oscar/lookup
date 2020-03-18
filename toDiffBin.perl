@@ -25,7 +25,7 @@ while (<STDIN>){
 	if ($c ne $pc && $pc ne ""){
 	  out();
 	}
-    $pc = $c;
+  $pc = $c;
 	my $type = "m";
 	if (! defined $new || $new eq ""){
 	  $type = "d";
@@ -41,8 +41,8 @@ while (<STDIN>){
 	    $old = fromHex($old);
 	  }else{
 	    $type = "r";
-		$old =~ s|^/||;
-		$old .= "\0";
+		  $old =~ s|^/||;
+		  $old .= "\0";
 	  }
 	}
 	$tmp .= "$type$n\0$new$old";
@@ -53,7 +53,7 @@ out();
 sub out {
 	my $l = length ($tmp);
 	my $tmpC = safeComp ($tmp);
-    my $h = sha1_hex ("bdiff $l\0$tmpC");
+  my $h = sha1_hex ("bdiff $l\0$tmpC");
 	my $lc = length($tmpC);
 	print A "$off;$lc;$l;$h;$pc\n";
 	$off += $lc;

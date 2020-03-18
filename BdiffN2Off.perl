@@ -33,8 +33,8 @@ if ( -f "$fbasei$sec.idx"){
   while (<A>){
     chop ();
     my @x = split (/\;/, $_, -1);
-    my $of = $x[1];
-    my $len = $x[2];
+    my $of = $x[0];
+    my $len = $x[1];
     my $hash = $x[4];
     my $h = fromHex ($hash);
     if (defined $fhoso{$sec}{$h}){

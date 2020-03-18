@@ -27,10 +27,10 @@ while (<STDIN>){
     my $h = "";	
     if (length($buff)>=20){
       $h = substr($buff, 0, 20);
-	  $buff = substr($buff, 20, length($buff) - 20);
-	} else {
+	    $buff = substr($buff, 20, length($buff) - 20);
+	  } else {
       print STDERR "no hash: $o;$n\n";
-	  exit();
+	    exit();
     }
     my $t = substr ($n, 0, 1);
     $n = substr ($n, 1, length($n)-1);
