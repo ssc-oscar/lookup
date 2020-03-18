@@ -48,11 +48,12 @@ while ( my $doc = $result->next ) {
   my $do = 0;
 #  $do++ if $doc->{'_id'} eq "5cd48b431b93640143c6edb1";#chris
 #  $do++ if $doc->{'_id'} eq "5cd48c101b93640143c6edb2";#marat
-#  $do++ if $doc->{'_id'} eq "";#
-#  $do++ if $doc->{'_id'} eq "";#
-#  $do++ if $doc->{'_id'} eq "";#
-#  $do++ if $doc->{'_id'} eq "";#
-  $do++ if $doc->{'_id'} eq "5d15fe22c420d377e4fdcd97";#mbernotas
+#  $do++ if $doc->{'_id'} eq "5cf452bc5ed67a5ac576c98a";#zyang37@vols.utk.edu
+#  $do++ if $doc->{'_id'} eq "5d30a51fc420d377e4fdcd98";#atutko@vols.utk.edu
+  $do++ if $doc->{'_id'} eq "5d5febbd4150392a9be3e752";#jim.herbsleb@gmail.com
+  $do++ if $doc->{'_id'} eq "5d8125a9c60cf900cfa5831e";#brusso
+#  $do++ if $doc->{'_id'} eq "5d7bc7bcc60cf900cfa5831d";#azh@utk.edu
+#  $do++ if $doc->{'_id'} eq "5d15fe22c420d377e4fdcd97";#mbernotas
 #  $do++ if $doc->{'_id'} eq "5cd9c1bf1b93640143c6edba";# moh
 #  $do++ if $doc->{'_id'} eq "5cd9ea8f7e662355ba53e159";# dycz0fx
 #  $do++ if $doc->{'_id'} eq "5cee9a305ea3d86976bdce65";# dkennard
@@ -69,6 +70,7 @@ while ( my $doc = $result->next ) {
 #  $do++ if $doc->{'_id'} eq "5cec22465ea3d86976bdce62";# diomidis 
 #  $do++ if $doc->{'_id'} eq "5cec55115ea3d86976bdce64"; #dirk
 #  $do++ if $doc->{'_id'} eq "5cec483a5ea3d86976bdce63";#  ahn
+
   next if $do == 0;
   for my $id (@$a){
     if (ref $id eq "HASH"){
@@ -229,7 +231,7 @@ sub listB {
 my %a2bF;
 my %c2b = ();
 for my $sec (0..($split-1)){
-  my $fname = "/fast/c2bFullO.$sec.tch";
+  my $fname = "/fast/c2bFullP.$sec.tch";
   tie %{$c2b{$sec}}, "TokyoCabinet::HDB", "$fname", TokyoCabinet::HDB::OREADER | TokyoCabinet::HDB::ONOLCK,
         16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
       or die "cant open $fname\n";
@@ -255,7 +257,7 @@ for my $sec (0..($split-1)){
 # get files for a user
 my %a2fF = ();
 for my $sec (0..($split-1)){
-  my $fname = "/fast/c2fFullO.$sec.tch";
+  my $fname = "/fast/c2fFullP.$sec.tch";
   tie %{$a2fF{$sec}}, "TokyoCabinet::HDB", "$fname", TokyoCabinet::HDB::OREADER | TokyoCabinet::HDB::ONOLCK,
         16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
       or die "cant open $fname\n";

@@ -11,7 +11,7 @@ my (%clones);
 my $hdb = TokyoCabinet::HDB->new();
 
 if(!tie(%clones, "TokyoCabinet::HDB", "$fname",
-                  TokyoCabinet::HDB::OWRITER | TokyoCabinet::HDB::ONOLCK)){
+                  TokyoCabinet::HDB::OWRITER | TokyoCabinet::HDB::OCREAT | TokyoCabinet::HDB::ONOLCK)){
         print STDERR "tie error for $fname\n";
 }
 
@@ -20,7 +20,7 @@ while (read (STDIN, $lk, 4) == 4){
   $lk = unpack 'l', $lk;
   if (read (STDIN, $lv, 4) == 4){
     $lv = unpack 'l', $lv;
-    print "$lk;$lv\n";
+    #print "$lk;$lv\n";
     my ($k, $v);
     read (STDIN, $k, $lk);
     if (read (STDIN, $v, $lv) == $lv){

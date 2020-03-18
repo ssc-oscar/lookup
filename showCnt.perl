@@ -86,7 +86,10 @@ sub getBdiff {
 #  my $rl = read ($f, $codeC, $len);
 #  print STDERR "$off;$sec;$ch;$len;$rl\n";
 #  my $buff = safeDecomp ($codeC, "$off;$sec;$ch;$len;$rl");
-  my $buff = safeDecomp ($fhosc{$sec}{$cB}, "sec;$ch");
+  my $val = $fhosc{$sec}{$cB};
+  #print STDERR "got bdiff sec=$sec len=".(length($val))."\n";
+  my $buff = $val;
+  #my $buff = safeDecomp ($val, "sec;$ch");
   my $res = "";
   while ($buff =~ s/^(.+?)\0//){
     my $n = $1;
@@ -100,7 +103,7 @@ sub getBdiff {
     }
     my $t = substr ($n, 0, 1);
     $n = substr ($n, 1, length($n)-1);
-                      #print STDERR "$c;$t;$n;".(toHex($h)).";".length($buff)."\n";
+    #print STDERR "$c;$t;$n;".(toHex($h)).";".length($buff)."\n";
     my $new = "";
     my $old = "";
     if ($t =~ /[crm]/){
@@ -123,7 +126,7 @@ sub getBdiff {
     }
     $res.= "$ch;$n;$new;$old\n";
   }
-  print "bdiff;$sec;$res\n";
+  print "bdiff;$sec;$res";
 }
 
 sub getTree {
