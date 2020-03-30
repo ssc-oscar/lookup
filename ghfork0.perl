@@ -2,15 +2,16 @@ use strict;
 use warnings;
 
 my %r2cr;
-open A, "zcat projectstr2.gz|";
+open A, "zcat ghForkMapR.gz|";
 while (<A>){
   chop();
-  my ($r, $cd, $ud, $f, $del, $stars) = split (/;/);
-  $r2cr{$r} = $r;
-  $r2cr{$r} = $f if $f =~ /_/;  
+  my ($r, $f) = split (/;/);
+  $r2cr{$r} = $f;
 }
+
+
 my $off = 0;
-$off = $ARGV[0] if defined $ARGV[0];
+$off = $ARGV[0] - 1 if defined $ARGV[0];
 my $pc = "";
 my %tmp;
 my @res;

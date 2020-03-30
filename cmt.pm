@@ -10,6 +10,7 @@ our @EXPORT = qw(addForks toUrl %badProjects %badAuthors %badCmt %badBlob %badTr
 use vars qw(@ISA);
 
 our %badProjects = (
+  "repo.or.cz_src" => "all projects on repo.or.cz_src",
   "bb_fusiontestaccount_fuse-2944" => "32400A",
   "bb_fusiontestaccount_fuse1999v2" => "34007A", 
   "octocat_Spoon-Knife" => "forking tutorial, 41176A", 
@@ -251,6 +252,7 @@ our %badCmt = (
   "66ac0671392e55f9f26717d12d912be506bece29" => 523145,
   "66d9890c62c4e1baacdedd2653c68ef8bc2f6d6d" => 617679,
   "6d2e49cd628cfa43b98ced89acb71370ca090e44" => 619672,
+  "6d32c8efbb971af33d4c12f6869c2ddffec2bed4" => 440060,
   "6d3cb75b3102e98c2f9a53f8b00371a5d8565de6" => 520380,
   "6dfaa2833450d1cdf410fda67a87e5c2fff2bf7c" => 505317,
   "8b5d8aa66e69b64092b1304910510c8474db9449" => 983677,
@@ -268,6 +270,7 @@ our %badCmt = (
   "e88c59f2fab3243c3d0af6cc2ae2874ac77f63aa" => 532401,
   "ed769eef9e9dd69037322ffd5c24470590328a09" => 726169,
   "ed89c009aab3b63874683404d989b40e225ce6f8" => 630643,
+
 
 
   "142e0f29cd5bd79f2d2e3aab108a6bc4fc0027d5" => 10000000000, # tons of fake folders
