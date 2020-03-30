@@ -11,13 +11,14 @@ sub toHex {
 }
 
 my $null = "\0" x 20;
-my $pc = "";
 my $tmp = "";
 
 open A, "tac $ARGV[0].idx|head -1|";
 my $str = <A>;
 chop($str);
 my ($off, $lc, $l, $h, $pc) = split(/;/, $str, -1);
+$off += $lc;
+$pc = "";
 
 open A, ">>$ARGV[0].idx";
 open B, ">>$ARGV[0].bin";

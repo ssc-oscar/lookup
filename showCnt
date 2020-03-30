@@ -11,12 +11,8 @@ if [[ $h == da5.eecs.utk.edu ]]
 then 
   ~/lookup/showCnt.perl $t $cfmt
 else
- if [[ $t == 'commit' ]] 
- then 
-  [[ $h == da3.eecs.utk.edu ]] && ~/lookup/showCnt.perl commit $cfmt
-  [[ $h != da3.eecs.utk.edu ]] && ssh da3 ~/lookup/showCnt.perl commit $cfmt
- else
-  [[ $h != da4.eecs.utk.edu ]] && ssh da4 ~/lookup/showCnt.perl $t $fmt
-  [[ $h == da4.eecs.utk.edu ]] && ~/lookup/showCnt.perl $t $fmt
+ if [[ $h == 'da3.eecs.utk.edu' || $h == 'da4.eecs.utk.edu' ]] 
+ then ~/lookup/showCnt.perl $t $cfmt
+ else ssh da4 ~/lookup/showCnt.perl $t $cfmt
  fi
 fi
