@@ -86,6 +86,10 @@ while(<STDIN>){
     print STDERR "no commit for $rev\n";
     next;
   }
+  if ($parent eq ""){
+    print STDERR "no parent for $rev\n";
+    next;
+  }
   if (defined $parent && $parent ne ""){
     $parent = substr ($parentFull, 0, 40); #ignore additional parents
     my ($treeP, $parentP) = getCT ($parent);
