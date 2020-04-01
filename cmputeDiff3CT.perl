@@ -318,12 +318,10 @@ sub getTO {
   my ($off, $len) = unpack ("w w", $fhos{$sec}{$tB});
   my $f = $fhob{$sec};
   seek ($f, $off, 0);
-#my $curpos = tell($f);
+  #my $curpos = tell($f);
   my $codeC = "";
   my $rl = read ($f, $codeC, $len);
-#  my $code = safeDecomp ($codeC, "$sec;$curpos;$blob");
-#  my $codeC = $fhos{$sec}{$tB};
-  print STDERR "tree $t1 $sec $off $len $rl\n";
+  #  print STDERR "tree $t1 $sec $off $len $rl\n";
   if (defined $codeC && length ($codeC) > 0){
     return safeDecomp ($codeC, "tree $t1 $sec $off $len $rl\n");
   }else{
@@ -344,7 +342,7 @@ sub getC {
   seek ($f, $off, 0);
   my $codeC = "";
   my $rl = read ($f, $codeC, $len);
-  print STDERR "commit $sec $t1 $off $len $rl\n";
+  #print STDERR "commit $sec $t1 $off $len $rl\n";
   if (defined $codeC && length ($codeC) > 0){
     return safeDecomp ($codeC, "commit $sec $t1 $off $len $rl\n");
   }else{
