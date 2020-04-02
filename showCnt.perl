@@ -88,8 +88,8 @@ sub getBdiff {
 #  my $buff = safeDecomp ($codeC, "$off;$sec;$ch;$len;$rl");
   my $val = $fhosc{$sec}{$cB};
   #print STDERR "got bdiff sec=$sec len=".(length($val))."\n";
-  my $buff = $val;
-  #my $buff = safeDecomp ($val, "sec;$ch");
+#my $buff = $val;
+  my $buff = safeDecomp ($val, "sec;$ch");
   my $res = "";
   while ($buff =~ s/^(.+?)\0//){
     my $n = $1;
