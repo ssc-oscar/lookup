@@ -6,25 +6,29 @@ use woc;
 
 
 my $type = $ARGV [0];
+
+# this is to handle different output formats
 my $debug = 0;
 $debug = $ARGV[1]+0 if defined $ARGV[1]; #select output format based on the cleantCmt function in cmt.pm
 my $sections = 128;
-my $raw = ""; #produce .idx/.bin database as in All.blobs
-$raw = $ARGV[2] if defined $ARGV[2];
+
+#this is to handle whether or not tch is used as content or offset for bdiff, trees, and commits
+my $ncnt = 0; 
+$ncnt = $ARGV[2] if defined $ARGV[2];
 
 
 my (%fhob, %fhost, %fhosc);
 
 my $fbasec="All.sha1c/${type}_";
-if ($type eq "blob"){
+if ($type eq "blob" || ($type =~ /bdiff|commit|tree/ && $ncnt) ){
   $fbasec="All.sha1o/sha1.${type}_";
 }
 for my $sec (0 .. ($sections-1)){
-  my $pre = "/fast/";
+  my $pre = "/fast";
   tie %{$fhosc{$sec}}, "TokyoCabinet::HDB", "$pre/${fbasec}$sec.tch", TokyoCabinet::HDB::OREADER,  
     16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
     or die "cant open $pre/$fbasec$sec.tch\n";
-  if ( $type eq "blob"){
+  if ( $type eq "blob" || ($type =~ /bdiff|commit|tree/ && $ncnt)){
 	  open $fhob{$sec}, "/data/All.blobs/${type}_$sec.bin" or die "$!";
   }
 }
@@ -33,11 +37,11 @@ while (<STDIN>){
   chop();
   my ($cmt, $rest) = split(/;/, $_, -1);
   if ($type eq "bdiff"){
-	  getBdiff($cmt);
+	  getBdiff ($cmt);
     next;
   }
   if ($type eq "blob"){
-	  getBlob($cmt);
+	  getBlob ($cmt);
     next;
   }
   if ($type eq "tree"){
@@ -49,7 +53,16 @@ while (<STDIN>){
   if (! defined $fhosc{$sec}{$cB}){
      print STDERR "no $type $cmt in $sec\n";
   }else{
-    cleanCmt ($fhosc{$sec}{$cB}, $cmt, $debug);
+    my $codeC = "";
+    if ($ncnt){
+      my ($off, $len) = unpack ("w w", $fhosc{$sec}{$cB});
+      my $f = $fhob{$sec};
+      seek ($f, $off, 0);
+      $codeC = ""; my $rl = read ($f, $codeC, $len);
+    } else {
+      $codeC = $fhosc{$sec}{$cB};
+    }
+    cleanCmt ($codeC, $cmt, $debug);
   }
 }
 
@@ -79,17 +92,20 @@ sub getBdiff {
     print STDERR "no bdiff for commit $ch in $sec\n";
     return "";
   }
-#my ($off, $len) = unpack ("w w", $fhosc{$sec}{$cB});
-#  my $f = $fhob{$sec};
-#  seek ($f, $off, 0);
-#  my $codeC = "";
-#  my $rl = read ($f, $codeC, $len);
-#  print STDERR "$off;$sec;$ch;$len;$rl\n";
-#  my $buff = safeDecomp ($codeC, "$off;$sec;$ch;$len;$rl");
-  my $val = $fhosc{$sec}{$cB};
-  #print STDERR "got bdiff sec=$sec len=".(length($val))."\n";
-#my $buff = $val;
-  my $buff = safeDecomp ($val, "sec;$ch");
+  my $buff = "";
+  if ($ncnt){ #use offset
+    my ($off, $len) = unpack ("w w", $fhosc{$sec}{$cB});
+    my $f = $fhob{$sec};
+    seek ($f, $off, 0);
+    my $codeC = "";
+    my $rl = read ($f, $codeC, $len);
+    #  print STDERR "$off;$sec;$ch;$len;$rl\n";
+    $buff = safeDecomp ($codeC, "$off;$sec;$ch;$len;$rl");
+  }else{ # use content
+    my $val = $fhosc{$sec}{$cB};
+    #print STDERR "got bdiff sec=$sec len=".(length($val))."\n";
+    $buff = safeDecomp ($val, "sec;$ch");
+  }
   my $res = "";
   while ($buff =~ s/^(.+?)\0//){
     my $n = $1;
@@ -137,7 +153,15 @@ sub getTree {
     print STDERR "no tree $tree\n";
     next;
   }
-  my $codeC = $fhosc{$sec}{$tB};
+  my $codeC = "";
+  if ($ncnt){ #use offset
+    my ($off, $len) = unpack ("w w", $fhosc{$sec}{$tB});
+    my $f = $fhob{$sec};
+    seek ($f, $off, 0);
+    my $rl = read ($f, $codeC, $len);
+  }else{
+    $codeC = $fhosc{$sec}{$tB};
+  }
   my $code = safeDecomp ($codeC);
   my $len = length ($code);
   my $treeobj = $code;
@@ -149,11 +173,11 @@ sub prtTree {
   while ($treeobj) {
   # /s is important so . matches any byte!
     if ($treeobj =~ s/^([0-7]+) (.+?)\0(.{20})//s) {
-      my ($mode,$name,$bytes) = (oct($1),$2,$3);
+      my ($mode, $name, $bytes) = (oct($1), $2, $3);
       $name =~ s/\n/__NEWLINE__/g;
       printf "$off%06o;%s;%s\n",
         $mode, #($mode == 040000 ? "tree" : "blob"),
-        unpack("H*", $bytes), $name;
+        unpack ("H*", $bytes), $name;
       if ($debug == 3 && $mode == 040000){
         getTree (unpack("H*", $bytes), "$off  ");
       }
