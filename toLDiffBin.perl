@@ -77,8 +77,8 @@ while (<STDIN>){
 	  my $bos = getBlob($old);
 	  my $bns = getBlob($new);
 	  next if $bos eq "" || $bns eq ""; #in case we have no blob or if it is empty
-      my ($fho, $fo) = tempfile ( "tmpfileXXXXX", DIR => ".");
-      my ($fhn, $fn) = tempfile ( "tmpfileXXXXX", DIR => ".");
+    my ($fho, $fo) = tempfile ( "tmpfileXXXXX", DIR => ".");
+    my ($fhn, $fn) = tempfile ( "tmpfileXXXXX", DIR => ".");
 	  print $fho $bos;
 	  print $fhn $bns;
 	  open A, "diff $fo $fn|";

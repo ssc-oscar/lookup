@@ -11,6 +11,7 @@ my $n = $ARGV[0];
 #open A,  'zcat /da0_data/basemaps/gz/b2cFullO'.$n.'.s|tail -486433797 |cut -d\; -f1 | uniq|'; 
 open A,  'zcat /da0_data/basemaps/gz/b2cFullO'.$n.'.s|cut -d\; -f1 | uniq|'; 
 #open A,  'zcat /da0_data/basemaps/gz/b2cFullO'.$n.'.s| tail -373446289|cut -d\; -f1 | uniq|'; 
+#open A,  'zcat /da0_data/basemaps/gz/b2cFullO'.$n.'.s| tail -763047513|cut -d\; -f1 | uniq|'; 
 while (<STDIN>){
   chop();
   my  ($bh, $t, $au, $ch) = split(/\;/, $_, -1);

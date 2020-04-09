@@ -3,16 +3,23 @@
 h=$(hostname)
 t=$1
 
-fmt=$2
-
-cfmt=${fmt:-3}
+off=${3:-0}
+fmt=${2:-0}
 
 if [[ $h == da5.eecs.utk.edu ]] 
 then 
-  ~/lookup/showCnt.perl $t $cfmt
+  off=0
+  ~/lookup/showCnt.perl $t $fmt $off
 else
- if [[ $h == 'da3.eecs.utk.edu' || $h == 'da4.eecs.utk.edu' ]] 
- then ~/lookup/showCnt.perl $t $cfmt
- else ssh da4 ~/lookup/showCnt.perl $t $cfmt
- fi
+ if [[ $h == 'da3.eecs.utk.edu' ]] 
+ then 
+   off=1
+   ~/lookup/showCnt.perl $t $fmt $off
+ else
+   off=0
+   if [[ $h == 'da4.eecs.utk.edu' ]]
+   then ~/lookup/showCnt.perl $t $fmt $off
+   else ssh da4 ~/lookup/showCnt.perl $t $fmt $off
+   fi
+  fi
 fi

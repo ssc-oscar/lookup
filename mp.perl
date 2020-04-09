@@ -8,13 +8,13 @@ open A, "zcat $map|";
 while (<A>){
   chop();
   my ($f, $t) = split(/;/);
-  $p2P{$f}=$t;
+  $p2P{$f}=$t if $f ne $t; #dont store identity
 }
 
 my $col = $ARGV[0]+0;
 while(<STDIN>){
   chop();
   my @x=split(/;/);
-  $x[$col] = $p2P{$x[$col]} if defined $p2P{$x[$col]};
+  $x[$col] = $p2P{$x[$col]} if defined $x[$col] && defined $p2P{$x[$col]};
   print "".(join ';', @x)."\n";
 }
