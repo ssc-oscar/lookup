@@ -207,6 +207,12 @@ our %badCmt = (
   "fc4247ae1baf592a4b52a355d3047e1938ef3f9b" =>  941677, #DATA
   "695b944f918414ebc0608cb25b8dbb8fc906a720" => 1000001, #bash_lab v1
   "a69f8f2cb6eba2ca18870ac00d511f8ae7c360e3" =>  819200, #layer_1
+  "a919d97b57e275cd1af964b4915f8889f94799ed" =>  839703, #ready to test
+  "d8034ac8562b8c978376008f4b33df01b8887b19" => 1578523, #Replacing the 500k programs by 1m, and better folder structure
+  "df3e25ef63aeeb62982740d44f2a8e6a6534ac94" => 1000000, #deleted
+  "ac4ba8e8f32627854cf3d2cd5870c138622e9fee" =>  941686, #Json author gmtr-web <gmtrweb@gmail.com> 
+  "e477a5c4173e9a568c352f9e743ec1e330aa8a2a" => 13300108, #edits author Muhammad Usman <muhammadusman@utexas.edu> 1583026565 -0600
+  "e601b95f45dde98dd4d1f80a1d3304905a340ab8" => 1004542, # [Automatic commit] Errors from geogebra/geogebra
 
   "0a36c08880da83a84209efe5aa90ca3f9b1dc453" => 10000000000, # tons of fake blobs
   "12ef405ef13a47da699aa2b8e86c4d49edc57e5d" => 10000000000, # tons of fake blobs
