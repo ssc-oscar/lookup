@@ -214,7 +214,7 @@ our %badCmt = (
   "e477a5c4173e9a568c352f9e743ec1e330aa8a2a" => 13300108, #edits author Muhammad Usman <muhammadusman@utexas.edu> 1583026565 -0600
   "e601b95f45dde98dd4d1f80a1d3304905a340ab8" => 1004542, # [Automatic commit] Errors from geogebra/geogebra
   "7140aaf36cca2e8ecf01cd765608208f44f108e7" =>  851015, # Add data author manhcuongk55 <dmcksclck55@gmail.com> 1579495353 +0700
-
+  
   "0a36c08880da83a84209efe5aa90ca3f9b1dc453" => 10000000000, # tons of fake blobs
   "12ef405ef13a47da699aa2b8e86c4d49edc57e5d" => 10000000000, # tons of fake blobs
   "2c1e65d57edc4a9e57b74d17fec019be8d3afac0" => 10000000000, # tons of fake blobs
