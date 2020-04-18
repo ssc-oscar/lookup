@@ -21,7 +21,8 @@ use TokyoCabinet;
 
 #sub toHex { return unpack "H*", $_[0]; } 
 
-my ($prj, $rev, $tree, $parent, $aname, $cname, $alogin, $clogin, $path, $atime, $ctime, $f, $comment) = ("","","","","","","","","","","","","");
+my $rev = "";
+#my ($prj, $rev, $tree, $parent, $aname, $cname, $alogin, $clogin, $path, $atime, $ctime, $f, $comment) = ("","","","","","","","","","","","","");
 my (%c2p, %p2c, %b2c, %c2f);
 
 #my $prj = "";
@@ -43,8 +44,8 @@ for my $sec (0 .. ($sections-1)){
   tie %{$fhoc{$sec}}, "TokyoCabinet::HDB", "$preO/sha1.commit_$sec.tch", TokyoCabinet::HDB::OREADER,  
         16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
      or die "can't open $pre/commit_$sec.tch\n";
-  open $fhob{$sec}, "/data/All.blobs/tree_$sec.bin" or die "$!"
-  open $fhocb{$sec}, "/data/All.blobs/commit_$sec.bin" or die "$!"
+  open $fhob{$sec}, "/data/All.blobs/tree_$sec.bin" or die "$!";
+  open $fhocb{$sec}, "/data/All.blobs/commit_$sec.bin" or die "$!";
 }
 
 
@@ -54,12 +55,12 @@ sub getCT {
 	 #print STDERR "no commit $c\n";
     return ("", "");
   }
-  my $codeC = getC($c);
-  my $code = safeDecomp ($codeC, $c);
+  my $code = getC($c);
+#my $code = safeDecomp ($codeC, $c);
 
   my ($tree, $parent, $auth, $cmtr, $ta, $tc) = ("","","","","","");
-  my ($pre, @rest) = split(/\n\n/, $code, -1);
-  for my $l (split(/\n/, $pre, -1)){
+  my ($preX, @rest) = split(/\n\n/, $code, -1);
+  for my $l (split(/\n/, $preX, -1)){
      if ($l =~ m/^tree (.*)$/){
 		  $tree = $1;
      } 
@@ -317,13 +318,12 @@ sub getTO {
   my ($off, $len) = unpack ("w w", $fhos{$sec}{$tB});
   my $f = $fhob{$sec};
   seek ($f, $off, 0);
-#my $curpos = tell($f);
+  #my $curpos = tell($f);
   my $codeC = "";
   my $rl = read ($f, $codeC, $len);
-#  my $code = safeDecomp ($codeC, "$sec;$curpos;$blob");
-#  my $codeC = $fhos{$sec}{$tB};
+  #  print STDERR "tree $t1 $sec $off $len $rl\n";
   if (defined $codeC && length ($codeC) > 0){
-    return safeDecomp ($codeC);
+    return safeDecomp ($codeC, "tree $t1 $sec $off $len $rl\n");
   }else{
     return "";
   }
@@ -342,8 +342,9 @@ sub getC {
   seek ($f, $off, 0);
   my $codeC = "";
   my $rl = read ($f, $codeC, $len);
+  #print STDERR "commit $sec $t1 $off $len $rl\n";
   if (defined $codeC && length ($codeC) > 0){
-    return safeDecomp ($codeC);
+    return safeDecomp ($codeC, "commit $sec $t1 $off $len $rl\n");
   }else{
     return;
   }

@@ -44,9 +44,11 @@ for my $s ($part, $part + 32, $part + 64, $part + 96){
     chop();
     my ($nn, $of, $len, $hash) = split (/\;/, $_, -1);
     my $h = fromHex ($hash);
+    next if defined $c2pc{$h};
     my $sec = (unpack "C", substr ($h, 0, 1)) % 32;
     print STDERR "problem $sec $part\n" if $sec != $part;
     my $codeC = "";
+    seek (FD, $of, 0);
     my $rl = read (FD, $codeC, $len);
     my ($parent) = extrPar ($codeC);
     if ($parent eq ""){
