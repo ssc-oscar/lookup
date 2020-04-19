@@ -6,7 +6,7 @@
 #PBS -j oe
 #PBS -S /bin/bash
 LD_LIBRARY_PATH=$HOME/lib:$HOME/lib64:$LD_LIBRARY_PATH
-c=/lustre/haven/user/audris/basemaps
+c=/lustre/haven/user/audris/gz
 cd $c
 
 #https://github.com/luislobo/common-js-file-extensions/blob/master/index.js
@@ -120,7 +120,7 @@ fi
 # for j in {0..127}; do lsort 2G -t\; -k1b,2 <(zcat b$pVer${LA}pkgs.$j.gz) <(zcat b$ver${LA}pkgs.$j.s1) | gzip > b$ver${LA}pkgs.$j.gz; done
 # # copy back
 # scp -p da4:/data/play/${LA}thruMaps/b$ver${LA}pkgs.*.gz .
-# sed "s/PART/second/;s/VER/L/g;s/LANG/$LA/;s/beacon/monster/" ~/lookup/grepNew.pbs | qsub
+# sed "s/PART/second/;s/VER/$ver/g;s/LANG/$LA/;s/MACHINE/monster/" ~/lookup/grepNew.pbs | qsub
 
 # for JS look in the following, since dependencies are not in the .js files
 #grepStr=';(bower.json|package.json|packages/[^/]*/package.json|codemods/[^/]*/package.json|lerna.json|yarn.lock|package-lock.json)$'
@@ -184,9 +184,12 @@ echo c2p$ver$LA.$j.gz
 zcat c2p$ver$LA.*.gz | cut -d\; -f2 | lsort $(($maxM*32))G  -u | gzip > p$ver$LA.gz
 echo p$ver$LA.gz
 
+#fi
+#if test $part = 'firstb'; then
+
 # get time/author attributes for relevant commits 
 for j in {0..31}
-do zcat c2taF$ver.$j.s | join -t\; - <(zcat c$ver$LA.$j.cs) | gzip > c2ta$ver$LA.$j.gz &
+do zcat ../c2fb/c2taFull$ver.$j.s | join -t\; - <(zcat c$ver$LA.$j.cs) | gzip > c2ta$ver$LA.$j.gz &
 done
 wait
 echo c2ta$ver$LA.$j.gz
@@ -246,8 +249,8 @@ do zcat c2pta$ver$LA.$j.gz | join -t\; - <(zcat c2bPkg$ver$LA.$j.s) | gzip > c2b
 done
 wait
 echo c2bptaPkg$ver$LA.$j.gz
-
 fi
+
 
 for j in {0..31}
 do zcat c2bptaPkg$ver$LA.$j.gz
@@ -267,17 +270,20 @@ echo p2m$ver$LA
 fi
 if test $part = second; then
 
-
 # map projects based on forks
-#zcat c2pFull$ver.forks | lsort $(($maxM*32))G -t\; -k1b,1 | join -t\; - <(zcat p$ver$LA.gz) | gzip > p$ver$LA.forks
-zcat c2pFull$ver.forks.s | join -t\; - <(zcat p$ver$LA.gz) | gzip > p$ver$LA.forks
+##zcat c2pFull$ver.forks | lsort $(($maxM*32))G -t\; -k1b,1 | join -t\; - <(zcat p$ver$LA.gz) | gzip > p$ver$LA.forks
+#zcat c2pFull$ver.forks.s | join -t\; - <(zcat p$ver$LA.gz) | gzip > p$ver$LA.forks
 
+#zcat pQnoAdj.forks.s | join -t\; - <(zcat p$ver$LA.gz) | gzip > p$ver$LA.forks
+zcat p2P$ver.s | join -t\; - <(zcat p$ver$LA.gz) | gzip > p$ver$LA.forks
 # create an c2p map for canonical project names
+
 for j in {0..31}
 do zcat c2p$ver$LA.$j.gz |  perl $HOME/lookup/mp.perl 1 p$ver$LA.forks | uniq | lsort ${maxM}G -u | gzip > c2P$ver$LA.$j.gz &
 done
 wait
 echo c2P$ver$LA.$j.gz
+
 
 # add time/author attributes (mesed up for all)
 for j in {0..31}
@@ -344,12 +350,18 @@ done
 wait
 echo c2bPkg$ver$LA.$j.s
 
+#fi
+#if test $part = 'final'; then
+
 # add blob and package info to Pta
 for j in {0..31}
 do zcat c2Pta$ver$LA.$j.gz | join -t\; - <(zcat c2bPkg$ver$LA.$j.s) | gzip > c2bPtaPkg$ver$LA.$j.gz &
 done
 wait
 echo c2bPtaPkg$ver$LA.$j.gz
+
+fi
+if test 'a' = 'b'; then
 
 #do summaries
 for j in {0..31}
@@ -381,5 +393,27 @@ wait
 echo $ver$LA.$m1
 
 fi
+if test $part = 'trend'; then
+
+if test 'a' = 'b'; then
+for LA in jl pl R F Go Scala Rust Cs PY ipy JS C java rb
+do 
+  for j in {0..31}
+  do zcat c2bPtaPkgQ$LA.$j.gz | cut -d\; -f2,3,4,6- | uniq | gzip > PtaPkgQ$LA.$j.gz &
+  done
+  wait
+  echo PtaPkgQ$LA.$j.gz 
+done
+fi
+
+for LA in jl pl R F Go Scala Rust Cs PY ipy JS C java rb
+do
+  for j in {0..31}
+  do zcat PtaPkgQ$LA.$j.gz | lsort ${maxM}G -t\| | uniq | gzip > PtaPkgQ$LA.$j.s &
+  done
+  wait
+  echo PtaPkgQ$LA.$j.s
+done
 
 
+fi
