@@ -240,6 +240,34 @@ literal
 symbol
 icon
 parameterEntity
+conference
+domain
+element
+formal
+functor
+grammar
+guard
+operator
+protectspec
+region
+repoid
+rule
+separate
+taskspec
+theme
+token
+toplevelVariable
+element
+functor
+inline
+modport
+modulepar
+namedPattern
+namedTemplate
+repoid
+synonym
+theme
+timer
 EOT
 
 my $regExp = $types;
