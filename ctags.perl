@@ -47,6 +47,105 @@ heading2
 heading3
 heading4
 heading5
+key
+property
+section
+source
+citation
+id
+packageName
+inproceedings
+signal
+subprogspec
+category
+play
+generator
+library
+subst
+accessor
+methodSpec
+subprogram
+Constructor
+group
+const
+describe
+entity
+getter
+book
+target
+implementation
+singletonMethod
+tag
+unknown
+paragraph
+enumConstant
+procedure
+interface
+subsubsection
+globalVar
+data
+arg
+chapter
+null
+func
+article
+functionVar
+subsection
+selector
+entry
+fd
+frametitle
+l5subsection
+ltlibrary
+misc
+phdthesis
+placeholder
+protected
+record
+register
+script
+signature
+structure
+directory
+node
+packspec
+template
+annotation
+division
+program
+project
+root
+title
+trait
+Exception
+component
+event
+heredoc
+message
+common
+optwith
+def
+incollection
+setter
+value
+anonMember
+mixin
+port
+repositoryId
+modifiedFile
+context
+constructor
+index
+optenable
+command
+inbook
+table
+condition
+definition
+parameter
+groupId
+hunk
+l4subsection
 EOT
 
 my $regExp = $types;
@@ -150,7 +249,7 @@ sub dDump {
   my %tmp = ();
   while (<IN>){
     my ($t, $n, $f) = Declarations ($_);
-    print STDERR "$t\;$n\;$f\n";
+    #print STDERR "$t\;$n\;$f\n";
     $tmp{$ibatch{$f}}{"$t|$n"}++ if $t ne "" && $f ne "" && defined $ibatch{$f};
   }
   for my $b (keys %tmp){
