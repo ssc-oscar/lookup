@@ -356,7 +356,7 @@ sub dDump {
   for my $b (keys %batch){
     my $f = $batch{$b};
     my ($off, $len) = getBinf ($b);
-    if ($len < 1000000 && ($f !~ /\.json$/ || $len < 10000)){
+    if ($len < 100000 && ($f !~ /\.json$/ || $len < 5000)){
       my $cnt = getBlob ($off, $len, $b);
       if ($cnt ne ""){
         #printf STDERR "in dump: $f $b $ibatch{$f} $batch{$b}\n";
