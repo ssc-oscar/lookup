@@ -38,13 +38,24 @@ struct
 typedef
 enum
 union
+var
+module
+RecordField
 variable
-heading[0-9]
+heading1
+heading2
+heading3
+heading4
+heading5
 EOT
 
 my $regExp = $types;
 $regExp =~ s/\n/|/g;
 $regExp = "^$regExp\$";
+my %matches;
+for my $k (split(/\n/, $types, -1)){
+  $matches{$k}++;
+}
 
 my $sec = $ARGV[0];
 
@@ -126,6 +137,7 @@ sub dDump {
     if ($len < 1000000 && ($f !~ /\.json$/ || $len < 10000)){
       my $cnt = getBlob ($off, $len, $b);
       if ($cnt ne ""){
+        #printf STDERR "in dump: $f $b $ibatch{$f} $batch{$b}\n";
         open OUTPUT, ">$f";
         print OUTPUT $cnt;
         print FLIST "$f\n";
@@ -138,6 +150,7 @@ sub dDump {
   my %tmp = ();
   while (<IN>){
     my ($t, $n, $f) = Declarations ($_);
+    print STDERR "$t\;$n\;$f\n";
     $tmp{$ibatch{$f}}{"$t|$n"}++ if $t ne "" && $f ne "" && defined $ibatch{$f};
   }
   for my $b (keys %tmp){
@@ -188,12 +201,13 @@ sub getBlob {
 
 sub Declarations {
   my %decl = ();
-  my $rest;
-  die "unable to parse output ctags:$_:" unless /^(.+?)\s+([^ ]+?)\s+([0-9]+)\s+([^ ]+?)\s*(.*)$/;
-  ($decl{name}, $decl{type}, $decl{line}, $rest) = ($1, $2, $3, $4);
-  if ($decl{type} =~ m|$regExp|){
+  my ($file, $rest);
+  die "unable to parse output ctags:$_:" unless /^(.+?)\s+([^ ]+?)\s+([0-9]+)\s+([0-9]+_[^ ]+)\s*(.*)$/;
+  ($decl{name}, $decl{type}, $decl{line}, $file, $rest) = ($1, $2, $3, $4, $5);
+  #if ($decl{type} =~ m|$regExp|){
+  if (defined $matches{$decl{type}}){
   }else{
-    print STDERR "$decl{type}\n"; return ("", "", "");
+    print STDERR "bad type:$decl{type}:\n"; return ("", "", "");
   }
-  return ($decl{type}, $decl{name}, $rest);
+  return ($decl{type}, $decl{name}, $file);
 }
