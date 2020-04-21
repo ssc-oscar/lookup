@@ -371,6 +371,8 @@ sub dDump {
         print OUTPUT $cnt;
         print FLIST "$f\n";
       }
+    }else{
+      print STDERR "large file;$sec;$f;$b\n";
     }
   }
   close OUTPUT;
