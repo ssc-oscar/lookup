@@ -271,6 +271,11 @@ timer
 submodule
 error
 probe
+covergroup
+error
+altstep
+identifier
+infoitem
 EOT
 
 my $regExp = $types;
@@ -431,7 +436,7 @@ sub Declarations {
   #if ($decl{type} =~ m|$regExp|){
   if (defined $matches{$decl{type}}){
   }else{
-    print STDERR "bad type:$decl{type}:\n"; return ("", "", "");
+    print STDERR "new type:$decl{type}:\n";
   }
   return ($decl{type}, $decl{name}, $file);
 }
