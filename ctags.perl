@@ -189,7 +189,7 @@ sub getBlob {
 sub Declarations {
   my %decl = ();
   my $rest;
-  die "unable to parse output ctags:$_:" unless /^(.+?)\s+([^ ]+?)\s+([0-9]+)\s+([^ ]+?)\s+(.+)$/;
+  die "unable to parse output ctags:$_:" unless /^(.+?)\s+([^ ]+?)\s+([0-9]+)\s+([^ ]+?)\s*(.*)$/;
   ($decl{name}, $decl{type}, $decl{line}, $rest) = ($1, $2, $3, $4);
   if ($decl{type} =~ m|$regExp|){
   }else{
