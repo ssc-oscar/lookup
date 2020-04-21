@@ -269,6 +269,8 @@ synonym
 theme
 timer
 submodule
+error
+probe
 EOT
 
 my $regExp = $types;
@@ -295,7 +297,7 @@ my $record = 0;
 my $pb = "";
 my $pf = "";
 my $i = 0;
-my $maxBatch = 10000;
+my $maxBatch = 1000;
 my %batch;
 my %ibatch;
 while (<STDIN>){
@@ -368,7 +370,7 @@ sub dDump {
   }
   close OUTPUT;
   close FLIST;
-  open IN, '$HOME/bin/ctags -x -L flist |';
+  open IN, '$HOME/bin/ctags -ux -L flist |';
   my %tmp = ();
   while (<IN>){
     my ($t, $n, $f) = Declarations ($_);
