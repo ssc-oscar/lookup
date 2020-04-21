@@ -381,11 +381,18 @@ sub dDump {
   my %tmp = ();
   while (<IN>){
     my ($t, $n, $f) = Declarations ($_);
+    my $val = "$t|$n";
     #print STDERR "$t\;$n\;$f\n";
-    $tmp{$ibatch{$f}}{"$t|$n"}++ if $t ne "" && $f ne "" && defined $ibatch{$f};
+    #$tmp{$ibatch{$f}}{"$t|$n"}++ if $t ne "" && $f ne "" && defined $ibatch{$f};
+    if ($t ne "" && $f ne "" && defined $ibatch{$f}){
+      $tmp{$ibatch{$f}} .= "\n$val";
+    }
+    #push @tmp{$ibatch{$f}}{"$t|$n"}++ if $t ne "" && $f ne "" && defined $ibatch{$f};
   }
   for my $b (keys %tmp){
-    my $code = join "\n", (sort keys %{$tmp{$b}});
+    #my $code = join "\n", (sort keys %{$tmp{$b}});
+    my $code = $tmp{$b};
+    $code =~ s/^\n//;
     my $len = length ($code);
     my $cnt = safeComp ($code);
     my $lenC = length ($cnt);
