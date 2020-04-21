@@ -268,6 +268,7 @@ repoid
 synonym
 theme
 timer
+submodule
 EOT
 
 my $regExp = $types;
