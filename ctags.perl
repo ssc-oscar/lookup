@@ -62,7 +62,7 @@ my $record = 0;
 my $pb = "";
 my $pf = "";
 my $i = 0;
-my $maxBatch = 800;
+my $maxBatch = 10000;
 my %batch;
 my %ibatch;
 while (<STDIN>){
