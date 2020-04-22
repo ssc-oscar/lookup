@@ -276,6 +276,23 @@ error
 altstep
 identifier
 infoitem
+MSI
+Series
+edesc
+filename
+fragment
+iparam
+kind
+langdef
+notation
+oparam
+phandler
+pkg
+publication
+qmp
+reopen
+slot
+font
 EOT
 
 my $regExp = $types;
