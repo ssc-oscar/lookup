@@ -13,6 +13,8 @@ tie %c2p, "TokyoCabinet::HDB", "$fname", TokyoCabinet::HDB::OWRITER | TokyoCabin
    16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
   or die "cant open $fname\n";
 
+my $doCmprs = 1;
+$doCmprs = $ARGV[1] + 0 if defined $ARGV[1];
 my $lines = 0;
 my $nc = 0;
 my $doDump = 0;
@@ -63,7 +65,11 @@ sub large {
     print A $psC;
     close (A);
   }else{
-    $c2p1{$cp} = safeComp ($psC);
+    if ($doCmprs){ 
+      $c2p1{$cp} = safeComp ($psC);
+    }else{
+      $c2p1{$cp} = $psC;
+    }
   } 
 }
 
