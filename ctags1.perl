@@ -8,6 +8,19 @@ use Getopt::Long;
 use TokyoCabinet;
 use Digest::SHA qw (sha1_hex sha1);
 
+my %ctagsHangs = ("8209fa2425c1c1d0bf20a3870d6f0546540c0958" => "operatorservice.proto",
+    "9a47ff27af14024249378f749e2097b3da7185ea" => "broker.proto",
+    "17383b248e9c1221916771f96a6ecf73f4b0ec50" => "wishlist.proto",
+    "7f7d775242dd83df60df9ae2c20cd1b60d396c5b" => "mastersvc.proto", 
+    "7e832be15a29257298da48ef3445606e9ec6d7aa" => "gTogether.proto");
+
+my %ctagsHangsF;
+
+for my $f (values %ctagsHangs){
+  $ctagsHangsF{$f}++;
+}
+
+
 my $types =  <<"EOT";
 Math
 alias
@@ -323,8 +336,8 @@ my %ibatch;
 while (<STDIN>){
   chop();
   my ($b, $f, $off, $len) = split(/;/, $_, -1);
-  if ($len < 100000 && ($f !~ /\.json$/ || $len < 5000)){	  
-    $f =~ s|.*/||;
+  $f =~ s|.*/||;
+  if ($len < 100000 && ($f !~ /\.json$/ || $len < 5000) && ! defined $ctagsHangs{$b} && ! defined $ctagsHangs{$f}){	  
     $f =~ s/[()\+\-\?\!\'\"\s]//g;
     #print STDERR "$b, $off, $len, ${i}_$f\n";
     addBlob ($b, $off, $len, ${i}."_".$f);
