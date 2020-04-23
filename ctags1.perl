@@ -12,7 +12,13 @@ my %ctagsHangs = ("8209fa2425c1c1d0bf20a3870d6f0546540c0958" => "operatorservice
     "9a47ff27af14024249378f749e2097b3da7185ea" => "broker.proto",
     "17383b248e9c1221916771f96a6ecf73f4b0ec50" => "wishlist.proto",
     "7f7d775242dd83df60df9ae2c20cd1b60d396c5b" => "mastersvc.proto", 
-    "7e832be15a29257298da48ef3445606e9ec6d7aa" => "gTogether.proto");
+    "7e832be15a29257298da48ef3445606e9ec6d7aa" => "gTogether.proto",
+    "7a5e1def59408c0a82f7762959b7ce07c0cb1327" => "todo-service.proto",
+    "7aead53de23be4193ac29711899c0bf230156c75" => "todo-service.proto",
+    "fac3b539ae1a7433e4d7fbd2f33dbf2e43c8636d" => "todo-service.proto",
+    "7af256a5e30a0c260f055e2a122d7b52e60e3831" => "todo-service.proto",
+    "7afe7b6b64d78faa740a19a451d7334360c8f7d2" => "todo-service.proto",
+    "7764d1e496837d9566463610236e8801dea6f0ed" => "ChatService.proto");
 
 my %ctagsHangsF;
 
@@ -399,10 +405,19 @@ sub dDump {
     print FLIST "$f\n";
   }
   close FLIST;
-  open IN, '$HOME/bin/ctags --fields=kKlz  -L flist -uf - |';
+  open IN, '$HOME/bin/myTimeout 600s $HOME/bin/ctags --fields=kKlz  -L flist -uf - |';
   my %tmp = ();
   my %ll = ();
+  my $start = 1;
   while (<IN>){
+    chop();
+    if ($start && $_ =~ /^TIMEOUT$/){
+      for my $b (keys %batch){
+        printf STDERR "BAD_BATCH:$b\;$batch{$b}\n";
+      }
+      last;
+    }
+    $start = 0;
     my ($t, $n, $f, $lan) = Declarations ($_);
     #print STDERR "$t\;$n\;$f\n";
     #$tmp{$ibatch{$f}}{"$t|$n"}++ if $t ne "" && $f ne "" && defined $ibatch{$f};
