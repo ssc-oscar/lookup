@@ -408,16 +408,14 @@ sub dDump {
   open IN, '$HOME/bin/myTimeout 600s $HOME/bin/ctags --fields=kKlz  -L flist -uf - |';
   my %tmp = ();
   my %ll = ();
-  my $start = 1;
   while (<IN>){
     chop();
-    if ($start && $_ =~ /^TIMEOUT$/){
+    if ($_ =~ /^TIMEOUT_TIMEOUT_TIMEOUT$/){
       for my $b (keys %batch){
         printf STDERR "BAD_BATCH:$b\;$batch{$b}\n";
       }
       last;
     }
-    $start = 0;
     my ($t, $n, $f, $lan) = Declarations ($_);
     #print STDERR "$t\;$n\;$f\n";
     #$tmp{$ibatch{$f}}{"$t|$n"}++ if $t ne "" && $f ne "" && defined $ibatch{$f};
