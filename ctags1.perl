@@ -312,6 +312,9 @@ qmp
 reopen
 slot
 font
+mlconn
+mlprop
+mltable
 EOT
 
 my $regExp = $types;
