@@ -32,7 +32,7 @@ my $offset = 0;
 
 while (<STDIN>){
   chop();
-  my $ch = $_;
+  my ($ch, @rest) = split (/;/, $_, -1);
   my $l = length($ch);
   my $c = $ch;
   $c = safeComp ($ch) if $f1 =~ /c/;
@@ -43,6 +43,10 @@ while (<STDIN>){
     my $d = unpack 'w', (substr($v, 20, length($v) - 20));
     print "$offset\;$l\;$ch\;$h\;$d\n";
   }else{
+    if (!defined $v || $v eq ""){
+      print STDERR "no value for :$ch:\n";
+      next;
+    }
     my $res = ";$v";
     if ($f2 =~ /cs/){
       $res = ";".$v;
@@ -55,6 +59,7 @@ while (<STDIN>){
         $res .= ";" . toHex (substr($v, $i*20, 20));
       }
     }
+    $res .= ";".(join ';', @rest) if $#rest >= 0;
     print "$ch$res\n";
   }
   $offset++;

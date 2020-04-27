@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 my %r2cr;
-open A, "zcat ghForkMap.gz|";
+open A, "zcat ghForkMapR.gz|";
 while (<A>){
   chop();
   my ($r, $f) = split (/;/);

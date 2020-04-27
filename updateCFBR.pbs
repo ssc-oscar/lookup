@@ -1,0 +1,386 @@
+#PBS -N WHAT
+#PBS -A ACF-UTK0011
+#PBS -l feature=MACHINE
+#PBS -l partition=MACHINE
+#PBS -l nodes=1:ppn=16,walltime=23:50:00
+#PBS -j oe
+#PBS -S /bin/bash
+LD_LIBRARY_PATH=$HOME/lib:$HOME/lib64:$LD_LIBRARY_PATH
+c=/lustre/haven/user/audris/c2fb
+cd $c
+
+what=WHAT
+ver=R
+pVer=PVE
+
+maxM=6G
+machine=MACHINE
+[[ $machine == monster ]] && maxM=29G
+[[ $machine == rho ]] && maxM=900M
+[[ $machine == sigma ]] && maxM=2900M
+
+if test "y" = "n"; then
+
+for j in {0..31}
+do zcat ../gz/c2pFull$ver$j.s |  perl -I $HOME/lib/perl5 -I $HOME/lookup $HOME/lookup/splitSec.perl c2pFull$ver$j. 128  &
+done
+wait
+echo c2pFull$ver$j.
+
+for j in {0..127}
+do i=$(($j%32)); mv c2pFull$ver$i.$j.gz c2pFull$ver$j.s
+done
+
+fi
+if test "y" = "n"; then
+
+for j in {0..31}
+do zcat c2fFull$ver$j.s | sed 's|;/|;|' | $HOME/bin/lsort $maxM -t\; -k1,2 -u | gzip > c2fFull$ver$j.s1 &
+done 
+wait
+echo c2fFull$ver$j.s1
+for j in {32..63}
+do zcat c2fFull$ver$j.s | sed 's|;/|;|' | $HOME/bin/lsort $maxM -t\; -k1,2 -u | gzip > c2fFull$ver$j.s1 &
+done 
+wait
+echo c2fFull$ver$j.s1
+for j in {64..95}
+do zcat c2fFull$ver$j.s | sed 's|;/|;|' | $HOME/bin/lsort $maxM -t\; -k1,2 -u | gzip > c2fFull$ver$j.s1 &
+done 
+wait
+echo c2fFull$ver$j.s1
+for j in {96..127}
+do zcat c2fFull$ver$j.s | sed 's|;/|;|' | $HOME/bin/lsort $maxM -t\; -k1,2 -u | gzip > c2fFull$ver$j.s1 &
+done 
+wait
+echo c2fFull$ver$j.s1
+
+fi
+if test "y" = "n"; then
+
+for j in {0..127}
+do zcat c2fbbFull$ver$j.s | perl -I ~/lookup/ -I ~/lib/perl5 -e 'use cmt; while(<STDIN>){$l=$_;($c,$f,$bn,$bo) = split(/;/,$l,-1); print "$c;$f\n" if !defined $badCmt{$c} && $f ne "";}' | uniq | $HOME/bin/lsort $maxM -t\; -k1,2 -u | gzip > c2fFull$ver$j.s &
+done
+wait
+echo c2fFull$ver$j.s
+
+for j in {0..127}
+do zcat c2fbbFull$ver$j.s | perl -I ~/lookup/ -I ~/lib/perl5 -e 'use cmt; while(<STDIN>){$l=$_;($c,$f,$bn,$bo) = split(/;/,$l,-1); print "$c;$bn\n" if !defined $badCmt{$c} && $bn ne "";}' | uniq | $HOME/bin/lsort $maxM -t\; -k1,2 -u | gzip > c2bFull$ver$j.s &
+done
+wait
+echo c2bFull$ver$j.s
+
+fi
+if test "y" = "n"; then
+
+for j in {0..127}
+do zcat c2fbbFull$ver$j.s | perl -I ~/lookup/ -I ~/lib/perl5 -e 'use cmt; while(<STDIN>){$l=$_;($c,$f,$bn,$bo) = split(/;/,$l,-1); print "$bn;$bo\n" if !defined $badCmt{$c} && $bn =~ /^[0-9a-f]{40}$/ && $bo =~ /^[0-9a-f]{40}$/;}' | uniq | gzip > b2bFull$ver.$j.gz &
+done
+wait
+echo  b2bFull$ver.$j.gz
+
+for j in {0..127}
+do zcat c2fbbFull$ver$j.s | perl -I ~/lookup/ -I ~/lib/perl5 -e 'use cmt; while(<STDIN>){$l=$_;($c,$f,$bn,$bo) = split(/;/,$l,-1); print "$bo;$bn\n" if !defined $badCmt{$c} && $bn =~ /^[0-9a-f]{40}$/ && $bo =~ /^[0-9a-f]{40}$/;}' | uniq | gzip > ob2bFull$ver.$j.gz &
+done
+wait
+echo  ob2bFull$ver.$j.gz
+
+fi
+if test "y" = "n"; then
+
+for j in {0..127}
+do zcat c2fbbFull$ver$j.s | perl -I ~/lookup/ -I ~/lib/perl5 -e 'use cmt; while(<STDIN>){$l=$_;($c,$f,$bn,$bo) = split(/;/,$l,-1); print "$bn;$c\n" if !defined $badCmt{$c} && $bn ne "";}' | uniq | gzip > b2cFull$ver.$j.gz &
+done
+wait
+echo b2cFull$ver.$j.gz
+
+fi
+if test "y" = "n"; then
+
+for j in {0..127}
+do zcat c2fbbFull$ver$j.s | perl -I ~/lookup/ -I ~/lib/perl5 -e 'use cmt; while(<STDIN>){$l=$_;($c,$f,$bn,$bo) = split(/;/,$l,-1); print "$bn;$f\n" if !defined $badCmt{$c} && $bn ne "" && $f ne "";}' | uniq | gzip > b2fFull$ver.$j.gz &
+done
+wait
+echo b2fFull$ver.$j.gz
+
+fi
+if test "y" = "n"; then
+
+for j in {0..127}
+do zcat c2fbbFull$ver$j.s | perl -I ~/lookup/ -I ~/lib/perl5 -e 'use cmt; while(<STDIN>){$l=$_;($c,$f,$bn,$bo) = split(/;/,$l,-1); print "$f;$c\n" if !defined $badCmt{$c} && $f ne "";}' | uniq | gzip > f2cFull$ver.$j.gz &
+done
+wait
+echo f2cFull$ver.$j.gz
+
+for j in {0..127}
+do zcat c2fbbFull$ver$j.s | perl -I ~/lookup/ -I ~/lib/perl5 -e 'use cmt; while(<STDIN>){$l=$_;($c,$f,$bn,$bo) = split(/;/,$l,-1); print "$f;$bn\n" if !defined $badCmt{$c} && $bn ne "" && $f ne "";}' | uniq | gzip >f2bFull$ver.$j.gz &
+done
+wait
+echo f2bFull$ver.$j.gz
+
+fi
+if test "y" = "y"; then
+
+#what=f2cFull$ver.
+#what=f2bFull$ver.
+#what=b2fFull$ver.
+#what=b2cFull$ver.
+# what b2c b2f f2c f2b
+what=${what}Full$ver.
+
+for j in {0..31}
+do zcat $what$j.gz |  perl -I $HOME/lib/perl5 -I $HOME/lookup $HOME/lookup/splitSec.perl $what$j. 128 &
+done
+wait
+echo $what$j.
+
+for j in {32..63}
+do zcat $what$j.gz |  perl -I $HOME/lib/perl5 -I $HOME/lookup $HOME/lookup/splitSec.perl $what$j. 128 &
+done
+wait
+echo $what$j.
+
+for j in {64..95}
+do zcat $what$j.gz |  perl -I $HOME/lib/perl5 -I $HOME/lookup $HOME/lookup/splitSec.perl $what$j. 128 &
+done
+wait
+echo $what$j.
+
+for j in {96..127}
+do zcat $what$j.gz |  perl -I $HOME/lib/perl5 -I $HOME/lookup $HOME/lookup/splitSec.perl $what$j. 128 &
+done
+wait
+echo $what$j.
+
+
+
+#fi
+#if test "y" = "y"; then
+
+for j in {0..127}
+do 
+ for i in {0..31}
+ do zcat $what$i.$j.gz | $HOME/bin/lsort $maxM -t\; -k1,2 | gzip > $what$i.$j.s &
+ done
+ wait
+ echo $what$i.$j.s
+ for i in {32..63}
+ do zcat $what$i.$j.gz | $HOME/bin/lsort $maxM -t\; -k1,2 | gzip > $what$i.$j.s &
+ done
+ wait
+ echo $what$i.$j.s
+ for i in {64..95}
+ do zcat $what$i.$j.gz | $HOME/bin/lsort $maxM -t\; -k1,2 | gzip > $what$i.$j.s &
+ done
+ wait
+ echo $what$i.$j.s
+ for i in {96..127}
+ do zcat $what$i.$j.gz | $HOME/bin/lsort $maxM -t\; -k1,2 | gzip > $what$i.$j.s &
+ done
+ wait
+ echo $what$i.$j.s
+done  
+ 
+
+#fi
+#if test "y" = "n"; then
+
+for j in {0..31}
+do str="$HOME/bin/lsort $maxM -t\; -k1,2 --merge"
+   for i in {0..127}
+   do str="$str <(zcat $what$i.$j.s)"
+   done
+   eval $str | gzip > $what$j.s &
+done
+wait
+echo $what$j.s
+for j in {32..63}
+do str="$HOME/bin/lsort $maxM -t\; -k1,2 --merge"
+   for i in {0..127}
+   do str="$str <(zcat $what$i.$j.s)"
+   done
+   eval $str | gzip > $what$j.s &
+done
+wait
+echo $what$j.s
+for j in {64..95}
+do str="$HOME/bin/lsort $maxM -t\; -k1,2 --merge"
+   for i in {0..127}
+   do str="$str <(zcat $what$i.$j.s)"
+   done
+   eval $str | gzip > $what$j.s &
+done
+wait
+echo $what$j.s
+for j in {96..127}
+do str="$HOME/bin/lsort $maxM -t\; -k1,2 --merge"
+   for i in {0..127}
+   do str="$str <(zcat $what$i.$j.s)"
+   done
+   eval $str | gzip > $what$j.s &
+done
+wait
+echo $what$j.s
+
+fi
+if test "y" = "n"; then
+
+for j in {0..127}
+do zcat c2fFull$ver$j.s | join -t\; - <(zcat c2taFull$ver$j.s|cut -d\; -f1,3) | \
+  awk -F\; '{ print $3";"$2}' | uniq | perl -I $HOME/lib/perl5 -I $HOME/lookup $HOME/lookup/splitSecCh.perl a2f$ver.$j. 32 &
+done
+wait
+echo a2f$ver.$j.
+
+for j in {0..31}
+do for i in {0..31}
+ do zcat a2f$ver.$i.$j.gz | $HOME/bin/lsort $maxM -t\; -k1,2 | gzip > a2f$ver.$i.$j.s &
+ done
+ wait
+ echo a2f$ver.$i.$j.s
+done
+for j in {0..31}
+do for i in {32..63}
+ do zcat a2f$ver.$i.$j.gz | $HOME/bin/lsort $maxM -t\; -k1,2 | gzip > a2f$ver.$i.$j.s &
+ done
+ wait
+ echo a2f$ver.$i.$j.s
+done
+for j in {0..31}
+do for i in {64..95}
+ do zcat a2f$ver.$i.$j.gz | $HOME/bin/lsort $maxM -t\; -k1,2 | gzip > a2f$ver.$i.$j.s &
+ done
+ wait
+ echo a2f$ver.$i.$j.s
+done
+for j in {0..31}
+do for i in {96..127}
+ do zcat a2f$ver.$i.$j.gz | $HOME/bin/lsort $maxM -t\; -k1,2 | gzip > a2f$ver.$i.$j.s &
+ done
+ wait
+ echo a2f$ver.$i.$j.s
+done
+
+
+
+fi
+if test "y" = "n"; then
+
+for j in {0..127}
+do zcat c2bFull$ver$j.s | join -t\; - <(zcat c2taFull$ver$j.s) | \
+  awk -F\; '{ print $2";"$3";"$4";"$1}' | perl -I $HOME/lib/perl5 -I $HOME/lookup $HOME/lookup/splitSec.perl b2ta$ver.$j. 128 &
+done
+wait
+echo b2ta$ver.$j.
+
+for j in {0..127}
+do for i in {0..31}
+ do zcat b2ta$ver.$i.$j.gz | $HOME/bin/lsort $maxM -t\; -k1,2 | gzip > b2ta$ver.$i.$j.s &
+ done
+ wait
+ echo b2ta$ver.$i.$j.s
+ 
+ for i in {32..63}
+ do zcat b2ta$ver.$i.$j.gz | $HOME/bin/lsort $maxM -t\; -k1,2 | gzip > b2ta$ver.$i.$j.s &
+ done
+ wait
+ echo b2ta$ver.$i.$j.s
+
+ for i in {64..95}
+ do zcat b2ta$ver.$i.$j.gz | $HOME/bin/lsort $maxM -t\; -k1,2 | gzip > b2ta$ver.$i.$j.s &
+ done
+ wait
+ echo b2ta$ver.$i.$j.s
+
+ for i in {96..127}
+ do zcat b2ta$ver.$i.$j.gz | $HOME/bin/lsort $maxM -t\; -k1,2 | gzip > b2ta$ver.$i.$j.s &
+ done
+ wait
+ echo b2ta$ver.$i.$j.s
+done
+
+for j in {0..31} #do for four intervals
+do str="$HOME/bin/lsort $maxM -t\; -k1,2 --merge -u"
+   for i in {0..127}
+   do str="$str <(zcat b2ta$ver.$i.$j.s)"
+   done
+   eval $str | gzip > b2taFull$ver$j.s &
+done
+wait
+echo b2taFull$ver$j.s
+
+for j in {32..63} #do for four intervals
+do str="$HOME/bin/lsort $maxM -t\; -k1,2 --merge -u"
+   for i in {0..127}
+   do str="$str <(zcat b2ta$ver.$i.$j.s)"
+   done
+   eval $str | gzip > b2taFull$ver$j.s &
+done
+wait
+echo b2taFull$ver$j.s
+
+for j in {64..95} #do for four intervals
+do str="$HOME/bin/lsort $maxM -t\; -k1,2 --merge -u"
+   for i in {0..127}
+   do str="$str <(zcat b2ta$ver.$i.$j.s)"
+   done
+   eval $str | gzip > b2taFull$ver$j.s &
+done
+wait
+echo b2taFull$ver$j.s
+
+for j in {96..127} #do for four intervals
+do str="$HOME/bin/lsort $maxM -t\; -k1,2 --merge -u"
+   for i in {0..127}
+   do str="$str <(zcat b2ta$ver.$i.$j.s)"
+   done
+   eval $str | gzip > b2taFull$ver$j.s &
+done
+wait
+echo b2taFull$ver$j.s
+
+
+fi
+if test "y" = "n"; then
+
+for j in {0..127}
+do zcat b2taFull$ver$j.s | perl -e '$pb="";while(<STDIN>){@x=split(/;/);print if ($x[0] ne $pb); $pb=$x[0];}' | gzip > b2faFull$ver$j.s &
+done
+wait
+echo b2faFull$ver$j.s
+
+fi
+if test "y" = "n"; then
+
+for j in {0..127}
+do zcat b2taFull$ver$j.s | awk -F\; '{print $3";"$1}' | gzip > a2bFull$ver.$j.gz &
+done
+wait
+echo a2bFull$ver.$j.gz
+
+for j in {0..127}
+do zcat a2bFull$ver.$j.gz | perl -I $HOME/lib/perl5 -I $HOME/lookup $HOME/lookup/splitSecCh.perl a2bFull$ver.$j. 32 &
+done
+wait
+echo a2bFull$ver.$j.
+
+for j in {0..127}
+do for i in {0..127}
+ do zcat a2bFull$ver.$i.$j.gz | $HOME/bin/lsort $maxM -t\; -k1,2 | gzip > a2bFull$ver.$i.$j.s &
+ done
+ wait
+ echo a2bFull$ver.$i.$j.s
+done
+
+for j in {0..127}
+do str="$HOME/bin/lsort $maxM -t\; -k1,2 --merge -u"
+   for i in {0..127}
+   do str="$str <(zcat a2bFull$ver.$i.$j.s)"
+   done
+   eval $str | gzip > a2bFull$ver$j.s &
+done
+wait
+echo a2bFull$ver$j.s
+
+fi
+

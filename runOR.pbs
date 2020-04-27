@@ -1,4 +1,4 @@
-#PBS -N Q.Stg2.NNN
+#PBS -N R.Otr.NNN
 #PBS -A ACF-UTK0011
 #PBS -l feature=beacon
 #PBS -l partition=beacon
@@ -6,15 +6,15 @@
 #PBS -j oe
 #PBS -S /bin/bash
 
-ver=Q
+ver=R
 #DT=201910.Otr
-DT=201910.Stg2
+DT=202003.Otr
 #DT=201910
 sub=NNN
 #sub1=$(echo $sub | sed 's/\.[0-9]$//')
 sub1=$sub
 #c=/lustre/haven/user/audris/$ver.Otr.$sub1
-c=/lustre/haven/user/audris/$ver.Stg2.$sub1
+c=/lustre/haven/user/audris/$ver.Otr.$sub1
 #c=/lustre/haven/user/audris/$ver.$sub1
 cd $c
 /nics/b/home/audris/bin/doBeaconUpI.sh $sub ${ver}1 $c $DT list New  
