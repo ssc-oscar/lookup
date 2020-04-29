@@ -83,6 +83,7 @@ while (<STDIN>){
         read (VAL, $v, $len);
       }else{
         open VAL, "zcat $lF|";
+        <VAL>; #drop first line: it is just the key
         $v="";
         while (<VAL>){ $v .= $_; }
       } 
