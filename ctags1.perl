@@ -478,7 +478,6 @@ sub getBlob {
 
 
 sub Declarations {
-  chop ();
   my ($name, $file, $rest, $type, $lang) = ("", "", "", "", "");
   m|^(.+?)\s+([0-9][^ ]+?)\s+(.*)\s+kind:([^ :]+)\s+language:([^ :]+)$|;
   if (!defined $1){
