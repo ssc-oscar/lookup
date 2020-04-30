@@ -43,7 +43,7 @@ $f1 = "h" if ($t1 =~ /^[cb]$/);
 $f2 = "h" if ($t2 =~ /^[cb]$/ || $t2 =~ /^(cc|pc|fb)$/);
 
 $f2 = "sh" if $types eq "b2a";
-$f2 = "s" if $t2 eq "ta";
+$f2 = "s" if $t2 =~ /^(ta|tk)$/;
 $f2 = "r" if $types =~ /^c2[hr]$/;
 
 $f1 = $ARGV[1] if defined $ARGV[1];
