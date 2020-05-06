@@ -47,8 +47,9 @@ while(<STDIN>){
   my ($ob, $nb) = split (/;/, $_, -1);
   if ($nb =~ /^[0-9a-f]{40}$/ && $ob =~ /^[0-9a-f]{40}$/){
     next if $pch eq "$ob;$nb" || $ob eq $nb; #in case of repeats or no change
-	  $pch = "$ob;$nb";
+    $pch = "$ob;$nb";
     my $diff = output ($ob, $nb);
+    $diff =~ s/\n$//;
     my $l = length ($diff);
     if ($l > 0){
       my $diffc = safeComp ($diff);
@@ -79,8 +80,8 @@ sub output {
 
   my %bos; for my $b (split (/\n/, $bot, -1)) { $bos{$b}++; };
   my %bns; for my $b (split (/\n/, $bnt, -1)) { $bns{$b}++; };
-  $bot = join '\n', sort keys %bos;
-  $bnt = join '\n', sort keys %bns;
+  $bot = (join "\n", sort keys %bos)."\n";
+  $bnt = (join "\n", sort keys %bns)."\n";
   $diff = diff (\$bot, \$bnt);
   return $diff;
   
