@@ -48,6 +48,10 @@ while (<STDIN>){
     getTree ($cmt, "");
     next;
   }
+  if ($type eq "tkns"){
+    getTkns ($cmt, "");
+    next;
+  }
   my $sec = hex (substr($cmt, 0, 2)) % $sections;
   my $cB = fromHex ($cmt);
   if (! defined $fhosc{$sec}{$cB}){
@@ -66,6 +70,20 @@ while (<STDIN>){
   }
 }
 
+sub getTkns {
+  my ($ch) = $_[0];
+  my $sec = hex (substr($ch, 0, 2)) % $sections;
+  my $cB = fromHex ($ch);
+  if (! defined $fhosc{$sec}{$cB}){
+    print STDERR "no bdiff for commit $ch in $sec\n";
+    return "";
+  }
+  my $codeC = $fhosc{$sec}{$cB};
+  print "".(safeDecomp ($codeC, "$sec;$ch"));
+}
+  
+
+
 sub getBlob {
   my ($blob) = $_[0];
   my $sec = hex (substr($blob, 0, 2)) % $sections;
@@ -81,7 +99,8 @@ sub getBlob {
   my $codeC = "";
   my $rl = read ($f, $codeC, $len);
   my $code = safeDecomp ($codeC, "$sec;$curpos;$blob");
-  print "blob;$sec;$rl;$curpos;$off;$len\;$blob\n$code\n";
+  #print "blob;$sec;$rl;$curpos;$off;$len\;$blob\n";
+  print "$code\n";
 }
 
 sub getBdiff {

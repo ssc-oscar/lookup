@@ -43,7 +43,7 @@ $f1 = "h" if ($t1 =~ /^[cb]$/);
 $f2 = "h" if ($t2 =~ /^[cb]$/ || $t2 =~ /^(cc|pc|fb)$/);
 
 $f2 = "sh" if $types eq "b2a";
-$f2 = "s" if $t2 eq "ta";
+$f2 = "s" if $t2 =~ /^(ta|tk)$/;
 $f2 = "r" if $types =~ /^c2[hr]$/;
 
 $f1 = $ARGV[1] if defined $ARGV[1];
@@ -53,6 +53,7 @@ $f2 = $ARGV[2] if defined $ARGV[2];
 
 while (<STDIN>){
   chop();
+  my $large = 0;
   my ($ch, @rest) = split(/;/, $_, -1);
   my $extra = "";
   $extra = join ';', @rest if $#rest >= 0;
@@ -67,9 +68,32 @@ while (<STDIN>){
   }
   my $v = $clones{$s}{$c};
   if (!defined $v){
-    print "$ch\n";
-    print STDERR "no $ch in $fname\n";
-    next;
+    my $lF = "$fname.$s.tch.large.";
+    if ($f1 =~ /h/){
+      $lF .= $ch;
+    }else{
+      $lF .= sprintf "%.8x", sHashV ($c);
+    }
+    if (-f $lF){
+      $large = 1;
+      my $len = -s $lF;
+      if ($f2 =~ /h/){
+        open VAL, $lF;
+        $v="";
+        read (VAL, $v, $len);
+      }else{
+        open VAL, "zcat $lF|";
+        <VAL>; #drop first line: it is just the key
+        $v="";
+        while (<VAL>){ $v .= $_; }
+      } 
+      #print STDERR "big file\n";
+      #print "$ch\n";
+    }else{
+      print "$ch\n";
+      print STDERR "no $ch in $fname\n";
+      next;
+    }
   }
   if ($f2 =~ /r/){
     my $h = toHex (substr($v, 0, 20));
@@ -78,8 +102,11 @@ while (<STDIN>){
   }else{
     my $res = ";$v";
     if ($f2 =~ /cs/){
-      $res = ";".$v;
-      $res = ';'.safeDecomp ($v);
+      if ($large){
+        $res = ";".$v;
+      }else{
+        $res = ';'.safeDecomp ($v);
+      }
     }      
     if ($f2 eq "h"){
       my $n = length($v)/20;
