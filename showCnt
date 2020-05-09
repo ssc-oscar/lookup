@@ -14,12 +14,17 @@ else
  if [[ $h == 'da3.eecs.utk.edu' ]] 
  then 
    off=1
+   [[ $t == 'tdiff' || $t == 'tkns' ]] && off=0
    ~/lookup/showCnt.perl $t $fmt $off
  else
    off=0
-   if [[ $h == 'da4.eecs.utk.edu' ]]
-   then ~/lookup/showCnt.perl $t $fmt $off
-   else ssh da4 ~/lookup/showCnt.perl $t $fmt $off
+   if [[ $t == 'tdiff' || $t == 'tkns' ]]
+   then ssh da3 ~/lookup/showCnt.perl $t $fmt $off
+   else 
+     if [[ $h == 'da4.eecs.utk.edu' ]]
+     then ~/lookup/showCnt.perl $t $fmt $off
+     else ssh da4 ~/lookup/showCnt.perl $t $fmt $off
+     fi
    fi
   fi
 fi
