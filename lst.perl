@@ -10,12 +10,12 @@ use Compress::LZF;
 my $fname="$ARGV[0]";
 my (%clones);
 my $hdb = TokyoCabinet::HDB->new();
-
+my $printVal = 1;
 my $f1 = "h";
 my $f2 = "h";
 $f1 = $ARGV[1] if defined $ARGV[1];
 $f2 = $ARGV[2] if defined $ARGV[2];
-
+$printVal = $ARGV[3] if defined $ARGV[3];
 
 if(!tie(%clones, "TokyoCabinet::HDB", "$fname",
                   TokyoCabinet::HDB::OREADER | TokyoCabinet::HDB::ONOLCK)){
@@ -31,6 +31,10 @@ while (my ($c, $v) = each %clones){
 
   $c = safeDecomp ($c) if $f1 =~ /c/;
   $c = toHex($c) if $f1 =~ /h/;
+  if ($printVal == 0){
+    print "$c\n";
+    next;
+  }
   if ($f2 =~ /r/){
     my $h = toHex (substr($v, 0, 20));
     my $d = unpack 'w', (substr($v, 20, length($v) - 20));
