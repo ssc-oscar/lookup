@@ -12,8 +12,6 @@ my $lines = 0;
 my $trees = 0;
 my $fbasei ="tree_";
 my $sec = $ARGV[0];
-my $from = 0;
-$from = $ARGV[1] if defined $ARGV[1];
 {
   open (FD, "$fbasei$sec.bin") or die "$!";
   binmode(FD);
@@ -21,12 +19,9 @@ $from = $ARGV[1] if defined $ARGV[1];
     open A, "$fbasei$sec.idx" or die ($!);
     while (<A>){
       chop ();
-      $lines ++;
-      next if $lines < $from;
       my ($nn, $of, $len, $hash) = split (/\;/, $_, -1);
       my $h = pack 'H*', $hash;
       my $codeC = "";
-      seek (FD, $of, 0);
       my $rl = read (FD, $codeC, $len);
       $trees ++;
       if ($rl == $len){
@@ -38,7 +33,7 @@ $from = $ARGV[1] if defined $ARGV[1];
             #goto DONE;
           }
           my ($mode, $name, $bytes) = (oct($1),$2,$3);
-          if ($mode == 0100644){
+          if ($mode == 040000){
 	    my $bH = unpack "H*", $bytes;
 	    print "$bH;$hash;$name\n";
             #print "$name\n";
