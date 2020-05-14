@@ -25,7 +25,7 @@ if ($type eq "blob" || ($type =~ /bdiff|commit|tree/ && $ncnt) ){
 }
 for my $sec (0 .. ($sections-1)){
   my $pre = "/fast";
-  tie %{$fhosc{$sec}}, "TokyoCabinet::HDB", "$pre/${fbasec}$sec.tch", TokyoCabinet::HDB::OREADER,  
+  tie %{$fhosc{$sec}}, "TokyoCabinet::HDB", "$pre/${fbasec}$sec.tch", TokyoCabinet::HDB::OREADER | TokyoCabinet::HDB::ONOLCK,  
     16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
     or die "cant open $pre/$fbasec$sec.tch\n";
   if ( $type eq "blob" || ($type =~ /bdiff|commit|tree/ && $ncnt)){
@@ -37,19 +37,19 @@ while (<STDIN>){
   chop();
   my ($cmt, $rest) = split(/;/, $_, -1);
   if ($type eq "bdiff"){
-	  getBdiff ($cmt);
+    getBdiff ($cmt);
     next;
   }
   if ($type eq "blob"){
-	  getBlob ($cmt);
+    getBlob ($cmt);
     next;
   }
   if ($type eq "tree"){
     getTree ($cmt, "");
     next;
   }
-  if ($type eq "tkns"){
-    getTkns ($cmt, "");
+  if ($type eq "tkns" || $type eq "tdiff"){
+    getTkns ($cmt, $type);
     next;
   }
   my $sec = hex (substr($cmt, 0, 2)) % $sections;
@@ -71,11 +71,11 @@ while (<STDIN>){
 }
 
 sub getTkns {
-  my ($ch) = $_[0];
+  my ($ch, $type) = @_;
   my $sec = hex (substr($ch, 0, 2)) % $sections;
   my $cB = fromHex ($ch);
   if (! defined $fhosc{$sec}{$cB}){
-    print STDERR "no bdiff for commit $ch in $sec\n";
+    print STDERR "no content for $type $ch in $sec\n";
     return "";
   }
   my $codeC = $fhosc{$sec}{$cB};
