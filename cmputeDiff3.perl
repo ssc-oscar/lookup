@@ -1,4 +1,4 @@
-#!/usr/bin/perl -I $HOME/lookup -I $HOME/lib64/perl5
+#!/usr/bin/perl -I /home/audris/lookup -I /home/audris/lib64/perl5 -I /home/audris/lib/x86_64-linux-gnu/perl
 ############
 ############ See accurate diff ib cmputeDiff.perl
 ############ this is 40X faster but may miss renamed files under renamrd subflders
