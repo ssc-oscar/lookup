@@ -1,4 +1,4 @@
-#!/usr/bin/perl -I /home/audris/lib64/perl5
+#!/usr/bin/perl -I /home/audris/lib64/perl5 -I /home/audris/lookup -I /home/audris/lib/x86_64-linux-gnu/perl
 
 use strict;
 use warnings;
@@ -45,9 +45,15 @@ $from = $ARGV[1] if defined $ARGV[1];
 	    my $bH = unpack "H*", $bytes;
             $name =~ s/\n/__NEWLINE__/g;
             $name =~ s/\r/__CR__/g;
-	    print "$bH;$hash;$name\n";
+            $name =~ s/;/__SEMICOLON__/g;
+	    print "b;$bH;$hash;$name\n";
             #print "$name\n";
-          }
+          }else{
+	    if ($mode == 040000){
+	      my $bH = unpack "H*", $bytes;
+	      print "t;$bH;$hash;$name\n";
+	    }
+	  }
         }
       }else{
         exit (-1);

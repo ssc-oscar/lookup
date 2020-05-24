@@ -1,4 +1,4 @@
-#!/usr/bin/perl -I /home/audris/lib64/perl5
+#!/usr/bin/perl -I /home/audris/lib64/perl5 -I /home/audris/lookup -I /home/audris/lib/x86_64-linux-gnu/perl
 
 use strict;
 use warnings;
@@ -6,75 +6,42 @@ use Error qw(:try);
 
 use TokyoCabinet;
 use Compress::LZF;
+use cmt;
 
-sub toHex { 
-        return unpack "H*", $_[0]; 
-} 
+my $sec = $ARGV[0];
+my $fbase="/data/All.blobs/commit_$sec";
 
-sub fromHex { 
-        return pack "H*", $_[0]; 
-} 
-
-my $sections = 128;
-
-my $fbase="All.sha1c/commit_";
-
-my (%t2c, %fhoc);
-
-while(<STDIN>){
-  chop();
-  my $f = $_;
-  my %fhos = ();
-  tie %fhos, "TokyoCabinet::HDB", "$f", TokyoCabinet::HDB::OREADER,
-        16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
-     or die "cant open $f\n";
-
-  while (my ($sha, $v) = each %fhos){
-    my ($tree, $parent, $auth, $cmtr, $ta, $tc, @rest) = extrCmt ($v);
-    my $t = fromHex ($tree);
-    $t2c{$t}{$sha}++;
-  }
-  untie %fhos;
-}
-
-tie %fhoc, "TokyoCabinet::HDB", "$ARGV[0]", TokyoCabinet::HDB::OWRITER | TokyoCabinet::HDB::OCREAT,
-        16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
-     or die "cant open $ARGV[0]\n";
-
-while (my ($k, $v) = each %t2c){
-  my $v1 = join "", (sort keys %{$v});
-  $fhoc{$k} = $v1;
-}
-
-untie %fhoc;
-
-
-
-sub safeDecomp {
-        my $codeC = $_[0];
-        try {
-                my $code = decompress ($codeC);
-                return $code;
-        } catch Error with {
-                my $ex = shift;
-                print STDERR "Error: $ex\n";
-                return "";
-        }
-}
-
-sub extrCmt {
-  my $codeC = $_[0];
-  my $code = safeDecomp ($codeC);
-
-  my ($tree, $parent, $auth, $cmtr, $ta, $tc) = ("","","","","","");
+sub extrTree {
+  my $code = $_[0];
+  my $tree = "";
   my ($pre, @rest) = split(/\n\n/, $code, -1);
   for my $l (split(/\n/, $pre, -1)){
-     $tree = $1 if ($l =~ m/^tree (.*)$/);
-     $parent .= ":$1" if ($l =~ m/^parent (.*)$/);
-     ($auth, $ta) = ($1, $2) if ($l =~ m/^author (.*)\s([0-9]+\s[\+\-]*\d+)$/);
-     ($cmtr, $tc) = ($1, $2) if ($l =~ m/^committer (.*)\s([0-9]+\s[\+\-]*\d+)$/);
-  }
-  $parent =~ s/^:// if defined $parent;
-  return ($tree, $parent, $auth, $cmtr, $ta, $tc, @rest);
+    if ($l =~ m/^tree (.*)$/){
+      $tree = $1;
+      last;
+    }
+  }    
+  return $tree;
 }
+
+
+open (FD, "$fbase.bin") or die "$!";
+binmode(FD);
+if ( -f "$fbase.idx"){
+  open A, "$fbase.idx" or die ($!);
+  while (<A>){
+    chop ();
+    my ($nn, $of, $len, $hash) = split (/\;/, $_, -1);
+    my $h = pack 'H*', $hash;
+    my $codeC = "";
+    seek (FD, $of, 0);
+    my $rl = read (FD, $codeC, $len);
+    if ($rl == $len){
+      my $to = safeDecomp ($codeC);
+      my $tree = extrTree ($to);
+      print "$tree;$hash\n";
+    }
+  }
+}
+
 
