@@ -236,17 +236,17 @@ sub getTR {
       my $bH = toHex ($bytes);
       #print "$name;$bH;$mode\n";
       if ($mode == 040000){
-		  $map->{$bytes}{"$nO"} = $mode;
+        $map->{$bytes}{"$nO"} = $mode;
         $mapI->{"$nO"} = $bytes;        
         #print "got tree: $prefix $bH\n";
         #this is where time is sent
         #getTR (getTO($bH), "$prefix/$nO", $map, $map1);
       }else{
-		  #if ($mode == 0100644){
-  		    $mapF->{$bytes}{"$nO"} = $mode;
+	  #if ($mode == 0100644){
+          $mapF->{$bytes}{"$nO"} = $mode;
           $mapFI->{"$nO"} = $bytes; 
         #}               
-	   }
+      }
     }    
   }
 }
