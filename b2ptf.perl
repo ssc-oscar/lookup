@@ -45,7 +45,7 @@ $from = $ARGV[1] if defined $ARGV[1];
 	    my $bH = unpack "H*", $bytes;
             $name =~ s/\n/__NEWLINE__/g;
             $name =~ s/\r/__CR__/g;
-            $name =~ s/;/__SEMICOLON__/g;
+            $name =~ s/;/SEMICOLON/g;
 	    print "b;$bH;$hash;$name\n";
             #print "$name\n";
           }else{
