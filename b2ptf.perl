@@ -41,7 +41,7 @@ $from = $ARGV[1] if defined $ARGV[1];
             #goto DONE;
           }
           my ($mode, $name, $bytes) = (oct($1),$2,$3);
-          if ($mode == 100644 || $mode == 100664 || $mode == 100755){
+          if ($mode == 0100644 || $mode == 0100664 || $mode == 0100755){
             my $bH = unpack "H*", $bytes;
             $name =~ s/\n/__NEWLINE__/g;
             $name =~ s/\r/__CR__/g;
