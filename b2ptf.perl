@@ -41,19 +41,19 @@ $from = $ARGV[1] if defined $ARGV[1];
             #goto DONE;
           }
           my ($mode, $name, $bytes) = (oct($1),$2,$3);
-          if ($mode == 0100644){
-	    my $bH = unpack "H*", $bytes;
+          if ($mode == 100644 || $mode == 100664 || $mode == 100755){
+            my $bH = unpack "H*", $bytes;
             $name =~ s/\n/__NEWLINE__/g;
             $name =~ s/\r/__CR__/g;
             $name =~ s/;/SEMICOLON/g;
-	    print "b;$bH;$hash;$name\n";
+            print "b;$bH;$hash;$name\n";
             #print "$name\n";
           }else{
-	    if ($mode == 040000){
-	      my $bH = unpack "H*", $bytes;
-	      print "t;$bH;$hash;$name\n";
-	    }
-	  }
+	          if ($mode == 040000){
+              my $bH = unpack "H*", $bytes;
+              print "t;$bH;$hash;$name\n";
+            }
+          }
         }
       }else{
         exit (-1);
