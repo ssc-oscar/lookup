@@ -1,4 +1,5 @@
-#!/usr/bin/perl -I /home/audris/share/perl5/ -I /da3_data/lookup -I /home/audris/lib64/perl5
+#!/usr/bin/perl
+use lib ("$ENV{HOME}/lookup", "$ENV{HOME}/lib64/perl5","$ENV{HOME}/lib/perl5", "$ENV{HOME}/lib/x86_64-linux-gnu/perl", "$ENV{HOME}/share/perl");
 ############
 ############ See accurate diff ib cmputeDiff.perl
 ############ this is 40X faster but may miss renamed files under renamrd subflders
@@ -136,9 +137,9 @@ sub getBdiff {
         if ($t eq "m"){
           if (length($buff) >= 20){
             $old = toHex (substr($buff,0,20));
-            $buff = substr($buff,20,length($buff) - 20);
+            $buff = substr ($buff,20,length ($buff) - 20);
           }else{
-            print STDERR "1:$n;$ch;".(length($buff))."\n";
+            print STDERR "1:$n;$ch;".(length ($buff))."\n";
             exit ();
           }
         }

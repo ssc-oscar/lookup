@@ -1,4 +1,5 @@
-#!/usr/bin/perl -I /home/audris/lib64/perl5
+#!/usr/bin/perl
+use lib ("$ENV{HOME}/lookup", "$ENV{HOME}/lib64/perl5","$ENV{HOME}/lib/perl5", "$ENV{HOME}/lib/x86_64-linux-gnu/perl", "$ENV{HOME}/share/perl");
 
 use strict;
 use warnings;
@@ -95,6 +96,15 @@ while (<STDIN>){
       print BIGB $codeC;
       my $BOFF += $siz;
       print STDERR "uncompressable object: too large: $siz\n";
+      next;
+    }
+
+    if ($type eq "blob" && $p[0] =~ /^cryptobigbro_/){
+      # Ignore massive csv files of traiding data
+      print BIGI "$BOFF;$siz;$readFileBase;$offset;$sec;$hsha1Full;$path\n";
+      print BIGB $codeC;
+      my $BOFF += $siz;
+      print STDERR "ignoring cryptobigbro\n";
       next;
     }
 

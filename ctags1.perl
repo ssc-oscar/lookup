@@ -1,4 +1,5 @@
 #!/usr/bin/perl
+use lib ("$ENV{HOME}/lookup", "$ENV{HOME}/lib64/perl5","$ENV{HOME}/lib/perl5", "$ENV{HOME}/lib/x86_64-linux-gnu/perl", "$ENV{HOME}/share/perl");
 
 use strict;
 use warnings;
@@ -393,8 +394,8 @@ sub addBlob {
     print OUTPUT $cnt;
     $batch{$b} = $f;
     $ibatch{$f} = $b; 
+    close OUTPUT;#ensure it is flushed to disk
   }
-  close OUTPUT;
   if ($i >= $maxBatch){
     dDump ();
   }
@@ -407,13 +408,13 @@ sub dDump {
     my $f = $batch{$b};
     print FLIST "$f\n";
   }
-  close FLIST;
+  close FLIST; #ensure it is flushed to disk
   open IN, '$HOME/bin/myTimeout 600s $HOME/bin/ctags --fields=kKlz  -L flist -uf - |';
   my %tmp = ();
   my %ll = ();
   while (<IN>){
     chop();
-    if ($_ =~ /^TIMEOUT_TIMEOUT_TIMEOUT$/){
+    if ($_ =~ /TIMEOUT_TIMEOUT_TIMEOUT/){
       for my $b (keys %batch){
         printf STDERR "BAD_BATCH:$b\;$batch{$b}\n";
       }
@@ -475,7 +476,6 @@ sub getBlob {
   # print "$code\n";
   #
 }
-
 
 sub Declarations {
   my ($name, $file, $rest, $type, $lang) = ("", "", "", "", "");

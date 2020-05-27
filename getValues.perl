@@ -1,4 +1,5 @@
-#!/usr/bin/perl -I /home/audris/lookup -I /home/audris/lib64/perl5 -I /home/audris/lib/x86_64-linux-gnu/perl
+#!/usr/bin/perl
+use lib ("$ENV{HOME}/lookup", "$ENV{HOME}/lib64/perl5","$ENV{HOME}/lib/perl5", "$ENV{HOME}/lib/x86_64-linux-gnu/perl", "$ENV{HOME}/share/perl");
 #
 use strict;
 use warnings;
@@ -40,15 +41,15 @@ $f1 = "s" if ($t1 =~ /^[afp]$/);
 $f2 = "cs" if ($t2 =~ /^[afp]$/);
 
 $f1 = "h" if ($t1 =~ /^[cb]$/);
-$f2 = "h" if ($t2 =~ /^[cb]$/ || $t2 =~ /^(cc|pc|fb)$/);
+$f2 = "h" if ($t2 =~ /^[cb]$/ || $t2 =~ /^(cc|pc|fb|ob|td)$/);
 
 $f2 = "sh" if $types eq "b2a";
-$f2 = "s" if $t2 =~ /^(ta|tk)$/;
+$f2 = "s" if $t2 =~ /^ta$/;
+$f2 = "s" if $types eq "b2tk"; 
 $f2 = "r" if $types =~ /^c2[hr]$/;
 
 $f1 = $ARGV[1] if defined $ARGV[1];
 $f2 = $ARGV[2] if defined $ARGV[2];
-
 
 
 while (<STDIN>){

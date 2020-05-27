@@ -12,21 +12,27 @@ close (A);
 
 my $cn = "";
 my %cluster = ();
-my $ off = 0;
+my $off = 0;
 while (<STDIN>){
 	chop();
+  next if $_ =~ /^$/;
   $cluster{$_}{$off}++;
   $off++;
 }
-
+if ($off != $#num2f +1){
+  print STDERR "wrong length: $off vs ".($#num2f +1)."\n";
+  exit (-1);
+}
+print STDERR "length: $off\n";
 while (my ($k, $v) = each %cluster){
 	my %fs = ();
 	for my $f (keys %{$v}){
+    #print STDERR "$k;$f;$num2f[$f]\n"; 
 		$fs{$num2f[$f]}++;
 	}
+  #print STDERR "$k\n";
 	output (\%fs);
 }
-undef @num2f;
 
 sub output {
 	my $cl = $_[0];

@@ -1,4 +1,5 @@
-#!/usr/bin/perl -I /home/audris/lib64/perl5 -I /home/audris/lookup
+#!/usr/bin/perl
+use lib ("$ENV{HOME}/lookup", "$ENV{HOME}/lib64/perl5","$ENV{HOME}/lib/perl5", "$ENV{HOME}/lib/x86_64-linux-gnu/perl", "$ENV{HOME}/share/perl");
 use strict;
 use warnings;
 use Error qw(:try);

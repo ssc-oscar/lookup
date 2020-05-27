@@ -1,4 +1,5 @@
-#!/usr/bin/perl -I /home/audris/lib64/perl5 -I /da3_data/lookup
+#!/usr/bin/perl
+use lib ("$ENV{HOME}/lookup", "$ENV{HOME}/lib64/perl5","$ENV{HOME}/lib/perl5", "$ENV{HOME}/lib/x86_64-linux-gnu/perl", "$ENV{HOME}/share/perl");
 use strict;
 use warnings;
 use Error qw(:try);
@@ -8,7 +9,7 @@ use Digest::MD5 qw(md5 md5_hex md5_base64);
 use TokyoCabinet;
 use Compress::LZF;
 
-use lib qw(..);
+#use lib qw(..);
 use JSON qw(decode_json);
 
 my $hdb = TokyoCabinet::HDB->new();

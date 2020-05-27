@@ -1,4 +1,5 @@
-##drupal.com_ -> dr_ ? sf_7-zip-homepage -> git.code.sf.net_p/7-zip-homepage/code?; double check gl_ folders as gh; _ are wrong in some existing gl projects: gl_BackslashSoft_Framework_Modules_Resolver; android.googlesource.com_device[_/]; kde.org_->anongit.kde.org_; bioc_packages_vsn > git.bioconductor.org_admin/manifest; sf_sauron git.code.sf.net_p/berbox/code; git.eclipse.org_r_actf/org.eclipse.actf.examples.git/ git.eclipse.org_r/actf/org.eclipse.actf.examples.git/
+#!/usr/bin/perl
+use lib ("$ENV{HOME}/lookup", "$ENV{HOME}/lib64/perl5","$ENV{HOME}/lib/perl5", "$ENV{HOME}/lib/x86_64-linux-gnu/perl", "$ENV{HOME}/share/perl");
 
 my $off = 0;
 $off = $ARGV[0] if defined $ARGV[0];

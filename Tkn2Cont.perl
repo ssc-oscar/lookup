@@ -1,4 +1,5 @@
-#!/usr/bin/perl -I /home/audris/lib64/perl5
+#!/usr/bin/perl
+use lib ("$ENV{HOME}/lookup", "$ENV{HOME}/lib64/perl5","$ENV{HOME}/lib/perl5", "$ENV{HOME}/lib/x86_64-linux-gnu/perl", "$ENV{HOME}/share/perl");
 
 use strict;
 use warnings;
@@ -30,7 +31,7 @@ for my $i (0..127){
     my $of = $x[1];
     my $len = $x[2];
     my $hash = $x[4];
-    next if $hash !~ /^[0-9a-h]{40}$/;
+    next if !defined $hash || $hash !~ /^[0-9a-h]{40}$/;
     my $h = fromHex ($hash);
     my $sec = segB ($h, 128);
     if (defined $fhoso{$sec}{$h}){
