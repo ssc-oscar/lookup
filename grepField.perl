@@ -18,9 +18,9 @@ $off = $ARGV[1]-1 if defined $ARGV[1];
 my %match;
 open A, "gunzip -c $str|";
 while(<A>){
-        chop();
-        next if $_ eq "";
-        $match{$_}++;
+  s/\n$//;
+  next if $_ eq "";
+  $match{$_}++;
 }
 
 my $line = 0;

@@ -33,6 +33,7 @@ my $sections = 128;
   my $codeC = "";
   seek (FD, $ARGV[2], 0);
   my $rl = read (FD, $codeC, $ARGV[3]);
+  print STDERR "read $rl bytes: sha1 of content:".(sha1_hex($codeC))."\n";
   my $code = safeDecomp ($codeC, "$ARGV[2];$ARGV[3]");
   if ($code ne ""){
     my $lc = length($code);
