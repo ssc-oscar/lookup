@@ -22,7 +22,7 @@ if test $LA = 'C'; then grepStr='(\.[Cch]|\.cpp|\.hh|\.cc|\.hpp|\.cxx);'; fi
 if test $LA = 'java'; then grepStr='(\.java|\.iml|\.class);'; fi
 if test $LA = 'Cs'; then grepStr='\.cs;'; fi
 
-if test $LA = 'php'; then grepStr='\.php;'; fi
+if test $LA = 'php'; then grepStr='\.(php|php[345]|phtml);'; fi
 if test $LA = 'rb'; then grepStr='\.(rb|erb|gem|gemspec);'; fi
 if test $LA = 'Go'; then grepStr='\.go;'; fi
 if test $LA = 'Rust'; then grepStr='\.(rs|rlib|rst);'; fi
@@ -38,17 +38,23 @@ if test $LA = 'TypeScript'; then grepStr='\.(ts|tsx);'; fi
 
 if test $LA = 'Swift'; then grepStr='\.swift;'; fi # .swf is flash
 if test $LA = 'Sql'; then grepStr='\.(sql|sqllite|sqllite3|mysql);'; fi
-if test $LA = 'Lisp'; then grepStr='\.(el|lisp|elc|l|cli|lsp);'; fi
+if test $LA = 'Lisp'; then grepStr='\.(el|lisp|elc|l|cl|cli|lsp|clisp);'; fi
 if test $LA = 'Ada'; then grepStr='\.ad[abs];'; fi
 if test $LA = 'Erlang'; then grepStr='\.(erl|hrl);'; fi
-if test $LA = 'Fml'; then grepStr='\.(fs|fsi|ml|mli|hs|lhs|sml|v|aug);'; fi #https://en.wikipedia.org/wiki/Proof_assistant
+if test $LA = 'Fml'; then grepStr='\.(fs|fsi|aug|ml|mli|hs|lhs|sml|v|e);'; fi #https://en.wikipedia.org/wiki/Proof_assistant
 if test $LA = 'Lua'; then grepStr='\.lua;'; fi
 
 if test $LA = 'Markdown'; then grepStr='\.(md|markdown);'; fi
 if test $LA = 'CSS'; then grepStr='\.css;'; fi
 if test $LA = 'Clojure'; then grepStr='\.(clji|cljc);'; fi
-if test $LA = 'Basic'; then grepStr='\.bas;'; fi
-if test $LA = 'MatLab'; then grepStr='\.m;'; fi
+if test $LA = 'OCaml'; then grepStr='\.(aug|mli|ml);'; fi
+if test $LA = 'Basic'; then grepStr='\.(bas|bb|bi|pb);'; fi
+if test $LA = 'ObjectiveC'; then grepStr='\.(m|mm);'; fi #also MatLab: 92842;m;MatLab vs 180971;m;ObjectiveC
+if test $LA = 'Asp'; then grepStr='\.(X86|asa|A51|68k|x86|X68|ASM|asp|asm|[sS]);'; fi
+if test $LA = 'Cuda'; then grepStr='\.(cuh|cu);'; fi
+#13393;pp;PuppetManifest
+#2688;sml;SML
+#24754;yml;AnsiblePlaybook 11885;yml;Yaml
 #.COB (Program Source)
 #.CBL (Program Source)
 #.PCO (Recompilation Required Source Code)
