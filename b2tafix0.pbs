@@ -1,0 +1,33 @@
+#PBS -N b2tafix0.FROM
+#PBS -A ACF-UTK0011
+#PBS -l feature=MACHINE
+#PBS -l partition=MACHINE
+#PBS -l nodes=1:ppn=1,walltime=23:50:00
+#PBS -j oe
+#PBS -S /bin/bash
+LD_LIBRARY_PATH=$HOME/lib:$HOME/lib64:$LD_LIBRARY_PATH
+c=/lustre/haven/user/audris/c2fb
+cd $c
+
+
+machine=MACHINE
+maxM=5000
+[[ $machine == monster ]] && maxM=30000
+[[ $machine == rho ]] && maxM=900
+[[ $machine == sigma ]] && maxM=2900
+
+
+i=FROM
+what=WHAT
+
+if test 'a' = 'a'; then
+
+l=FROM
+for i in {0..15}
+do j=$((i+l*16))
+   zcat b2taFullR$j.s | perl -ane '@x=split(/;/); $x[1]=0 if length($x[1])>10; $x[1] = sprintf "%.10d",$x[1]; print "".(join ";",@x)' | gzip > b2taFullR$j.s1
+   echo b2taFullR$j.s1
+done
+
+fi
+

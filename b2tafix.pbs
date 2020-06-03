@@ -1,0 +1,55 @@
+#PBS -N b2tafix.FROM
+#PBS -A ACF-UTK0011
+#PBS -l feature=MACHINE
+#PBS -l partition=MACHINE
+#PBS -l nodes=1:ppn=1,walltime=23:50:00
+#PBS -j oe
+#PBS -S /bin/bash
+LD_LIBRARY_PATH=$HOME/lib:$HOME/lib64:$LD_LIBRARY_PATH
+c=/lustre/haven/user/audris/c2fb
+cd $c
+
+
+machine=MACHINE
+maxM=5000
+[[ $machine == monster ]] && maxM=30000
+[[ $machine == rho ]] && maxM=900
+[[ $machine == sigma ]] && maxM=2900
+
+
+i=FROM
+what=WHAT
+
+if test 'a' = 'b'; then
+
+l=FROM
+for i in {0..15}
+do j=$(($i+$l*16))
+  zcat cnp2bfFullR$j.s |  join -t\; - <(zcat c2taFullR$j.s1)
+done | perl -ane 'chop();@x=split(/;/, $_, -1); print "$x[1];$x[3];$x[4];$x[0]\n" if "$x[0];$x[1]" =~ m/^[0-9a-f]{40};[0-9a-f]{40}$/;' | perl -I $HOME/lib/perl5 -I $HOME/lookup $HOME/lookup/splitSec.perl b2tacnp.$l. 128 
+echo b2tacnp.$l.
+
+fi
+if test 'a' = 'b'; then
+
+l=FROM
+for i in {0..127}
+do zcat b2tacnp.$l.$i.gz | $HOME/bin/lsort ${maxM}M -t\; -k1,4 -u | gzip > b2tacnp.$l.$i.s
+   echo b2tacnp.$l.$i.s
+done
+
+fi
+if test 'a' = 'a'; then
+
+
+for k in {0..15}
+do i=$((FROM*16+$k)) 
+  str="$HOME/bin/lsort ${maxM}M -t\; -k1,4 -u --merge"  
+  for l in {0..7}
+  do str="$str <(zcat b2tacnp.$l.$i.s)"
+  done 
+  eval $str | gzip > b2tacnpFullR$i.s
+  echo b2tacnpFullR$i.s
+done
+
+fi

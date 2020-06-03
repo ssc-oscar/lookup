@@ -1,0 +1,137 @@
+#PBS -N b2ob.FROM
+#PBS -A ACF-UTK0011
+#PBS -l feature=MACHINE
+#PBS -l partition=MACHINE
+#PBS -l nodes=1:ppn=1,walltime=23:50:00
+#PBS -j oe
+#PBS -S /bin/bash
+LD_LIBRARY_PATH=$HOME/lib:$HOME/lib64:$LD_LIBRARY_PATH
+c=/lustre/haven/user/audris/c2fb
+cd $c
+
+
+machine=MACHINE
+maxM=5000
+[[ $machine == monster ]] && maxM=30000
+[[ $machine == rho ]] && maxM=900
+[[ $machine == sigma ]] && maxM=2900
+
+
+i=FROM
+what=WHAT
+
+if test 'a' = 'b'; then
+
+l=FROM
+for i in {0..15}; do (j=$(($i+$l*16)); zcat c2fbbFullR$j.s | cut -d\; -f3-4 | grep -E '^[0-9a-f]{40};[0-9a-f]{40}$' | gzip > b2ob$j.gz) &
+done 
+wait
+echo $l
+
+fi
+
+if test 'a' = 'b'; then
+
+l=FROM
+for i in {0..15}; do (j=$((i+$l*16)); zcat b2ob$j.gz | uniq) 
+done | perl -I $HOME/lib/perl5 -I $HOME/lookup $HOME/lookup/splitSec.perl b2ob.$l. 128 
+echo b2ob.$l.
+
+fi
+if test 'a' = 'b'; then
+
+l=FROM
+for i in {0..127}
+do zcat b2ob.$l.$i.gz | $HOME/bin/lsort ${maxM}M -t\; -k1,2 -u | gzip > b2ob.$l.$i.s
+done
+echo b2ob.$l.$i.s
+
+fi
+if test 'a' = 'b'; then
+
+for k in {0..7}
+do i=$((FROM*8+$k)) 
+  str="$HOME/bin/lsort ${maxM}M -t\; -k1,2 -u --merge"  
+  for l in {0..7}
+  do str="$str <(zcat b2ob.$l.$i.s)"
+  done 
+  eval $str | gzip > b2obFullR$i.s
+  echo b2obFullR$i.s
+done
+
+fi
+if test 'a' = 'b'; then
+
+l=FROM
+for i in {0..15}; do (j=$((i+$l*16)); zcat b2obFullR$j.s)
+done | awk -F\; '{print $2";"$1}' | perl -I $HOME/lib/perl5 -I $HOME/lookup $HOME/lookup/splitSec.perl ob2b.$l. 128
+echo split ob2b.$l.
+
+fi
+if test 'a' = 'b'; then
+
+l=FROM
+for i in {0..127}
+do zcat ob2b.$l.$i.gz | $HOME/bin/lsort ${maxM}M -t\; -k1,2 -u | gzip > ob2b.$l.$i.s
+done
+echo ob2b.$l.$i.s
+
+fi
+if test 'a' = 'b'; then
+
+for k in {0..7}
+do i=$((FROM*8+$k))
+  str="$HOME/bin/lsort ${maxM}M -t\; -k1,2 -u --merge"
+  for l in {0..7}
+  do str="$str <(zcat ob2b.$l.$i.s)"
+  done
+  eval $str | gzip > ob2bFullR$i.s
+  echo ob2bFullR$i.s
+done
+
+fi
+if test 'a' = 'b'; then
+
+l=FROM
+for i in {0..15}
+do j=$((i+l*16))
+  zcat c2fbbFullR$j.s | perl -ane  'chop();@x=split(/;/, $_, -1);$bbc="$x[2];$x[3];$x[0]"; print "$bbc;$x[1]\n" if $bbc =~ /^[0-9a-f]{40};[0-9a-f]{40};[0-9a-f]{40}$/' | uniq | gzip > bb2cf$j.gz 
+  echo bb2cf$j.gz
+done
+
+fi
+if test 'a' = 'b'; then
+
+l=FROM
+for i in {0..15}; do (j=$((i+l*16)); zcat bb2cf$j.gz)
+done | perl -I $HOME/lib/perl5 -I $HOME/lookup $HOME/lookup/splitSec.perl bb2cf.$l. 128
+echo split bb2cf.$l.
+
+fi
+if test 'a' = 'b'; then
+
+l=FROM   
+for i in {0..127}
+do zcat bb2cf.$l.$i.gz | $HOME/bin/lsort ${maxM}M -t\; -k1,4 -u | gzip > bb2cf.$l.$i.s
+   echo bb2cf.$l.$i.s
+done
+
+fi
+if test 'a' = 'a'; then
+
+for k in {0..15}
+do i=$((FROM*16+$k))
+  str="$HOME/bin/lsort ${maxM}M -t\; -k1,4 -u --merge"
+  for l in {0..7}
+  do str="$str <(zcat bb2cf.$l.$i.s)"
+  done
+  eval $str | gzip > bb2cfFullR$i.s
+  echo bb2cfFullR$i.s
+done
+
+fi
+
+
+
+
+

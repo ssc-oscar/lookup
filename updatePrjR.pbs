@@ -2,7 +2,7 @@
 #PBS -A ACF-UTK0011
 #PBS -l feature=MACHINE
 #PBS -l partition=MACHINE
-#PBS -l nodes=1,walltime=23:50:00
+#PBS -l nodes=1:ppn=16,walltime=23:50:00
 #PBS -j oe
 #PBS -S /bin/bash
 LD_LIBRARY_PATH=$HOME/lib:$HOME/lib64:$LD_LIBRARY_PATH
@@ -19,7 +19,7 @@ maxM=5000
 inc=00
 ver=R
 
-if test 'a' == 'b'; then
+if test 'a' = 'b'; then
 
 for f in R.$inc/*.p2c
 do zcat $f | awk -F\; '{ print $2";"$1}' | perl -ane 'print if $_ =~ m/^[0-f]{40};/'
@@ -28,7 +28,7 @@ done | $HOME/lookup/splitSec.perl c2p$ver$inc. 32
 echo c2p$ver$inc.
 
 #fi
-#if test 'a' == 'a'; then
+#if test 'a' = 'a'; then
 
 for j in {0..31}
 do zcat c2p$ver$inc.$j.gz | $HOME/bin/lsort ${maxM}M -t\; -k1,2 -u | gzip > c2p$ver$inc.$j.s &
@@ -37,7 +37,7 @@ wait
 echo c2p$ver$inc.$j.s
 
 #fi
-#if test 'a' == 'a'; then
+#if test 'a' = 'a'; then
 
 for j in {0..31}
 do zcat c2p$ver$inc.$j.s | awk -F\; '{print $2";"$1}' | perl -I ~/lib/perl5 -I ~/lookup $HOME/lookup/splitSecCh.perl p2c$ver$inc.$j. 32 &
@@ -64,7 +64,7 @@ wait
 echo p2c$ver$inc.$j.s
 
 fi
-if test 'a' == 'b'; then
+if test 'a' = 'b'; then
 
 for j in {0..31}
 do $HOME/bin/lsort ${maxM}M -t\; -k1,2 --merge -u <(zcat c2p${ver}00.$j.s) <(zcat c2p${ver}01.$j.s) <(zcat c2pFullQ$j.s) | perl -ane 'print if $_ =~ m/^[0-f]{40};/' | uniq | gzip > c2pFull$ver$j.s &
@@ -73,7 +73,22 @@ wait
 echo c2pFull$ver$j.s
 
 fi
-if test 'a' == 'a'; then
+if test 'a' = 'a'; then
+
+#ensure that after name correction everything is sorted
+for j in {0..15}
+do zcat c2pFull$ver$j.s | $HOME/bin/lsort ${maxM}M -t\; -k1,2  -u | gzip > c2pFull$ver$j.s2 &
+done
+wait
+echo c2pFull$ver$j.s2
+for j in {16..31}
+do zcat c2pFull$ver$j.s | $HOME/bin/lsort ${maxM}M -t\; -k1,2  -u | gzip > c2pFull$ver$j.s2 &
+done
+wait
+echo c2pFull$ver$j.s2
+
+fi
+if test 'a' = 'b'; then
 
 for j in {0..31}
 do $HOME/bin/lsort ${maxM}M -t\; -k1,2 --merge -u <(zcat p2cFullQ$j.s) <(zcat p2c${ver}00.$j.s) <(zcat p2c${ver}01.$j.s) | uniq | perl -ane 'print if $_ =~ m/;[0-f]{40}$/' | uniq | gzip > p2cFull$ver$j.s &
@@ -82,7 +97,7 @@ wait
 echo p2cFullQ$inc.$j.s
 
 fi 
-if test 'a' == 'b'; then
+if test 'a' = 'b'; then
 
 for j in {0..31}
 do zcat p2cFullQ.$j.s|cut -d\; -f1| uniq | gzip > pQ.$j.s &
@@ -91,7 +106,7 @@ wait
 echo pQ.$j.s
 
 fi
-if test 'a' == 'b'; then
+if test 'a' = 'b'; then
 
 for j in {0..31}
 do zcat c2pFullQ.$j.s | perl ~/lookup/ghfork0.perl 1 | gzip > c2PFullQ.$j.s &
@@ -101,7 +116,7 @@ echo c2PFullQ.$j.s
 
 fi
 
-if test 'a' == 'b'; then
+if test 'a' = 'b'; then
 
 for i in 0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9
 do  
@@ -116,7 +131,7 @@ done
 wait
 
 fi
-if test 'a' == 'b'; then
+if test 'a' = 'b'; then
 
 n=1
 zcat c2ptmaP*.$n.cs | awk -F\; '{ if ($4 < "2006_06" ) print $0}' | gzip > 1.0.gz &
@@ -143,7 +158,7 @@ wait
 
 
 fi
-if test 'a' == 'b'; then
+if test 'a' = 'b'; then
 
 n=2
 zcat c2ptmaP*.$n.cs | awk -F\; '{ if ($4 < "2009_01" ) print $0}' | gzip > $n.0.gz &
@@ -171,7 +186,7 @@ done
 wait
 
 fi
-if test 'a' == 'b'; then
+if test 'a' = 'b'; then
 
 n=3
 zcat c2ptmaP*.$n.cs | awk -F\; '{ if ($4 < "2010_08" ) print $0}' | gzip > $n.0.gz &
