@@ -33,11 +33,40 @@ while (<STDIN>){
   $code =~ s/\r//g;
   # two types of match
   my %matches = ();
-  for my $l (split(/\n/, $code, -1)){
-    if ($l =~ m/^use\s+(\w+)/) {
-      $matches{$1}++ if defined $1;
+  for my $lm (split(/\n/, $code, -1)){
+    for my $l (split(/;/, $lm, -1)){
+      if ($l =~ m/^\s*import\s*(.*)$/) {
+        my $m = $1;
+        if (defined $m){
+          if ($m =~ s/ as (.*)//){
+            my $mm = $1;
+            $m =~ s/^['"]//; $m =~ s/['"]$//;
+            if ($mm =~ s/ show (.*)//){
+              for my $s (split(/,/, $1, -1)){
+                $s =~ s/^\s*//; $s =~ s/\s*$//;
+                $matches{"$m.$s"}++;
+              }
+            }else{
+              $m =~ s/ hide .*//;
+              $m =~ s/^['"]//; $m =~ s/['"]$//;
+              $matches{"$m"}++;
+            }
+          }else{
+            if ($m =~ s/ show (.*)//){
+              for my $s (split(/,/, $1, -1)){
+                $s =~ s/^\s*//; $s =~ s/\s*$//;
+                $matches{"$m.$s"}++;
+              }
+            }else{
+              $m =~ s/ hide .*//;
+              $m =~ s/^['"]//; $m =~ s/['"]$//;
+              $matches{"$m"}++;
+            }
+          }  
+        }
+      }
     }
-  }
+  }  
   if (%matches){
     print $_;
     for my $elem (keys %matches) {
