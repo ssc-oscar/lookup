@@ -39,14 +39,16 @@ while (<STDIN>){
       $rest =~ s/\s+as\s+.*//;
       my @mds = $rest =~ m/(\w[\w.]*[\,\s]*)*/;
       #old my @mds = $1 =~ m/(\w+[\,\s]*)*/;
-      for my $m (@mds) { $matches{$m}++ if defined $m};
+      for my $m (@mds) { $m =~ s/\s*$//; $matches{$m}++ if defined $m};
     }
      if ($l =~ m/^\s*from\s+(\w[\w.]*)\s+import\s+(\w*)/) {
        if ($2 ne ""){
          $matches{"$1.$2"} = 1;
 #old if ($l =~ m/^\s*from\s+(\w+)/) {
        }else{
-          $matches{$1} = 1;
+         my $m = $1;
+         $m =~ s/\s*$//;
+         $matches{$1} = 1;
        }
     }
   }

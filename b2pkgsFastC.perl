@@ -34,9 +34,11 @@ while (<STDIN>){
   # two types of match
   my %matches = ();
   for my $l (split(/\n/, $code, -1)){
+    $l =~ s|//.*|| if ($l =~ m/^\#include/); 
     if ($l =~ m/^\#include\s*\<(.*)\>/) {
       my $m = $1;
       $m =~ s|.*/||;
+      $m =~ s|\s+$||;
       $matches{$m}++ if defined $m;
     }
   }
