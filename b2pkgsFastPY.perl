@@ -30,25 +30,30 @@ while (<STDIN>){
   $hh = unpack 'H*', $b2 if length($b2) == 20;
   my $code = $codeC;
   $code = safeDecomp ($codeC, "$offset;$hh");
-  $code =~ s/\r//g;
+  $code =~ s/\r\n/\n/g;
+  $code =~ s/\r//g;#in case only cr
+  $code =~ s/\\\n//g;#join line continuations
   # two types of match
   my %matches = ();
   for my $l (split(/\n/, $code, -1)){
-    if ($l =~ m/^\s*import\s+(.*)/) {
+    if ($l =~ m/^import\s+(.*)/) {
       my $rest = $1;
       $rest =~ s/\s+as\s+.*//;
-      my @mds = $rest =~ m/(\w[\w.]*[\,\s]*)*/;
-      #old my @mds = $1 =~ m/(\w+[\,\s]*)*/;
-      for my $m (@mds) { $m =~ s/\s*$//; $matches{$m}++ if defined $m};
+      while ($rest =~ m/\s*(\w[^\s,]*)[\,\s]*/g){
+        #old my @mds = $1 =~ m/(\w+[\,\s]*)*/;
+        my $m = $1;
+        $m =~ s/\s*$//; 
+        $matches{$m}++ if defined $m;
+      }
     }
-     if ($l =~ m/^\s*from\s+(\w[\w.]*)\s+import\s+(\w*)/) {
+    if ($l =~ m/^from\s+(\w[\w.]*)\s+import\s+(\w*|\*)/) {
        if ($2 ne ""){
          $matches{"$1.$2"} = 1;
 #old if ($l =~ m/^\s*from\s+(\w+)/) {
        }else{
          my $m = $1;
          $m =~ s/\s*$//;
-         $matches{$1} = 1;
+         $matches{$m} = 1;
        }
     }
   }
