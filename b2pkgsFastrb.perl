@@ -39,9 +39,18 @@ while (<STDIN>){
     }
     if ($l =~ m/^require\s+(.+)$/) {
       my $m = $1;
+      $m =~ s/\s+if\s+.*//;
       $m =~ s/^[\'"]//;      
-      $m =~ s/[\'"]$//;      
-      $matches{$m} = 1;
+      $m =~ s/[\'"]$//;
+      $m =~ s/.*\+\s*//;
+      $m =~ s/File\.[^"']*['"]//;
+      $m =~ s/\).*//;
+      $m =~ s/['"]//g;
+      for my $mm (split (/,/, $m, -1)){
+#$m =~ s/['"][^'"]*//;
+        $mm =~ s/^\s+//; $m =~ s/\s+$//;
+        $matches{$mm} = 1 if $mm ne "" && $mm ne "__FILE__" && $mm !~ m|^[\./]|;
+      }
     }
     if ($l =~ m/^require_dependency\s+(.+)$/) {
       my $m = $1;

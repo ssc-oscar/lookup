@@ -36,6 +36,7 @@ while (<STDIN>){
   my $start = 0;
   for my $l (split(/\n/, $code, -1)){
     if ($l =~ m/^import\s*"([^"]*)"/) {
+      print STDERR "$1\n";
       my $m = $1;
       $m =~ s|.*/||;
       $matches{$m}++ if defined $m;
@@ -50,7 +51,7 @@ while (<STDIN>){
        } 
     }
     if ($l =~ m/^import\s*\(/) {
-      $start = 1;
+      $start = 1 if $l !~ m/^import\s*\(\)/;
     }
   }
   if (%matches){
