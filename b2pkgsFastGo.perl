@@ -35,6 +35,7 @@ while (<STDIN>){
   my %matches = ();
   my $start = 0;
   for my $l (split(/\n/, $code, -1)){
+    $l =~ s|//.*||;
     if ($l =~ m/^import\s*"([^"]*)"/) {
       print STDERR "$1\n";
       my $m = $1;
