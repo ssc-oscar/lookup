@@ -37,8 +37,9 @@ my $types = $fname;
 $types =~ s|.*/||;
 $types =~ s|Full[A-Z]$||;
 my ($t1, $t2) = split(/2/, $types);
-$f1 = "s" if ($t1 =~ /^[afp]$/);
-$f2 = "cs" if ($t2 =~ /^[afp]$/);
+$f1 = "s" if ($t1 =~ /^[afpP]$/);
+
+$f2 = "cs" if ($t2 =~ /^[afpP]$/);
 
 $f1 = "h" if ($t1 =~ /^[cb]$/);
 $f2 = "h" if ($t2 =~ /^[cb]$/ || $t2 =~ /^(cc|pc|fb|ob|td)$/);
@@ -47,6 +48,9 @@ $f2 = "sh" if $types eq "b2a";
 $f2 = "s" if $t2 =~ /^ta$/;
 $f2 = "s" if $types eq "b2tk"; 
 $f2 = "r" if $types =~ /^c2[hr]$/;
+
+$f1 = "s" if ($t1 eq "PS" || $t1 eq "PF"); 
+$f2 = "s" if ($t2 eq "PS" || $t2 eq "PF"); 
 
 $f1 = $ARGV[1] if defined $ARGV[1];
 $f2 = $ARGV[2] if defined $ARGV[2];
@@ -91,7 +95,7 @@ while (<STDIN>){
       #print STDERR "big file\n";
       #print "$ch\n";
     }else{
-      print "$ch\n";
+      #print "$ch\n";
       print STDERR "no $ch in $fname\n";
       next;
     }
