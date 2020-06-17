@@ -48,7 +48,7 @@ while (<STDIN>){
       $m =~ s/['"]//g;
       for my $mm (split (/,/, $m, -1)){
 #$m =~ s/['"][^'"]*//;
-        $mm =~ s/^\s+//; $m =~ s/\s+$//;
+        $mm =~ s/^\s+//; $mm =~ s/\s+$//;
         $matches{$mm} = 1 if $mm ne "" && $mm ne "__FILE__" && $mm !~ m|^[\./]|;
       }
     }
@@ -56,6 +56,7 @@ while (<STDIN>){
       my $m = $1;
       $m =~ s/^[\'"]//;
       $m =~ s/[\'"]$//;
+      $m =~ s/^\s+//; $m =~ s/\s+$//;
       $matches{$m} = 1;
       
     }
