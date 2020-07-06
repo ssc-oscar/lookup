@@ -1,0 +1,393 @@
+#PBS -N LANG.PART.VER
+#PBS -A ACF-UTK0011
+#PBS -l feature=MACHINE
+#PBS -l partition=MACHINE
+#PBS -l nodes=1:ppn=16,walltime=23:50:00
+#PBS -j oe
+#PBS -S /bin/bash
+LD_LIBRARY_PATH=$HOME/lib:$HOME/lib64:$LD_LIBRARY_PATH
+c=/lustre/haven/user/audris/c2fb
+cd $c
+
+#https://github.com/luislobo/common-js-file-extensions/blob/master/index.js
+#'js|iced|liticed|iced.md|coffee|litcoffee|coffee.md|ts|cs|ls|es6|es|jsx|sjs|co|eg|json|json.ls|json5'
+#R extensions: r|R|S|s
+#py extensions: py|py3|pyx|pyo|pyw|pyc
+LA=LANG
+if test $LA = 'JS'; then grepStr='\.(js|iced|liticed|iced.md|coffee|litcoffee|coffee.md|ls|es6|es|jsx|mjs|sjs|co|eg|json|json.ls|json5);'; fi
+if test $LA = 'PY'; then grepStr='\.(py|py3|pyx|pyo|pyw|pyc|whl|wsgi|pxd);'; fi
+if test $LA = 'ipy'; then grepStr='\.(ipynb|IPYNB);'; fi
+
+if test $LA = 'C'; then grepStr='(\.[Cch]|\.cpp|\.hh|\.cc|\.hpp|\.cxx);'; fi #152902;h;ObjectiveC
+if test $LA = 'java'; then grepStr='(\.java|\.iml|\.class);'; fi
+if test $LA = 'Cs'; then grepStr='\.cs;'; fi
+
+if test $LA = 'php'; then grepStr='\.(php|php[345]|phtml);'; fi
+if test $LA = 'rb'; then grepStr='\.(rb|erb|gem|gemspec);'; fi
+if test $LA = 'Go'; then grepStr='\.go;'; fi
+if test $LA = 'Rust'; then grepStr='\.(rs|rlib|rst);'; fi
+if test $LA = 'R'; then grepStr='(\.Rd|\.[Rr]|\.Rprofile|\.RData|\.Rhistory|\.Rproj|^NAMESPACE|^DESCRIPTION|/NAMESPACE|/DESCRIPTION);'; fi
+if test $LA = 'Scala'; then grepStr='\.scala;'; fi
+if test $LA = 'pl'; then grepStr='\.(pl|PL|pm|pod|perl|pm6|pl6|p6|plx|ph);'; fi
+if test $LA = 'F'; then grepStr='\.(f[hi]|[fF]|[fF]77|[fF]9[0-9]|fortran|forth|FOR|for|FTN|ftn|[fF]0[378]);'; fi
+if test $LA = 'jl'; then grepStr='\.jl;'; fi 
+if test $LA = 'Dart'; then grepStr='\.dart;'; fi 
+if test $LA = 'Kotlin'; then grepStr='\.(kt|kts|ktm);'; fi
+
+if test $LA = 'TypeScript'; then grepStr='\.(ts|tsx);'; fi
+
+if test $LA = 'Swift'; then grepStr='\.swift;'; fi # .swf is flash
+if test $LA = 'Sql'; then grepStr='\.(sql|sqllite|sqllite3|mysql);'; fi
+if test $LA = 'Lisp'; then grepStr='\.(el|lisp|elc|l|cl|cli|lsp|clisp);'; fi
+if test $LA = 'Ada'; then grepStr='\.ad[abs];'; fi
+if test $LA = 'Erlang'; then grepStr='\.(erl|hrl);'; fi
+if test $LA = 'Fml'; then grepStr='\.(fs|fsi|aug|ml|mli|hs|lhs|sml|v|e);'; fi #https://en.wikipedia.org/wiki/Proof_assistant
+if test $LA = 'Lua'; then grepStr='\.lua;'; fi
+
+if test $LA = 'Markdown'; then grepStr='\.(md|markdown);'; fi
+if test $LA = 'CSS'; then grepStr='\.css;'; fi
+if test $LA = 'Clojure'; then grepStr='\.(cljs|cljc|clj);'; fi
+if test $LA = 'OCaml'; then grepStr='\.(aug|mli|ml|aug);'; fi
+if test $LA = 'Basic'; then grepStr='\.(bas|bb|bi|pb);'; fi
+if test $LA = 'ObjectiveC'; then grepStr='\.(m|mm);'; fi #also MatLab: 92842;m;MatLab vs 180971;m;ObjectiveC
+if test $LA = 'Asp'; then grepStr='\.(X86|asa|A51|68k|x86|X68|ASM|asp|asm|[sS]);'; fi
+if test $LA = 'Cuda'; then grepStr='\.(cuh|cu);'; fi
+#13393;pp;PuppetManifest
+#2688;sml;SML
+#24754;yml;AnsiblePlaybook 11885;yml;Yaml
+#.COB (Program Source)
+#.CBL (Program Source)
+#.PCO (Recompilation Required Source Code)
+#.FD   (File Descriptions)
+#.SEL (Select Statements)
+#.WS  (Working Storage Copy books)
+#.CPY (Copybooks)
+#if test $LA = 'Cob'; then grepStr='\.(COB|CBL|PCO|FD|SEL|CPY|cob|cbl|pco|fd|sel|cpy);'; fi
+if test $LA = 'Cob'; then grepStr='\.(COB|cob|CBL|cbl);'; fi
+#pro pas vbs vb flow ipynb sh csh zsh ex m-objc mat-matlab
+
+machine=MACHINE
+maxM=6
+[[ $machine == monster ]] && maxM=30
+
+ver=VER
+part=PART
+
+# find commits that modify files of the relevant language
+# look for c2f, b2f pattern
+#grepStr=$(echo $grepStr|sed 's/;$/$/;s/\^/;/g')
+grepStr=$(echo $grepStr|sed 's/;$/$/')
+
+if test $LA = JS; then
+
+grepStr=';(bower.json|package.json|packages/[^/]*/package.json|codemods/[^/]*/package.json|lerna.json|yarn.lock|package-lock.json)$'
+
+fi
+
+if test $part = firstP0; then
+    
+#################################################################
+##########################FIRST##################################
+#################################################################
+    
+#find blobs of the relevant language, exclude generic blobs
+for j in {0..127}
+# need to enhance b2cf with commits that have no parent 
+do zcat b2callfFullR$j.s | grep -Ei "$grepStr" | perl -I $HOME/lib/perl5 -I $HOME/lookup -e 'use cmt; while(<STDIN>){ ($b, @r) = split(/;/); print $_ if ! defined $badBlob{$b};}' | gzip > b2cf$ver$LA.$j.gz &
+done
+wait
+echo b2cf$ver$LA.$j.gz 
+
+#get bs for blob processing
+for j in {0..127}
+do zcat b2cf$ver$LA.$j.gz | cut -d\; -f1,2 | uniq | gzip > b2c$ver$LA.$j.s &
+done
+wait
+echo b2c$ver$LA.$j.s
+
+
+for j in {0..127}
+do zcat b2c$ver$LA.$j.s | cut -d\; -f1 | uniq | gzip > b$ver$LA.$j.bs &
+done
+wait
+echo b$ver$LA.$j.bs
+
+fi
+if test $part = firstS0; then
+
+for j in {FROM..127}
+do zcat b2callfFullR$j.s | grep -Ei "$grepStr" | perl -I $HOME/lib/perl5 -I $HOME/lookup -e 'use cmt; while(<STDIN>){ ($b, @r) = split(/;/); print $_ if ! defined $badBlob{$b};}' | gzip > b2cf$ver$LA.$j.gz
+  echo b2cf$ver$LA.$j.gz
+done
+#get bs for blob processing
+for j in {0..127}
+do zcat b2cf$ver$LA.$j.gz | cut -d\; -f1,2 | uniq | gzip > b2c$ver$LA.$j.s 
+   echo b2c$ver$LA.$j.s
+done
+
+for j in {0..127}
+do zcat b2c$ver$LA.$j.s | cut -d\; -f1 | uniq | gzip > b$ver$LA.$j.bs 
+   echo b$ver$LA.$j.bs
+done
+
+fi
+if test $part = firstS1; then
+
+echo $(date +"%s")
+# this is not prallel, run as a separate stage?
+# invert bbcf$ver$LA.$j.gz? may be faster for smaller languages?
+for j in {0..127}
+#do zcat c2fbbFull$ver$j.s | cut -d\; -f1,2 |  grep -Ei $grepStr | cut -d\; -f1 | uniq | gzip > c$ver$LA.$j.cs &
+do zcat b2cf$ver$LA.$j.gz | awk -F\; '{ print $2";"$1}' |  uniq 
+done | perl -I $HOME/lib/perl5 -I $HOME/lookup  $HOME/lookup/splitSec.perl c2b$ver$LA. 128
+echo $(date +"%s")
+
+fi
+if test $part = firstP2; then
+#this may be memory hog, see how to run in single thread as well as in multi-threded way as is below
+for l in {0..127..32}
+do for k in {0..31}
+  do j=$(($l+$k))
+  zcat c2b$ver$LA.$j.gz | lsort ${maxM}G  -u | gzip > c2b$ver$LA.$j.s & 
+  done
+  wait
+  echo c$ver$LA.$l.s
+done
+
+for j in {0..127}
+do zcat c2b$ver$LA.$j.s | cut -d\; -f1 | uniq | gzip > c$ver$LA.$j.cs &
+done
+wait
+echo c$ver$LA.$j.cs
+
+#determine projects for the relevant commits
+for j in {0..127}
+do zcat c2PFull$ver$j.s | join -t\; - <(zcat c$ver$LA.$j.cs) | gzip > c2P$ver$LA.$j.gz &
+done
+wait
+echo c2P$ver$LA.$j.gz
+
+#fi
+#if test $part = firstP11; then
+# get time/author attributes for relevant commits 
+for j in {0..127}
+do zcat c2taFull$ver$j.s | join -t\; - <(zcat c$ver$LA.$j.cs) | gzip > c2ta$ver$LA.$j.gz &
+done
+wait
+echo c2ta$ver$LA.$j.gz
+
+
+# add time/author attributes 
+for j in {0..127}
+do zcat c2P$ver$LA.$j.gz | join -t\; - <(zcat c2ta$ver$LA.$j.gz) | gzip > c2Pta$ver$LA.$j.gz &
+done
+wait
+echo c2Pta$ver$LA.$j.gz
+
+fi
+if test $part = firstS2; then
+
+for l in {0..127..32}
+do for k in {0..31}
+  do j=$(($l+$k))
+  zcat c2b$ver$LA.$j.gz | lsort ${maxM}G  -u | gzip > c2b$ver$LA.$j.s
+  echo c$ver$LA.$l.s
+  done
+done
+
+for j in {0..127}
+do zcat c2b$ver$LA.$j.s | cut -d\; -f1 | uniq | gzip > c$ver$LA.$j.cs
+   echo c$ver$LA.$j.cs
+done
+
+for j in {0..127}
+do zcat c2PFull$ver$j.s | join -t\; - <(zcat c$ver$LA.$j.cs) | gzip > c2P$ver$LA.$j.gz
+   echo c2P$ver$LA.$j.gz
+done
+
+for j in {0..127}
+do zcat c2taFull$ver$j.s | join -t\; - <(zcat c$ver$LA.$j.cs) | gzip > c2ta$ver$LA.$j.gz
+   echo c2ta$ver$LA.$j.gz
+done
+
+for j in {0..127}
+do zcat c2P$ver$LA.$j.gz | join -t\; - <(zcat c2ta$ver$LA.$j.gz) | gzip > c2Pta$ver$LA.$j.gz
+   echo c2Pta$ver$LA.$j.gz
+done
+
+fi
+if test $part = firstS3; then
+
+echo $(date +"%s")
+for j in {0..127}
+do zcat c2Pta$ver$LA.$j.gz | join -t\; <(zcat c2b$ver$LA.$j.s) -
+done | perl -ane '@x=split(/;/,$_,-1);$a=$x[0];$x[0]=$x[1];$x[1]=$a;print "".(join ";",@x);' | perl -I $HOME/lib/perl5 -I $HOME/lookup  $HOME/lookup/splitSec.perl b2cPta$ver$LA. 128
+echo b2cPta$ver$LA.
+echo $(date +"%s")
+
+# Get the list of projects, not essential
+zcat c2P$ver$LA.*.gz | cut -d\; -f2 | lsort ${maxM}G  -u | gzip > P$ver$LA.gz
+echo P$ver$LA.gz
+echo $(date +"%s")
+
+fi
+if test $part = firstS4; then
+
+for l in {0..127..32}
+do for k in {0..31}
+   do (j=$(($l+$k)); zcat b2cPta$ver$LA.$j.gz | lsort ${maxM}G -t\; -k1,2 | gzip > b2cPta$ver$LA.$j.s) 
+   done
+   wait 
+   echo b2cPta$ver$LA.$l.s
+done
+
+
+fi
+if test $part = firstP4; then
+
+for l in {0..127..32}
+do for k in {0..31}
+   do (j=$(($l+$k)); zcat b2cPta$ver$LA.$j.gz | lsort ${maxM}G -t\; -k1,2 | gzip > b2cPta$ver$LA.$j.s) &
+   done
+   wait
+   echo b2cPta$ver$LA.$l.s
+done
+
+
+fi
+if test $part = secondP0; then
+
+for j in {0..127}
+do zcat b2cPta$ver$LA.$j.s | join -t\; - <(zcat b$ver${LA}pkgs.$j.gz) | gzip > b2cPtaPkg$ver$LA.$j.s &
+done  
+wait
+echo b2cPtaPkg$ver$LA.$j.s
+
+fi
+if test $part = secondP0v; then
+
+for j in {0..127}
+do zcat b2cPta$ver$LA.$j.s | join -t\; - <(zcat b$ver${LA}pkgsv.$j.gz) | gzip > b2cPtaPkgv$ver$LA.$j.s 
+done
+wait
+echo b2cPtaPkgv$ver$LA.$j.s
+
+fi
+if test $part = secondP0d; then
+
+for j in {0..127}
+do zcat b2cPta$ver$LA.$j.s | join -t\; - <(zcat b$ver${LA}dpkgsv.$j.gz) | gzip > b2cPtaDPkgv$ver$LA.$j.s 
+done
+wait
+echo b2cPtaDPkgv$ver$LA.$j.s
+
+fi
+if test $part = secondS0; then
+
+for j in {0..127}
+do zcat b2cPta$ver$LA.$j.s | join -t\; - <(zcat b$ver${LA}pkgs.$j.gz) | gzip > b2cPtaPkg$ver$LA.$j.s
+   echo b2cPtaPkg$ver$LA.$j.s
+done
+ 
+fi
+if test $part = secondS1; then
+
+for j in {0..127}
+do zcat b2cPtaPkg$ver$LA.$j.s
+done | cut -d\; -f3,6-| \
+  perl -e 'while(<STDIN>){chop();($p,@m)=split(/;/);for $mm (@m){$p2m{$p}{$mm}++;}}; for $p (keys %p2m){@ms=sort keys %{$p2m{$p}}; print "$p;",(join ";", @ms)."\n"; }' |gzip > P2m$ver$LA 
+echo P2m$ver$LA
+
+zcat P2m$ver$LA |\
+   perl -e 'while(<STDIN>){chop();($p,@ms)=split(/;/);for $m (@ms){$mp{$m}{$p}++}};while (($m,$p) = each %mp){@ps=keys %$p;print "$m\;$#ps\n"}' | \
+   gzip > m2nP$ver$LA 
+echo m2nP$ver$LA
+
+zcat m2nP$ver$LA | lsort ${maxM}G -t\; -rnk2 |gzip > m2nP$ver$LA.s
+echo m2nP$ver$LA.s
+
+zcat m2nP$ver$LA.s | cut -d\; -f1 | head -30 > mods.$ver$LA
+echo mods.$ver$LA
+
+fi
+if test $part = secondS2; then
+
+for mod in $(cat mods.$ver$LA) 
+do m1=$(echo $mod|sed 's|/|_|g;s|"||g;s|[()]||g') 
+  for j in {0..31}
+  do zcat b2cPtaPkg$ver$LA.$j.s; done | grep -E ";$mod$|;$mod;" | cut -d\; -f1,3 | lsort ${maxM}G -t\; -k1,2 | awk -F\; '{ if (p!=$1) print $1";"int($2/3600/365.25/24*12)/12+1970;p=$1}' | gzip > $ver$LA.$m1
+  echo $ver$LA.$m1
+done
+echo $ver$LA.$m1
+
+fi
+if test $part = secondS1v; then
+
+for j in {0..127}
+do zcat b2cPtaPkgv$ver$LA.$j.s
+done | cut -d\; -f3,6-| \
+  perl -e 'while(<STDIN>){chop();($p,@m)=split(/;/);for $mm (@m){$p2m{$p}{$mm}++;}}; for $p (keys %p2m){@ms=sort keys %{$p2m{$p}}; print "$p;",(join ";", @ms)."\n"; }' |gzip > P2mv$ver$LA
+echo P2mv$ver$LA
+
+zcat P2mv$ver$LA |\
+   perl -e 'while(<STDIN>){chop();($p,@ms)=split(/;/);for $m (@ms){$mp{$m}{$p}++}};while (($m,$p) = each %mp){@ps=keys %$p;print "$m\;$#ps\n"}' | \
+   gzip > mv2nP$ver$LA
+echo mv2nP$ver$LA
+
+zcat mv2nP$ver$LA | lsort ${maxM}G -t\; -rnk2 |gzip > mv2nP$ver$LA.s
+echo mv2nP$ver$LA.s
+
+fi
+if test $part = secondS1d; then
+
+for j in {0..127}
+do zcat b2cPtaDPkgv$ver$LA.$j.s
+done | cut -d\; -f3,6-| \
+  perl -e 'while(<STDIN>){chop();($p,@m)=split(/;/);for $mm (@m){$p2m{$p}{$mm}++;}}; for $p (keys %p2m){@ms=sort keys %{$p2m{$p}}; print "$p;",(join ";", @ms)."\n"; }' |gzip > P2dmv$ver$LA
+echo P2dmv$ver$LA
+
+zcat P2dmv$ver$LA |\
+   perl -e 'while(<STDIN>){chop();($p,@ms)=split(/;/);for $m (@ms){$mp{$m}{$p}++}};while (($m,$p) = each %mp){@ps=keys %$p;print "$m\;$#ps\n"}' | \
+   gzip > dmv2nP$ver$LA
+echo dmv2nP$ver$LA
+
+zcat dmv2nP$ver$LA | lsort ${maxM}G -t\; -rnk2 |gzip > dmv2nP$ver$LA.s
+echo dmv2nP$ver$LA.s
+
+zcat dmv2nP$ver$LA.s | cut -d\; -f1 | head -30 > dmodsv.$ver$LA
+echo dmodsv.$ver$LA
+
+fi
+if test $part = secondS2; then
+
+for mod in $(cat mods.$ver$LA) 
+do m1=$(echo $mod|sed 's|/|_|g;s|"||g;s|[()]||g')
+  for j in {0..31}
+  do zcat b2cPtaPkg$ver$LA.$j.s; done | grep -E ";$mod$|;$mod;" | cut -d\; -f1,3 | lsort ${maxM}G -t\; -k1,2 | awk -F\; '{ if (p!=$1) print $1";"int($2/3600/365.25/24*12)/12+1970;p=$1}' | gzip > $ver$LA.$m1
+  echo $ver$LA.$m1
+done
+echo $ver$LA.$m1
+
+fi
+
+if test $part = 'trend'; then
+
+for LA in jl pl R F Go Scala Rust Cs PY ipy JS C java rb
+do 
+  for j in {0..127}
+  do zcat b2cPtaPkg$ver$LA.$j.gz | cut -d\; -f3- | uniq | gzip > PtaPkg$ver$LA.$j.gz 
+  done
+  wait
+  echo PtaPkg$ver$LA.$j.gz 
+done
+
+for LA in jl pl R F Go Scala Rust Cs PY ipy JS C java rb
+do
+  for j in {0..31}
+  do zcat PtaPkgQ$LA.$j.gz | lsort ${maxM}G -t\| | uniq | gzip > PtaPkg$ver$LA.$j.s 
+  done
+  wait
+  echo PtaPkg$ver$LA.$j.s
+done
+
+fi

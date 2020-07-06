@@ -34,19 +34,30 @@ while (<STDIN>){
   # two types of match
   my %matches = ();
   for my $l (split(/\n/, $code, -1)){
+    $l =~ s|\#.*||;
     if ($l =~ m/^use\s+(\w+)/) {
       $matches{$1}++ if defined $1;
     }
     if ($l =~ m/^require\s+(.+)$/) {
       my $m = $1;
+      $m =~ s/\s+if\s+.*//;
       $m =~ s/^[\'"]//;      
-      $m =~ s/[\'"]$//;      
-      $matches{$m} = 1;
+      $m =~ s/[\'"]$//;
+      $m =~ s/.*\+\s*//;
+      $m =~ s/File\.[^"']*['"]//;
+      $m =~ s/\).*//;
+      $m =~ s/['"]//g;
+      for my $mm (split (/,/, $m, -1)){
+#$m =~ s/['"][^'"]*//;
+        $mm =~ s/^\s+//; $mm =~ s/\s+$//;
+        $matches{$mm} = 1 if $mm ne "" && $mm ne "__FILE__" && $mm !~ m|^[\./]|;
+      }
     }
     if ($l =~ m/^require_dependency\s+(.+)$/) {
       my $m = $1;
       $m =~ s/^[\'"]//;
       $m =~ s/[\'"]$//;
+      $m =~ s/^\s+//; $m =~ s/\s+$//;
       $matches{$m} = 1;
       
     }

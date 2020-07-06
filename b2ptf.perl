@@ -24,15 +24,14 @@ $from = $ARGV[1] if defined $ARGV[1];
     open A, "$fbasei$sec.idx" or die ($!);
     while (<A>){
       chop ();
-      $lines ++;
-      next if $lines < $from;
-      next if $to >= 0 && $lines > $to;
+      $trees ++;
+      next if $trees < $from;
+      next if $to >= 0 && $trees > $to;
       my ($nn, $of, $len, $hash) = split (/\;/, $_, -1);
       my $h = pack 'H*', $hash;
       my $codeC = "";
       seek (FD, $of, 0);
       my $rl = read (FD, $codeC, $len);
-      $trees ++;
       if ($rl == $len){
         my $to = safeDecomp ($codeC);
         while ($to =~ s/^([0-7]+) (.+?)\0(.{20})//s) {
@@ -50,10 +49,10 @@ $from = $ARGV[1] if defined $ARGV[1];
             print "b;$bH;$hash;$name\n";
             #print "$name\n";
           }else{
-	          if ($mode == 040000){
+	    if ($mode == 040000){
               my $bH = unpack "H*", $bytes;
               print "t;$bH;$hash;$name\n";
-            }
+            }# ignoring links 120000 and gitlinks 160000
           }
         }
       }else{

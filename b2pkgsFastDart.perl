@@ -33,29 +33,52 @@ while (<STDIN>){
   $code =~ s/\r//g;
   # two types of match
   my %matches = ();
-  my $start = 0;
-  for my $l (split(/\n/, $code, -1)){
-    $l =~ s|//.*||;
-    if ($l =~ m/^import\s*"([^"]*)"/) {
-      #print STDERR "$1\n";
-      my $m = $1;
-      $m =~ s|.*/||;
-      $matches{$m}++ if defined $m;
+  $code =~ s|//[^\n]*\n|\n|g;
+  $code =~ s|;\n|;|g;
+  $code =~ s|\n| |g;
+  for my $l (split(/;/, $code, -1)){
+#$l =~ s/\s*$//;
+#   $l =~ s/^\s*//;
+#    for my $l (split(/;/, $lm, -1)){
+      if ($l =~ m/^import\s+(.*)$/) {
+        my $m = $1;
+        if (defined $m){
+          if ($m =~ s/\s+as\s+(.*)//){
+            my $mm = $1;
+            $mm =~ s/['"]//g; 
+            $m =~ s/['"]//g; 
+            if ($mm =~ s/\s+show\s+(.*)//){
+              $mm = $1;
+              $mm =~ s/\s+hide\s+.*//;
+              for my $s (split(/,/, $1, -1)){
+                $s =~ s/^\s*//; $s =~ s/\s*$//;
+                $matches{"$m.$s"}++;
+              }
+            }else{
+              $m =~ s/\s+hide\s+.*//;
+              $m =~ s/['"]//g;
+              $m =~ s/\s+(show|deferred)$//;
+              $m =~ s/^\s*//; $m =~ s/\s*$//;
+              $matches{"$m"}++;
+            }
+          }else{
+            $m =~ s/['"]//g;
+            if ($m =~ s/\s+show\s+(.*)//){
+              for my $s (split(/,/, $1, -1)){
+                $s =~ s/^\s*//; $s =~ s/\s*$//;
+                $matches{"$m.$s"}++;
+              }
+            }else{
+              $m =~ s/\s+hide\s+.*//;
+              $m =~ s/\s+(show|deferred)$//;
+              $m =~ s/^\s*//; $m =~ s/\s*$//;
+              $matches{"$m"}++;
+            }
+          }  
+        }
+#     }
     }
-    if ($start){
-       if ($l =~ m/\)/){
-         $start = 0;
-       }
-       if ($l =~ m|\s*"([^"]*)"|){
-         my $m = $1;
-         $m =~ s/\{\{ \.\w* \}\}//;
-         $matches{$m}++ if defined $m;
-       }
-    }
-    if ($l =~ m/^import\s*\(/) {
-      $start = 1 if $l !~ m/^import\s*\(\)/;
-    }
-  }
+  }  
   if (%matches){
     print $_;
     for my $elem (keys %matches) {

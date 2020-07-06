@@ -30,7 +30,7 @@ while (<STDIN>){
     next;
   }
   my $c = fromHex ($hc);
-  $c2p{$c} = "$t;$a;$c";
+  $c2p{$b} = "$t;$a;$c";
   if (!($lines%100000000)){
     print STDERR "$lines done\n";
   }

@@ -33,27 +33,12 @@ while (<STDIN>){
   $code =~ s/\r//g;
   # two types of match
   my %matches = ();
-  my $start = 0;
   for my $l (split(/\n/, $code, -1)){
-    $l =~ s|//.*||;
-    if ($l =~ m/^import\s*"([^"]*)"/) {
-      #print STDERR "$1\n";
+    if ($l =~ m/^import\s*(.*)/) {
       my $m = $1;
       $m =~ s|.*/||;
+      $m =~ s| as .*$||;
       $matches{$m}++ if defined $m;
-    }
-    if ($start){
-       if ($l =~ m/\)/){
-         $start = 0;
-       }
-       if ($l =~ m|\s*"([^"]*)"|){
-         my $m = $1;
-         $m =~ s/\{\{ \.\w* \}\}//;
-         $matches{$m}++ if defined $m;
-       }
-    }
-    if ($l =~ m/^import\s*\(/) {
-      $start = 1 if $l !~ m/^import\s*\(\)/;
     }
   }
   if (%matches){
