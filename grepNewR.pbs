@@ -15,10 +15,10 @@ cd $c
 #py extensions: py|py3|pyx|pyo|pyw|pyc
 LA=LANG
 if test $LA = 'JS'; then grepStr='\.(js|iced|liticed|iced.md|coffee|litcoffee|coffee.md|ls|es6|es|jsx|mjs|sjs|co|eg|json|json.ls|json5);'; fi
-if test $LA = 'PY'; then grepStr='\.(py|py3|pyx|pyo|pyw|pyc|whl);'; fi
+if test $LA = 'PY'; then grepStr='\.(py|py3|pyx|pyo|pyw|pyc|whl|wsgi|pxd);'; fi
 if test $LA = 'ipy'; then grepStr='\.(ipynb|IPYNB);'; fi
 
-if test $LA = 'C'; then grepStr='(\.[Cch]|\.cpp|\.hh|\.cc|\.hpp|\.cxx);'; fi
+if test $LA = 'C'; then grepStr='(\.[Cch]|\.cpp|\.hh|\.cc|\.hpp|\.cxx);'; fi #152902;h;ObjectiveC
 if test $LA = 'java'; then grepStr='(\.java|\.iml|\.class);'; fi
 if test $LA = 'Cs'; then grepStr='\.cs;'; fi
 
@@ -28,8 +28,8 @@ if test $LA = 'Go'; then grepStr='\.go;'; fi
 if test $LA = 'Rust'; then grepStr='\.(rs|rlib|rst);'; fi
 if test $LA = 'R'; then grepStr='(\.Rd|\.[Rr]|\.Rprofile|\.RData|\.Rhistory|\.Rproj|^NAMESPACE|^DESCRIPTION|/NAMESPACE|/DESCRIPTION);'; fi
 if test $LA = 'Scala'; then grepStr='\.scala;'; fi
-if test $LA = 'pl'; then grepStr='\.(pl|PL|pm|pod|perl);'; fi
-if test $LA = 'F'; then grepStr='\.(f[hi]|[fF]|[fF]77|[fF]9[0-9]|fortran|forth);'; fi
+if test $LA = 'pl'; then grepStr='\.(pl|PL|pm|pod|perl|pm6|pl6|p6|plx|ph);'; fi
+if test $LA = 'F'; then grepStr='\.(f[hi]|[fF]|[fF]77|[fF]9[0-9]|fortran|forth|FOR|for|FTN|ftn|[fF]0[378]);'; fi
 if test $LA = 'jl'; then grepStr='\.jl;'; fi 
 if test $LA = 'Dart'; then grepStr='\.dart;'; fi 
 if test $LA = 'Kotlin'; then grepStr='\.(kt|kts|ktm);'; fi
@@ -46,8 +46,8 @@ if test $LA = 'Lua'; then grepStr='\.lua;'; fi
 
 if test $LA = 'Markdown'; then grepStr='\.(md|markdown);'; fi
 if test $LA = 'CSS'; then grepStr='\.css;'; fi
-if test $LA = 'Clojure'; then grepStr='\.(clji|cljc);'; fi
-if test $LA = 'OCaml'; then grepStr='\.(aug|mli|ml);'; fi
+if test $LA = 'Clojure'; then grepStr='\.(cljs|cljc|clj);'; fi
+if test $LA = 'OCaml'; then grepStr='\.(aug|mli|ml|aug);'; fi
 if test $LA = 'Basic'; then grepStr='\.(bas|bb|bi|pb);'; fi
 if test $LA = 'ObjectiveC'; then grepStr='\.(m|mm);'; fi #also MatLab: 92842;m;MatLab vs 180971;m;ObjectiveC
 if test $LA = 'Asp'; then grepStr='\.(X86|asa|A51|68k|x86|X68|ASM|asp|asm|[sS]);'; fi
@@ -185,6 +185,37 @@ wait
 echo c2Pta$ver$LA.$j.gz
 
 fi
+if test $part = firstS2; then
+
+for l in {0..127..32}
+do for k in {0..31}
+  do j=$(($l+$k))
+  zcat c2b$ver$LA.$j.gz | lsort ${maxM}G  -u | gzip > c2b$ver$LA.$j.s
+  echo c$ver$LA.$l.s
+  done
+done
+
+for j in {0..127}
+do zcat c2b$ver$LA.$j.s | cut -d\; -f1 | uniq | gzip > c$ver$LA.$j.cs
+   echo c$ver$LA.$j.cs
+done
+
+for j in {0..127}
+do zcat c2PFull$ver$j.s | join -t\; - <(zcat c$ver$LA.$j.cs) | gzip > c2P$ver$LA.$j.gz
+   echo c2P$ver$LA.$j.gz
+done
+
+for j in {0..127}
+do zcat c2taFull$ver$j.s | join -t\; - <(zcat c$ver$LA.$j.cs) | gzip > c2ta$ver$LA.$j.gz
+   echo c2ta$ver$LA.$j.gz
+done
+
+for j in {0..127}
+do zcat c2P$ver$LA.$j.gz | join -t\; - <(zcat c2ta$ver$LA.$j.gz) | gzip > c2Pta$ver$LA.$j.gz
+   echo c2Pta$ver$LA.$j.gz
+done
+
+fi
 if test $part = firstS3; then
 
 echo $(date +"%s")
@@ -200,13 +231,25 @@ echo P$ver$LA.gz
 echo $(date +"%s")
 
 fi
+if test $part = firstS4; then
+
+for l in {0..127..32}
+do for k in {0..31}
+   do (j=$(($l+$k)); zcat b2cPta$ver$LA.$j.gz | lsort ${maxM}G -t\; -k1,2 | gzip > b2cPta$ver$LA.$j.s) 
+   done
+   wait 
+   echo b2cPta$ver$LA.$l.s
+done
+
+
+fi
 if test $part = firstP4; then
 
 for l in {0..127..32}
 do for k in {0..31}
    do (j=$(($l+$k)); zcat b2cPta$ver$LA.$j.gz | lsort ${maxM}G -t\; -k1,2 | gzip > b2cPta$ver$LA.$j.s) &
    done
-   wait 
+   wait
    echo b2cPta$ver$LA.$l.s
 done
 
@@ -224,7 +267,7 @@ fi
 if test $part = secondP0v; then
 
 for j in {0..127}
-do zcat b2cPta$ver$LA.$j.s | join -t\; - <(zcat b$ver${LA}pkgsv.$j.gz) | gzip > b2cPtaPkgv$ver$LA.$j.s &
+do zcat b2cPta$ver$LA.$j.s | join -t\; - <(zcat b$ver${LA}pkgsv.$j.gz) | gzip > b2cPtaPkgv$ver$LA.$j.s 
 done
 wait
 echo b2cPtaPkgv$ver$LA.$j.s
@@ -233,7 +276,7 @@ fi
 if test $part = secondP0d; then
 
 for j in {0..127}
-do zcat b2cPta$ver$LA.$j.s | join -t\; - <(zcat b$ver${LA}dpkgsv.$j.gz) | gzip > b2cPtaDPkgv$ver$LA.$j.s &
+do zcat b2cPta$ver$LA.$j.s | join -t\; - <(zcat b$ver${LA}dpkgsv.$j.gz) | gzip > b2cPtaDPkgv$ver$LA.$j.s 
 done
 wait
 echo b2cPtaDPkgv$ver$LA.$j.s
