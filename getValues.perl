@@ -103,7 +103,7 @@ while (<STDIN>){
   if ($f2 =~ /r/){
     my $h = toHex (substr($v, 0, 20));
     my $d = unpack 'w', (substr($v, 20, length($v) - 20));
-    print "$offset\;$l\;$ch\;$h\;$d\n";
+    print "$ch\;$h\;$d\n";
   }else{
     my $res = ";$v";
     if ($f2 =~ /cs/){
