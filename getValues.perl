@@ -49,8 +49,8 @@ $f2 = "s" if $t2 =~ /^ta$/;
 $f2 = "s" if $types eq "b2tk"; 
 $f2 = "r" if $types =~ /^c2[hr]$/;
 
-$f1 = "s" if ($t1 eq "PS" || $t1 eq "PF"); 
-$f2 = "s" if ($t2 eq "PS" || $t2 eq "PF"); 
+$f1 = "s" if ($t1 eq "PS" || $t1 eq "PF" || $t1 eq "PFS"); 
+$f2 = "s" if ($t2 eq "PS" || $t2 eq "PF" || $t2 eq "PFS"); 
 
 $f1 = $ARGV[1] if defined $ARGV[1];
 $f2 = $ARGV[2] if defined $ARGV[2];
