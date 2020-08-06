@@ -74,26 +74,35 @@ sub fromHex {
         return pack "H*", $_[0];
 }
 sub safeDecomp {
-        my ($codeC, $msg) = @_;
-        try {
-                my $code = decompress ($codeC);
-                return $code;
-        } catch Error with {
-                my $ex = shift;
-                print STDERR "Error: $ex, $msg\n";
-                return "";
-        }
+  my ($codeC, $msg) = @_;
+  my $code = "";
+  eval { 
+    $code = decompress ($codeC);
+    return $code;
+  } or do {
+    my $ex = $@;
+    print STDERR "Error: $ex, msg=$msg, code=$code\n";
+    eval {
+      $code = decompress (substr($codeC, 0, 70));
+      return "$code";
+    } or do {
+      my $ex = $@;;
+      print STDERR "Error: $ex, $msg, $code\n";
+      return "";
+    }
+  }
 }
 sub safeComp {
-        my ($codeC, $msg) = @_;
-        try {   
-                my $code = compress ($codeC);
-                return $code;
-        } catch Error with {
-                my $ex = shift;
-                print STDERR "Error: $ex, $msg\n";
-                return "";
-        }
+  my ($codeC, $msg) = @_;
+  my $code = "";
+  eval {   
+    my $code = compress ($codeC);
+    return $code;
+  } or do {
+    my $ex = $@;
+    print STDERR "Error: $ex, $msg\n";
+    return "";
+  }
 }
 
 # showCommit, showBlob, showTree, showTag
