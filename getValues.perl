@@ -22,14 +22,7 @@ my $f1 = "h";
 my $f2 = "h";
 
 my $split = 32;
-$split = $ARGV[3] if defined $ARGV[3];
 
-for my $s (0..($split-1)){
-  if(!tie(%{$clones{$s}}, "TokyoCabinet::HDB", "$fname.$s.tch",
-                  TokyoCabinet::HDB::OREADER | TokyoCabinet::HDB::ONOLCK)){
-        print STDERR "tie error for $fname.$s.tch\n";
-  }
-}
 
 
 my $offset = 0;
@@ -55,6 +48,21 @@ $f2 = "s" if ($t2 eq "PS" || $t2 eq "PF" || $t2 eq "PFS");
 $f1 = $ARGV[1] if defined $ARGV[1];
 $f2 = $ARGV[2] if defined $ARGV[2];
 
+$split = 1 if $types eq "p2P" || $types eq "P2p";
+$split = $ARGV[3] if defined $ARGV[3];
+if ($split > 1){
+  for my $s (0..($split-1)){
+    if(!tie(%{$clones{$s}}, "TokyoCabinet::HDB", "$fname.$s.tch",
+       TokyoCabinet::HDB::OREADER | TokyoCabinet::HDB::ONOLCK)){
+      die "tie error for $fname.$s.tch\n";
+    }
+  }
+}else{
+  if(!tie(%{$clones{"0"}}, "TokyoCabinet::HDB", "$fname.tch", 
+        TokyoCabinet::HDB::OREADER | TokyoCabinet::HDB::ONOLCK)){
+    die "tie error for $fname.tch\n";
+  }
+}
 
 while (<STDIN>){
   chop();
