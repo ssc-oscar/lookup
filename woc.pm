@@ -15,6 +15,7 @@ use vars qw(@ISA);
 
 # basic utilities
 
+# obsolete
 my %toUrlMap = ("bb" => "bitbucket.org","gl" => "gitlab.org",
 		"android.googlesource.com" => "android.googlesource.com",
 		"bioconductor.org" => "bioconductor.org",
@@ -274,6 +275,10 @@ sub cleanCmt {
 # Peculiar objects that have some problems associated with them
 
 our %badProjects = (
+  "Pontorez_z-i" => "massive number of csv files listing IPs censored in Russia",
+  "acycliq_full_coronal_datastore" => "some large changing data",
+  "volzinnovation_fuel_price_variations_germany" => "some large changing data",
+
   "bb_fusiontestaccount_fuse-2944" => "32400A",
   "bb_fusiontestaccount_fuse1999v2" => "34007A", 
   "octocat_Spoon-Knife" => "forking tutorial, 41176A", 
