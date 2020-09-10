@@ -275,9 +275,11 @@ sub cleanCmt {
 # Peculiar objects that have some problems associated with them
 
 our %badProjects = (
+  "beijingicu_maps" => "massive number of png files",
   "Pontorez_z-i" => "massive number of csv files listing IPs censored in Russia",
   "acycliq_full_coronal_datastore" => "some large changing data",
   "volzinnovation_fuel_price_variations_germany" => "some large changing data",
+  "SockPuppetry_Loop-A" => "test script", 
 
   "bb_fusiontestaccount_fuse-2944" => "32400A",
   "bb_fusiontestaccount_fuse1999v2" => "34007A", 
