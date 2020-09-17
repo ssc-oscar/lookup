@@ -10,7 +10,7 @@ require Exporter;
 our @ISA = qw (Exporter);
 our @EXPORT = qw(toUrl segB segH sHash sHashV toHex fromHex safeDecomp safeComp 
 		splitSignature signature_error contains_angle_brackets extract_trimmed git_signature_parse extrCmt getTime cleanCmt	
-		addForks %badProjects %badAuthors %badCmt %badBlob %badTree, %largeBlobPrj, %largeTreePrj);
+		addForks %badProjects %badAuthors %badCmt %badBlob %badTree %largeBlobPrj %largeTreePrj);
 use vars qw(@ISA);
 
 # basic utilities
