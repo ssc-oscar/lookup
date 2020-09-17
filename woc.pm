@@ -273,7 +273,7 @@ sub cleanCmt {
 
 
 # Peculiar objects that have some problems associated with them
-our %largeBlobPrj = {
+our %largeBlobPrj = (
   "dead-hosts_just-domains_web_malwaredomains.com" =>  203537862600,
   "briancpark_COVID-19-Visualizations" => 171205213898,
   "benchmark-driver_benchmark-driver.github.io" => 161693451294,
@@ -325,9 +325,9 @@ our %largeBlobPrj = {
   "acycliq_full_coronal_datastore" => => 200000000000,               #"some large changing data",
   "volzinnovation_fuel_price_variations_germany" => => 200000000000, # "some large changing data",
   "SockPuppetry_Loop-A" => => 200000000000,                          # "test script", 
-};
+);
 
-our %largeTreePrj = {
+our %largeTreePrj = (
 "lihkg-backup_thread" => 200000000000,
 "dapplion_Ethereum-Mainnet-Blocks" => 196663178831,
 "archlinux_svntogit-community" => 44765415181,
@@ -378,7 +378,7 @@ our %largeTreePrj = {
 "alpinelinux_aports" => 1082644363,
 "home-assistant_core" => 1049552102,
 "aquasecurity_vuln-list" => 1000824961,
-};
+);
 
 our %badProjects = (
   "bitzhoumy_helloworld" => "damaged trees",
