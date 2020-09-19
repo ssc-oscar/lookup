@@ -63,10 +63,10 @@ my $BOFF = 0;
 sub isGarbage {
 	my ($t, $p) = @_;
    if ($t eq "tree" || $t eq "blob"){
-     return 1 if defined $largeTreePrj{$p} && largeTreePrj{$p} > 31333583176;
+     return 1 if defined $largeTreePrj{$p} && $largeTreePrj{$p} > 31333583176;
    }
    if ($t eq "blob"){
-     return 1 if defined $largeBlobPrj{$p} && largeBlobPrj{$p} > 31333583176;
+     return 1 if defined $largeBlobPrj{$p} && $largeBlobPrj{$p} > 31333583176;
    }
    return 0;
 }
