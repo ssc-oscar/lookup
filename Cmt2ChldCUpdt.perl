@@ -37,6 +37,7 @@ for my $s (0..($npar-1)){
 for my $s (0..127){
   print STDERR "reading $s\n";
   open A, "tac $fbase$s.idx|";
+  open A, "$fbase$s.idx" if $part >= 0;
   open FD, "$fbase$s.bin";
   binmode(FD);
   my $n = 0;
@@ -46,7 +47,12 @@ for my $s (0..127){
     my $h = fromHex ($hash);
     my $s1 = $s % $npar;
     $n++;
-    if ($n > $minRow){
+    # commits with existing children and commits with no existing children are taken care of by going over the new commits and making sure they are assigned as children to their parents
+    #  but the new commits might be parents of the existing commits: ie, c2cc might have a commit that is not in the current set of commits, but need to loop over them as they will appear 
+    #  as new commits
+    #  To check for these instances loop over all c2cc and find all that are not in the commits
+    #  An alternative way is export c2pc as a flat map, then sort by parent
+    if ($n > $minRow && $part < 0){
       print STDERR "$s $s1 $n\n"; #handle only new commits/ what about cnc?
       last;
     }
@@ -56,14 +62,14 @@ for my $s (0..127){
 
     my ($parent) = extrPar ($codeC);
     if ($parent eq ""){
-	    #print "$hash\n"; #no parent
+      #print "$hash\n"; #no parent
       next;
     }
     for my $p (split(/:/, $parent)){
       my $pbin = fromHex ($p);
       if ($part >= 0){
         my $sec = (unpack "C", substr ($pbin, 0, 1)) % $npar; 
-        $fhoc{$pbin}{$h}++ if $sec == $part;
+        $hoc{$pbin}{$h}++ if $sec == $part;
       }else{
         $fhoc{$pbin}{$h}++;
       }
