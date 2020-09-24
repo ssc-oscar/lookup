@@ -22,14 +22,7 @@ my $f1 = "h";
 my $f2 = "h";
 
 my $split = 32;
-$split = $ARGV[3] if defined $ARGV[3];
 
-for my $s (0..($split-1)){
-  if(!tie(%{$clones{$s}}, "TokyoCabinet::HDB", "$fname.$s.tch",
-                  TokyoCabinet::HDB::OREADER | TokyoCabinet::HDB::ONOLCK)){
-        print STDERR "tie error for $fname.$s.tch\n";
-  }
-}
 
 
 my $offset = 0;
@@ -37,8 +30,9 @@ my $types = $fname;
 $types =~ s|.*/||;
 $types =~ s|Full[A-Z]$||;
 my ($t1, $t2) = split(/2/, $types);
-$f1 = "s" if ($t1 =~ /^[afp]$/);
-$f2 = "cs" if ($t2 =~ /^[afp]$/);
+$f1 = "s" if ($t1 =~ /^[afpP]$/);
+
+$f2 = "cs" if ($t2 =~ /^[afpP]$/);
 
 $f1 = "h" if ($t1 =~ /^[cb]$/);
 $f2 = "h" if ($t2 =~ /^[cb]$/ || $t2 =~ /^(cc|pc|fb|ob|td)$/);
@@ -48,9 +42,27 @@ $f2 = "s" if $t2 =~ /^ta$/;
 $f2 = "s" if $types eq "b2tk"; 
 $f2 = "r" if $types =~ /^c2[hr]$/;
 
+$f1 = "s" if ($t1 eq "PS" || $t1 eq "PF" || $t1 eq "PFS"); 
+$f2 = "s" if ($t2 eq "PS" || $t2 eq "PF" || $t2 eq "PFS"); 
+
 $f1 = $ARGV[1] if defined $ARGV[1];
 $f2 = $ARGV[2] if defined $ARGV[2];
 
+$split = 1 if $types eq "p2P" || $types eq "P2p";
+$split = $ARGV[3] if defined $ARGV[3];
+if ($split > 1){
+  for my $s (0..($split-1)){
+    if(!tie(%{$clones{$s}}, "TokyoCabinet::HDB", "$fname.$s.tch",
+       TokyoCabinet::HDB::OREADER | TokyoCabinet::HDB::ONOLCK)){
+      die "tie error for $fname.$s.tch\n";
+    }
+  }
+}else{
+  if(!tie(%{$clones{"0"}}, "TokyoCabinet::HDB", "$fname.tch", 
+        TokyoCabinet::HDB::OREADER | TokyoCabinet::HDB::ONOLCK)){
+    die "tie error for $fname.tch\n";
+  }
+}
 
 while (<STDIN>){
   chop();
@@ -91,7 +103,7 @@ while (<STDIN>){
       #print STDERR "big file\n";
       #print "$ch\n";
     }else{
-      print "$ch\n";
+      #print "$ch\n";
       print STDERR "no $ch in $fname\n";
       next;
     }
@@ -99,7 +111,7 @@ while (<STDIN>){
   if ($f2 =~ /r/){
     my $h = toHex (substr($v, 0, 20));
     my $d = unpack 'w', (substr($v, 20, length($v) - 20));
-    print "$offset\;$l\;$ch\;$h\;$d\n";
+    print "$ch\;$h\;$d\n";
   }else{
     my $res = ";$v";
     if ($f2 =~ /cs/){

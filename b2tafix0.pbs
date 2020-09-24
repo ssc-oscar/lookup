@@ -11,7 +11,7 @@ cd $c
 
 
 machine=MACHINE
-maxM=5000
+maxM=14000
 [[ $machine == monster ]] && maxM=30000
 [[ $machine == rho ]] && maxM=900
 [[ $machine == sigma ]] && maxM=2900
@@ -20,7 +20,7 @@ maxM=5000
 i=FROM
 what=WHAT
 
-if test 'a' = 'a'; then
+if test 'a' = 'b'; then
 
 l=FROM
 for i in {0..15}
@@ -30,4 +30,29 @@ do j=$((i+l*16))
 done
 
 fi
+
+if test 'a' = 'b'; then
+
+l=FROM   
+for i in {0..7}
+do j=$((i+l*8))
+   zcat b2taFullR$j.s1 | $HOME/bin/lsort ${maxM}M -t\; -k1,2  | gzip > b2taFullR$j.s2
+   echo b2taFullR$j.s2
+done
+
+fi
+
+if test 'a' = 'a'; then
+
+#merge with the results of b2tafix.pbs
+
+l=FROM
+for i in {0..15}
+do j=$((i+l*16))
+   zcat b2taFullR$j.s2 | $HOME/bin/lsort ${maxM}M -t\; -k1,2  --merge - <(zcat b2tacnpFullR$j.s) | gzip > b2taFullR$j.s
+   echo b2taFullR$j.s
+done
+
+fi
+
 

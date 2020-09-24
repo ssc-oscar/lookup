@@ -37,6 +37,7 @@ while (<STDIN>){
     if ($l =~ m/^import\s*(.*)/) {
       my $m = $1;
       $m =~ s|.*/||;
+      $m =~ s| as .*$||;
       $matches{$m}++ if defined $m;
     }
   }
