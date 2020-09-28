@@ -36,7 +36,7 @@ for my $s (0..($split-1)){
 }
 my $ncalc = 0;
 my $nlook = 0;
-my $mdepth x= 0;
+my $mdepth = 0;
 open A, 'cut -d\; -f4'." /data/All.blobs/commit_$sec.idx /data/All.blobs/commit_".($sec+32).".idx /data/All.blobs/commit_".($sec+64).".idx /data/All.blobs/commit_".($sec+96).".idx|";
 while (<A>){
   chop();
