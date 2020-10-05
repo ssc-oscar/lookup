@@ -40,6 +40,7 @@ $f2 = "h" if ($t2 =~ /^[cb]$/ || $t2 =~ /^(cc|pc|fb|ob|td)$/);
 $f2 = "sh" if $types eq "b2a";
 $f2 = "s" if $t2 =~ /^ta$/;
 $f2 = "s" if $types eq "b2tk"; 
+$f2 = "s" if $types eq "td2f"; 
 $f2 = "r" if $types =~ /^c2[hr]$/;
 
 $f1 = "s" if ($t1 eq "PS" || $t1 eq "PF" || $t1 eq "PFS"); 
