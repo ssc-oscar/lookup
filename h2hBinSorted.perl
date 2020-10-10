@@ -10,9 +10,17 @@ use cmt;
 
 my ($tmp, %c2p, %c2p1);
 my $fname = $ARGV[0];
-tie %c2p, "TokyoCabinet::HDB", "$fname", TokyoCabinet::HDB::OWRITER | TokyoCabinet::HDB::OCREAT,   
-  507377777, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
+my $large = 1;
+$large = $ARGV[1] if (defined $ARGV[1]);
+
+if ($large){
+  tie %c2p, "TokyoCabinet::HDB", "$fname", TokyoCabinet::HDB::OWRITER | TokyoCabinet::HDB::OCREAT,   
+    507377777, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
+    or die "cant open $fname\n";
+}else{
+  tie %c2p, "TokyoCabinet::HDB", "$fname", TokyoCabinet::HDB::OWRITER | TokyoCabinet::HDB::OCREAT
   or die "cant open $fname\n";
+}
 
 my $lines = 0;
 my $nc = 0;

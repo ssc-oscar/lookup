@@ -24,7 +24,7 @@ my $sec = $ARGV[0];
 my $ver = $ARGV[1];
 
 for my $s (0..($split-1)){
-  tie %{$c2h{$s}}, "TokyoCabinet::HDB", "/fast/c2hFull$ver.$s.tch", TokyoCabinet::HDB::OWRITER | TokyoCabinet::HDB::OCREAT | TokyoCabinet::HDB::ONOLCK,
+  tie %{$c2h{$s}}, "TokyoCabinet::HDB", "/fast/c2hFull$ver.$s.tch", TokyoCabinet::HDB::OWRITER | TokyoCabinet::HDB::OCREAT,
     16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
     or die "cant open /fast/c2hFull$ver.$s.tch\n";
 }
@@ -36,8 +36,9 @@ for my $s (0..($split-1)){
 }
 my $ncalc = 0;
 my $nlook = 0;
-my $mdepth x= 0;
+my $mdepth = 0;
 open A, 'cut -d\; -f4'." /data/All.blobs/commit_$sec.idx /data/All.blobs/commit_".($sec+32).".idx /data/All.blobs/commit_".($sec+64).".idx /data/All.blobs/commit_".($sec+96).".idx|";
+#open A, 'cut -d\; -f4'." /data/All.blobs/commit_$sec.idx |";
 while (<A>){
   chop();
   my $ch = $_;
