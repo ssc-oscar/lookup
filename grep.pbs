@@ -58,38 +58,20 @@ if test $part = first; then
 ##########################FIRST##################################
 # find commits that modify files of the relevant language
 grepStr=$(echo $grepStr|sed 's/;$/$/;s/\^/;/g')
+
+#find bobs of the relevant language, exclude generic blobs
 for j in {0..31}
-do zcat ../c2fb/c2fFull$ver$j.s | grep -E "$grepStr" | gzip > c2f$ver$LA.$j.gz &
-done
-wait
-echo c2f$ver$LA.$j.gz
-#find bobs of the relevant language
-for j in {0..31}
-do zcat ../c2fb/b2fFull$ver$j.s | grep -E "$grepStr" | gzip > b2f$ver$LA.$j.gz &
+do zcat ../c2fb/b2fFull$ver$j.s | grep -E "$grepStr" | perl -I $HOME/lib/perl5 -I $HOME/lookup -e 'use cmt; while(<STDIN>){ ($b, @r) = split(/;/); print $_ if ! defined $badBlob{$b};}' | gzip > b2f$ver$LA.$j.gz &
 done
 wait
 echo b2f$ver$LA.$j.gz 
-#determine projects for the relevant commits
-for j in {0..31}
-do zcat c2pFull$ver$j.s | join -t\; - <(zcat c2f$ver$LA.$j.gz|cut -d\; -f1|uniq) | gzip > c2p$ver$LA.$j.gz &
-done
-wait
-echo c2p$ver$LA.$j.gz
-
-# find all blobs for relevant commits (a larger set than blobs for relevant language as the commits modify other files as well
-for j in {0..31}
-do zcat ../c2fb/c2bFull$ver$j.s | join -t\; - <(zcat c2f$ver$LA.$j.gz|cut -d\; -f1|uniq) | gzip > c2b$ver$LA.$j.gz &
-done
-wait
-echo c2b$ver$LA.$j.gz
-
 
 #extract a unique list of blobs for the relevant language
 for j in {0..31}
 do zcat b2f$ver$LA.$j.gz | cut -d\; -f1 | uniq | lsort ${maxM}G -u | gzip > b2f$ver$LA.$j.bs &
 done
 wait
-echo b2f$ver$LA.$j.cs
+echo b2f$ver$LA.$j.bs
 
 #get blob to commit map for blobs related to relevant language files
 for j in {0..31}
@@ -98,33 +80,77 @@ done
 wait
 echo b2c$ver$LA.$j.gz
 
-# Get a list of projects
-zcat c2p$ver$LA.*.gz | cut -d\; -f2 | lsort $(($maxM*32))G  -u | gzip > p$ver$LA.gz
-echo p$ver$LA.gz
-
-# get a blob list for blobs related to language files that can also be related to any commit 
+# get a blob list for blobs related to language files that can also
+# have at least one associated commit 
 for j in {0..31}
 do zcat b2c$ver$LA.$j.gz
 done | cut -d\; -f1 | uniq | $HOME/lookup/splitSec.perl b$ver$LA. 128
 echo b$ver$LA.
 
+#scp -p b$ver$LA.*.gz da4:/data/play/${LA}thruMaps/
 
-# for JS look in the following
+# for JS look in the following, since dependencies are not in the .js files
 #grepStr=';(bower.json|package.json|packages/[^/]*/package.json|codemods/[^/]*/package.json|lerna.json|yarn.lock|package-lock.json)$'
 #for j in {0..31}; do zcat b2f$verJS.$j.gz; done | grep -Ei $grepStr | cut -d\; -f1 | uniq | ~/lookup/splitSec.perl b2f$verjson. 128 &
 
-#fi
-#if test 'a' = 'b'; then
-#for j in {0..31}; do zcat bJ${LA}pkgs.$j.gz | lsort 100G -t\; -k1b,1 |  lsort 100G -t\; -k1b,1 --merge - <(zcat bJ${LA}pkgs.$(($j+32)).gz|lsort 100G -t\; -k1b,1)     <(zcat bJ${LA}pkgs.$(($j+64)).gz|lsort 100G -t\; -k1b,1)     <(zcat bJ${LA}pkgs.$(($j+96)).gz|lsort 100G -t\; -k1b,1) |     perl -ane 'print if m/^[0-f]{40};/' | uniq |     gzip > bJ${LA}pkgs.$j.s; done
+#invert b2c into c2bi
+for j in {0..31}
+do zcat b2c$ver$LA.$j.gz | awk -F\; '{print $2";"$1}' | $HOME/lookup/splitSec.perl c2bi$ver$LA.$j. 32 &
+done 
+wait
+echo c2bi$ver$LA.$j.
 
-#for j in {0..31}; do zcat c2ta.$j.gz | lsort 10G -t\; -k1b,1 | lsort 25G -t\; -k1b,1 --merge - <(zcat c2ta.$(($j+32)).gz|lsort 10G -t\; -k1b,1) <(zcat c2ta.$(($j+64)).gz|lsort 10G -t\; -k1b,1) <(zcat c2ta.$(($j+96)).gz|lsort 10G -t\; -k1b,1) | gzip > c2ta.$j.s; done &
-#
-#for j in {0..127}; do $HOME/lookup/lstCmt.perl 1 $j | lsort 5G -t\; -k1b,2 | gzip > c2atFull$ver$j.s & done
-#for j in {0..31}; do zcat c2taFull$ver$j.gz | lsort 10G -t\; -k1b,2 | lsort 85G -t\; -k1b,2 --merge - <(zcat c2taFull$ver$(($j+32)).gz|lsort 10G -t\; -k1b,2) <(zcat c2taFull$ver$(($j+64)).gz|lsort 10G -t\; -k1b,2) <(zcat c2taFull$ver$(($j+96)).gz | lsort 10G -t\; -k1b,2) | gzip > c2taF$ver.$j.s; done
+for j in {0..31}
+do for i in {0..31}
+  do zcat c2bi$ver$LA.$i.$j.gz | lsort ${maxM}G -t\; -k1b,2 -u | gzip > c2bi$ver$LA.$i.$j.s &
+  done
+  wait
+done
+echo c2bi$ver$LA.$i.$j.s
+
+for j in {0..31}
+do  str="$HOME/bin/lsort ${maxM}G -u --merge -t\; -k1b,2"
+  for i in {0..31}
+  do str="$str <(zcat c2bi$ver$LA.$i.$j.s)"
+  done
+  eval $str | gzip > c2bi$ver$LA.$j.s &
+done
+wait
+echo c2bi$ver$LA.$j.s
+
+
+# is this needed, can get it by inverting b2c?
+# answer: yes, we need to restrict commits to ones creating relevant
+# files because inverting b2c produces massive number of commits
+# that do not modify relevant files like a blob for an empty file
+# maps to all commits reating empty file, not just commits for a
+# specific file extension 
+for j in {0..31}
+do zcat ../c2fb/c2fFull$ver$j.s | grep -E "$grepStr" | gzip > c2f$ver$LA.$j.gz &
+done
+wait
+echo c2f$ver$LA.$j.gz
+
+for j in {0..31}
+do zcat zcat c2f$ver$LA.$j.gz | cut -d\; -f1 | uniq | gzip > c$ver$LA.$j.cs &
+done
+wait
+echo c$ver$LA.$j.cs
+
+#determine projects for the relevant commits
+for j in {0..31}
+do zcat c2pFull$ver$j.s | join -t\; - <(zcat c$ver$LA.$j.cs) | gzip > c2p$ver$LA.$j.gz &
+done
+wait
+echo c2p$ver$LA.$j.gz
+
+# Get the list of projects
+zcat c2p$ver$LA.*.gz | cut -d\; -f2 | lsort $(($maxM*32))G  -u | gzip > p$ver$LA.gz
+echo p$ver$LA.gz
 
 # get time/author attributes for relevant commits 
 for j in {0..31}
-do zcat c2taF$ver.$j.s | join -t\; - <(zcat c2f$ver$LA.$j.gz|cut -d\; -f1|uniq) | gzip > c2ta$ver$LA.$j.gz &
+do zcat c2taF$ver.$j.s | join -t\; - <(zcat c$ver$LA.$j.cs) | gzip > c2ta$ver$LA.$j.gz &
 done
 wait
 echo c2ta$ver$LA.$j.gz
@@ -146,44 +172,16 @@ done
 wait
 echo c2Pta$ver$LA.$j.gz 
 
-# add blobs (meesed up for all) 
+# add blobs 
 for j in {0..31}
-do zcat c2b$ver$LA.$j.gz | join -t\; - <(zcat c2Pta$ver$LA.$j.gz) | gzip > c2bPta$ver$LA.$j.gz &
+do zcat c2bi$ver$LA.$j.gz | join -t\; - <(zcat c2Pta$ver$LA.$j.gz) | gzip > c2bPta$ver$LA.$j.gz &
 done
 wait
 echo c2bPta$ver$LA.$j.gz
 
-# now invert c2b to b2c (is that necessary? seems to take forever for popular languages)
-# perhaps it would be much faster to invert b2c and join with c2ta to get time/author attributes?
-for j in {0..31}
-do zcat c2bPta$ver$LA.$j.gz | awk -F\; '{print $2";"$1";"$3";"$4";"$5}' | $HOME/lookup/splitSec.perl b2cPta$ver$LA.$j. 32 &
-done 
-wait
-echo b2cPta$ver$LA.$j.
-
-
-for j in {0..31}
-do for i in {0..31}
-  do zcat b2cPta$ver$LA.$i.$j.gz | lsort ${maxM}G -t\; -k1b,1 | \
-   join -t\; - <(zcat b2c$ver$LA.$j.gz | cut -d\; -f1 | uniq) | gzip > b2cPta$ver$LA.$i.$j.s &
-  done
-  wait
-done
-echo b2cPta$ver$LA.$i.$j.s
-
-for j in {0..31}
-do  str="$HOME/bin/lsort ${maxM}G -u --merge -t\; -k1b,2"
-  for i in {0..31}
-  do str="$str <(zcat b2cPta$ver$LA.$i.$j.s)"
-  done
-  eval $str | gzip > b2cPta$ver$LA.$j.s &
-done
-wait
-echo b2cPta$ver$LA.$j.s
 
 fi
-if test $part = redoPre; then
-
+if test $part = second; then
 
 ##########################REDO##################################
 #this is needed prior to the second stage after run on da4 produces b$ver${LA}pkgs.$j.gz1
@@ -198,15 +196,6 @@ done
 wait
 echo b$ver${LA}pkgs.$j.s
 
-fi
-if test $part = redo; then
-
-#redo forks: used J by mistake
-for j in {0..31}
-do zcat c2P$ver$LA.$j.gz | join -t\; - <(zcat c2ta$ver$LA.$j.gz) | gzip > c2Pta$ver$LA.$j.gz &
-done
-wait
-echo c2Pta$ver$LA.$j.gz
 
 # add package info to minimal b2c
 for j in {0..31}
@@ -214,12 +203,14 @@ do zcat b2c$ver$LA.$j.gz | join -t\; - <(zcat b$ver${LA}pkgs.$j.s) | gzip > b2cP
 done
 wait
 echo b2cPkg$ver$LA.$j.gz
-# invert
+
+# invert fast because only a meaningful subset has the modules
 for j in {0..31}   
 do zcat b2cPkg$ver$LA.$j.gz | perl -ane '($a,$b,@rest)=split(/\;/, $_, -1);print "$b;$a;".(join ";", @rest)' | $HOME/lookup/splitSec.perl c2bPkg$ver$LA.$j. 32 &
 done
 wait
 echo c2bPkg$ver$LA.$j.
+
 for j in {0..31}  
 do for i in {0..31}
   do zcat c2bPkg$ver$LA.$i.$j.gz | lsort ${maxM}G -t\; -k1b,2 - | gzip > c2bPkg$ver$LA.$i.$j.s &
@@ -227,6 +218,7 @@ do for i in {0..31}
   wait
   echo c2bPkg$ver$LA.$i.$j.s
 done
+
 for j in {0..31}
 do  str="$HOME/bin/lsort ${maxM}G -u --merge -t\; -k1b,2"
   for i in {0..31} 
@@ -257,364 +249,3 @@ wait
 
 
 fi
-if test $part = mid; then
-
-#####################################MID#########################################################T
-# invert b2c$ver in order to get attributes (P, t, and a from c)
-for j in {0..31}
-do zcat b2c$ver$LA.$j.gz | awk -F\; '{print $2";"$1}' | $HOME/lookup/splitSec.perl c2b1$ver$LA.$j. 32 &
-done
-wait
-echo c2b1$ver$LA.$j. 
-for j in {0..31}
-do for i in {0..31}
-  do zcat c2b1$ver$LA.$i.$j.gz | lsort ${maxM}G -t\; -k1b,2 -u - | gzip > c2b1$ver$LA.$i.$j.s &
-  done
-  wait
-  echo c2b1$ver$LA.$i.$j.s
-done
-for j in {0..31}
-do  str="$HOME/bin/lsort ${maxM}G -u --merge -t\; -k1b,2"
-  for i in {0..31}
-  do str="$str <(zcat c2b1$ver$LA.$i.$j.s)"
-  done
-  eval $str | gzip > c2b1$ver$LA.$j.s &
-done
-wait
-echo c2b1$ver$LA.$j.s
-
-fi
-if test $part = mid1; then
-
-# join P and ta attributes
-for j in {0..31}
-do zcat c2P$ver$LA.$j.gz | join -t\; - <(zcat c2ta$ver$LA.$j.gz) | gzip > c2Pta$ver$LA.$j.gz &
-done
-wait
-echo c2Pta$ver$LA.$j.gz
-
-# now add blobs
-for j in {0..31}
-do zcat c2b1$ver$LA.$j.s | cut -d\; -f1,2 | join -t\; - <(zcat c2Pta$ver$LA.$j.gz) | gzip > c2b1Pta$ver$LA.$j.gz &
-done
-wait
-echo c2b1Pta$ver$LA.$j.gz
-
-
-# invert again for joining with packages (may be join with packages then invert above?)
-for j in {0..31}
-do zcat c2b1Pta$ver$LA.$j.gz | awk -F\; '{print $2";"$1";"$3";"$4";"$5}' | $HOME/lookup/splitSec.perl b2c1Pta$ver$LA.$j. 32 &
-done
-wait
-echo b2c1Pta$ver$LA.$j.
-for j in {0..31}
-do for i in {0..31}
-  do zcat b2c1Pta$ver$LA.$i.$j.gz | lsort ${maxM}G -t\; -k1b,2 -u - | gzip > b2c1Pta$ver$LA.$i.$j.s &
-  done
-  wait
-  echo b2c1Pta$ver$LA.$i.$j.s
-done
-wait
-for j in {0..31}
-do  str="$HOME/bin/lsort ${maxM}G -u --merge -t\; -k1b,2"
-  for i in {0..31}
-  do str="$str <(zcat b2c1Pta$ver$LA.$i.$j.s)"
-  done
-  eval $str | gzip > b2c1Pta$ver$LA.$j.s &
-done
-wait
-echo b2c1Pta$ver$LA.$j.s
-
-# add packages
-for j in {0..31}
-do zcat b2c1Pta$ver$LA.$j.s | join -t\; - <(zcat b$ver${LA}pkgs.$j.s) | gzip > b2c1PtaPkg$ver$LA.$j.gz &
-done
-wait
-echo b2c1PtaPkg$ver$LA.$j.gz
-
-# produce summaries
-for j in {0..31}
-do zcat b2cPtaPkg$ver$LA.$j.gz
-done | cut -d\; -f3,6-| \
-  perl -e 'while(<STDIN>){chop();($p,@m)=split(/;/);for $mm (@m){$p2m{$p}{$mm}++;}}; for $p (keys %p2m){@ms=sort keys %{$p2m{$p}}; print "$p;",(join ";", @ms)."\n"; }' |gzip > P2m$ver$LA &
-wait
-zcat p2m$ver$LA |\
-   perl -e 'while(<STDIN>){chop();($p,@ms)=split(/;/);for $m (@ms){$mp{$m}{$p}++}};while (($m,$p) = each %mp){@ps=keys %$p;print "$m\;$#ps\n"}' | \
-   gzip > m2np$ver$LA &
-wait
-
-#echo Nothing
-##################
-
-fi
-if test $part = second; then
-
-
-#####################################SECOND#########################################################T
-#merge from 128 to 32 chunks
-for j in {0..31}
-do $HOME/bin/lsort ${maxM}G -t\; -k1b,1 --merge \
-            <(zcat b$ver${LA}pkgs.$j.gz1 | lsort ${maxM}G -t\; -k1b,1) \
-    <(zcat b$ver${LA}pkgs.$(($j+32)).gz1 | lsort ${maxM}G -t\; -k1b,1) \
-    <(zcat b$ver${LA}pkgs.$(($j+64)).gz1 | lsort ${maxM}G -t\; -k1b,1) \
-    <(zcat b$ver${LA}pkgs.$(($j+96)).gz1 | lsort ${maxM}G -t\; -k1b,1) | \
-     perl -ane 'print if m/^[0-f]{40};/' | uniq |  gzip > b$ver${LA}pkgs.$j.s &
-done
-wait
-echo b$ver${LA}pkgs.$j.s
-
-# ensure we deal with blobs that actually modify language files (is that really necessary, can't this be done on da4 better?
-for j in {0..31}
-do zcat b2cPta$ver$LA.$j.s | join -t\; - <(zcat b$ver${LA}pkgs.$j.s) | gzip > b2cPtaPkg$ver$LA.$j.gz &
-done
-wait
-echo b2cPtaPkg$ver$LA.$j.gz
-
-# do we really need this?
-for j in {0..31}
-do zcat b2cPtaPkg$ver$LA.$j.gz |  join -t\; - <(zcat b2c$ver$LA.$j.gz | cut -d\; -f1 | uniq) | gzip > b2cPtaPkgB$ver$LA.$j.gz &
-done
-wait
-echo b2cPtaPkgB$ver$LA.$j.gz
-
-fi
-if test $part = third; then
-
-for LA in C JS PY java R rb F Cs Go Rust Scala pl
-do 
-  for j in {0..31}; do zcat b2cPtaPkg$ver$LA.$j.gz; done | cut -d\; -f3,6-| \
-    perl -e 'while(<STDIN>){chop();($p,@m)=split(/;/);for $mm (@m){$p2m{$p}{$mm}++;}}; for $p (keys %p2m){@ms=sort keys %{$p2m{$p}}; print "$p;",(join ";", @ms)."\n"; }' |gzip > P2m$ver$LA
-  zcat p2m$ver$LA|perl -e 'while(<STDIN>){chop();($p,@ms)=split(/;/);for $m (@ms){$mp{$m}{$p}++}};while (($m,$p) = each %mp){@ps=keys %$p;print "$m\;$#ps\n"}' |gzip > m2np$ver$LA
-done
-
-fi
-
-if test 'a' = 'b'; then
-
-# in case forks file was not produced eralier
-for j in {0..31}
-do zcat b2cPtaPkgB$ver$LA.$j.gz | perl mp.perl 3 p$ver$LA.forks | uniq | lsort 500M -u | gzip > b2cP1taPkgB$ver$LA.$j.gz &
-done
-wait
-zcat b2cP1taPkgB$ver$LA.* | cut -d\; -f3,6-| perl -e 'while(<STDIN>){chop();($p,@m)=split(/;/);for $mm (@m){$p2m{$p}{$mm}++;}}; for $p (keys %p2m){@ms=sort keys %{$p2m{$p}}; print "$p;",(join ";", @ms)."\n"; }' |gzip > P2m$LA 
-zcat p2m$LA|perl -e 'while(<STDIN>){chop();($p,@ms)=split(/;/);for $m (@ms){$mp{$m}{$p}++}};while (($m,$p) = each %mp){@ps=keys %$p;print "$m\;$#ps\n"}' |gzip > m2np$LA
-#zcat b2cPtaPkgBJR.*.gz| grep data.table | cut -d\; -f3-5 | lsort 1G -t\; -n -k1b,2 | awk -F\; 'BEGIN {p=""} {if ($1 != p) print; p=$1; }' | gzip > DT.srt
-
-fi
-
-
-# b2cPtaPkgJ$LA.$j.gz has all the info
-
-#for j in {0..31}
-#do zcat c2bJ$LA.$j.gz
-#done | cut -d\; -f2 | uniq |  $HOME/lookup/splitSec.perl bJ$LA. 128
-#for j in {0..127}
-#do zcat bJ$LA.$j.gz | lsort 100M -u | gzip > bJ$LA.$j.s &
-#done
-#wait
-#now process bJ$LA.$j.s to extract import statements
-#   
-#link b2c and c2at to get time
-#         and c2p  to get project
-
-# go from 128 to 32
-# for j in {0..31}; do zcat c2ta.$j.gz | lsort 1G --merge - <(zcat c2ta.$(($j+32)).gz) <(zcat c2ta.$(($j+64)).gz) <(zcat c2ta.$(($j+96)).gz) | gzip > c2ta.$j.s; done
-#need to map b2p, though bs are more necessary
-#need to map b2t
-#for j in {0..31}
-#do zcat c2bJ$LA.$j.gz
-#done | cut -d\; -f2 |uniq | $HOME/lookup/splitSec.perl c2bJ$LA.bs. 32
-#for j in {0..31}
-#do zcat c2bJ$LA.bs.$j.gz |lsort 100M -u|join -t\; - <(zcat b2fJ$LA.$j.gz|cut -d\; -f1|uniq)
-#done
-#wait
-
-
-pr=MAP
-[[ $pr = *"f" ]] && grepStr=$(echo $grepStr|sed 's/;$/$/;s/\^/;/g')
-
-
-if test 'a' = 'b'; then
-j=1
-zcat c2fJ$LA.c2p.ps.$j.gz | join -v1 - <(zcat b2fJ$LA.b2c.c2p.ps.$j.gz) | wc
-#  31937   31937  803971
-#git clone gh:A-ezzat1997/Determint
-#find Determint -name '*.py*'
-#./Determint/Det.py
- 
-zcat c2fJ$LA.c2p.ps.$j.gz | join -v2 - <(zcat b2fJ$LA.b2c.c2p.ps.$j.gz) | wc
-# 824613  824613 19640049
-#git clone gh:A-A-G/conky
-#find conky/ -name '*.py*'
-
-#this is the nonsense blob linking to other files
-#echo 72e8ffc0db8aad71a934dd11e5968bd5109e54b4 | /da3_data/lookup/showBlob.perl 
-#blob;114;3;46999185316;46999185316;3;72e8ffc0db8aad71a934dd11e5968bd5109e54b4
-
-fi
-if test 'a' = 'b'; then
-
-####################################################################
-## do c2f -> c2p: This produces many fewer projects, investigate why
-####################################################################
-pr=c2f
-for j in {0..31}
-do zcat ${pr}J$LA.$j.gz | cut -d\; -f1 | uniq | gzip > ${pr}J$LA.$j.cs &
-done
-wait
-for j in {0..31}
-do zcat c2pFullJ$j.s | perl $HOME/bin/grepField.perl ${pr}J$LA.$j.cs 1 | gzip > ${pr}J$LA.cs.$j.c2p &
-done
-wait
-for j in {0..31}
-do zcat ${pr}J$LA.cs.$j.c2p | cut -d\; -f2 | $HOME/bin/lsort 100M -u | gzip > ${pr}J$LA.cs.$j.c2p.ps &
-done
-wait
-for j in {0..31}
-do zcat ${pr}J$LA.cs.$j.c2p.ps 
-done | $HOME/bin/lsort 8G -u | perl $HOME/lookup/splitSecCh.perl ${pr}J$LA.c2p.ps. 32 &
-wait
-
-fi
-if test 'a' = 'b'; then
-
-#################################################################
-## do b2f b2c c2p: faster than starting from f2b, same result
-################################################################
-#this is a full cycle based pn b2f of going 
-# from files to blobs: b2fJPY.$j.gz, blobs are in b2fJPY.$j.bs
-# blobs to commits: b2fJPY.$j.b2c, commits are in b2fJPY.b2c.cs.$j.s
-# commits to projects:  b2fJPY.b2c.cs.$j.s.c2p, projects are in b2fJPY.b2c.c2p.ps.$j.gz
-################################################################
-pr=b2f
-for j in {0..31}
-do zcat ${pr}J$LA.$j.gz | cut -d\; -f1 | uniq | gzip > ${pr}J$LA.$j.bs &
-done
-wait
-for j in {0..31}
-do zcat b2cFullJ$j.s | perl $HOME/bin/grepField.perl ${pr}J$LA.$j.bs 1 | gzip > ${pr}J$LA.$j.b2c &
-done
-wait
-for j in {0..31}
-do zcat ${pr}J$LA.$j.b2c | cut -d\; -f2 | perl $HOME/lookup/splitSec.perl ${pr}J$LA.$j.b2c.cs. 32 &
-done
-wait
-for j in {0..31}
-do for i in {0..31}
-   do zcat ${pr}J$LA.$i.b2c.cs.$j.gz | $HOME/bin/lsort 100M -u | gzip > ${pr}J$LA.$i.b2c.cs.$j.s &
-   done
-   wait
-done
-for j in {0..31}
-do  str="$HOME/bin/lsort 1G -u --merge"
-  for i in {0..31}
-  do str="$str <(zcat ${pr}J$LA.$i.b2c.cs.$j.s)"
-  done
-  eval $str | gzip > ${pr}J$LA.b2c.cs.$j.s &
-done
-wait
-for j in {0..31}
-do zcat c2pFullJ$j.s | perl $HOME/bin/grepField.perl ${pr}J$LA.b2c.cs.$j.s 1 | gzip > ${pr}J$LA.b2c.cs.$j.s.c2p &
-done
-wait
-for j in {0..31}
-do zcat ${pr}J$LA.b2c.cs.$j.s.c2p | cut -d\; -f2 | $HOME/bin/lsort 100M -u | gzip > ${pr}J$LA.b2c.cs.$j.s.c2p.ps &
-done
-wait
-for j in {0..31}
-do zcat ${pr}J$LA.b2c.cs.$j.s.c2p.ps 
-done | $HOME/bin/lsort 8G -u | perl $HOME/lookup/splitSecCh.perl ${pr}J$LA.b2c.c2p.ps. 32 &
-wait
-
-fi
-if test 'a' = 'b'; then
-
-#######################
-# do f2b b2c c2p
-#######################
-#this is a full cycle based pn f2b of going 
-# from files to blobs: f2bJPY.$j.gz, blobs are in f2bJPY.$j.bs.s
-# blobs to commits: f2bJPY.$j.bs.s.b2c, commits are in f2bJPY.bs.s.b2c.cs.$j.s
-# commits to projects:  f2bJPY.bs.s.b2c.cs.$j.s.c2p, projects are in f2bJPY.b2c.c2p.ps.$j.gz
-################################################################
-LA=JS
-for j in {0..31}
-do zcat f2bJ$LA.$j.gz | cut -d\; -f2 | lsort 2G -u | gzip > f2bJ$LA.$j.bs &
-done
-wait
-for j in {0..31} 
-do zcat f2bJ$LA.$j.bs | perl $HOME/lookup/splitSec.perl f2bJ$LA.$j.bs. 32 &
-done
-wait
-for j in {0..31}
-do for i in {0..31}
-   do zcat f2bJ$LA.$i.bs.$j.gz | $HOME/bin/lsort 100M -u | gzip > f2bJ$LA.$i.bs.$j.s &
-   done
-   wait
-done
-wait
-for j in {0..31}
-do  str="$HOME/bin/lsort 1G -u --merge"
-  for i in {0..31}
-  do str="$str <(zcat f2bJ$LA.$i.bs.$j.s)"
-  done
-  eval $str | gzip > f2bJ$LA.$j.bs.s &
-done
-wait
-for j in {0..31}
-do zcat b2cFullJ$j.s | perl $HOME/bin/grepField.perl f2bJ$LA.$j.bs.s 1 | gzip > f2bJ$LA.$j.bs.s.b2c &
-done
-wait
-for j in {0..31}
-do zcat f2bJ$LA.$j.bs.s.b2c | cut -d\; -f2 | perl $HOME/lookup/splitSec.perl f2bJ$LA.$j.bs.s.b2c.cs. 32 &
-done
-wait
-for j in {0..31}
-do for i in {0..31}
-   do zcat f2bJ$LA.$i.bs.s.b2c.cs.$j.gz | $HOME/bin/lsort 100M -u | gzip > f2bJ$LA.$i.bs.s.b2c.cs.$j.s &
-   done
-   wait
-done
-wait
-for j in {0..31}
-do  str="$HOME/bin/lsort 1G -u --merge"
-  for i in {0..31}
-  do str="$str <(zcat f2bJ$LA.$i.bs.s.b2c.cs.$j.s)"
-  done
-  eval $str | gzip > f2bJ$LA.bs.s.b2c.cs.$j.s &
-done
-wait
-for j in {0..31}
-do zcat c2pFullJ$j.s | perl $HOME/bin/grepField.perl f2bJ$LA.bs.s.b2c.cs.$j.s 1 | gzip > f2bJ$LA.bs.s.b2c.cs.$j.s.c2p &
-done
-wait
-for j in {0..31}
-do zcat f2bJ$LA.bs.s.b2c.cs.$j.s.c2p | cut -d\; -f2 | $HOME/bin/lsort 100M -u | gzip > f2bJ$LA.bs.s.b2c.cs.$j.s.c2p.ps &
-done
-wait
-for j in {0..31}
-do zcat f2bJ$LA.bs.s.b2c.cs.$j.s.c2p.ps 
-done | $HOME/bin/lsort 8G -u | perl $HOME/lookup/splitSecCh.perl f2bJ$LA.b2c.c2p.ps. 32 &
-wait
-
-fi
-if test 'a' = 'b'; then
-
-for j in {0..31}
-do zcat ../c2fb/${pr}FullJ$j.s | grep -E "$grepStr" | gzip > ${pr}J$LA.$j.gz &
-#do zcat f2bFullJ$j.s | grep -E '\.(py|py3|pyx|pyo|pyw|pyc);' | gzip > f2bJPY.$j.gz &
-#do zcat b2fFullJ$j.s | grep -E '\.(py|py3|pyx|pyo|pyw|pyc)$' | gzip > b2fJPY.$j.gz &
-#do zcat c2fFullJ$j.s | grep -E '\.(py|py3|pyx|pyo|pyw|pyc)$' | gzip > c2fJPY.$j.gz &
-#do zcat f2bFullJ$j.s | grep -E '\.(js|iced|liticed|iced.md|coffee|litcoffee|coffee.md|ts|cs|ls|es6|es|jsx|sjs|co|eg|json|json.ls|json5);' | gzip > f2bJJS.$j.gz &
-#do zcat c2fFullJ$j.s | grep -E '\.(js|iced|liticed|iced.md|coffee|litcoffee|coffee.md|ts|cs|ls|es6|es|jsx|sjs|co|eg|json|json.ls|json5)$' | gzip > c2fJJS.$j.gz &
-#do zcat f2cFullJ$j.s | grep -E '\.(js|iced|liticed|iced.md|coffee|litcoffee|coffee.md|ts|cs|ls|es6|es|jsx|sjs|co|eg|json|json.ls|json5);' | gzip > f2cJJS.$j.gz &
-done
-wait
-exit
-fi
-
-#do zcat c2bcsJ$j.s | join -v2 - <(zcat cmts.s5.$j.gz) | gzip > cmts.s5.$j.miss &
-#do zcat c2bFullJ$j.s | cut -d\; -f1 | uniq | gzip > c2bcsJ$j.s &
-#do zcat f2cFullI$j.s | cut -d\; -f1 | uniq | gzip > fs$j.gz &
-#
-

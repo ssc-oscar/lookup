@@ -560,7 +560,7 @@ wait
 str="lsort 30G -u --merge -t\; -k1,1"
 for i in {0..31}; do str="$str <(zcat a$ver$i.s)"; done; 
 eval $str | gzip > a$ver.s
-#create databases
+# create databases
 for j in {0..31}; do zcat a2cFull$ver.$j.s | ~/lookup/s2hBinSorted.perl /fast/a2cFull$ver.$j.tch; done &
 for i in {0..31}; do zcat c2taFull$ver$i.s c2taFull$ver$(($i+32)).s c2taFull$ver$(($i+64)).s c2taFull$ver$(($i+96)).s  | ~/lookup/Cmt2taBin.perl /fast/c2taFull$ver.$i.tch 1; done &
 wait
@@ -569,24 +569,30 @@ scp -p a$ver.s c2taFull$ver{[0-9],[1-9][0-9],1[0-9][0-9]}.s da3:/data/basemaps/g
 scp -p /fast/a2cFull$ver.{[0-9],[1-3][0-9]}.tch da0:/data/basemaps/
 
 # commit to parent commit
-for i in {0..31..4}; do scp -p da0:/da?_data/basemaps/c2pcFullR.$i.tch /fast/c2pcFull${ver}.$i.tch; ~/lookup/Cmt2Par.perl $i $ver | gzip > cnpFull$ver.$i; done &
+for i in {0..31..4}; do ~/lookup/Cmt2Par.perl $i $ver | gzip > cnpFull$ver.$i; done &
 ...
 wait
 scp -p cnpFull$ver.* da0:/data/basemaps/gz
-for i in {0..31}; do scp -p da0:/data/basemaps/c2ccFullR.$i.tch /fast/c2ccFull${ver}.$i.tch; done
-# commit to child commit - takes long
-time ~/lookup/Cmt2ChldCUpdt.perl /fast/c2ccFull$ver 2480391
-#4250m
-# the approach may miss children where the new commit is the
-# parent of the old (and did not exist previously, but that should
-# not be an issue based on the calculation as the new commit has to
-# be in the old one)
-# for i n {0..31}; do time ~/lookup/Cmt2ChldCUpdt.perl /fast/c2ccFull$ver 0 $;idone
+for i in {0..31}; do ~/lookup/lst.perl /fast/c2pcFullS.$i.tch  | perl -ane 'chop();($c,@pc)=split(/;/,$_,-1);for $p (@pc){print "$p;$c\n";}' | gzip > pc2c.$i; done
+# run on beacon to produce c2ccFullS*.s
+# create small (0) tch files via h2h
+for j in {0..31}; do zcat c2ccFull$ver$j.s | ~/lookup/h2hBinSorted.perl /fast/c2ccFull$ver.$j.tch 0; done 
+# commit to child commit - takes long and misses some commits: don't use, removed
+# time ~/lookup/Cmt2ChldCUpdt.perl /fast/c2ccFull$ver 2480391
+# 2564m33
 
-for i in {0..31}; do scp -p da0:/data/basemaps/c2rFullR.$i.tch /fast/c2rFull${ver}.$i.tch; ~/lookup/Cmt2Root.perl $i ${ver}; done &
-wait
-for i in {0..31}; do rm -f /fast/c2hFull${ver}.$i.tch; done
-for i in {0..31}; do time ~/lookup/Cmt2Head.perl $i ${ver}; done
+# c2r may change if the formerly undefined commit is retrieved and
+# has a parent
+# first seed with roots/leaves up to 10th-level
+time for k in {0..9}; do ~/lookup/Cmt2RootNew.perl S $k; done
+real 218m21.025s
+for i in {0..9}; do ~/lookup/Cmt2HeadNew.perl $ver $i; done
+time for i in 0; do echo $i; time ~/lookup/Cmt2Head.perl $i ${ver}; done
+
+
+# now deal with the remaining commits
+time for i in {0..31}; do echo $i; ~/lookup/Cmt2Root.perl $i ${ver}; done 
+time for i in {0..31}; do time ~/lookup/Cmt2Head.perl $i ${ver}; done
 # 6926m on i=0, 758m on i=1 481m on i=2 347m on i=3 262m on i=4 221m on i=5...117m on i=10 79m i=19 65m i=30
 ```
 
