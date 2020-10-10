@@ -384,10 +384,8 @@ Examples:
    * echo a7081031fc8f4fea0d35dd8486f8900febd2347e | ~/lookup/showCnt blob
    
 Output:
-   Formatting: blob;#ofSections;rl;CurrentPosition;Offset;Length;"Blob-ID"
-               "Content of the blob"
+   Formatting: "Content of the blob"
    Examples:
-              blob;5;8529;54537521775;54537521775;8529;05fe634ca4c8386349ac519f899145c75fff4169
               # Syllabus for "Fundamentals of Digital Archeology"
               ## News
                  * Assignment1 due Monday Sep 8 before 2:30PM
