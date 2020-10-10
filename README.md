@@ -384,8 +384,10 @@ Examples:
    * echo a7081031fc8f4fea0d35dd8486f8900febd2347e | ~/lookup/showCnt blob
    
 Output:
-   Formatting: "Content of the blob"
+   Formatting: blob;#ofSections;rl;CurrentPosition;Offset;Length;"Blob-ID"
+               "Content of the blob"
    Examples:
+              blob;5;8529;54537521775;54537521775;8529;05fe634ca4c8386349ac519f899145c75fff4169
               # Syllabus for "Fundamentals of Digital Archeology"
               ## News
                  * Assignment1 due Monday Sep 8 before 2:30PM
@@ -505,6 +507,10 @@ ls */*.p2c | cut -d/ -f1 | while read i; do rsync -av $i/*.p2c bb1:/da2_data/upd
 #lookup/updatePrj${ver}.pbs
 #get forks sed "s/VER/${ver}/;s/MACHINE/monster/;s/=23/=23/" ~/lookup/fork.pbs | qsub
 
+#create databases for c2p/p2c
+for i in {0..31}; do zcat p2cFull$ver{$i,$(($i+32)),$(($i+64)),$(($i+96))}.s | ~/lookup/s2hBinSorted.perl ../p2cFull$ver.$i.tch; done &
+for i in {0..31}; do zcat c2pFull$ver{$i,$(($i+32)),$(($i+64)),$(($i+96))}.s | ~/lookup/h2sBinSorted.perl ../c2pFull$ver.$i.tch; done &
+
 
 - Update content
 ```
@@ -526,6 +532,10 @@ cd c2fb
 for i in {0..127}; do cut -d\; -f4 /data/All.blobs/commit_$i.idx| lsort 50G -u | join -v1 - <(ssh da4 'cut -d\; -f4 /data/All.blobs/commit_'$i'.idx' < /dev/null | lsort 50G -u) | gzip > RS$i.cs; done
 --
 for i in {0..127}; do time zcat RS$i.cs  | perl -I ~/lookup -I ~/lib64/perl5 ~/lookup/cmputeDiff3.perl 2> errRS.$i | gzip > RS$i.gz; done  &
+
+(i=0;zcat RS$i.gz|perl -I $HOME/lib64/perl5 -I $HOME/lookup -e 'use cmt; while(<STDIN>){ chop (); s|;/|;|g; @r = split(/;/); $r[$#r] = "long" if $r[$#r] =~ / /&& length($r[$#r]) > 300; print "".(join ";", @r)."\n" if ! defined $badCmt{$r[0]};}' | lsort 5G | gzip > RS$i.s)
+
+(i=0; lsort 3G -t\; -k1,1 --merge <(zcat c2fbbFullR$i.s) <(zcat RS$i.s) | gzip > c2fbbFullS$i.s) &
 ```
 
 #on dad2
@@ -583,8 +593,11 @@ for j in {0..31}; do zcat c2ccFull$ver$j.s | ~/lookup/h2hBinSorted.perl /fast/c2
 # has a parent
 # first seed with roots/leaves up to 10th-level
 time for k in {0..9}; do ~/lookup/Cmt2RootNew.perl S $k; done
-real 218m21.025s
-for i in {0..9}; do ~/lookup/Cmt2HeadNew.perl $ver $i; done
+#218m21.025s
+time for i in 0; do echo $i; time ~/lookup/Cmt2Root.perl $i ${ver}; done
+
+time for i in {0..9}; do ~/lookup/Cmt2HeadNew.perl $ver $i; done
+#996m
 time for i in 0; do echo $i; time ~/lookup/Cmt2Head.perl $i ${ver}; done
 
 
