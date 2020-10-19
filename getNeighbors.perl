@@ -123,7 +123,7 @@ sub cvt {
 }
 
 for my $k (sort keys %lnk){
-  for my $c (sort keys %{$lnk}{$k}){
+  for my $c (sort keys %{$lnk{$k}){
     for my $v (keys %{$lnk{$k}{$c}}){
 		print "$obj;$k;$c;$v\n";
     }
