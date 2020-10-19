@@ -91,7 +91,7 @@ while ($d <= $depth){
 
 for my $ch (keys %cs){
   my $c = fromHex ($ch);
-  my $s = segB ($c, $split)
+  my $s = segB ($c, $split);
   for my $k ("c2P", "c2f", "c2ta"){
     myOpen ($k, $s); 
     for my $v (split (/;/, cvt ($k, $dat{$k}{$s}{$c}), -1)){
