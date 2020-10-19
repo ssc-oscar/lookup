@@ -72,7 +72,6 @@ if ($cvt eq ""){
 }
 $d = 1;
 while ($d <= $depth){ 
-  my %as;
   for my $k ("c2cc", "c2pc"){
     for my $obj (keys %{$out{$d-1}{$k}}){
       for my $ch (keys %{$out{$d-1}{$k}{$obj}}){
@@ -87,6 +86,7 @@ while ($d <= $depth){
       }
     }
   }
+  $d += 1;
 }
 
 for my $ch (keys %cs){
@@ -116,16 +116,16 @@ sub cvt {
     if ($f eq "cs"){
 		$res = safeDecomp($v);
     }else{
-		 $res = split (/;/, $v, -1)[1];
+		 $res = (split (/;/, $v, -1))[1];
     }
   }
   $res;
 }
 
 for my $k (sort keys %lnk){
-  for my $c (sort keys %{$lnk{$k}){
+  for my $c (sort keys %{$lnk{$k}}){
     for my $v (keys %{$lnk{$k}{$c}}){
-		print "$obj;$k;$c;$v\n";
+		  print "$obj;$k;$c;$v\n";
     }
   }
 }
