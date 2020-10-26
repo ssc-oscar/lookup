@@ -229,6 +229,12 @@ sub splitSignature {
 
 sub cleanCmt {
   my ($cont, $cmt, $debug) = @_;
+  if ($debug == 6){
+    my ($tree, $parents, $auth, $cmtr, $ta, $tc, @rest) = extrCmt ($cont, $cmt);
+    $ta=~s/ .*//;
+    print "$cmt;$tree;$parents;$auth;$ta\n";
+    return;
+  }
   if ($debug == 5){
     print "$cmt;".(extrPar($cont))."\n";
     return;
