@@ -232,7 +232,9 @@ sub cleanCmt {
   if ($debug == 6){
     my ($tree, $parents, $auth, $cmtr, $ta, $tc, @rest) = extrCmt ($cont, $cmt);
     $ta=~s/ .*//;
-    print "$cmt;$tree;$parents;$auth;$ta\n";
+    $ta = 0 if length($ta) > 10; 
+    $ta = sprintf "%.10d", $ta;
+    print "$cmt;$ta;$auth;$tree;$parents\n";
     return;
   }
   if ($debug == 5){
