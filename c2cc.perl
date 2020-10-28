@@ -26,20 +26,24 @@ if (! defined $ARGV[1]){
 	exit (-1);
 }
 my $f0 = $ARGV[0];
-my $fname = $ARGV[1];
+my $ver = $ARGV[1];
+my $sections = 32;
 
-my (%c2pc);
-tie %c2pc, "TokyoCabinet::HDB", "$fname", TokyoCabinet::HDB::OWRITER | TokyoCabinet::HDB::OCREAT | TokyoCabinet::HDB::ONOLCK
-     or die "cant open $fname\n";
+my (%c2cc);
 
-my (%c2p);
+for my $i (0..($sections-1)){
+  tie %{$c2cc{$i}}, "TokyoCabinet::HDB", "/fast/c2ccFull$ver.$i.tch", TokyoCabinet::HDB::OWRITER | TokyoCabinet::HDB::OCREAT 
+     or die "cant open /fast/c2ccFull$ver.$i.tch\n";
+}
 
+my %tmp;
 open FD, "$f0";
 binmode(FD);
 while (<STDIN>){
   chop();
   my ($nn, $of, $len, $hash) = split (/\;/, $_, -1);
   my $h = fromHex ($hash);
+  my $sec = (unpack "C", substr ($h, 0, 1)) % $sections;
   my $codeC = "";
   seek (FD, $of, 0);
   my $rl = read (FD, $codeC, $len);
@@ -48,22 +52,29 @@ while (<STDIN>){
     print "$hash\n"; #no parent
     next;
   }
-  my %tmp;
   for my $p (split(/:/, $parent)){
     next if $p !~ /^[0-9a-f]{40}$/;
     my $pbin = fromHex ($p);
-    $tmp{$pbin}++;
-  }
-  if (defined $c2pc{$h}){
-    my $v = $c2pc{$h};
-    for my $i (0..(length($v)/20)){
-      my $pbin = substr ($v, $i*20, 20);
-      $tmp{$pbin}++;
+    my $sec = (unpack "C", substr ($pbin, 0, 1)) % $sections;
+    if (defined $c2cc{$sec}{$pbin}){
+      my $v = $c2cc{$sec}{$pbin};
+      for my $i (0..(length($v)/20)){
+        my $cbin = substr ($v, $i*20, 20);
+        $tmp{$sec}{$pbin}{$cbin}++;
+      }
     }
-  }    
-  my $v1 = join '', sort keys %tmp;
-  $c2pc{$h} = $v1;
+    $tmp{$sec}{$pbin}{$h} ++;
+  }
 }
 
-untie %c2pc;
+for my $sec (keys %tmp){
+  for my $p (keys %{$tmp{$sec}}){
+    my $v = join '', sort keys %{$tmp{$sec}{$p}};
+    $c2cc{$sec}{$p} = $v;
+  }
+}
+
+for my $i (0..($sections-1)){
+  untie %{$c2cc{$i}};
+}
 
