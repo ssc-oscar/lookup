@@ -1,0 +1,129 @@
+#PBS -N WHATFROM
+#PBS -A ACF-UTK0011
+#PBS -l feature=MACHINE
+#PBS -l partition=MACHINE
+#PBS -l nodes=1:ppn=1,walltime=23:50:00
+#PBS -j oe
+#PBS -S /bin/bash
+LD_LIBRARY_PATH=$HOME/lib:$HOME/lib64:$LD_LIBRARY_PATH
+c=/lustre/haven/user/audris/All.blobs/
+cd $c
+
+ver=S
+machine=MACHINE
+maxM=10000
+
+[[ $machine == monster ]] && maxM=30000
+[[ $machine == rho ]] && maxM=900
+[[ $machine == sigma ]] && maxM=2900
+maxA=$(($maxM*32))
+
+if test 'WHAT' == 'c2dat'; then
+
+for i in {0..3}
+do j=$((FROM*4+$i))
+   $HOME/lookup/lstCmt.perl 6 $j |  \
+   $HOME/bin/lsort ${maxM}M -t\; -k1,5| gzip > ../gz/c2datFull$ver$j.s
+   echo ../gz/c2datFull$ver$j.s
+done 
+
+fi
+if test 'WHAT' == 'c2tasplit'; then
+
+for i in {0..7}
+do j=$((FROM*8+$i))
+   zcat ../gz/c2datFull$ver$j.s
+done | perl -ane 'chop();@x=split(/;/, $_, -1); print "$x[2];$x[0]\n"' | ~/lookup/splitSecCh.perl a2cFull$ver.FROM. 32
+echo a2cFull$ver.FROM.
+
+#fi
+#if test 'WHAT' == 'a2csort'; then
+
+
+for j in {0..31}
+  do zcat a2cFull$ver.FROM.$j.gz | $HOME/bin/lsort ${maxM}M -t\; -k1,2 -u | gzip > a2cFull$ver.FROM.$j.s
+  echo a2cFull$ver.FROM.$j.s
+done
+
+fi
+if test 'WHAT' == 'a2cmerge'; then
+
+for i in {0..3}
+do j=$((FROM*4+$i)) 
+  str="$HOME/bin/lsort ${maxM}M -t\; -k1,2 -u --merge"
+  for k in {0..15}
+  do str="$str <(zcat a2cFull${ver}.$k.$j.s)"
+  done
+  eval $str | gzip > ../gz/a2cFull${ver}$j.s 
+  echo ../gz/a2cFull${ver}$j.s
+  zcat ../gz/a2cFull$ver$j.s | cut -d\; -f1 | uniq | gzip > ../gz/a$ver$j.s
+  echo ../gz/a$ver$j.s
+done
+
+fi
+if test 'WHAT' == 'as'; then
+
+str="$HOME/bin/lsort ${maxM}M -t\; -k1,1 -u --merge"
+for i in {0..31}; do str="$str <(zcat ../gz/a$ver$i.s)"; done 
+eval $str | gzip > ../gz/a$ver.s
+
+fi
+if test 'WHAT' == 'pc2csplit'; then
+
+for i in {0..7}
+do j=$((FROM*8+$i))
+   zcat ../gz/c2datFull$ver$j.s
+done | perl -ane 'chop();($c,$ta,$a,$t,$pc)=split(/;/,$_,-1); for $p (split /:/, $pc, -1) { print "$p;$c\n" if $p=~/^[0-9a-f]{40}$/;}' | ~/lookup/splitSecCh.perl c2ccFull$ver.FROM. 32
+echo c2ccFull$ver.FROM.
+
+for j in {0..31}
+  do zcat c2ccFull$ver.FROM.$j.gz | $HOME/bin/lsort ${maxM}M -t\; -k1,2 -u | gzip > c2ccFull$ver.FROM.$j.s
+  echo c2ccFull$ver.FROM.$j.s
+done
+
+
+fi
+if test 'WHAT' == 't2csplit'; then
+
+for i in {0..7}
+do j=$((FROM*8+$i))
+   zcat ../gz/c2datFull$ver$j.s
+done | perl -ane 'chop();($c,$ta,$a,$t,$pc)=split(/;/,$_,-1); print "$t;$c\n" if $t=~/^[0-9a-f]{40}$/;' | ~/lookup/splitSec.perl t2cFull$ver.FROM. 32
+echo t2cFull$ver.FROM.
+
+for j in {0..31}
+  do zcat t2cFull$ver.FROM.$j.gz | $HOME/bin/lsort ${maxM}M -t\; -k1,2 -u | gzip > t2cFull$ver.FROM.$j.s
+  echo t2cFull$ver.FROM.$j.s
+done
+
+fi
+
+if test 'WHAT' == 'c2ccmerge'; then
+
+for i in {0..3}
+do j=$((FROM*4+$i))
+  str="$HOME/bin/lsort ${maxM}M -t\; -k1,2 -u --merge"
+  for k in {0..15}
+  do str="$str <(zcat c2ccFull${ver}.$k.$j.s)"
+  done
+  eval $str | gzip > ../gz/c2ccFull${ver}$j.s
+  echo ../gz/c2ccFull${ver}$j.s
+done
+
+fi
+if test 'WHAT' == 't2cmerge'; then
+
+for i in {0..3}
+do j=$((FROM*4+$i))
+  str="$HOME/bin/lsort ${maxM}M -t\; -k1,2 -u --merge"
+  for k in {0..15}
+  do str="$str <(zcat t2cFull${ver}.$k.$j.s)"
+  done
+  eval $str | gzip > ../gz/t2cFull${ver}$j.s
+  echo ../gz/t2cFull${ver}$j.s
+done
+
+fi
+
+
+

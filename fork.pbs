@@ -1,4 +1,4 @@
-#PBS -N frkVER.PRT.WHAT
+#PBS -N frkVER.FROM.WHAT
 #PBS -A ACF-UTK0011
 #PBS -l feature=MACHINE
 #PBS -l partition=MACHINE
@@ -16,7 +16,7 @@ maxM=4000
 [[ $machine == rho ]] && maxM=900
 [[ $machine == sigma ]] && maxM=2900
 
-prt=PRT
+prt=FROM
 ver=VER
 
 if test 'WHAT' = 'p2p'; then
@@ -58,20 +58,20 @@ echo c2pFull$ver.np2p.s
 fi
 if test 'WHAT' = 'defork'; then
 # use community detection on c2pFull$ver.np2p to get
-#c2pFullS.np2p.PLMmap.forks and c2pFullS.np2pw.PLMmap.forks
+# c2pFullS.np2p.PLMmap.forks and c2pFullS.np2pw.PLMmap.forks
 
-for i in {0..3}
-do j=$((FROM*4+$i))
-  zcat c2pFull$ver$j.s | perl ~/lookup/mp.perl 1 c2pFull$ver.np2pw.PLMmap.forks | uniq | lsort ${maxM}M -t\; -k1,2 -u | gzip > c2PFull$ver$j.s
+for i in {0..1}
+do j=$((FROM*2+$i))
+  zcat c2pFull$ver$j.s | perl ~/lookup/mp.perl 1 c2pFull$ver.np2pu.PLMmap.forks | uniq | lsort ${maxM}M -t\; -k1,2 -u | gzip > c2PFull$ver$j.s
   echo c2PFull$ver$j.s
 done
 
 fi
-if test 'WHAT' = 'deforku'; then
+if test 'WHAT' = 'deforklw'; then
 
 for i in {0..3}
 do j=$((FROM*4+$i))
-  zcat c2pFull$ver$j.s | perl ~/lookup/mp.perl 1 c2pFull$ver.np2pu.PLMmap.forks | uniq | lsort ${maxM}M -t\; -k1,2 -u | gzip > c2PuFull$ver$j.s
+  zcat c2pFull$ver$j.s | perl ~/lookup/mp.perl 1 c2pFull$ver.np2plw.PLMmap.forks | uniq | lsort ${maxM}M -t\; -k1,2 -u | gzip > c2PuFull$ver$j.s
   echo c2PuFull$ver$j.s
 done
 
@@ -81,11 +81,8 @@ if test 'WHAT' = 'deforkP'; then
 for i in {0..7}
 do j=$((FROM*8+$i))
    zcat c2PFull$ver$j.s
-done | awk -F\; '{print $2";"$1}' | perl $HOME/lookup/splitSecCh.perl P2cFull$ver.FROM. 128
+done |perl -ane 'chop();@x=split(/;/, $_, -1); print "$x[1];$x[0]\n";' | perl $HOME/lookup/splitSecCh.perl P2cFull$ver.FROM. 128
 echo P2cFull$ver$j.s
-
-fi
-if test 'WHAT' = 'deforkPs'; then
 
 for j in {0..127}
 do zcat P2cFull$ver.FROM.$j.gz | lsort ${maxM}M -t\; -k1,2 -u | gzip > P2cFull$ver.FROM.$j.s
@@ -98,7 +95,7 @@ if test 'WHAT' = 'deforkPm'; then
 for i in {0..7}
 do j=$((FROM*8+$i))
   str="$HOME/bin/lsort ${maxM}M -t\; -k1b,2 --merge -u"
-  for k in {0..127}; do str="$str <(zcat P2cFull$ver.$k.$j.s)"; done
+  for k in {0..15}; do str="$str <(zcat P2cFull$ver.$k.$j.s)"; done
   eval $str | gzip > P2cFull$ver$j.s
   echo P2cFull$ver$j.s
 done
