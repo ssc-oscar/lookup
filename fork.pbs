@@ -1,8 +1,8 @@
-#PBS -N forkVER
+#PBS -N frkVER.FROM.WHAT
 #PBS -A ACF-UTK0011
 #PBS -l feature=MACHINE
 #PBS -l partition=MACHINE
-#PBS -l nodes=1,walltime=23:50:00
+#PBS -l nodes=1:ppn=1,walltime=23:50:00
 #PBS -j oe
 #PBS -S /bin/bash
 LD_LIBRARY_PATH=$HOME/lib:$HOME/lib64:$LD_LIBRARY_PATH
@@ -11,207 +11,93 @@ cd $c
 
 
 machine=MACHINE
-maxM=5000
+maxM=4000
 [[ $machine == monster ]] && maxM=30000
 [[ $machine == rho ]] && maxM=900
 [[ $machine == sigma ]] && maxM=2900
 
-
-
+prt=FROM
 ver=VER
-if test 'a' = 'b'; then
-#run on monster or break into pieces
 
-for j in {0..31}
-do zcat c2pFull$ver$j.s | perl ~/lookup/ghfork0.perl 2 2> noForkI${ver}.$j | gzip > c2PFull$ver$j.s &
-done
-wait
-echo c2PFull$ver$j.s
+if test 'WHAT' = 'p2p'; then
 
-for j in {0..31}
-do zcat c2PFull$ver$j.s | uniq | lsort ${maxM}M -t\; -k1,2 -u | gzip > c2PFull$ver$j.ss &
-done
-wait
-echo c2PFull$ver$j.ss
-
-for j in {0..31}
-do zcat c2PFull$ver$j.ss | perl $HOME/lookup/connectExportPreNoExclude.perl | gzip > c2PFull$ver$j.p2p & 
-done
-wait
-echo c2PFull$ver$j.p2p
-
-for j in {0..31}
-do zcat c2PFull$ver$j.p2p | perl ~/lookup/connectExportPre1.perl c2PFull$ver$j &
-done
-wait
-echo c2PFull$ver$j.names
-
-for j in {0..31}
-do zcat c2PFull$ver$j.versions |  perl $HOME/lookup/connectPrune.perl |gzip > c2PFull$ver$j.versions.gz &
-done
-wait
-echo c2PFull$ver$j.versions.gz 
-
-#produce commits as treching a set of repos
-for j in {0..31}
-do zcat c2PFull$ver$j.p2p | perl -ane 'chop();($c,@x) = split(/;/); print "".(join ";", (sort @x))."\n";' | gzip > c2PFull$ver$j.p2p.gz &
-done
-wait
-echo c2PFull$ver$j.p2p.gz
-
-for j in {0..31}
-do zcat c2PFull$ver$j.p2p.gz | lsort  ${maxM}M -t\| | uniq -c | perl -ane 'chop();s|^\s*([0-9]*) ||;print "$_;$1\n"' | gzip > c2PFull$ver$j.p2p.s &
-#do zcat c2PFull$ver$j.p2p.gz | lsort  ${maxM}M -t\| -u | gzip > c2PFull$ver$j.p2p.s &
-done
-wait
-echo c2PFull$ver$j.p2p.s
-
-#fi
-#if test 'a' = 'a'; then
-
-str="lsort $(($maxM*32))M -t\| -u --merge"
-for j in {0..31}
-do str="$str <(zcat  c2PFull$ver$j.p2p.s)"
-done
-eval $str | gzip > c2PFull$ver.p2p.s
-
-#now add-up repeated counts in the last field
-zcat  c2PFull$ver.p2p.s | perl -e '$pstr="";$nn=0;while(<STDIN>){chop;(@x)=split(/;/);$n=pop @x;$str=join ";", @x; if ($pstr ne $str && $pstr ne ""){ print "$nn;$pstr\n";$pstr=$str;$nn=$n }else{ $pstr=$str;$nn+=$n}};print "$nn;$pstr\n";' | gzip > c2PFull$ver.np2p  
-
-fi
-#now use R for community detection?
-if test 'a' = 'b'; then
-
-
-for j in {0..31}
-do zcat c2pFull${ver}$j.s | perl $HOME/lookup/connectExportPreNoExclude.perl | gzip > c2pFull$ver$j.p2p &
-done
-wait
+#for i in {0..3}
+#do j=$(($prt*4+$i))
+j=PRT
+zcat c2pFull${ver}$j.s | perl $HOME/lookup/connectExportPreNoExclude.perl | gzip > c2pFull$ver$j.p2p
 echo c2pFull$ver$j.p2p
-
-
-for j in {0..31}
-do zcat c2pFull$ver$j.p2p | perl -ane 'chop();($c,@x) = split(/;/); print "".(join ";", (sort @x))."\n";' | gzip > c2pFull$ver$j.p2p.gz &
-done
-wait
+zcat c2pFull$ver$j.p2p | perl -ane 'chop();($c,@x) = split(/;/); print "".(join ";", (sort @x))."\n";' | gzip > c2pFull$ver$j.p2p.gz 
 echo c2pFull$ver$j.p2p.gz
-
-for j in {0..31}
-do zcat c2pFull$ver$j.p2p.gz | lsort  ${maxM}M -t\| | uniq -c | perl -ane 'chop();s|^\s*([0-9]*) ||;print "$_;$1\n"' | gzip > c2pFull$ver$j.p2p.s &
-#do zcat c2PFull$ver$j.p2p.gz | lsort  ${maxM}M -t\| -u | gzip > c2PFull$ver$j.p2p.s &
-done
-wait
+zcat c2pFull$ver$j.p2p.gz | lsort  ${maxM}M -t\| | uniq -c | perl -ane 'chop();s|^\s*([0-9]*) ||;print "$_;$1\n"' | gzip > c2pFull$ver$j.p2p.s 
 echo c2pFull$ver$j.p2p.s
+#done
 
 fi
-if test 'a' = 'a'; then
+if test 'WHAT' = 'MERGE'; then
 
-str="lsort $(($maxM*32))M -t\| -u --merge"
-for j in {0..31}
-do str="$str <(zcat  c2pFull$ver$j.p2p.s)"
+str="lsort $(($maxM))M -t\| --merge"
+for i in {0..7}
+do j=$(($prt*8+$i))
+   str="$str <(zcat c2pFull$ver$j.p2p.s)"
 done
-eval $str | gzip > c2pFull$ver.p2p.s
-
-zcat  c2pFull$ver.p2p.s | perl -e '$pstr="";$nn=0;while(<STDIN>){chop;(@x)=split(/;/);$n=pop @x;$str=join ";", @x; if ($pstr ne $str && $pstr ne ""){ print "$nn;$pstr\n";$pstr=$str;$nn=$n }else{ $pstr=$str;$nn+=$n}};print "$nn;$pstr\n";' | gzip > c2pFull$ver.np2p
+eval $str | perl -e '$pstr="";$nn=0;while(<STDIN>){chop;(@x)=split(/;/);$n=pop @x;$str=join ";", @x; if ($pstr ne $str && $pstr ne ""){ print "$pstr;$nn\n";$pstr=$str;$nn=$n }else{ $pstr=$str;$nn+=$n}};print "$pstr;$nn\n";' | \
+     gzip > c2pFull$ver.p2p.$prt.s
+echo c2pFull$ver.p2p.$prt.s
 
 fi
-if test 'a' = 'b'; then
+if test 'WHAT' = 'MERGEM'; then
 
-for j in {0..31}
-do zcat c2pFull$ver$j.p2p | perl $HOME/lookup/connectExportSrtAdj.perl c2pFull$ver$j &
+str="lsort $(($maxM*3))M -t\| --merge"
+for i in {0..15}
+do str="$str <(zcat  c2pFull$ver.p2p.$i.s)"
 done
-wait
-echo c2pFull$ver$j
-
-for j in {0..31}
-do zcat c2pFull$ver$j.versions |  perl $HOME/lookup/connectPrune.perl |gzip > c2pFull$ver$j.versions1 &
-done
-wait
-echo c2pFull$ver$j.versions1
-
-for j in {0..31}
-do (zcat c2pFull$ver$j.versions1| $HOME/bin/connect | gzip > c2pFull$ver$j.clones; perl $HOME/lookup/connectImport.perl c2pFull$ver$j | gzip > c2pFull$ver$j.map) &
-done 
-wait
-echo c2pFull$ver$j.map
-
-zcat c2pFull$ver*.map | perl $HOME/lookup/connectExportPre1.perl c2pFull$ver
-echo c2pFull$ver
-
-
-zcat c2pFull$ver.versions |  $HOME/bin/connect | gzip > c2pFull$ver.clones
-echo c2pFull$ver.clones
-
-perl $HOME/lookup/connectImport.perl c2pFull$ver | gzip > c2pFull$ver.forks
-echo c2pFull$ver.forks
-zcat c2pFull$ver.forks | $HOME/bin/lsort ${maxM}M -t\; -k1b,1 | gzip > c2pFull$ver.forks.s
-echo c2pFull$ver.forks.s
-
-
-for i in {0..31}; do zcat p$ver.$i.s; done | awk '{print $1";"$1}' | perl $HOME/lookup/mp.perl 0 c2pFull$ver.forks | gzip > p$ver.map
-echo p$ver.map
+eval $str | perl -e '$pstr="";$nn=0;while(<STDIN>){chop;(@x)=split(/;/);$n=pop @x;$str=join ";", @x; if ($pstr ne $str && $pstr ne ""){ print "$nn;$pstr\n";$pstr=$str;$nn=$n }else{ $pstr=$str;$nn+=$n}};print "$nn;$pstr\n";'  | \
+   gzip > c2pFull$ver.np2p.s
+echo c2pFull$ver.np2p.s
 
 fi
+if test 'WHAT' = 'defork'; then
+# use community detection on c2pFull$ver.np2p to get
+# c2pFullS.np2p.PLMmap.forks and c2pFullS.np2pw.PLMmap.forks
 
-if test 'a' = 'b'; then
-
-for j in {0..31}
-do zcat c2PFull$ver$j.ss | perl ~/lookup/mp.perl 0 c2pcFullQ.map.$j.gz | uniq | gzip > C2PFull$ver$j.gz &
+for i in {0..1}
+do j=$((FROM*2+$i))
+  zcat c2pFull$ver$j.s | perl ~/lookup/mp.perl 1 c2pFull$ver.np2pu.PLMmap.forks | uniq | lsort ${maxM}M -t\; -k1,2 -u | gzip > c2PFull$ver$j.s
+  echo c2PFull$ver$j.s
 done
-wait
-echo C2PFull$ver$j.gz
-
-for j in {0..31}
-do zcat C2PFullQ$j.gz | uniq | perl $HOME/lookup/splitSec.perl C2PFullQ$j. 32 &
-done
-wait
-echo C2PFullQ$j.
-
-for j in {0..31}
-do for k in {0..31}
-  do zcat C2PFullQ$j.$k.gz | lsort ${maxM}M -t\; -k1,2 -u | gzip > C2PFullQ$j.$k.s &
-  done
-  wait
-  echo C2PFullQ$j.$k.s
-done
-
-for j in {0..31}
-do str="$HOME/bin/lsort ${maxM}M -t\; -k1b,2 --merge -u"
-  for k in {0..31}; do str="$str <(zcat C2PFullQ$k.$j.s)"; done
-  eval $str | gzip > C2PFullQ$j.s &
-done
-wait
-echo C2PFullQ$j.s 
-
-for j in {0..31}
-do zcat C2PFullQ$j.gz | uniq | lsort ${maxM}M -t\; -k1,2 -u | gzip > C2PFullQ$j.s &
-done
-wait
-echo C2PFullQ$j.s
-
-for j in {0..31}
-do zcat C2PFull$ver$j.s | perl $HOME/lookup/connectExportPreNoExclude.perl | gzip > C2PFull$ver$j.p2p &
-done
-wait
-echo C2PFull$ver$j.p2p
-  
-for j in {0..31}
-do zcat C2PFull$ver$j.p2p | perl ~/lookup/connectExportPre1.perl C2PFull$ver$j &
-done
-wait
-echo C2PFull$ver$j.names
-
-for j in {0..31}
-do zcat C2PFull$ver$j.versions |  perl $HOME/lookup/connectPrune.perl |gzip > C2PFull$ver$j.versions.gz &
-done
-wait
-echo C2PFull$ver$j.versions.gz
 
 fi
-if test 'a' = 'b'; then
+if test 'WHAT' = 'deforklw'; then
 
-zcat C2PFull${ver}0-31.s | perl $HOME/lookup/connectExportPreNoExclude.perl | gzip > C2PFull${ver}0-31.p2p
-zcat C2PFull${ver}0-31.p2p | perl ~/lookup/connectExportPre1.perl C2PFull${ver}0-31
-zcat C2PFull${ver}0-31.versions |  perl $HOME/lookup/connectPrune.perl |gzip > C2PFull${ver}0-31.versions.gz
+for i in {0..3}
+do j=$((FROM*4+$i))
+  zcat c2pFull$ver$j.s | perl ~/lookup/mp.perl 1 c2pFull$ver.np2plw.PLMmap.forks | uniq | lsort ${maxM}M -t\; -k1,2 -u | gzip > c2PuFull$ver$j.s
+  echo c2PuFull$ver$j.s
+done
+
+fi
+if test 'WHAT' = 'deforkP'; then
+
+for i in {0..7}
+do j=$((FROM*8+$i))
+   zcat c2PFull$ver$j.s
+done |perl -ane 'chop();@x=split(/;/, $_, -1); print "$x[1];$x[0]\n";' | perl $HOME/lookup/splitSecCh.perl P2cFull$ver.FROM. 128
+echo P2cFull$ver$j.s
+
+for j in {0..127}
+do zcat P2cFull$ver.FROM.$j.gz | lsort ${maxM}M -t\; -k1,2 -u | gzip > P2cFull$ver.FROM.$j.s
+   echo P2cFull$ver.FROM.$j.s
+done
+
+fi
+if test 'WHAT' = 'deforkPm'; then
+
+for i in {0..7}
+do j=$((FROM*8+$i))
+  str="$HOME/bin/lsort ${maxM}M -t\; -k1b,2 --merge -u"
+  for k in {0..15}; do str="$str <(zcat P2cFull$ver.$k.$j.s)"; done
+  eval $str | gzip > P2cFull$ver$j.s
+  echo P2cFull$ver$j.s
+done
 
 fi

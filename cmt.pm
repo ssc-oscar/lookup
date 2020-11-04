@@ -2,15 +2,435 @@ package cmt;
 use strict;
 use warnings;
 use Compress::LZF;
+use TokyoCabinet;
+use Digest::FNV::XS;
 
 
 require Exporter;
 our @ISA = qw (Exporter);
-our @EXPORT = qw(addForks toUrl %badProjects %badAuthors %badCmt %badBlob %badTree splitSignature segB segH signature_error contains_angle_brackets extract_trimmed git_signature_parse extrCmt getTime cleanCmt safeDecomp safeComp toHex fromHex sHash sHashV);
+our @EXPORT = qw(toUrl segB segH sHash sHashV toHex fromHex safeDecomp safeComp 
+		splitSignature signature_error contains_angle_brackets extract_trimmed git_signature_parse extrCmt getTime cleanCmt	
+		addForks %badProjects %badAuthors %badCmt %badBlob %badTree %largeBlobPrj %largeTreePrj);
 use vars qw(@ISA);
 
+# basic utilities
+
+# obsolete
+my %toUrlMap = ("bb" => "bitbucket.org", "gl" => "gitlab.org",
+		"android.googlesource.com" => "android.googlesource.com",
+		"bioconductor.org" => "bioconductor.org",
+		"drupal.com" => "git.drupal.org", "git.eclipse.org" => "git.eclipse.org",
+		"git.kernel.org" => "git.kernel.org/pub/scm/",
+		"git.postgresql.org" => "git.postgresql.org" ,
+		"git.savannah.gnu.org" => "git.savannah.gnu.org",
+		"git.zx2c4.com" => "git.zx2c4.com" ,
+		"gitlab.gnome.org" => "gitlab.gnome.org",
+		"kde.org" => "anongit.kde.org",
+		"repo.or.cz" => "repo.or.cz",
+		"salsa.debian.org" => "salsa.debian.org",
+		"sourceforge.net" => "git.code.sf.net/p"
+    # "git.kernel.org" => "git.kernel.org/pub/scm/",
+    );
+
+sub toUrl {
+  my $in = $_[0];
+  my $found = 0;
+  for my $p (keys %toUrlMap){
+    if ($in =~ /^${p}_/ && (scalar(split(/_/, $in)) > 2 || $p eq "sourceforge.net")){
+      $in =~ s|^${p}_|$toUrlMap{$p}\/|;
+      $found ++;
+      last;
+    }
+  }
+  $in =~ s|^|github.com/| if (!$found);
+  $in =~ s|_|/|;
+  return "https://$in";
+}
+
+sub segB {
+  my ($s, $n) = @_;
+  return (unpack "C", substr ($s, 0, 1))%$n;
+}
+
+
+sub segH {
+  my ($sh, $n) = @_;
+  return (unpack "C", substr (fromHex($sh), 0, 1))%$n;
+}
+
+sub sHash {
+  # $nseg is powers of 2
+  #  otherwise use % $nseg
+  my ($v, $nseg) = @_;
+  Digest::FNV::XS::fnv1a_32 ($v) & ($nseg - 1);
+}
+sub sHashV {
+  my $v = $_[0];
+  Digest::FNV::XS::fnv1a_32 ($v);
+}
+
+sub toHex {
+        return unpack "H*", $_[0];
+}
+sub fromHex {
+        return pack "H*", $_[0];
+}
+sub safeDecomp {
+  my ($codeC, $msg) = @_;
+  my $code = "";
+  eval { 
+    $code = decompress ($codeC);
+    return $code;
+  } or do {
+    my $ex = $@;
+    print STDERR "Error: $ex, msg=$msg, code=$code\n";
+    eval {
+      $code = decompress (substr($codeC, 0, 70));
+      return "$code";
+    } or do {
+      my $ex = $@;;
+      print STDERR "Error: $ex, $msg, $code\n";
+      return "";
+    }
+  }
+}
+sub safeComp {
+  my ($codeC, $msg) = @_;
+  my $code = "";
+  eval {   
+    my $code = compress ($codeC);
+    return $code;
+  } or do {
+    my $ex = $@;
+    print STDERR "Error: $ex, $msg\n";
+    return "";
+  }
+}
+
+# showCommit, showBlob, showTree, showTag
+#sub showCommit {
+#}
+
+# Parsing git commits
+
+sub signature_error {
+        my ($msg, $data) = @_;
+        print STDERR  "failed to parse signature - $msg\n";
+        return ($data, "");
+}
+
+sub contains_angle_brackets{ 
+   my $input = $_[0];
+        return index ($input, '<') >= 0 || index ($input, '>') >= 0;
+}
+
+sub is_crud {
+   my $c = $_[0];
+   return  ord($c) <= 32  ||
+                $c eq '.' ||
+                $c eq ',' ||
+                $c eq ':' ||
+                $c eq ';' ||
+                $c eq '<' ||
+                $c eq '>' ||
+                $c eq '"' ||
+                $c eq '\\' ||
+                $c eq '\'';
+}
+
+sub extract_trimmed {
+   my ($ptr, $len) = @_;
+   $ptr = substr($ptr, 0, $len);
+   my $off = 0;
+   while (is_crud (substr($ptr, $off, 1)) && $len > 0) {
+                $off++; $len--;
+   }
+   $ptr = substr ($ptr, $off, $len);
+   $off = 0;
+   while ($len && is_crud (substr($ptr, $len-1, 1))) {
+        $len--;
+   }
+   return substr ($ptr, 0, $len);
+}
+
+sub git_signature_parse {
+   my ($buffer, $cmt) = @_;
+   my $email_start = index ($buffer, '<');
+   my $email_end = index ($buffer, '>');
+   if ($email_start < 0 || !$email_end || $email_end <= $email_start){
+      if ($email_end < $email_start){
+        print STDERR  "in $cmt malformed e-mail ($email_start, $email_end): $buffer\n";
+        $buffer =~ s/\>// if $email_end >= 0;
+        $buffer =~ s/$/\>/ if $email_end < 0;
+        return git_signature_parse ($buffer, $cmt);
+      }else{
+        return signature_error("in $cmt malformed e-mail ($email_start, $email_end): $buffer", $buffer);
+      }
+   }
+   $email_start += 1;
+   my $name = extract_trimmed ($buffer, $email_start - 1);
+   my $email = substr($buffer, $email_start, $email_end - $email_start);
+   $email = extract_trimmed($email, $email_end - $email_start);
+
+   return ($name, $email);
+}
+
+sub extrCmt {
+  my ($codeC, $str) = @_;
+  my $code = safeDecomp ($codeC, $str);
+  my ($tree, $parent, $auth, $cmtr, $ta, $tc) = ("","","","","","");
+  my ($pre, @rest) = split(/\n\n/, $code, -1);
+  for my $l (split(/\n/, $pre, -1)){
+     #print "$l\n";
+     $tree = $1 if ($l =~ m/^tree (.*)$/);
+     $parent .= ":$1" if ($l =~ m/^parent (.*)$/);
+     #($auth, $ta) = ($1, $2) if ($l =~ m/^author (.*)\s([0-9]+\s[\+\-]*\d+)$/);
+     #($cmtr, $tc) = ($1, $2) if ($l =~ m/^committer (.*)\s([0-9]+\s[\+\-]*\d+)$/);
+     ($auth) = ($1) if ($l =~ m/^author (.*)$/);
+     ($cmtr) = ($1) if ($l =~ m/^committer (.*)$/);
+  }
+  ($auth, $ta) = ($1, $2) if ($auth =~ m/^(.*)\s(-?[0-9]+\s+[\+\-]*\d+)$/);
+  ($cmtr, $tc) = ($1, $2) if ($cmtr =~ m/^(.*)\s(-?[0-9]+\s+[\+\-]*\d+)$/);
+  $parent =~ s/^:// if defined $parent;
+  return ($tree, $parent, $auth, $cmtr, $ta, $tc, @rest);
+}
+
+sub extrPar {
+  my ($codeC, $str) = @_;
+  my $code = safeDecomp ($codeC, $str);
+  my ($tree, $parent, $auth, $cmtr, $ta, $tc) = ("","","","","","");
+  my ($pre, @rest) = split(/\n\n/, $code, -1);
+  for my $l (split(/\n/, $pre, -1)){
+    $parent .= ":$1" if ($l =~ m/^parent (.*)$/);
+  }
+  $parent =~ s/^:// if defined $parent;
+  return $parent;
+}
+
+
+sub getTime {
+  my ($codeC, $str) = @_;
+  my $code = safeDecomp ($codeC, $str);
+  my ($pre, @rest) = split(/\n\n/, $code, -1);
+  my ($auth, $cmtr, $ta, $tc) = ("","","","");
+  for my $l (split(/\n/, $pre, -1)){
+    ($auth) = ($1) if ($l =~ m/^author (.*)$/);
+    ($cmtr) = ($1) if ($l =~ m/^committer (.*)$/);
+  }
+  ($auth, $ta) = ($1, $2) if ($auth =~ m/^(.*)\s(-?[0-9]+\s+[\+\-]*\d+)$/);
+  ($cmtr, $tc) = ($1, $2) if ($cmtr =~ m/^(.*)\s(-?[0-9]+\s+[\+\-]*\d+)$/);
+  ($ta, $tc);
+}
+
+sub splitSignature {
+  my $s = $_[0];
+  return git_signature_parse ($s, "");
+}
+
+sub cleanCmt {
+  my ($cont, $cmt, $debug) = @_;
+  if ($debug == 6){
+    my ($tree, $parents, $auth, $cmtr, $ta, $tc, @rest) = extrCmt ($cont, $cmt);
+    $ta=~s/ .*//;
+    $ta = 0 if length($ta) > 10; 
+    $ta = sprintf "%.10d", $ta;
+    print "$cmt;$ta;$auth;$tree;$parents\n";
+    return;
+  }
+  if ($debug == 5){
+    print "$cmt;".(extrPar($cont))."\n";
+    return;
+  }
+  my ($tree, $parents, $auth, $cmtr, $ta, $tc, @rest) = extrCmt ($cont, $cmt);
+  my $msg = join '\n\n', @rest;
+  if ($debug){
+    if ($debug == 3){
+      my $c = safeDecomp($cont, $cmt);
+      $c =~ s/\r/ /g;
+      print "$c\n";
+    }else{
+      $msg =~ s/[\r\n;]/ /g;
+      $msg =~ s/^\s*//;
+      $msg =~ s/\s*$//;
+      $auth =~ s/;/ /g;
+      if ($debug == 2){
+        print "$cmt;$auth;$ta;$msg\n";
+      }else{
+        #if ($debug == 3){
+        #  my ($a, $e) = git_signature_parse ($auth, $msg);
+        #  print "$msg;$cmt;$a;$e;$ta;$auth\n";
+        #}else{
+        if ($debug == 4){
+          print "$cmt;$auth\n";
+        }else{
+          $ta=~s/ .*//;
+          print "$cmt;$ta;$auth\n";
+        }
+      }
+    }
+  }else{
+    $msg =~ s/[\r\n]*$//;
+    $msg =~ s/\r/__CR__/g;
+    $msg =~ s/\n/__NEWLINE__/g; 
+    $msg =~ s/;/SEMICOLON/g; 
+    $auth =~ s/;/SEMICOLON/g; 
+    $cmtr =~ s/;/SEMICOLON/g;
+    print "$cmt;$tree;$parents;$auth;$cmtr;$ta;$tc\n";
+  }
+}
+
+
+
+# Peculiar objects that have some problems associated with them
+our %largeBlobPrj = (
+ "dead-hosts_just-domains_web_malwaredomains.com" => 203537862600,
+ "briancpark_COVID-19-Visualizations" => 171205213898,
+ "benchmark-driver_benchmark-driver.github.io" => 161693451294,
+ "cfpland_frontend" => 138600000000,
+ "hackmud-dtr_fragments-one-file" => 137259845661,
+ "CareyLabVT_SCCData" => 129131000000,
+ "scriptzteam_UseNet-Newsgroups-Stats-v3" => 111159914988,
+ "moiify_AutoGreen" => 109406000000,
+ "benchmark-driver_sky2-result" => 101453703349,
+ "dead-hosts_rlwpx.free.fr.hrsk_git_FadeMind" => 101243706223,
+ "bowmanlab_MIMSWebApp" => 99034200000,
+ "Yu-Group_covid19-severity-prediction" => 96430200000,
+ "raphaelvigee_velib" => 95267740853,
+ "MakeNowJust_diary" => 88554400000,
+ "TsangStreamLab_TsangStreamLab.github.io" => 88303300000,
+ "swift-zym_scp-docs" => 86196479061,
+ "randel_COVID-19-US-county-map" => 81160799723,
+ "anenriquez_mrta" => 79351900000,
+ "benchmark-driver_sky2-result" => 73213620001,
+ "DMR-Database_database-beta" => 71890200000,
+ "mitchellkrogza_Phishing.Database" => 71867290987,
+ "olebeck_vitadb_tracking" => 70824716844,
+ "luisbtejada_test1" => 69363610571,
+ "merkleID_covid-domains" => 63861262430,
+ "dead-hosts_add.Risk_git_FadeMind" => 62766028343,
+ "GeoDS_COVID19USFlows" => 58243500000,
+ "hamlett-neil-ur_BizStratTopicAnalysis" => 55308958784,
+ "olebeck_vitadb_tracking" => 54604616511,
+ "damng_hackernews-rss-with-inlined-content" => 53554579838,
+ "batchpause_PAUSE-git" => 48400418092,
+ "WhonixBOT_whonix-wiki-html" => 48253300000,
+ "Park-Ju-hyeong_Quant" => 46335100000,
+ "dazaza_dazaza.github.io" => 46103700000,
+ "dead-hosts_rlwpx.free.fr.htrc_git_FadeMind" => 45629463605,
+ "raphaelvigee_velib" => 45213248868,
+ "BlankerL_DXY-COVID-19-Data" => 44929100000,
+ "lihkg-backup_thread" => 44723920434,
+ "ln-state_network-graph" => 43903009670,
+ "dead-hosts_Badd-Boyz-Hosts_git_mitchellkrogza" => 43381795047,
+ "HuidaeCho_covid-19" => 43207300000,
+ "cul-it_rmc-eads" => 41770000062,
+ "trendtopic_trendtopic.github.io" => 41341658602,
+ "choosunsick_Korea_Stocks" => 39468170418,
+ "jetblogs_jetblogs.github.io" => 38964394686,
+ "Ultimate-Hosts-Blacklist_BadIPs.com_KEY" => 38457900000,
+ "asamaru7_train" => 37579158386,
+ "dead-hosts_The-Big-List-of-Hacked-Malware-Web-Sites_git_mitchellkrogza" => 37170287458,
+ "AdguardTeam_FiltersRegistry" => 35963900000,
+ "dead-hosts_Ad-filter-list_web_disconnect.me" => 35778458670,
+ "Ultimate-Hosts-Blacklist_BadIPs.com_Level_3" => 35644600000,
+ "DavHau_nix-pypi-fetcher" => 35392800000,
+ "LuizGC_wealthymachinedata" => 34853600000,
+ "open-covid-19_data" => 34551970588,
+ "dead-hosts_domain_blocklist_web_dbl-oisd-nl" => 33791419357,
+ "kristinbranson_JAABA" => 33050200000,
+ "LibrariesWest_opendata" => 32675300000,
+ "ledwindra_nber" => 31722700000,
+ "qgis_pyqgis" => 31690765131,
+ "RaiderIO_raiderio-addon" => 31477400000,
+ "rozierguillaume_covid-19" => 31340198554,
+ "cipriancraciun_covid19-datasets" => 31333583176,
+
+ "enosysau_enointel-beta" => 200000000000,                          # "Enosys Security Operations Team (ip address risk)",
+ "covid19india_api" => 200000000000,
+ "covid19br_central_covid" => 200000000000,
+ "cipriancraciun_covid19-datasets" => 200000000000,
+ "beijingicu_maps" => 200000000000,                                 # "massive number of png files",
+ "Pontorez_z-i" => 200000000000,                                    # "massive number of csv files listing IPs censored in Russia",
+ "zapret-info/z-i" => 200000000000,
+ "acycliq_full_coronal_datastore" => => 200000000000,               #"some large changing data",
+ "volzinnovation_fuel_price_variations_germany" => => 200000000000, # "some large changing data",
+ "SockPuppetry_Loop-A" => => 200000000000,                          # "test script", 
+);
+
+#based on update in Version S
+our %largeTreePrj = (
+ "lihkg-backup_thread" => 200000000000,
+ "eugenelabzov_mp3lib" => 342866000000,
+ "otiny_up" => 221345000000,
+ "dapplion_Ethereum-Mainnet-Blocks" => 196663178831,
+ "parkr_status" => 63335763661,
+ "archlinux_svntogit-community" => 44765415181,
+ "sandsmark_scp-wiki" => 42512961508,
+ "biorealize_biorealize.github.io" => 36736915460,
+ "zasdfgbnm_archlinux-community" => 36329023062,
+ "conglp90_UpGitHub" => 35512900000,
+ "vith_archlinux-packages-community" => 24063000000,
+ "chinapedia_wikipedia.ja" => 20598200000,
+ "hk-hospital-watch_hk-ha-ae-wait-time" => 19003300000,
+ "BuildingBlocksTechnologiesLLC_Data" => 17862600000,
+ "samber_powEUr" => 16885037822,
+ "insolar_constellation" => 16466764253,
+ "revuloj_revo-fonto" => 16060863600,
+ "regro_cf-graph-countyfair" => 14225966059,
+ "chinapedia_wikipedia.zh" => 14096800000,
+ "vrhk_vrhk.github.io" => 12796291825,
+ "vith_archlinux-packages-community" => 12466763781,
+ "zq9409img_qunagaoqing" => 12432340526,
+ "vith_archlinux-packages-community" => 11596263428,
+ "regro_cf-graph-countyfair" => 10854862254,
+ "openSUSE_kernel-source" => 10815200000,
+ "jlippold_tweakCompatible" => 10226593179,
+ "SUSE_kernel-source" => 10201400000,
+ "thomasNDS_lbl" => 9559910000,
+ "lvsti_airspace" => 9510080385,
+ "Homebrew_homebrew-core" => 9304030000,
+ "conda-forge_feedstocks" => 8125286856,
+ "void-linux_void-packages" => 7927674122,
+ "minionsmanaged_observations" => 7324054293,
+ "xxcode_img.ibz.bz" => 7056410000,
+ "thomasNDS_lbl" => 6924695102,
+ "majorna_blockchain" => 6612206242,
+ "adriaanvanrossum_saasforcovid.com" => 6192540000,
+ "greglyman_HogueSolarData" => 6097824986,
+ "Jonty_uk_petitions_data" => 6048200000,
+ "shinhwagk_test" => 5918462920,
+ "kawadasatoshi_q_img_store" => 5550472266,
+ "git.kernel.org_pub_scm/linux/kernel/git/sashal/deps" => 5442000000,
+ "owid_owid-static" => 5377125430,
+ "giantswarm_control-plane-test-catalog" => 5347003487,
+ "bioconda_bioconda-recipes" => 5305494796,
+ "DefinitelyTyped_DefinitelyTyped" => 5202710000,
+ "marco-c_gecko-dev-comments-removed" => 5133780000,
+ "newstools_2019-the-guardian-uk" => 4973440048,
+ "StukFi_stukfi.github.io" => 4890750000,
+ "input-output-hk_hackage.nix" => 4839560225,
+ "dazaza_dazaza.github.io" => 4640080000,
+ "SOMEONE360_homebrew-core" => 4609770000,
+ "watch-devtube_contrib" => 4590562228,
+ "AxelTerizaki_karaokebase" => 4544830000,
+ "test-organization-kkjeer_app-test" => 4363369816,
+ "ahs-ckm_ckm-mirror" => 4072498026,
+ "Homebrew_homebrew-cask" => 4006360000,
+ "newstools_2020-the-guardian-uk" => 3958431603,
+ "plazi_treatments-rdf" => 3864314742,
+ "imagej_imagej.github.io" => 3852490000,
+ "kaboomserver_schematics" => 3725495209,
+ "dlancerzz_hanzi" => 3470271727,
+ "f-droid_fdroiddata" => 3420805359,
+ "repo.or.cz_homebrew-core" => 3418130000,
+ "onedrive-x_media-10" => 3371060000,
+ "onedrive-x_media-10" => 3371057719,
+ "schlattsubserver_inventories" => 3317485471,
+
+);
+
 our %badProjects = (
-  "repo.or.cz_src" => "all projects on repo.or.cz_src",
+  "bitzhoumy_helloworld" => "damaged trees",
   "bb_fusiontestaccount_fuse-2944" => "32400A",
   "bb_fusiontestaccount_fuse1999v2" => "34007A", 
   "octocat_Spoon-Knife" => "forking tutorial, 41176A", 
@@ -143,34 +563,6 @@ our %badAuthors = ( 'one-million-repo <mikigal.acc@gmail.com>' => "1M commits",
    'tip-bot for Linus Torvalds <torvalds@linux-foundation.org>' => "",
    'root <root@ubuntu.(none)>' => '');
 
-my %toUrlMap = ("bb" => "bitbucket.org","gl" => "gitlab.org",
-"android.googlesource.com" => "android.googlesource.com",
-"bioconductor.org" => "bioconductor.org",
-"drupal.com" => "git.drupal.org", "git.eclipse.org" => "git.eclipse.org",
-"git.kernel.org" => "git.kernel.org/pub/scm/",
-"git.postgresql.org" => "git.postgresql.org" ,
-"git.savannah.gnu.org" => "git.savannah.gnu.org",
-"git.zx2c4.com" => "git.zx2c4.com" ,
-"gitlab.gnome.org" => "gitlab.gnome.org",
-"kde.org" => "anongit.kde.org",
-"repo.or.cz" => "repo.or.cz",
-"salsa.debian.org" => "salsa.debian.org", 
-"sourceforge.net" => "git.code.sf.net/p");
-
-sub toUrl {
-  my $in = $_[0];
-  my $found = 0;
-  for my $p (keys %toUrlMap){
-    if ($in =~ /^${p}_/ && (scalar(split(/_/, $in)) > 2 || $p eq "sourceforge.net")){
-      $in =~ s|^${p}_|$toUrlMap{$p}\/|;
-      $found ++;
-      last;
-    }
-  }  
-  $in =~ s|^|github.com/| if (!$found);
-  $in =~ s|_|/|;
-  return "https://$in";
-}
 
 
 our %badCmt = (
@@ -443,214 +835,7 @@ our %badFile = (
   "Makefile" => 2463961
 );
 
-use Digest::FNV::XS;
-sub sHash {
-  # $nseg is powers of 2
-  #  otherwise use % $nseg
-  my ($v, $nseg) = @_;
-  Digest::FNV::XS::fnv1a_32 ($v) & ($nseg - 1);
-}
-sub sHashV {
-  my $v = $_[0];
-  Digest::FNV::XS::fnv1a_32 ($v);
-}
 
-sub toHex {
-        return unpack "H*", $_[0];
-}
-sub fromHex {
-        return pack "H*", $_[0];
-}
-sub safeDecomp {
-        my ($codeC, $msg) = @_;
-        try {
-                my $code = decompress ($codeC);
-                return $code;
-        } catch Error with {
-                my $ex = shift;
-                print STDERR "Error: $ex, $msg\n";
-                return "";
-        }
-}
-sub safeComp {
-        my ($codeC, $msg) = @_;
-        try {   
-                my $code = compress ($codeC);
-                return $code;
-        } catch Error with {
-                my $ex = shift;
-                print STDERR "Error: $ex, $msg\n";
-                return "";
-        }
-}
-
-
-sub signature_error {
-        my ($msg, $data) = @_;
-        print STDERR  "failed to parse signature - $msg\n";
-        return ($data, "");
-}
-
-sub contains_angle_brackets{ 
-   my $input = $_[0];
-        return index ($input, '<') >= 0 || index ($input, '>') >= 0;
-}
-
-sub is_crud {
-   my $c = $_[0];
-   return  ord($c) <= 32  ||
-                $c eq '.' ||
-                $c eq ',' ||
-                $c eq ':' ||
-                $c eq ';' ||
-                $c eq '<' ||
-                $c eq '>' ||
-                $c eq '"' ||
-                $c eq '\\' ||
-                $c eq '\'';
-}
-
-sub extract_trimmed {
-   my ($ptr, $len) = @_;
-   $ptr = substr($ptr, 0, $len);
-   my $off = 0;
-   while (is_crud (substr($ptr, $off, 1)) && $len > 0) {
-                $off++; $len--;
-   }
-   $ptr = substr ($ptr, $off, $len);
-   $off = 0;
-   while ($len && is_crud (substr($ptr, $len-1, 1))) {
-        $len--;
-   }
-   return substr ($ptr, 0, $len);
-}
-
-sub git_signature_parse {
-   my ($buffer, $cmt) = @_;
-   my $email_start = index ($buffer, '<');
-   my $email_end = index ($buffer, '>');
-   if ($email_start < 0 || !$email_end || $email_end <= $email_start){
-      if ($email_end < $email_start){
-        print STDERR  "in $cmt malformed e-mail ($email_start, $email_end): $buffer\n";
-        $buffer =~ s/\>// if $email_end >= 0;
-        $buffer =~ s/$/\>/ if $email_end < 0;
-        return git_signature_parse ($buffer, $cmt);
-      }else{
-        return signature_error("in $cmt malformed e-mail ($email_start, $email_end): $buffer", $buffer);
-      }
-   }
-   $email_start += 1;
-   my $name = extract_trimmed ($buffer, $email_start - 1);
-   my $email = substr($buffer, $email_start, $email_end - $email_start);
-   $email = extract_trimmed($email, $email_end - $email_start);
-
-   return ($name, $email);
-}
-
-sub extrCmt {
-  my ($codeC, $str) = @_;
-  my $code = safeDecomp ($codeC, $str);
-  my ($tree, $parent, $auth, $cmtr, $ta, $tc) = ("","","","","","");
-  my ($pre, @rest) = split(/\n\n/, $code, -1);
-  for my $l (split(/\n/, $pre, -1)){
-     #print "$l\n";
-     $tree = $1 if ($l =~ m/^tree (.*)$/);
-     $parent .= ":$1" if ($l =~ m/^parent (.*)$/);
-     #($auth, $ta) = ($1, $2) if ($l =~ m/^author (.*)\s([0-9]+\s[\+\-]*\d+)$/);
-     #($cmtr, $tc) = ($1, $2) if ($l =~ m/^committer (.*)\s([0-9]+\s[\+\-]*\d+)$/);
-     ($auth) = ($1) if ($l =~ m/^author (.*)$/);
-     ($cmtr) = ($1) if ($l =~ m/^committer (.*)$/);
-  }
-  ($auth, $ta) = ($1, $2) if ($auth =~ m/^(.*)\s(-?[0-9]+\s+[\+\-]*\d+)$/);
-  ($cmtr, $tc) = ($1, $2) if ($cmtr =~ m/^(.*)\s(-?[0-9]+\s+[\+\-]*\d+)$/);
-  $parent =~ s/^:// if defined $parent;
-  return ($tree, $parent, $auth, $cmtr, $ta, $tc, @rest);
-}
-
-sub extrPar {
-  my ($codeC, $str) = @_;
-  my $code = safeDecomp ($codeC, $str);
-  my ($tree, $parent, $auth, $cmtr, $ta, $tc) = ("","","","","","");
-  my ($pre, @rest) = split(/\n\n/, $code, -1);
-  for my $l (split(/\n/, $pre, -1)){
-    $parent .= ":$1" if ($l =~ m/^parent (.*)$/);
-  }
-  $parent =~ s/^:// if defined $parent;
-  return $parent;
-}
-
-
-sub getTime {
-  my ($codeC, $str) = @_;
-  my $code = safeDecomp ($codeC, $str);
-  my ($pre, @rest) = split(/\n\n/, $code, -1);
-  my ($auth, $cmtr, $ta, $tc) = ("","","","");
-  for my $l (split(/\n/, $pre, -1)){
-    ($auth) = ($1) if ($l =~ m/^author (.*)$/);
-    ($cmtr) = ($1) if ($l =~ m/^committer (.*)$/);
-  }
-  ($auth, $ta) = ($1, $2) if ($auth =~ m/^(.*)\s(-?[0-9]+\s+[\+\-]*\d+)$/);
-  ($cmtr, $tc) = ($1, $2) if ($cmtr =~ m/^(.*)\s(-?[0-9]+\s+[\+\-]*\d+)$/);
-  ($ta, $tc);
-}
-
-sub splitSignature {
-  my $s = $_[0];
-  return git_signature_parse ($s, "");
-}
-
-sub cleanCmt {
-  my ($cont, $cmt, $debug) = @_;
-  if ($debug == 5){
-    print "$cmt;".(extrPar($cont))."\n";
-    return;
-  }
-  my ($tree, $parents, $auth, $cmtr, $ta, $tc, @rest) = extrCmt ($cont, $cmt);
-  my $msg = join '\n\n', @rest;
-  if ($debug){
-    if ($debug == 3){
-      my $c = safeDecomp($cont, $cmt);
-      $c =~ s/\r/ /g;
-      print "$c\n";
-    }else{
-      $msg =~ s/[\r\n;]/ /g;
-      $msg =~ s/^\s*//;
-      $msg =~ s/\s*$//;
-      $auth =~ s/;/ /g;
-      if ($debug == 2){
-        print "$cmt;$auth;$ta;$msg\n";
-      }else{
-        #if ($debug == 3){
-        #  my ($a, $e) = git_signature_parse ($auth, $msg);
-        #  print "$msg;$cmt;$a;$e;$ta;$auth\n";
-        #}else{
-        if ($debug == 4){
-          print "$cmt;$auth\n";
-        }else{
-          $ta=~s/ .*//;
-          print "$cmt;$ta;$auth\n";
-        }
-      }
-    }
-  }else{
-    $msg =~ s/[\r\n]*$//;
-    $msg =~ s/\r/__CR__/g;
-    $msg =~ s/\n/__NEWLINE__/g; 
-    $msg =~ s/;/SEMICOLON/g; 
-    $auth =~ s/;/SEMICOLON/g; 
-    $cmtr =~ s/;/SEMICOLON/g;
-    print "$cmt;$tree;$parents;$auth;$cmtr;$ta;$tc\n";
-  }
-}
-
-sub segB {
-  my ($s, $n) = @_;
-  return (unpack "C", substr ($s, 0, 1))%$n;
-}
-sub segH {
-  my ($sh, $n) = @_;
-  return (unpack "C", substr (fromHex($sh), 0, 1))%$n;
-}
 
 
 my $badCmtHere =  <<"EOT";

@@ -384,10 +384,8 @@ Examples:
    * echo a7081031fc8f4fea0d35dd8486f8900febd2347e | ~/lookup/showCnt blob
    
 Output:
-   Formatting: blob;#ofSections;rl;CurrentPosition;Offset;Length;"Blob-ID"
-               "Content of the blob"
+   Formatting: "Content of the blob"
    Examples:
-              blob;5;8529;54537521775;54537521775;8529;05fe634ca4c8386349ac519f899145c75fff4169
               # Syllabus for "Fundamentals of Digital Archeology"
               ## News
                  * Assignment1 due Monday Sep 8 before 2:30PM
@@ -484,6 +482,12 @@ Merge branch 'master' into master;0a26e5acd9444f97f1a9e903117d957772a59c1d
 (nn=78; cd ../S.${nn}; for t in tag commit tree;do ls -f  *$t.bin  | sed 's/\.bin$//' | while read i; do (echo $i; perl -I ~/lib64/perl5/ ~/lookup/checkBin1in.perl $t $i) &>> ../S.$nn.$t.err; done; done)
 ls ../S.76/*.idx | sed 's|\.idx$||'| while read i; do ss=$(tail -1 $i.idx|cut -d\; -f1,2|sed 's|;|+|'|bc); res=$(($ss - $(stat -c '%s' $i.bin))); [[ $res != 0 ]] && echo $i; done
 ```
+- add
+```
+for type in tag commit tree blob
+do echo S.78 | while read r; do cd $r; ls -f *.$type.bin |  ~/lookup/AllUpdateObj.perl $type; cd /data/home/audris/update; done
+done
+```
 - unusual sizes
 ```
 ls S.78/New202*blob.idx | while read i; do awk -F\; '{ p[$5]+=$2} END {for (a in p){print a";"p[a]}}' $i; done |gzip > S.sizesb
@@ -501,11 +505,15 @@ ls */*.p2c | cut -d/ -f1 | while read i; do rsync -av $i/*.p2c bb1:/da2_data/upd
 #lookup/updatePrj${ver}.pbs
 #get forks sed "s/VER/${ver}/;s/MACHINE/monster/;s/=23/=23/" ~/lookup/fork.pbs | qsub
 
+#create databases for c2p/p2c
+for i in {0..31}; do zcat p2cFull$ver{$i,$(($i+32)),$(($i+64)),$(($i+96))}.s | ~/lookup/s2hBinSorted.perl ../p2cFull$ver.$i.tch; done &
+for i in {0..31}; do zcat c2pFull$ver{$i,$(($i+32)),$(($i+64)),$(($i+96))}.s | ~/lookup/h2sBinSorted.perl ../c2pFull$ver.$i.tch; done &
+
 
 - Update content
 ```
-
-```
+#backup existing tail
+for t in blob commit tag tree; do for i in {0..127}; do tail -1 /data/All.blobs/${t}_$i.idx; done; done > /data/All.blobs.$ver
 ~/lookup/cnt.sh
 
 for i in {0..127}; do time ~/lookup/Obj2ContUpdt.perl commit $i 2380392; done &
@@ -522,10 +530,15 @@ cd c2fb
 for i in {0..127}; do cut -d\; -f4 /data/All.blobs/commit_$i.idx| lsort 50G -u | join -v1 - <(ssh da4 'cut -d\; -f4 /data/All.blobs/commit_'$i'.idx' < /dev/null | lsort 50G -u) | gzip > RS$i.cs; done
 --
 for i in {0..127}; do time zcat RS$i.cs  | perl -I ~/lookup -I ~/lib64/perl5 ~/lookup/cmputeDiff3.perl 2> errRS.$i | gzip > RS$i.gz; done  &
+
+(i=0;zcat RS$i.gz|perl -I $HOME/lib64/perl5 -I $HOME/lookup -e 'use cmt; while(<STDIN>){ chop (); s|;/|;|g; @r = split(/;/); $r[$#r] = "long" if $r[$#r] =~ / /&& length($r[$#r]) > 300; print "".(join ";", @r)."\n" if ! defined $badCmt{$r[0]};}' | lsort 5G | gzip > RS$i.s)
+
+(i=0; lsort 3G -t\; -k1,1 --merge <(zcat c2fbbFullR$i.s) <(zcat RS$i.s) | gzip > c2fbbFullS$i.s) &
 ```
 
 #on dad2
 #do Authors
+```
 ver=S
 cd /store/cmts
 #fix timestamp to sort properly and make nonsense (11 digit) time zero
@@ -534,10 +547,10 @@ for j in {1..127..4}; do $HOME/lookup/lstCmt.perl 1 $j | perl -ane '@x=split(/;/
 for j in {2..127..4}; do $HOME/lookup/lstCmt.perl 1 $j | perl -ane '@x=split(/;/, $_, -1); $x[1] = 0 if length($x[1]) > 10; $x[1] = sprintf "%.10d", $x[1]; print "".(join ";", @x);' | lsort 30G -t\; -k1,2 | gzip > c2taFull$ver$j.s; done &
 for j in {3..127..4}; do $HOME/lookup/lstCmt.perl 1 $j | perl -ane '@x=split(/;/, $_, -1); $x[1] = 0 if length($x[1]) > 10; $x[1] = sprintf "%.10d", $x[1]; print "".(join ";", @x);' | lsort 30G -t\; -k1,2 | gzip > c2taFull$ver$j.s; done &
 wait
-for j in {0..31..4}; do zcat c2taFull$ver$j.s | lsort 30G -t\; -k1,2 --merge - <(zcat c2taFull$ver$(($j+32)).s) <(zcat c2taFull$ver$(($j+64)).s) <(zcat c2taFull$ver$(($j+96)).s) | awk -F\; '{print $3";"$1}' | ~/lookup/splitSecCh.perl a2cFull$ver.$j. 32 & 
-for j in {1..31..4}; do zcat c2taFull$ver$j.s | lsort 30G -t\; -k1,2 --merge - <(zcat c2taFull$ver$(($j+32)).s) <(zcat c2taFull$ver$(($j+64)).s) <(zcat c2taFull$ver$(($j+96)).s) | awk -F\; '{print $3";"$1}' | ~/lookup/splitSecCh.perl a2cFull$ver.$j. 32 & 
-for j in {2..31..4}; do zcat c2taFull$ver$j.s | lsort 30G -t\; -k1,2 --merge - <(zcat c2taFull$ver$(($j+32)).s) <(zcat c2taFull$ver$(($j+64)).s) <(zcat c2taFull$ver$(($j+96)).s) | awk -F\; '{print $3";"$1}' | ~/lookup/splitSecCh.perl a2cFull$ver.$j. 32 & 
-for j in {3..31..4}; do zcat c2taFull$ver$j.s | lsort 30G -t\; -k1,2 --merge - <(zcat c2taFull$ver$(($j+32)).s) <(zcat c2taFull$ver$(($j+64)).s) <(zcat c2taFull$ver$(($j+96)).s) | awk -F\; '{print $3";"$1}' | ~/lookup/splitSecCh.perl a2cFull$ver.$j. 32 & 
+for j in {0..31..4}; do zcat c2taFull$ver$j.s | lsort 30G -t\; -k1,2 --merge - <(zcat c2taFull$ver$(($j+32)).s) <(zcat c2taFull$ver$(($j+64)).s) <(zcat c2taFull$ver$(($j+96)).s) | awk -F\; '{print $3";"$1}' | ~/lookup/splitSecCh.perl a2cFull$ver.$j. 32; done &
+for j in {1..31..4}; do zcat c2taFull$ver$j.s | lsort 30G -t\; -k1,2 --merge - <(zcat c2taFull$ver$(($j+32)).s) <(zcat c2taFull$ver$(($j+64)).s) <(zcat c2taFull$ver$(($j+96)).s) | awk -F\; '{print $3";"$1}' | ~/lookup/splitSecCh.perl a2cFull$ver.$j. 32; done & 
+for j in {2..31..4}; do zcat c2taFull$ver$j.s | lsort 30G -t\; -k1,2 --merge - <(zcat c2taFull$ver$(($j+32)).s) <(zcat c2taFull$ver$(($j+64)).s) <(zcat c2taFull$ver$(($j+96)).s) | awk -F\; '{print $3";"$1}' | ~/lookup/splitSecCh.perl a2cFull$ver.$j. 32; done & 
+for j in {3..31..4}; do zcat c2taFull$ver$j.s | lsort 30G -t\; -k1,2 --merge - <(zcat c2taFull$ver$(($j+32)).s) <(zcat c2taFull$ver$(($j+64)).s) <(zcat c2taFull$ver$(($j+96)).s) | awk -F\; '{print $3";"$1}' | ~/lookup/splitSecCh.perl a2cFull$ver.$j. 32; done & 
 wait
 for j in {0..31}
 do for i in {0..31}
@@ -553,6 +566,44 @@ wait
 str="lsort 30G -u --merge -t\; -k1,1"
 for i in {0..31}; do str="$str <(zcat a$ver$i.s)"; done; 
 eval $str | gzip > a$ver.s
+# create databases
+for j in {0..31}; do zcat a2cFull$ver.$j.s | ~/lookup/s2hBinSorted.perl /fast/a2cFull$ver.$j.tch; done &
+for i in {0..31}; do zcat c2taFull$ver$i.s c2taFull$ver$(($i+32)).s c2taFull$ver$(($i+64)).s c2taFull$ver$(($i+96)).s  | ~/lookup/Cmt2taBin.perl /fast/c2taFull$ver.$i.tch 1; done &
+wait
+
+scp -p a$ver.s c2taFull$ver{[0-9],[1-9][0-9],1[0-9][0-9]}.s da3:/data/basemaps/gz
+scp -p /fast/a2cFull$ver.{[0-9],[1-3][0-9]}.tch da0:/data/basemaps/
+
+# commit to parent commit
+for i in {0..31..4}; do ~/lookup/Cmt2Par.perl $i $ver | gzip > cnpFull$ver.$i; done &
+...
+wait
+scp -p cnpFull$ver.* da0:/data/basemaps/gz
+for i in {0..31}; do ~/lookup/lst.perl /fast/c2pcFullS.$i.tch  | perl -ane 'chop();($c,@pc)=split(/;/,$_,-1);for $p (@pc){print "$p;$c\n";}' | gzip > pc2c.$i; done
+# run on beacon to produce c2ccFullS*.s
+# create small (0) tch files via h2h
+for j in {0..31}; do zcat c2ccFull$ver$j.s | ~/lookup/h2hBinSorted.perl /fast/c2ccFull$ver.$j.tch 0; done 
+# commit to child commit - takes long and misses some commits: don't use, removed
+# time ~/lookup/Cmt2ChldCUpdt.perl /fast/c2ccFull$ver 2480391
+# 2564m33
+
+# c2r may change if the formerly undefined commit is retrieved and
+# has a parent
+# first seed with roots/leaves up to 10th-level
+time for k in {0..9}; do ~/lookup/Cmt2RootNew.perl S $k; done
+#218m21.025s
+time for i in 0; do echo $i; time ~/lookup/Cmt2Root.perl $i ${ver}; done
+
+time for i in {0..9}; do ~/lookup/Cmt2HeadNew.perl $ver $i; done
+#996m
+time for i in 0; do echo $i; time ~/lookup/Cmt2Head.perl $i ${ver}; done
+
+
+# now deal with the remaining commits
+time for i in {0..31}; do echo $i; ~/lookup/Cmt2Root.perl $i ${ver}; done 
+time for i in {0..31}; do time ~/lookup/Cmt2Head.perl $i ${ver}; done
+# 6926m on i=0, 758m on i=1 481m on i=2 347m on i=3 262m on i=4 221m on i=5...117m on i=10 79m i=19 65m i=30
+```
 
 ### Version R
 
