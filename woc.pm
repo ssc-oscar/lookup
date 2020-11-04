@@ -534,6 +534,56 @@ sub addForks {
 }
 
 
+our %badAuthors = ( 'one-million-repo <mikigal.acc@gmail.com>' => "1M commits", 
+   'scraped_page_archive gem 0.5.0 <scraped_page_archive-0.5.0@scrapers.everypolitician.org>' => "4243985C", 
+   'Your Name <you@example.com>' => "1829654C",
+   'Auto Pilot <noreply@localhost>' => "2063212C",
+   'GitHub Merge Button <merge-button@github.com>' => "109778A",
+   '= <=>' => "190490A",
+   'greenkeeper[bot] <greenkeeper[bot]@users.noreply.github.com>' => "2067354C", 
+   'Google Code Exporter <GoogleCodeExporter@users.noreply.github.com>' => "277+K projects",
+   'datakit <datakit@docker.com>' => "4400778 commits", 
+   'The Octocat <octocat@nowhere.com>' => 'forking tutorial',
+   'The Gitter Badger <badger@gitter.im>' => 'The Gitter Badger',
+   'root <root@localhost.localdomain>' => 'homonym',
+   'root <you@example.com>' => 'homonym', 
+   'testuser <testuser>'  => 'homonym',
+   'Linus Torvalds <linus@git.org>' => "singingwolfboy_cookbook",
+   'torvals <torvalds@osdl.org>' => 'Feminist-Software-Foundation_C-plus-Equality',  
+   'Deleted user <ghost@github.com>' => "",'root <root@localhost.localdomain>' => "", 
+   'tip-bot for Linus Torvalds <torvalds@linux-foundation.org>' => "",
+   'root <root@ubuntu.(none)>' => '');
+
+my %toUrlMap = ("bb" => "bitbucket.org","gl" => "gitlab.org",
+"android.googlesource.com" => "android.googlesource.com",
+"bioconductor.org" => "bioconductor.org",
+"drupal.com" => "git.drupal.org", "git.eclipse.org" => "git.eclipse.org",
+"git.kernel.org" => "git.kernel.org/pub/scm/",
+"git.postgresql.org" => "git.postgresql.org" ,
+"git.savannah.gnu.org" => "git.savannah.gnu.org",
+"git.zx2c4.com" => "git.zx2c4.com" ,
+"gitlab.gnome.org" => "gitlab.gnome.org",
+"kde.org" => "anongit.kde.org",
+"repo.or.cz" => "repo.or.cz",
+"salsa.debian.org" => "salsa.debian.org", 
+"sourceforge.net" => "git.code.sf.net/p");
+
+sub toUrl {
+  my $in = $_[0];
+  my $found = 0;
+  for my $p (keys %toUrlMap){
+    if ($in =~ /^${p}_/ && (scalar(split(/_/, $in)) > 2 || $p eq "sourceforge.net")){
+      $in =~ s|^${p}_|$toUrlMap{$p}\/|;
+      $found ++;
+      last;
+    }
+  }  
+  $in =~ s|^|github.com/| if (!$found);
+  $in =~ s|_|/|;
+  return "https://$in";
+}
+
+
 our %badCmt = (
   "c89423063a78259e6a7d13d9b00278a0c5e637b0" => 10000000005,
   "45546f17e5801791d4bc5968b91253a2f4b0db72" => 10000000000,
@@ -553,6 +603,31 @@ our %badCmt = (
   "3d156dd720d679df5cb2468c7eb4fe58dc642494" => 2219847,
   "61f824547f2e82c19570302de75c06f1d4f960b0" => 2541111,
   "3f631f976149d8702d0b1496df7b98f16a9357ed" => 2013166, #2013166 blobs
+  "14bde94da008ac1c65e0c066ee269315e47c0987" => 7651931, #Completed Search Engine with Cosine Similarity and Champion Lists, storing the entire inverted index in terms, with each term having its own pickle file.
+  "1682fa6408b6e0c8f131cf74e0b17a5870acc00c" => 2161208, #dataset: train
+  "149d0c641a429719acdd5ee3e0c11dffa41ea6c9" => 1293339, #Update Git repository using egup-single
+  "96cc354af7f67bb600e9e79c6c8cd5dad16ce51e" => 1000001, #lol
+  "0a1fc2163e0faff92e0533d321af5a2ce0be60fb" =>  994111, #[egup] Update repository metadata
+  "15f69dd2ce7b71657617e7f7f40232df7755a962" =>  839705, #update partition_failure_rate
+  "0b24aed7c8e379a04d7fd9fbd56b6407acc04b66" =>  819200, #layer_2:
+  "c2785b165b3d804b769207536a27e2606a254a42" =>  958884, # Added cifar dataset and visualizations
+  "c2907c7d3bfaed6ffa39a54d44498a2c610cb75f" => 4098244, #im back
+  "c9089ba3b4f17e006844befa9828c4e03b44723a" => 1899090, #[Automatic commit] Errors from ibinti/bugvm
+  "d117f34065df34797cb8b2529d1f30142615f32e" =>  828546, #More websites and add HTML exports of mailing lists
+  "d370ba139a4fecce298bda5f3662536d28928f5c" => 1151323, #Fill blank tiles
+  "f94fa89009c8e3ba5e46fbf1c583114d9c6b37f8" =>  933725, #Uploading
+  "fc4247ae1baf592a4b52a355d3047e1938ef3f9b" =>  941677, #DATA
+  "695b944f918414ebc0608cb25b8dbb8fc906a720" => 1000001, #bash_lab v1
+  "a69f8f2cb6eba2ca18870ac00d511f8ae7c360e3" =>  819200, #layer_1
+  "a919d97b57e275cd1af964b4915f8889f94799ed" =>  839703, #ready to test
+  "d8034ac8562b8c978376008f4b33df01b8887b19" => 1578523, #Replacing the 500k programs by 1m, and better folder structure
+  "df3e25ef63aeeb62982740d44f2a8e6a6534ac94" => 1000000, #deleted
+  "ac4ba8e8f32627854cf3d2cd5870c138622e9fee" =>  941686, #Json author gmtr-web <gmtrweb@gmail.com> 
+  "e477a5c4173e9a568c352f9e743ec1e330aa8a2a" => 13300108, #edits author Muhammad Usman <muhammadusman@utexas.edu> 1583026565 -0600
+  "e601b95f45dde98dd4d1f80a1d3304905a340ab8" => 1004542, # [Automatic commit] Errors from geogebra/geogebra
+  "7140aaf36cca2e8ecf01cd765608208f44f108e7" =>  851015, # Add data author manhcuongk55 <dmcksclck55@gmail.com> 1579495353 +0700
+
+  "0e2bfc6cfacfb1567b094e7f09e81fc925e83303" => 1359989, # LiamOSullivan/dd-ver1-data-archive rm sound data
 
   "0a36c08880da83a84209efe5aa90ca3f9b1dc453" => 10000000000, # tons of fake blobs
   "12ef405ef13a47da699aa2b8e86c4d49edc57e5d" => 10000000000, # tons of fake blobs
@@ -590,6 +665,48 @@ our %badCmt = (
  
   "a02ca3c3719eb34e8d8d521cbd6325871cfdf240" => 10000000000, # tons of identical trees with the same empty file .gap.json
   "4332d6eda8f6b3ce73571225409a07a11a856e1b" => 10000000000, # tons of identical trees with the same empty file .gap.json
+
+  "66645f6a8d41bc9f1b31596b6c9c47e7a1b6a060" => 520530, #520530 in c2fb
+  "029aad01abe478c2f3e844de698231f7dc2f7cf3" => 3793324,
+  "07cd2db66cd48dfdd9632d18fa7a150c51e0ac6e" => 1599721,
+  "0d45d1a714b1d95fd5258b3bbdd294897e29d5ed" => 683751,
+  "0d9291b790a9e88c29246a740f105a05711ed24c" => 824097,
+  "0dfc9793807b720923a99a6f68639695c45aae80" => 770124,
+  "2267c4f139c7195869f5d24b14db0426b90bd2aa" => 707836,
+  "226b606fcb2ec4dc46846751d6f801943c92f739" => 1989222,
+  "229c2a315ea2f2c1b13ab40d88f3c16e02b56754" => 628225,
+  "22a693c9de5c4619b72060ff9883b7a70d719b8c" => 660836,
+  "22d719509de6b9bc537606b8f1f8fabeb0f30987" => 1105700,
+  "2d6d5242dd8e521ffbd305265988526c469f9a5a" => 669185,
+  "2d8b23c25acf88e1342bb7c1655625c6128fef87" => 855359,
+  "2dc663b47b7d999c2545e41f33f9f166ff427eab" => 979089,
+  "662f26d714229d6998d40d91423b51d7a9c7a9a8" => 990000,
+  "66424c417f8b8d05cbead89bec8eeb64846302f9" => 774383,
+  "66616e3d934973fe001adfd30b6bb045d87cfec8" => 703016,
+  "66645f6a8d41bc9f1b31596b6c9c47e7a1b6a060" => 520530,
+  "6665b2f3ada6ec1c585ca4dcd69bba8cf8604845" => 520513,
+  "66ac0671392e55f9f26717d12d912be506bece29" => 523145,
+  "66d9890c62c4e1baacdedd2653c68ef8bc2f6d6d" => 617679,
+  "6d2e49cd628cfa43b98ced89acb71370ca090e44" => 619672,
+  "6d32c8efbb971af33d4c12f6869c2ddffec2bed4" => 440060,
+  "6d3cb75b3102e98c2f9a53f8b00371a5d8565de6" => 520380,
+  "6dfaa2833450d1cdf410fda67a87e5c2fff2bf7c" => 505317,
+  "8b5d8aa66e69b64092b1304910510c8474db9449" => 983677,
+  "8d2c5f5f34b54d543862d70942d3cf5ab2ac58d6" => 578554,
+  "8d34c18e1bbc121171a5340dfc62654847dd86ed" => 608994,
+  "8d463bcbf3d83da7e400c2a752ad1811ae3fc125" => 517401,
+  "90679fae3785ca97d7b7a66862369295baee98c0" => 539497,
+  "a2c89d2625d552404b040e6e0c24e1d4088a134a" => 584909,
+  "a2d04e9f17258008ba11b3a7b545f0867f6efe81" => 555012,
+  "a2e1aea8797b8e2bed3953385dc8e0dccc9db271" => 1377218,
+  "ad3b87b8f9e564c4a4e028036fe2abe1e4d5986e" => 510268,
+  "ad44d8c300a6f93c1a0c5d4500d82b934cb0e060" => 621165,
+  "e5b1a20e53a60d6da1e34f0d22b30170aa053f3f" => 539487,
+  "e6541de24113b9cb4e2f19387bc1af5511ad799e" => 3997933,
+  "e88c59f2fab3243c3d0af6cc2ae2874ac77f63aa" => 532401,
+  "ed769eef9e9dd69037322ffd5c24470590328a09" => 726169,
+  "ed89c009aab3b63874683404d989b40e225ce6f8" => 630643,
+
 
 
   "142e0f29cd5bd79f2d2e3aab108a6bc4fc0027d5" => 10000000000, # tons of fake folders
