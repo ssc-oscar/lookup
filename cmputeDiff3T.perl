@@ -111,6 +111,7 @@ while(<STDIN>){
     }
     separate2T ($rev, $parent, "", $tree, $treeP);
   }else{
+    print STDERR "no parent for $rev\n";
     #commit with no parents; added missing created parameter to put blobs in the right column
     printTR ($rev, getTO ($tree), "", 1);
   }

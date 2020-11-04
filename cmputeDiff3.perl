@@ -87,10 +87,10 @@ while(<STDIN>){
     print STDERR "no commit for $rev\n";
     next;
   }
-  if ($parent eq ""){
-    print STDERR "no parent for $rev\n";
-    next;
-  }
+#if ($parent eq ""){
+#    print STDERR "no parent for $rev\n";
+#    next;
+#  }
   if (defined $parent && $parent ne ""){
     $parent = substr ($parentFull, 0, 40); #ignore additional parents
     my ($treeP, $parentP) = getCT ($parent);
@@ -112,6 +112,7 @@ while(<STDIN>){
     }
     separate2T ($rev, $parent, "", $tree, $treeP);
   }else{
+    print STDERR "no parent for $rev\n";
     #commit with no parents; added missing created parameter to put blobs in the right column
     printTR ($rev, getTO ($tree), "", 1);
   }
