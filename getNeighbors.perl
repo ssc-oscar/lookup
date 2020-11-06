@@ -33,6 +33,9 @@ if ($type eq "a"){
   $cvt="a2c";
 }
 if ($type eq "p"){
+  $cvt="p2c";
+}
+if ($type eq "P"){
   $cvt="P2c";
 }
 if ($type eq "f"){
