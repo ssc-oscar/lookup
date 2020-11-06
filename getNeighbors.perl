@@ -12,11 +12,15 @@ use Compress::LZF;
 my $flat="n"; 
 GetOptions('flat=s' => \$flat);
 
-
+my $cmdl = "@ARGV";
 
 my $type=$ARGV[0];
 my $depth=$ARGV[1]+0;
-my $obj = $ARGV[2];
+
+$cmdl =~ s/^$type\s+//;
+$cmdl =~ s/^$depth //;
+
+my $obj = $cmdl;
 
 my $cvt="";
 if ($type eq "tree"){
@@ -30,6 +34,9 @@ if ($type eq "a"){
 }
 if ($type eq "p"){
   $cvt="P2c";
+}
+if ($type eq "f"){
+  $cvt="f2c";
 }
 
 my $split = 32;
@@ -55,9 +62,51 @@ my $d = 0;
 my %cs;
 my %lnk;
 
+if ($cvt eq "t2c" || $cvt eq "b2c"){
+  my $t = fromHex ($obj);
+  my $s = segB ($t, $split);
+  my $k = $cvt;
+  my %foundCs;
+  myOpen ($k, $s);
+  if (defined $dat{$k}{$s}{$t}){
+    for my $v (split (/;/, cvt ($k, $dat{$k}{$s}{$t}, -1))){
+      $out{$d}{$k}{$obj}{$v}++;
+      $lnk{$k}{$obj}{$v}++;
+      $foundCs{$v}++;
+    }
+  }
+  for my $c (keys %foundCs){
+    getPC ($c);    
+  }
+}
+
+if ($cvt eq "a2c" || $cvt eq "P2c" || $cvt eq "f2c"){
+  my $s = sHash ($obj, $split);
+  my $k = $cvt;
+  my %foundCs;
+  myOpen ($k, $s);
+  if (defined $dat{$k}{$s}{$obj}){
+    for my $v (split (/;/, cvt ($k, $dat{$k}{$s}{$obj}, -1))){
+      $out{$d}{$k}{$obj}{$v}++;
+      $lnk{$k}{$obj}{$v}++;
+      $foundCs{$v}++;
+    }
+  }
+  for my $c (keys %foundCs){
+    getPC ($c);    
+  }
+}
+
 if ($cvt eq ""){
   #get parents/children
-  my $c = fromHex ($obj);$cs{$obj}++;
+  getPC ($obj);
+}
+
+
+sub getPC {
+  my $obj = $_[0];
+  my $c = fromHex ($obj);
+  $cs{$obj}++;
   my $s = segB ($c, $split);
   for my $k ("c2cc", "c2pc"){
     myOpen ($k, $s);
@@ -70,6 +119,7 @@ if ($cvt eq ""){
     }
   }
 }
+
 $d = 1;
 while ($d <= $depth){ 
   for my $k ("c2cc", "c2pc"){

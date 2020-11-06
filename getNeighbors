@@ -1,24 +1,16 @@
 #!/bin/bash
 
+
 h=$(hostname)
-ver=R
-pVer=Q
-flat=n
-pass=""
-while getopts "fv:" option
-do 
- case $option in
- f) flat=y; pass="$pass -f" ;;
- v) ver=$OPTARG; pass="$pass -v$ver";; esac
-done
-shift $((OPTIND-1))
+ver=S
+pVer=R
 t=$1
 d=${2:-0}
 
 if [[ $t == "" ]]; then
- echo "Usage: getNeighbors [OPTIONS] map depth";
+ echo "Usage: getNeighbors [commit|tree|blob|ap|f] depth object";
  exit 1;
 fi
 
-~/lookup/getNeighbors.perl $t $d
+perl /home/audris/lookup/getNeighbors.perl $*
 
