@@ -83,12 +83,14 @@ if ($cvt eq "t2c" || $cvt eq "b2c"){
   }
 }
 
-if ($cvt eq "a2c" || $cvt eq "P2c" || $cvt eq "f2c"){
+if ($cvt eq "a2c" || $cvt eq "P2c" || $cvt eq "p2c" || $cvt eq "f2c"){
   my $s = sHash ($obj, $split);
   my $k = $cvt;
   my %foundCs;
   myOpen ($k, $s);
+  # print STDERR "$k;$obj;$s\n";
   if (defined $dat{$k}{$s}{$obj}){
+    # print STDERR "$k;$obj;$s\n";
     for my $v (split (/;/, cvt ($k, $dat{$k}{$s}{$obj}, -1))){
       $out{$d}{$k}{$obj}{$v}++;
       $lnk{$k}{$obj}{$v}++;
@@ -96,6 +98,7 @@ if ($cvt eq "a2c" || $cvt eq "P2c" || $cvt eq "f2c"){
     }
   }
   for my $c (keys %foundCs){
+    # print STDERR "$obj;".(toHex($c))."\n";
     getPC ($c);    
   }
 }
