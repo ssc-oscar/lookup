@@ -15,7 +15,7 @@ shift $((OPTIND-1))
 t=$1
 
 if [[ $t == "" ]]; then
- echo "Usage: getValue [OPTIONS] map";
+ echo "Usage: getValues [OPTIONS] map";
  exit 1;
 fi
 
@@ -35,19 +35,27 @@ else
       then ver=$pVer
         path=/data/basemaps/${t}Full$ver
       else
-        path=$(ls -f /da?_data/basemaps/${t}Full$ver.31.tch 2> /dev/null)
+        path=$(ls -f /da?_data/basemaps/${t}Full$ver.31.tch 2> /dev/null | head -1)
         if [[ -f $path ]]
         then
-          path=$(ls -f /da?_data/basemaps/${t}Full$ver.31.tch)
+          path=$(ls -f /da?_data/basemaps/${t}Full$ver.31.tch 2> /dev/null | head -1)
           path=${path%%.31.tch}
           ssh=${path%%_data*}
           ssh="ssh "${ssh##/}
         else
-          ver=$pVer
-          path=$(ls -f /da?_data/basemaps/${t}Full$ver.31.tch)
-          path=${path%%.31.tch}
-          ssh=${path%%_data*}
-          ssh="ssh "${ssh##/}
+          path=$(ls -f /da?_data/basemaps/${t}Full$ver.tch 2> /dev/null | head -1)
+          if [[ -f $path ]]
+          then
+            path=${path%%.tch}
+            ssh=${path%%_data*}
+            ssh="ssh "${ssh##/}
+          else
+            ver=$pVer
+            path=$(ls -f /da?_data/basemaps/${t}Full$ver.31.tch 2> /dev/null | head -1)
+            path=${path%%.31.tch}
+            ssh=${path%%_data*}
+            ssh="ssh "${ssh##/}
+          fi
         fi
       fi
     fi
