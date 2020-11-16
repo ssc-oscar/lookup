@@ -455,6 +455,44 @@ sub pl {
     print "\n";
   }
 }
+
+sub PY {
+  my ($code, $base) = @_;
+
+  $code =~ s/\\\n//g;#join line continuations
+  # two types of match
+  my %matches = ();
+  for my $l (split(/\n/, $code, -1)){
+    if ($l =~ m/^import\s+(.*)/) {
+      my $rest = $1;
+      $rest =~ s/\s+as\s+.*//;
+      while ($rest =~ m/\s*(\w[^\s,]*)[\,\s]*/g){
+        #old my @mds = $1 =~ m/(\w+[\,\s]*)*/;
+        my $m = $1;
+        $m =~ s/\s*$//; 
+        $matches{$m}++ if defined $m;
+      }
+    }
+    if ($l =~ m/^from\s+(\w[\w.]*)\s+import\s+(\w*|\*)/) {
+       if ($2 ne ""){
+         $matches{"$1.$2"} = 1;
+#old if ($l =~ m/^\s*from\s+(\w+)/) {
+       }else{
+         my $m = $1;
+         $m =~ s/\s*$//;
+         $matches{$m} = 1;
+       }
+    }
+  }
+  if (%matches){
+    print $base;
+    for my $elem (keys %matches) {
+      print ';'.$elem;
+    }
+    print "\n";
+  }
+}
+
 sub rb {
   my ($code, $base) = @_;
   my %matches = ();
