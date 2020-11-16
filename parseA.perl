@@ -184,8 +184,7 @@ sub Cs {
 
 sub Dart {
   my ($code, $base) = @_;
-
-}  my %matches = ();
+  my %matches = ();
   $code =~ s|//[^\n]*\n|\n|g;
   $code =~ s|;\n|;|g;
   $code =~ s|\n| |g;
@@ -229,6 +228,7 @@ sub Dart {
             }
           }  
       }
+    }
   }  
   if (%matches){
     print $base;
