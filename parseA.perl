@@ -28,9 +28,8 @@ sub safeDecomp {
 }
 
 my $s = $ARGV[0];
-open A, "zcat blob_$s.idxf2|";
-open B, "blob_$s.bin";
-
+my $from = $ARGV[1];
+my $to = $ARGV[2];
 my %b2t;
 
 my %parse = (
@@ -60,15 +59,22 @@ while (<STDIN>){
 
 my ($n, $off, $len, $cb, @x);
 
+open A, "zcat blob_$s.idxf2|";
+open B, "blob_$s.bin";
+my $nn = -1;
 while (<A>){
+  $nn++;
+  next if $nn < $from;
+  last if $nn >= $to;
+  chop(); 
   ($n, $off, $len, $cb, @x) = split(/\;/, $_, -1);
   if (defined $b2t{$cb} && $b2t{$cb} ne ""){ 
     my $codeC = getBlob ($cb);
     my $code = safeDecomp ($codeC, "$off;$cb");
     $code =~ s/\r//g;
-    my $base = "$cb";
     my $type = $b2t{$cb};
-    print "$type\n";
+    my $base = "$cb;$type";
+    #print "$type\n";
     $parse{$type} -> ($code, $base);
   }
 }

@@ -355,6 +355,12 @@ j=PRT
 inc=$((73791582/32))
 perl ~/lookup/ctags3.perl $i tkns$i.$j $((inc*j)) $((inc*(j+1)))
 echo $i tkns$i.$j $((inc*j)) $((inc*(j+1)))
+inc=$((73791582/32))
+cat tkns$i.$j.idx | ~/lookup/parseAll.perl $i $((inc*j)) $((inc*(j+1))) | gzip > tkns$i.$j.parse
+echo tkns$i.$j.parse
+zcat tkns$i.$j.parse | perl -I ~/lookup -I ~/lib/perl/perl5 ~/lookup/parseA.perl $i $((inc*j)) $((inc*(j+1))) | gzip > tkns$i.$j.pkg
+echo tkns$i.$j.pkg
+
 
 fi
 if test 'WHAT' = 'toparse'; then
@@ -364,10 +370,12 @@ c=/lustre/haven/user/audris/All.blobs
 cd $c
 
 i=FROM
-for j in {0..31}
-do cat tkns$i.$j.idx 
-done | ~/lookup/parseAll.perl | gzip > tkns$i.parse
-echo tkns$i.parse
+j=PRT
+inc=$((73791582/32))
+cat tkns$i.$j.idx | ~/lookup/parseAll.perl $i $((inc*j)) $((inc*(j+1))) | gzip > tkns$i.$j.parse
+echo tkns$i.$j.parse
+zcat tkns$i.$j.parse | perl -I ~/lookup -I ~/lib/perl/perl5 ~/lookup/parseA.perl $i $((inc*j)) $((inc*(j+1))) | gzip > tkns$i.$j.pkg 
+echo tkns$i.$j.pkg
 
 fi
 

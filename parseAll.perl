@@ -205,11 +205,16 @@ my %doParse = (
 'pl' => 1,
 'rb' => 1);
 
+my $s = $ARGV[0];
+my $from = $ARGV[1];
+my $to = $ARGV[2];
 
+my %b2v;
 while (<STDIN>){
   chop();
   #0;0;217;305;0d5602e74c8f3b477cb9357dc7eeea0622baea0d;807e8e2b26a3aeba077cbc914dd4dfbc2301fd93;0_0_10_identifier.rb;Ruby
   my ($n, $o, $s, $S, $tk, $b, $f, $t) = split (/\;/, $_, -1);
+  $b2v{$b}++;
   $f =~ s|^[0-9]+_[0-9]+_[0-9]+_||;
   my $found = "";
   for my $mt (keys %grepStr){
@@ -218,12 +223,33 @@ while (<STDIN>){
       last;
     }
   }
-  my $info = "$b";
   if ($found eq ""){
     #cat tkns0.0.idx | ~/lookup/parseAll.perl|grep '^;'| grep -vE ';(HTML|Maven2|Tex|YACC|Make|Awk|XML|Tcl|XSLT|SVG|Ant|Man|DosBatch|Iniconf|PuppetManifest|DTD|Automake|TeXBeamer|Autoconf|WindRes|Flex|SCSS|M4|CMake|Vim);'
     $found = $mapT{$t} if defined $mapT{$t};     
   }
-  print "$info;$found;$t;$f\n" if defined $doParse{$found};
+  print "$b;$found;$t;$f\n" if defined $doParse{$found};
 }
-    
-   
+
+#get files ctag does not parse
+my $i = -1;
+open IDX, "zcat blob_${s}.idxf2|";
+#00000000;0;461;00b31262da21c4f57d5b207372b6ded0bb332911;library/socket/fixtures/classes.rb
+while (<IDX>){
+  $i++;
+  next if $i < $from;
+  last if $i >=$to;
+  chop ();
+  my ($j, $off, $len, $b, $f) = split(/;/, $_, -1);
+  if ($f ne "" && !defined $b2v{$b}){
+    $f =~ s|^.*/||;
+    $f =~ s|[\s\[\]\{\}\(\)\!\?]|_|g;
+    my $found = "";
+    for my $mt (keys %grepStr){ 
+      if ($f =~ /$grepStr{$mt}/){
+        $found = $mt;
+        last;
+      }
+    }
+    print "$b;$found;;$f\n" if defined $doParse{$found}; 
+  }
+}

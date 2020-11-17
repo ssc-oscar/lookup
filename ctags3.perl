@@ -330,20 +330,33 @@ my $sec = $ARGV[0];
 open CNT, "blob_$sec.bin" or die "$!";
 open RESULTST, ">$ARGV[1].idx";
 open RESULTSB, ">$ARGV[1].bin";
+my ($from, $to) = (0, -1);
+$from = $ARGV[2] if defined $ARGV[2];
+$to = $ARGV[3] if defined $ARGV[3];
+
 my $offset = 0;
 my $record = 0;
 
+my $flist = "${sec}_${from}_flist";
+print STDERR "$flist\n";
+
 my $i = -1;
-my $maxBatch = 1000;
+my $maxBatch = 300;
 my %batch;
 my %ibatch;
 
+my $nn = -1;
 open IDX, "zcat blob_${sec}.idxf2|";
 #00000000;0;461;00b31262da21c4f57d5b207372b6ded0bb332911;library/socket/fixtures/classes.rb
 while (<IDX>){
   chop();
   my ($j, $off, $len, $b, $f) = split(/;/, $_, -1);
+  $j =~ s/^0*//;
+  $j = 0 if $j eq "";
   $i++;
+  $nn ++;
+  die "missed record at :$nn: :$j: $b\n" if ($nn+0 != $j+0);
+  next if $j < $from || ($to >= 0 && $j >=$to);
   if ($f ne ""){
     $f =~ s|^.*/||;
     $f =~ s|[\s\[\]\{\}\(\)\!\?]|_|g;
@@ -384,9 +397,10 @@ sub addBlob {
   my ($b, $off, $len, $f) = @_;
   my $cnt = getBlob ($off, $len, $b);
   if ($cnt ne ""){
-    open OUTPUT, "> ${i}_$f";
+    my $fn = "${sec}_${from}_${i}_$f";
+    open OUTPUT, "> $fn";
     print OUTPUT $cnt;
-    $batch{$b} = $f;
+    $batch{$b} = "$fn";
     close OUTPUT;#ensure it is flushed to disk
   }
   if ($i >= $maxBatch){
@@ -394,12 +408,13 @@ sub addBlob {
   }
 }
 
+
 sub dDump {
   #printf STDER"in dump\n";
-  open FLIST, '> flist';
+  open FLIST, "> $flist";
   for my $b (keys %batch){
     my $f = $batch{$b};
-    if ($f =~ |[0-9]+_$|){
+    if ($f =~ m/^${sec}_${from}_[0-9]+_$/){
       open EXT, "file -bi $f|";
       my $ext = <EXT>;
       chop ($ext);
@@ -421,7 +436,7 @@ sub dDump {
     }
   }
   close FLIST; #ensure it is flushed to disk
-  open IN, '$HOME/bin/myTimeout 600s $HOME/bin/ctags --fields=kKlz  -L flist -uf - |';
+  open IN, '$HOME/bin/myTimeout 600s $HOME/bin/ctags --fields=kKlz  -L '.$flist.' -uf - |';
   my %tmp = ();
   my %ll = ();
   while (<IN>){
@@ -458,22 +473,11 @@ sub dDump {
   $i = 0;
   %batch = ();
   %ibatch = ();
-  open II, "flist";
+  open II, "$flist";
   while (<II>){
     chop ($_);
     unlink $_  or warn "Could not unlink $_: $!";
   }
-}
-
-sub getBinf {
-  my ($blob) = $_[0];
-  my $s = hex (substr($blob, 0, 2)) % 128;
-  if ($s != $sec){
-    die "wrong section $s $sec for blob $blob\n";
-  }
-  my $bB = fromHex ($blob);
-  if (! defined $fhosc{$bB}){ return (0, 0);}
-  return unpack ("w w", $fhosc{$bB});
 }
 
 sub getBlob {
@@ -488,7 +492,7 @@ sub getBlob {
   # print "$code\n";
   #
 }
-
+#xlink 544_ring-1.svg /^  width="373.34px" height="372.92px" viewBox="0 0 373.34 372.92" enable-background="new 0 0 373./;"      kind:nsprefix   language:XML    uri:http://www.w3.org/1999/xlink
 sub Declarations {
   my ($name, $file, $rest, $type, $lang) = ("", "", "", "", "");
   m|^(.+?)\s+([0-9][^ ]+?)\s+(.*)\s+kind:([^ :]+)\s+language:([^ :]+)$|;
@@ -502,10 +506,13 @@ sub Declarations {
   }else{
     ($name, $file, $rest, $type, $lang) = ($1, $2, $3, $4, $5);
   }
-  if (defined $matches{$type}){
+  if (defined $type){
+   if (defined $matches{$type}){
+   }else{
+     print STDERR "new type:$type:\n";
+   }
   }else{
-    print STDERR "new type:$type:\n";
+    print STDERR "$type, $name, $file, $lang\n$_";
   }
-  print STDERR "$type, $name, $file, $lang\n$_" if !defined $type;
   return ($type, $name, $file, $lang);
 }
