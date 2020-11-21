@@ -47,6 +47,24 @@ my $bad = <<"EOT";
     130 package
     129 PKG_NAME
     127 u
+    271 project_var_name
+    243 pip_package_name
+    204 __project__
+    196 APP_NAME
+    194 app_name
+    170 find_meta(
+    163 metadata[
+    149 YourAppName
+    146 module_name
+    145 pre_commit_dummy_package
+    143 __package_name__
+    142 app
+    142 PROJECT_PACKAGE_NAME
+    140 Name
+    129 PackageName
+    117 __plugin_name__
+    117 __appname__
+    114 release_package
 EOT
 my %genPkg;
 for my $i (split (/\n/, $bad, -1)){
