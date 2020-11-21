@@ -22,6 +22,7 @@ tie %{$fhosc{$sec}}, "TokyoCabinet::HDB", "/fast/All.sha1o/sha1.blob_$sec.tch", 
 my $parsed=0;
 my $notParsed=0;
 my $offset = 0;
+
 my $bad = <<"EOT";
    5900 NAME
    3899 name
@@ -48,13 +49,12 @@ my $bad = <<"EOT";
     129 PKG_NAME
     127 u
 EOT
+#ignore generic package names
 my %genPkg;
 for my $i (split (/\n/, $bad, -1)){
   $i =~ s/^\s*[0-9]+\s//;
   $genPkg{$i}++;
 }
-
-
 while (<STDIN>){
   chop ();
   my $b = $_;
@@ -79,7 +79,7 @@ while (<STDIN>){
   for my $l (split(/\n/, $code, -1)){
 #print STDERR "$start;$l\n";
     if ($start == 1){ 
-      if ($l =~ m/^\s*(name|license|author|author_email|description)\s*=\s*['"]?([^'",\s]*)/){
+      if ($l =~ m/^\s*(name|author|author_email|summary|version)\s*=\s*['"]?([^'"]*)/){
         if (defined $1 && defined $2){
           my $k = $1;
           my $vv = $2; $vv =~ s/;/SEMICOLON/g;
@@ -88,29 +88,16 @@ while (<STDIN>){
         }else{
           print STDERR "$b\;$l\n";
         }
-      }else{
-        if ($l =~ m/^\s*install_requires\s*=\s*\[\s*$/){
-          $start = 2;
-        }
-      }
-    }else{
-      if ($start == 2){
-        if ($l =~ /\s*\]/){
-          $start = 1;
-        }else{
-          $l =~ s/^\s*['"]//;
-          $l =~ s/['"],//;
-          $l =~ s/['"]$//;
-          $l =~ s/;/SEMICOLON/g;
-          $dat{'install_requires'}.=";$l";
-        }
       }
     }
-    $start = 1 if $l =~ /setup\s*\(/;
+    $start = 1 if $l =~ /^\[metadata\]$/;
+    if ($l =~ /^\[([^\]]*)\]$/){
+      $start = 1 if $1 ne "metadata";
+    }
   }
   if (defined $dat{'name'} && $dat{'name'} ne "" && !defined $genPkg{$dat{'name'}}){ #otherwise look for setup.cfg
     print "$b";
-    for my $k ("name","author","author_email","description", "install_requires"){
+    for my $k ("name","author","author_email","summary", "version"){
       my $v = "";
       $v = $dat{$k} if defined $dat{$k};
       $v =~ s/^;//;
@@ -118,8 +105,8 @@ while (<STDIN>){
     }
     print "\n";
   }else{
-    $parsed--;
     $notParsed++;
+    $parsed--;
   }
 }
 print STDERR "parsede/not: $parsed $notParsed\n";
