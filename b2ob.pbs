@@ -283,7 +283,7 @@ if test 'WHAT' = 'a2f'; then
 l=FROM
 for i in {0..7}
 do j=$(($i+$l*8));
-  zcat c2fFull$ver$j.s | join -t\; <(zcat ../gz/c2datFull$ver$j.s| cut -d\; -f1-3) - | cut -d\; -f2-3 | uniq
+  zcat c2fFull$ver$j.s | join -t\; <(zcat ../gz/c2datFull$ver$j.s| cut -d\; -f1,3) - | cut -d\; -f2-3 | uniq
 done | perl -I $HOME/lib/perl5 -I $HOME/lookup $HOME/lookup/splitSecCh.perl a2fFull$ver.$l. 32
 echo a2fFull$ver.$l.
 
@@ -299,7 +299,7 @@ if test 'WHAT' = 'P2b'; then
 l=FROM
 for i in {0..7}
 do j=$(($i+$l*8));
-  zcat c2bFull$ver$j.s | join -t\; <(zcat ../gz/c2PFull$ver$j.s| cut -d\; -f1-3) - | cut -d\; -f2-3 | uniq
+  zcat c2bFull$ver$j.s | join -t\; <(zcat ../gz/c2PFull$ver$j.s) - | cut -d\; -f2-3 | uniq
 done | perl -I $HOME/lib/perl5 -I $HOME/lookup $HOME/lookup/splitSecCh.perl P2bFull$ver.$l. 32
 echo P2bFull$ver.$l.
 
@@ -318,7 +318,7 @@ if test 'WHAT' = 'b2P'; then
 l=FROM
 for i in {0..7}
 do j=$(($i+$l*8));
-  zcat c2bFull$ver$j.s | join -t\; - <(zcat ../gz/c2PFull$ver$j.s| cut -d\; -f1-3) | cut -d\; -f2-3 | uniq
+  zcat c2bFull$ver$j.s | join -t\; - <(zcat ../gz/c2PFull$ver$j.s) | cut -d\; -f2-3 | uniq
 done | perl -I $HOME/lib/perl5 -I $HOME/lookup $HOME/lookup/splitSec.perl b2PFull$ver.$l. 32
 echo b2PFull$ver.$l.
 
@@ -334,7 +334,7 @@ if test 'WHAT' = 'P2f'; then
 l=FROM
 for i in {0..7}
 do j=$(($i+$l*8));
-  zcat c2fFull$ver$j.s | join -t\; <(zcat ../gz/c2PFull$ver$j.s| cut -d\; -f1-3) - | cut -d\; -f2-3 | uniq
+  zcat c2fFull$ver$j.s | join -t\; <(zcat ../gz/c2PFull$ver$j.s) - | cut -d\; -f2-3 | uniq
 done | perl -I $HOME/lib/perl5 -I $HOME/lookup $HOME/lookup/splitSecCh.perl P2fFull$ver.$l. 32
 echo P2fFull$ver.$l.
 
