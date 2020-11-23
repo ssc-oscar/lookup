@@ -34,8 +34,8 @@ $f1 = "s" if ($t1 =~ /^[afpP]$/);
 
 $f2 = "cs" if ($t2 =~ /^[afpP]$/);
 
-$f1 = "h" if ($t1 =~ /^[cb]$/);
-$f2 = "h" if ($t2 =~ /^[cb]$/ || $t2 =~ /^(cc|pc|fb|ob|td)$/);
+$f1 = "h" if ($t1 =~ /^[cb]$/ || $t1 =~ /^(ob|td)$/);
+$f2 = "h" if ($t2 =~ /^[cb]$/ || $t2 =~ /^(cc|pc|ob|td)$/);
 
 $f2 = "sh" if $types eq "b2a";
 $f2 = "s" if $t2 =~ /^ta$/;
@@ -49,20 +49,29 @@ $f2 = "s" if ($t2 eq "PS" || $t2 eq "PF" || $t2 eq "PFS");
 $f1 = $ARGV[1] if defined $ARGV[1];
 $f2 = $ARGV[2] if defined $ARGV[2];
 
-$split = 1 if $types eq "p2P" || $types eq "P2p";
+if ($types eq "p2P" || $types eq "P2p" ||  $types eq "a2A" || $types eq "A2a"){
+  $split = 1;
+  $f1 = "s";
+  $f2 = "s";
+  $f2 = "cs" if ($types eq "P2p" ||$types eq "A2a");
+}
 $split = $ARGV[3] if defined $ARGV[3];
-if ($split > 1){
-  for my $s (0..($split-1)){
+
+sub get {
+  my ($c, $s) = @_;
+  return $clones{$s}{$c} if defined $clones{$s};
+  if ($split > 1){
     if(!tie(%{$clones{$s}}, "TokyoCabinet::HDB", "$fname.$s.tch",
        TokyoCabinet::HDB::OREADER | TokyoCabinet::HDB::ONOLCK)){
       die "tie error for $fname.$s.tch\n";
     }
-  }
-}else{
-  if(!tie(%{$clones{"0"}}, "TokyoCabinet::HDB", "$fname.tch", 
+  }else{
+    if(!tie(%{$clones{"0"}}, "TokyoCabinet::HDB", "$fname.tch", 
         TokyoCabinet::HDB::OREADER | TokyoCabinet::HDB::ONOLCK)){
-    die "tie error for $fname.tch\n";
+      die "tie error for $fname.tch\n";
+    }
   }
+  return $clones{$s}{$c};
 }
 
 while (<STDIN>){
@@ -80,7 +89,7 @@ while (<STDIN>){
     $s = sHash ($c, $split);
     $c = safeComp ($ch) if $f1 =~ /c/;
   }
-  my $v = $clones{$s}{$c};
+  my $v = get ($c, $s);
   if (!defined $v){
     my $lF = "$fname.$s.tch.large.";
     if ($f1 =~ /h/){
@@ -151,6 +160,6 @@ while (<STDIN>){
   $offset++;
 }
 for my $s (0..($split-1)){
-  untie %{$clones{$s}};
+  untie %{$clones{$s}} if defined $clones{$s};
 }
 
