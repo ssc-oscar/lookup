@@ -52,7 +52,7 @@ $f2 = $ARGV[2] if defined $ARGV[2];
 if ($types eq "p2P" || $types eq "P2p" ||  $types eq "a2A" || $types eq "A2a"){
   $split = 1;
   $f1 = "s";
-  $f2 = "s";
+  $f2 = "cs";
   $f2 = "cs" if ($types eq "P2p" ||$types eq "A2a");
 }
 $split = $ARGV[3] if defined $ARGV[3];
