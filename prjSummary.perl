@@ -46,15 +46,15 @@ sub out {
   print ";".scalar(@a);
   @a = keys %{$d{P2f}};
   print ";".scalar(@a);
-  my %ext = ();
+  my %e = ();
   for my $fi (@a){
-    $fi =~ s/.*\.//;
-    $ext{$fi}++ if $fi ne "";
+	 ext ($f, \%e) if $fi ne "";
   }
   @a = sort { $ext{$b} <=> $ext{$a} }  keys %ext;
   print ";".scalar(@a);
-  print ";$a[0]=$ext{$a[0]}" if $#a >= 0;
-  print ";$a[1]=$ext{$a[1]}" if $#a >= 1;
+  for my $i (@a){ 
+	  print ";$i=$e{$i}";
+  }
   print "\n";
 }
 
@@ -111,3 +111,38 @@ sub catchUp {
     }
   }
 }
+sub ext {
+  my ($f, $d) = @_;
+  %stats = %$d;
+  if( $f =~ m/(\.java$|\.iml|\.jar|\.class|\.dpj|\.xrb)$/ ) {$stats{'total_java_files'}++;}
+  elsif( $f =~ m/(\.perl|\.pod|\.pl|\.PL|\.pm)$/ ){ $stats{'total_perl_files'}++; }
+  elsif( $f =~ m/\.CPP$|\.CXX$|\.cpp$|\.[Cch]$|\.hh$|\.cc$|\.cxx$|\.hpp$|\.hxx$|\.Hxx$|\.HXX$|\.C$|\.c$|\.h$|\.H$/ ) { $stats{'total_c_or_c++_files'}++; }
+  elsif( $f =~ m/\.(js|iced|liticed|iced.md|coffee|litcoffee|coffee.md|cs|ls|es6|jsx|sjs|co|eg|json|json.ls|json5)$/ )      {$stats{'total_javascript_files'}++;}
+  elsif( $f =~ m/\.(py|py3|pyx|pyo|pyw|pyc|whl)$/ )    {$stats{'total_python_files'}++;}
+  elsif( $f =~ m/\.cs$/ )    {$stats{'total_csharp_files'}++;}
+  elsif( $f =~ m/\.php$/ )     {$stats{'total_php_files'}++;}
+  elsif( $f =~ m/\.(rb|erb|gem|gemspec)$/ )    {$stats{'total_ruby_files'}++;  }
+  elsif( $f =~ m/\.go$/ )      {$stats{'total_go_files'}++;}
+  elsif( $f =~ m/\.(rs|rlib|rst)$/ )   {$stats{'total_rust_files'}++;}
+  elsif( $f =~ m'./*(\.Rd|\.[Rr]|\.Rprofile|\.Rdata|\.Rhistory|\.Rproj|^NAMESPACE|^DESCRIPTION|/NAMESPACE|/DESCRIPTION)$' )    {$stats{'total_r_files'}++;}
+  elsif( $f =~ m/\.swift$/ )   {$stats{'total_swift_files'}++;}
+  elsif( $f =~ m/\.scala$/ )   {$stats{'total_scala_files'}++;}
+  elsif( $f =~ m/\.(f[hi]|[fF]|[fF]77|[fF]9[0-9]|fortran|forth)$/ )    {$stats{'total_fortran_files'}++;}
+  elsif( $f =~ m/\.ad[abs]$/ ) {$stats{'total_ada_files'}++;}
+  elsif( $f =~ m/\.erl$/ )     {$stats{'total_erlang_files'}++;}
+  elsif( $f =~ m/\.lua$/ )     {$stats{'total_lua_files'}++;}
+  elsif( $f =~ m/\.(sql|sqllite|sqllite3|mysql)$/ )    {$stats{'total_sql_files'}++;}
+  elsif( $f =~ m/\.(el|lisp|elc)$/ )   {$stats{'total_lisp_files'}++;}
+  elsif( $f =~ m/\.(fs|fsi|ml|mli|hs|lhs|sml|v)$/ )    {$stats{'total_fml_files'}++;}
+  elsif( $f =~ m/\.jl$/ )      {$stats{'total_jl_files'}++;}   
+  elsif( $f =~ m/\.(COB|CBL|PCO|FD|SEL|CPY|cob|cbl|pco|fd|sel|cpy)$/ ) {$stats{'total_cob_files'}++;}
+  elsif( $f =~ m/\.(kt|kts|ktm)$/ ) {$stats{'total_kotlin_files'}++;}
+  elsif( $f =~ m/\.(ts|tsx)$/ ) {$stats{'total_typescript_files'}++;}
+  elsif( $f =~ m/\.dart$/ ) {$stats{'total_dart_files'}++;}
+  elsif( $f =~ m/\.(cljs|cljc|clj)$/ ) {$stats{'total_clojure_files'}++;}
+  elsif( $f =~ m/\.(aug|mli|ml|aug)$/ ) {$stats{'total_ocaml_files'}++;}
+  elsif( $f =~ m/\.(bas|bb|bi|pb)$/ ) {$stats{'total_basic_files'}++;}
+  elsif( $f =~ m/\.ipy$/ ) {$stats{'total_ipy_files'}++;}
+  else {$stats{'total_other_files'}++;
+}
+
