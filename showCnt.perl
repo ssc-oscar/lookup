@@ -101,6 +101,10 @@ sub getBlob {
   my $rl = read ($f, $codeC, $len);
   my $code = safeDecomp ($codeC, "$sec;$curpos;$blob");
   #print "blob;$sec;$rl;$curpos;$off;$len\;$blob\n";
+  if ($debug == 1){
+    $code =~ s/\n/\\n/g;
+    $code = "$blob;$code";
+  }
   print "$code\n";
 }
 
