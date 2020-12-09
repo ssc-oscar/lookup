@@ -91,10 +91,13 @@ if ($cvt eq "a2c" || $cvt eq "P2c" || $cvt eq "p2c" || $cvt eq "f2c"){
   # print STDERR "$k;$obj;$s\n";
   if (defined $dat{$k}{$s}{$obj}){
     # print STDERR "$k;$obj;$s\n";
+	 my $ntot = 0;
     for my $v (split (/;/, cvt ($k, $dat{$k}{$s}{$obj}, -1))){
       $out{$d}{$k}{$obj}{$v}++;
       $lnk{$k}{$obj}{$v}++;
       $foundCs{$v}++;
+		$ntot ++;
+		last if $ntot > 25; # limit to 25 elements to avoid overload?
     }
   }
   for my $c (keys %foundCs){
