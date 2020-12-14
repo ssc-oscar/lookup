@@ -12,7 +12,11 @@ then
   ~/lookup/showCnt.perl $t $fmt $off
 else
  if [[ $t == 'blob' ]]
- then ssh da4 ~/lookup/showCnt.perl $t $fmt
+  then
+    if [[ $h == 'da4.eecs.utk.edu' ]]
+    then ~/lookup/showCnt.perl $t $fmt
+    else ssh da4 ~/lookup/showCnt.perl $t $fmt
+    fi
  else
   if [[ $h == 'da3.eecs.utk.edu' ]] 
   then 
