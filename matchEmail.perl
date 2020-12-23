@@ -50,10 +50,15 @@ open A, "zcat /data/basemaps/gz/e2nS.s|";
 while (<A>){
   chop();
   my ($e, $n) = split (/;/);
-  $e2n{$_}{$n}++;
+  $e2n{$e}{$n}++;
 }
 
 my %badR;
+open A, "AManyP1000S";
+while (<A>){
+  chop();
+  $bad{$_}++;
+}
 
 my %nr2n;
 my %n2nr;
