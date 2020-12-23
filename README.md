@@ -281,10 +281,12 @@ Examples:
 Output:
    Formatting:
       No Formatting Parameter: 
-         * "Commit-ID";"Tree-ID";"Parent-ID";Author;Committer
+         * "Commit-ID";"Tree-ID";"Parent-ID";"Author";"Committer";"Author Time";"Comitter Time"
       Parameter 1: 
-         * "Commit Message";"Commit-ID"
+         * "Commit-ID";"Commit Time No TZ";"Comitter"
       Parameter 2: 
+         * "Commit-ID";"Comitter";"Commit Time";"Commit Message"
+      Parameter 3: 
          * tree "Tree-ID"
            parent "Parent-ID"
            author "Author-ID"
@@ -292,23 +294,33 @@ Output:
                     
            "Commit Message"
            "Commit Message";"Commit-ID"
+      Parameter 4:
+         * "Commit-ID";"Comitter"
+      Parameter 5:
+         * "Commit-ID";"Parent-ID"
+      Parameter 6:
+         * "Commit-ID";"Commit Time No TZ";"Comitter";"Tree-ID";"Parent-ID"
       
    Examples:
       * No Formatting: 
-         * e4af89166a17785c1d741b8b1d5775f3223f510f;f1b66dcca490b5c4455af319bc961a34f69c72c2;
-           c19ff598808b181f1ab2383ff0214520cb3ec659;Audris Mockus <audris@utk.edu>;
-           Audris Mockus <audris@utk.edu>;1410029988 -0400;1410029988 -0400 
+         * e4af89166a17785c1d741b8b1d5775f3223f510f;f1b66dcca490b5c4455af319bc961a34f69c72c2;c19ff598808b181f1ab2383ff0214520cb3ec659;Audris Mockus <audris@utk.edu>;Audris Mockus <audris@utk.edu>;1410029988 -0400;1410029988 -0400
       * Parameter 1: 
-         * News for Sep 5;e4af89166a17785c1d741b8b1d5775f3223f510f
+         * e4af89166a17785c1d741b8b1d5775f3223f510f;1410029988;Audris Mockus <audris@utk.edu>
       * Parameter 2: 
-         * tree f1b66dcca490b5c4455af319bc961a34f69c72c2
-           parent c19ff598808b181f1ab2383ff0214520cb3ec659
-           author Audris Mockus <audris@utk.edu> 1410029988 -0400
-           committer Audris Mockus <audris@utk.edu> 1410029988 -0400
-           
-           News for Sep 5
-           News for Sep 5;e4af89166a17785c1d741b8b1d5775f3223f510f
+         * e4af89166a17785c1d741b8b1d5775f3223f510f;Audris Mockus <audris@utk.edu>;1410029988 -0400;News for Sep 5
+      * Parameter 3: 
+         *  tree f1b66dcca490b5c4455af319bc961a34f69c72c2
+            parent c19ff598808b181f1ab2383ff0214520cb3ec659
+            author Audris Mockus <audris@utk.edu> 1410029988 -0400
+            committer Audris Mockus <audris@utk.edu> 1410029988 -0400
 
+            News for Sep 5
+      * Parameter 4: 
+         * e4af89166a17785c1d741b8b1d5775f3223f510f;Audris Mockus <audris@utk.edu>
+      * Parameter 5:
+         * e4af89166a17785c1d741b8b1d5775f3223f510f;c19ff598808b181f1ab2383ff0214520cb3ec659
+      * Parameter 6:  
+         * e4af89166a17785c1d741b8b1d5775f3223f510f;1410029988;Audris Mockus <audris@utk.edu>;f1b66dcca490b5c4455af319bc961a34f69c72c2;c19ff598808b181f1ab2383ff0214520cb3ec659
 ```
 ------------
 
@@ -346,16 +358,23 @@ Examples:
    * echo a7081031fc8f4fea0d35dd8486f8900febd2347e | ~/lookup/showCnt blob
    
 Output:
-   Formatting: "Content of the blob"
+   Formatting:
+      No Formatting Parameter: 
+         * "Content of the blob"
+      Parameter 1:
+         * "Content of the blob with new lines replaced with \n"
    Examples:
-              # Syllabus for "Fundamentals of Digital Archeology"
-              ## News
-                 * Assignment1 due Monday Sep 8 before 2:30PM
-                 * Be ready to present your findings from Assignment1 on Monday
-                 * Project 1 teams are formed! You should see Team? where ? is 1-5 in your github page (on the right)
-                 * Lecture slides are at [Data Discovery](https://github.com/fdac/presentations/dd.pdf)
-                 * Sep 5 lecture recording failed as 323Link (host for the recording) went down
-                 ......
+      No Formatting Parameter: 
+         * # Syllabus for "Fundamentals of Digital Archeology"
+            ## News
+               * Assignment1 due Monday Sep 8 before 2:30PM
+               * Be ready to present your findings from Assignment1 on Monday
+               * Project 1 teams are formed! You should see Team? where ? is 1-5 in your github page (on the right)
+               * Lecture slides are at [Data Discovery](https://github.com/fdac/presentations/dd.pdf)
+               * Sep 5 lecture recording failed as 323Link (host for the recording) went down
+               ......
+      Parameter 1:
+         *  # Syllabus for "Fundamentals of Digital Archeology"\n\n## News\n\n* Assignment1 due Monday Sep 8 before 2:30PM\n* Be ready to present your findings from Assignment1 on Monday\n* Project 1 teams are formed! You should see Team? where ? is 1-5 in your github page (on the right)\n* Lecture slides are at [Data Discovery](https://github.com/fdac/presentations/dd.pdf)\n* Sep 5 lecture recording failed as 323Link (host for the recording) went down\n
    
 ```
 -----------
