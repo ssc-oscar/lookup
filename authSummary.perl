@@ -7,7 +7,7 @@ my $s = $ARGV[1];
 my %d = ();
 my $pP = "";
 my %tmp = ();
-open A, 'zcat P2cFull'.$v.'{'.$s.",".($s+32).",".($s+64).",".($s+96).'}'.'.s|';
+open A, "zcat a2cFull$v$s.s|";
 my $cnt = 0;
 while (<A>){
   chop ();
@@ -16,51 +16,32 @@ while (<A>){
   if ($pP ne "" && $pP ne $p){
     $d{c}{$pP} = scalar(keys %tmp);
     %tmp = ();
-    print STDERR "$s P2c $cnt\n" if (!($cnt++%1000000));
-    #last if $cnt > 1000;
+    print STDERR "$s a2c $cnt\n" if (!($cnt++%500000));
+    #last if $cnt > 10000;
   }
   $tmp{$c}++;
   $pP = $p;
 }
 $d{c}{$pP} = scalar(keys %tmp);
-print STDERR "done $s P2c $cnt\n";
+print STDERR "done $s a2c $cnt\n";
 
-open A, "zcat P2pFull$v.s |";
+open A, "zcat A2aFull$v.s |";
 $pP = "";
 while (<A>){
   chop();
   my ($p, $c) = split (/;/, $_, -1);
-  if ($pP ne "" && $pP ne $p && defined $d{c}{$pP}){
+  $d{parent}{$c} = $p if defined $d{c}{$p};
+  if ($pP ne "" && $pP){
     $d{p}{$pP} = scalar(keys %tmp);
     %tmp = ();
   }
   $pP = $p;
-  next if !defined $d{c}{$pP};
   $tmp{$c}++;
 }
-$d{p}{$pP} = scalar(keys %tmp) if defined $d{c}{$pP};
-print STDERR "done $s P2p\n";
+$d{p}{$pP} = scalar(keys %tmp);
+print STDERR "done $s A2a\n";
 
-#get forks/stars
-open A, "zcat /da0_data/play/forks/ghForkMapR.gz1|";
-while (<A>){
-  chop();
-  my ($p, $r, $ps, $rs) = split (/;/, $_, -1);
-  next if !defined $d{c}{$p} && !defined $d{c}{$r};
-  if (defined $d{c}{$r}){
-    my $star = $rs eq "" ? $ps : $rs;
-    $d{s}{$r} = $star if ($star ne "");
-    $d{f}{$r}{$p}++;
-  }elsif (defined $d{c}{$p}){
-    my $star = $rs eq "" ? $ps : $rs;
-    $d{parent}{$p} = $r;
-    $d{s}{$p} = $star if ($star ne "" && (!defined $d{s}{$p} || $d{s}{$p} < $star)); # select the largest star from the group
-  }
-}
-print STDERR "done $s Stars\n";
-
-
-for my $ty ("P2a", "P2b", "P2f"){
+for my $ty ("a2P", "a2fb", "a2f"){
   $cnt = 0;
   %tmp = ();
   $pP = "";
@@ -70,12 +51,12 @@ for my $ty ("P2a", "P2b", "P2f"){
     my ($p, $c) = split (/;/, $_, -1);
     if ($pP ne "" && $pP ne $p){
       $d{$ty}{$pP} = scalar(keys %tmp);
-      if ($ty eq "P2f"){
+      if ($ty eq "a2f"){
         doExt ($pP, \%tmp);
       }
       %tmp = ();
-      print STDERR "$s $ty $cnt prs\n" if (!($cnt++%1000000));
-      #last if $cnt > 1000;
+      print STDERR "$s $ty $cnt\n" if (!($cnt++%500000));
+      #last if $cnt > 10000;
     }
     $tmp{$c}++;
     $pP = $p;
@@ -88,13 +69,12 @@ for my $ty ("P2a", "P2b", "P2f"){
 my @a = keys %{$d{c}};
 print STDERR "$#a\n";
 for my $p (keys %{$d{c}}){
-  my $stars = defined $d{s}{$p} ? $d{s}{$p} : "";
-  my $forks = defined $d{f}{$p} ? scalar (keys %{$d{f}{$p}}) : 0;
   my $parent = defined $d{parent}{$p} ? $d{parent}{$p} : "";
-  my $as = defined $d{P2a}{$p} ?  $d{P2a}{$p} : "";
-  my $fs = defined $d{P2f}{$p} ?  $d{P2f}{$p} : "";
-  my $bs = defined $d{P2b}{$p} ?  $d{P2b}{$p} : "";
-  print "$p;$parent;$stars;$forks;$d{p}{$p};$d{c}{$p};$as;$bs;$fs";
+  my $nalias = (defined $parent && $parent ne "") ? $d{p}{$parent} : 0;
+  my $nPrj = defined $d{a2P}{$p} ? $d{a2P}{$p} : 0;
+  my $fb = defined $d{a2fb}{$p} ? $d{a2fb}{$p} : 0;
+  my $fs = defined $d{a2f}{$p} ? $d{a2f}{$p} : 0;
+  print "$p;$parent;$nalias;$d{c}{$p};$nPrj;$fb;$fs";
   for my $e (keys %{$d{e}{$p}}){
     print ";$e=$d{e}{$p}{$e}";
   }
