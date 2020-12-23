@@ -29,6 +29,7 @@ while (<A>){
 # zcat /data/basemaps/gz/a2AQ.s | perl -ane 'chop();($a,$b)=split(/;/); $e="";if ($b =~ m/.*<([^@]+@[^@\.]+\.[^>]+)>/){$e=$1;$e=~s/^\s*//;$e=~s/\s*$//;};$e1="";if ($a =~ m/.*<([^@]+@[^@\.]+\.[^>]+)>/){$e1=$1;$e1=~s/^\s*//;$e1=~s/\s*$//;} print "$e;$e1;$a;$b\n";' | lsort 10G -t\; -k1,1 | gzip > /data/basemaps/gz/e2AQ.s
 # zcat /data/basemaps/gz/e2nS.s|perl -e 'while(<STDIN>){($e,$n)=split(/;/);if ($e eq $pe){ print "$e\n"}; $pe=$e}'|uniq -c |gzip > /data/basemaps/gz/e2+S.s
 # zcat /data/basemaps/gz/e2+S.s|lsort 1G -rn | sed 's|^\s*||;s| |;|' | perl -ane '($x,$y)=split(/;/);print $y if $x> 10;' > badEmailS
+# edit manually (add - in front)!
 
 my %badE;
 open A, "badEmailS";
