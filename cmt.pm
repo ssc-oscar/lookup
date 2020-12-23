@@ -1,10 +1,10 @@
-package cmt;
+package woc;
 use strict;
 use warnings;
 use Compress::LZF;
 use TokyoCabinet;
 use Digest::FNV::XS;
-
+use MIME::Base64;
 
 require Exporter;
 our @ISA = qw (Exporter);
@@ -248,22 +248,30 @@ sub cleanCmt {
       $c =~ s/\r/ /g;
       print "$c\n";
     }else{
-      $msg =~ s/[\r\n;]/ /g;
-      $msg =~ s/^\s*//;
-      $msg =~ s/\s*$//;
-      $auth =~ s/;/ /g;
-      if ($debug == 2){
-        print "$cmt;$auth;$ta;$taz;$msg\n";
+      if ($debug == 7){
+        my $c = safeDecomp($cont, $cmt);
+        my $res = encode_base64 ($c);
+        $res =~ s/\r/\\r/g;
+        $res =~ s/\n/\\n/g;
+        print "$cmt;$res\n";
       }else{
-        #if ($debug == 3){
-        #  my ($a, $e) = git_signature_parse ($auth, $msg);
-        #  print "$msg;$cmt;$a;$e;$ta;$auth\n";
-        #}else{
-        if ($debug == 4){
-          print "$cmt;$auth\n";
+        $msg =~ s/[\r\n;]/ /g;
+        $msg =~ s/^\s*//;
+        $msg =~ s/\s*$//;
+        $auth =~ s/;/ /g;
+        if ($debug == 2){
+          print "$cmt;$auth;$ta;$taz;$msg\n";
         }else{
-          $ta=~s/ .*//;
-          print "$cmt;$ta;$auth\n";
+          #if ($debug == 3){
+          #  my ($a, $e) = git_signature_parse ($auth, $msg);
+          #  print "$msg;$cmt;$a;$e;$ta;$auth\n";
+          #}else{
+          if ($debug == 4){
+            print "$cmt;$auth\n";
+          }else{
+            $ta=~s/ .*//;
+            print "$cmt;$ta;$auth\n";
+          }
         }
       }
     }
