@@ -1,4 +1,4 @@
-package woc;
+package cmt;
 use strict;
 use warnings;
 use Compress::LZF;
