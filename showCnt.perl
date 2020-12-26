@@ -3,6 +3,7 @@ use lib ("$ENV{HOME}/lookup", "$ENV{HOME}/lib64/perl5", "/home/audris/lib64/perl
 use strict;
 use warnings;
 use Error qw(:try);
+use MIME::Base64;
 use woc;
 
 
@@ -84,7 +85,6 @@ sub getTkns {
 }
   
 
-
 sub getBlob {
   my ($blob) = $_[0];
   my $sec = hex (substr($blob, 0, 2)) % $sections;
@@ -101,6 +101,12 @@ sub getBlob {
   my $rl = read ($f, $codeC, $len);
   my $code = safeDecomp ($codeC, "$sec;$curpos;$blob");
   #print "blob;$sec;$rl;$curpos;$off;$len\;$blob\n";
+  if ($debug == 1){
+    $code = encode_base64($code);
+    $code =~ s/\r/\\r/g;
+    $code =~ s/\n/\\n/g;
+    $code = "$blob;$code";
+  }
   print "$code\n";
 }
 

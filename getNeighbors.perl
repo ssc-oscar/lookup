@@ -29,16 +29,16 @@ if ($type eq "tree"){
 if ($type eq "blob"){
   $cvt="b2c";
 }
-if ($type eq "a"){
+if ($type eq "a" || $type eq "author"){
   $cvt="a2c";
 }
-if ($type eq "p"){
+if ($type eq "p" || $type eq "project"){
   $cvt="p2c";
 }
-if ($type eq "P"){
+if ($type eq "P" || $type eq "Project"){
   $cvt="P2c";
 }
-if ($type eq "f"){
+if ($type eq "f" || $type eq "file"){
   $cvt="f2c";
 }
 
@@ -49,6 +49,7 @@ sub myOpen {
   my $ver = "S";
   my $pVer= "R";
   $ver = $pVer if (-f "/da0_data/basemaps/${k}Full$pVer.$s.tch");
+  # print STDERR "${k}Full$ver.$s.tch\n";
   if (!defined $dat{$k}{$s}){
     if (!tie (%{$dat{$k}{$s}}, "TokyoCabinet::HDB", "/da0_data/basemaps/${k}Full$ver.$s.tch",
        TokyoCabinet::HDB::OREADER | TokyoCabinet::HDB::ONOLCK)){
@@ -88,13 +89,16 @@ if ($cvt eq "a2c" || $cvt eq "P2c" || $cvt eq "p2c" || $cvt eq "f2c"){
   my $k = $cvt;
   my %foundCs;
   myOpen ($k, $s);
-  # print STDERR "$k;$obj;$s\n";
+  # print STDERR "$k;$obj;$s;$split\n";
   if (defined $dat{$k}{$s}{$obj}){
     # print STDERR "$k;$obj;$s\n";
+	  my $ntot = 0;
     for my $v (split (/;/, cvt ($k, $dat{$k}{$s}{$obj}, -1))){
       $out{$d}{$k}{$obj}{$v}++;
       $lnk{$k}{$obj}{$v}++;
       $foundCs{$v}++;
+      $ntot ++;
+		  last if $ntot > 25; # limit to 25 elements to avoid overload?
     }
   }
   for my $c (keys %foundCs){

@@ -1,41 +1,3 @@
-- Papers
-- Requirements
-- Are people using it that did not participate in the original
-hackathon (different tiers: informed, using, implementing stuff)
-
-how to be community building outside
--
-Online events good to inclode people who can not means to
-partticipate
-
-Main problems:
-a) register - but not come
-b) presence forses to work, remote allows slacking
-
-Have core people as informers/motivators on each team
-
-- People migration
-
-- Code migration
-
-- bridge
-
-
-If there are people who are willing to use resouce
-
-
-- just go and do.
-
-
-- Checkpoints - teams have internal times to work together
-fist checkpoint after 2 hours: team name, idea, job
-after 4-five hours, what happend, problems, next plans
-
-If teams have problems talk to individual teams.
-
-one on idea, resource, 
-
-
 # Python APIs
 are in github.com/ssc-oscar/oscar.py
 
@@ -83,8 +45,8 @@ Examples:
    * echo "Adam Tutko <atutko@vols.utk.edu>" | ~/lookup/getValues a2c
 
 Output:
-   Formatting: ;#ofCommitIds;CommitIds
-   Example: ;5;3ea51a41a5e6f85ce695d4ea56e789a10c9817e9;7c637bbfe419a71df5de89f358aeebf92a096129;
+   Formatting: ;CommitId0;...
+   Example: ;3ea51a41a5e6f85ce695d4ea56e789a10c9817e9;7c637bbfe419a71df5de89f358aeebf92a096129;
             c21fb159cd8fcb2c1674d353b0a0aaad1f7ed822;c2c65a39879bf443a430ba056ea892c51f0ff12d;
             d2ee19fffa494a1f75333c89c09fb2137444f203
 
@@ -105,7 +67,7 @@ Examples:
    * echo "Adam Tutko <atutko@vols.utk.edu>" | ~/lookup/getValues a2f
 
 Output:
-   Formatting: ;#ofFiles;FileNames
+   Formatting: ;FileNames
    Example: Adam Tutko <atutko@vols.utk.edu>;Adam Tutko <atutko@vols.utk.edu>;atutko.md;diffences.md;diffences.txt;proposal.md
    
 ```
@@ -125,8 +87,8 @@ Examples:
    * echo a7081031fc8f4fea0d35dd8486f8900febd2347e | ~/lookup/getValues b2c
 
 Output:
-   Formatting: "Blob-ID";#ofCommits;"Commit-IDs"
-   Example: a7081031fc8f4fea0d35dd8486f8900febd2347e;3;415feccd753c7f974dd94725eaad1e98e3743375;
+   Formatting: "Blob-ID";"Commit-IDs"
+   Example: a7081031fc8f4fea0d35dd8486f8900febd2347e;415feccd753c7f974dd94725eaad1e98e3743375;
             7365d601788017bb065c960cde2235f8ced27082;fe1ce9e5e8ebe83569c53ebe1f05f0688136ef2c
    
 ```
@@ -146,8 +108,8 @@ Examples:
    * echo fe1ce9e5e8ebe83569c53ebe1f05f0688136ef2c | ~/lookup/getValues c2b
 
 Output:
-   Formatting: Commit-ID;#ofBlob-IDs;Blob-ID
-   Example: fe1ce9e5e8ebe83569c53ebe1f05f0688136ef2c;1;a7081031fc8f4fea0d35dd8486f8900febd2347e
+   Formatting: Blob-ID;Blob-ID
+   Example: fe1ce9e5e8ebe83569c53ebe1f05f0688136ef2c;a7081031fc8f4fea0d35dd8486f8900febd2347e
 
 ```
 -----------
@@ -165,8 +127,8 @@ Examples:
    * echo fe1ce9e5e8ebe83569c53ebe1f05f0688136ef2c | ~/lookup/getValues c2p
    
 Output: 
-   Formatting: "Commit-ID";#ofProjects;ProjectNames
-   Example: e4af89166a17785c1d741b8b1d5775f3223f510f;12;W4D3_news;chumekaboom_news;fdac15_news;
+   Formatting: "Commit-ID";ProjectNames
+   Example: e4af89166a17785c1d741b8b1d5775f3223f510f;W4D3_news;chumekaboom_news;fdac15_news;
             fdac_syllabus;igorwiese_syllabus;jaredmichaelsmith_news;jking018_news;milanjpatel_news;
             rroper1_news;tapjdey_news;taurytang_syllabus;tennisjohn21_news
 ```
@@ -186,8 +148,8 @@ Examples:
    * echo atutko.md | ~/lookup/getValues f2c
    
 Output:
-   Formatting: "File Name";#ofCommit-IDs;Commit-IDs
-   Example: atutko.md;5;0a26e5acd9444f97f1a9e903117d957772a59c1d;3fc5c3db76306440a43460ab0fb52b27a01a2ab9;
+   Formatting: "File Name";Commit-IDs
+   Example: atutko.md;0a26e5acd9444f97f1a9e903117d957772a59c1d;3fc5c3db76306440a43460ab0fb52b27a01a2ab9;
             6176db8cb561292c5f0fdcd7d52eb3f1bca23b36;c21fb159cd8fcb2c1674d353b0a0aaad1f7ed822;
             c9ec77f6434319f9f9c417cf7f9c95ff64540223
             
@@ -207,8 +169,8 @@ Examples:
    * echo ArtiiQ_PocketMine-MP | ~/lookup/getValues p2c 
    
 Output: 
-   Formatting: "Project Name";#ofCommitIDs;Commit-IDs
-   Example: ArtiiQ_PocketMine-MP;4456;0000000bab11354f9a759332065be5f066c3398f;000a0dedd9364072cb0e64bc48f1fba82c9fba65;
+   Formatting: "Project Name";Commit-IDs
+   Example: ArtiiQ_PocketMine-MP;0000000bab11354f9a759332065be5f066c3398f;000a0dedd9364072cb0e64bc48f1fba82c9fba65;
    000ba5de528b3ea9680124f4fbe670867eafd2f8;000dfc860134262a46d8942a3c3b453528d99da9;.......
    
 ```
@@ -228,8 +190,8 @@ Examples:
    * echo fe1ce9e5e8ebe83569c53ebe1f05f0688136ef2c | ~/lookup/getValues c2cc
 
 Output:
-   Formatting: "Commit-ID";#ofCC;"Child-Commit-ID"
-   Example: fe1ce9e5e8ebe83569c53ebe1f05f0688136ef2c;1;65d49eee6fb6f0fa1d3a69af14ae43311da54907
+   Formatting: "Commit-ID";"Child-Commit-ID"
+   Example: fe1ce9e5e8ebe83569c53ebe1f05f0688136ef2c;65d49eee6fb6f0fa1d3a69af14ae43311da54907
    
 ```
 ----------
@@ -240,18 +202,18 @@ Output:
 This prints the file number of the .tch file associated with the passed ID.
 
 Command:
-   * echo "Blob, Commit, or Tree-ID" (no quotes) | /da3_data/lookup/splitSec.perl a 32 1
+   * echo "Blob, Commit, or Tree-ID" (no quotes) | ~/lookup/splitSec.perl a 32 1
 
 Examples: 
    Commit-IDs:
-      * echo 000000000001b58ef4d6727f61f4d7f8625feb72 | /da3_data/lookup/splitSec.perl a 32 1
+      * echo 000000000001b58ef4d6727f61f4d7f8625feb72 | ~/lookup/splitSec.perl a 32 1
       * echo e4af89166a17785c1d741b8b1d5775f3223f510f | /da3_data/lookup/splitSec.perl a 32 1
    Tree-IDs:
-      * echo f1b66dcca490b5c4455af319bc961a34f69c72c2 | /da3_data/lookup/splitSec.perl a 32 1
-      * echo 0f8d572eb262b0510788d3ee7445099a256be5cb | /da3_data/lookup/splitSec.perl a 32 1
+      * echo f1b66dcca490b5c4455af319bc961a34f69c72c2 | ~/lookup/splitSec.perl a 32 1
+      * echo 0f8d572eb262b0510788d3ee7445099a256be5cb | ~/lookup/splitSec.perl a 32 1
    Blob-IDs:
-      * echo 05fe634ca4c8386349ac519f899145c75fff4169 | /da3_data/lookup/splitSec.perl a 32 1
-      * echo a7081031fc8f4fea0d35dd8486f8900febd2347e | /da3_data/lookup/splitSec.perl a 32 1
+      * echo 05fe634ca4c8386349ac519f899145c75fff4169 | ~/lookup/splitSec.perl a 32 1
+      * echo a7081031fc8f4fea0d35dd8486f8900febd2347e | ~/lookup/splitSec.perl a 32 1
 
 Output:
    Formatting: #of.tchfile;ID
@@ -319,10 +281,12 @@ Examples:
 Output:
    Formatting:
       No Formatting Parameter: 
-         * "Commit-ID";"Tree-ID";"Parent-ID";Author;Committer
+         * "Commit-ID";"Tree-ID";"Parent-ID";"Author";"Committer";"Author Time";"Comitter Time"
       Parameter 1: 
-         * "Commit Message";"Commit-ID"
+         * "Commit-ID";"Commit Time No TZ";"Comitter"
       Parameter 2: 
+         * "Commit-ID";"Comitter";"Commit Time";"Commit Message"
+      Parameter 3: 
          * tree "Tree-ID"
            parent "Parent-ID"
            author "Author-ID"
@@ -330,23 +294,33 @@ Output:
                     
            "Commit Message"
            "Commit Message";"Commit-ID"
+      Parameter 4:
+         * "Commit-ID";"Comitter"
+      Parameter 5:
+         * "Commit-ID";"Parent-ID"
+      Parameter 6:
+         * "Commit-ID";"Commit Time No TZ";"Comitter";"Tree-ID";"Parent-ID"
       
    Examples:
       * No Formatting: 
-         * e4af89166a17785c1d741b8b1d5775f3223f510f;f1b66dcca490b5c4455af319bc961a34f69c72c2;
-           c19ff598808b181f1ab2383ff0214520cb3ec659;Audris Mockus <audris@utk.edu>;
-           Audris Mockus <audris@utk.edu>;1410029988 -0400;1410029988 -0400 
+         * e4af89166a17785c1d741b8b1d5775f3223f510f;f1b66dcca490b5c4455af319bc961a34f69c72c2;c19ff598808b181f1ab2383ff0214520cb3ec659;Audris Mockus <audris@utk.edu>;Audris Mockus <audris@utk.edu>;1410029988 -0400;1410029988 -0400
       * Parameter 1: 
-         * News for Sep 5;e4af89166a17785c1d741b8b1d5775f3223f510f
+         * e4af89166a17785c1d741b8b1d5775f3223f510f;1410029988;Audris Mockus <audris@utk.edu>
       * Parameter 2: 
-         * tree f1b66dcca490b5c4455af319bc961a34f69c72c2
-           parent c19ff598808b181f1ab2383ff0214520cb3ec659
-           author Audris Mockus <audris@utk.edu> 1410029988 -0400
-           committer Audris Mockus <audris@utk.edu> 1410029988 -0400
-           
-           News for Sep 5
-           News for Sep 5;e4af89166a17785c1d741b8b1d5775f3223f510f
+         * e4af89166a17785c1d741b8b1d5775f3223f510f;Audris Mockus <audris@utk.edu>;1410029988 -0400;News for Sep 5
+      * Parameter 3: 
+         *  tree f1b66dcca490b5c4455af319bc961a34f69c72c2
+            parent c19ff598808b181f1ab2383ff0214520cb3ec659
+            author Audris Mockus <audris@utk.edu> 1410029988 -0400
+            committer Audris Mockus <audris@utk.edu> 1410029988 -0400
 
+            News for Sep 5
+      * Parameter 4: 
+         * e4af89166a17785c1d741b8b1d5775f3223f510f;Audris Mockus <audris@utk.edu>
+      * Parameter 5:
+         * e4af89166a17785c1d741b8b1d5775f3223f510f;c19ff598808b181f1ab2383ff0214520cb3ec659
+      * Parameter 6:  
+         * e4af89166a17785c1d741b8b1d5775f3223f510f;1410029988;Audris Mockus <audris@utk.edu>;f1b66dcca490b5c4455af319bc961a34f69c72c2;c19ff598808b181f1ab2383ff0214520cb3ec659
 ```
 ------------
 
@@ -384,16 +358,23 @@ Examples:
    * echo a7081031fc8f4fea0d35dd8486f8900febd2347e | ~/lookup/showCnt blob
    
 Output:
-   Formatting: "Content of the blob"
+   Formatting:
+      No Formatting Parameter: 
+         * "Content of the blob"
+      Parameter 1:
+         * "Content of the blob with new lines replaced with \n"
    Examples:
-              # Syllabus for "Fundamentals of Digital Archeology"
-              ## News
-                 * Assignment1 due Monday Sep 8 before 2:30PM
-                 * Be ready to present your findings from Assignment1 on Monday
-                 * Project 1 teams are formed! You should see Team? where ? is 1-5 in your github page (on the right)
-                 * Lecture slides are at [Data Discovery](https://github.com/fdac/presentations/dd.pdf)
-                 * Sep 5 lecture recording failed as 323Link (host for the recording) went down
-                 ......
+      No Formatting Parameter: 
+         * # Syllabus for "Fundamentals of Digital Archeology"
+            ## News
+               * Assignment1 due Monday Sep 8 before 2:30PM
+               * Be ready to present your findings from Assignment1 on Monday
+               * Project 1 teams are formed! You should see Team? where ? is 1-5 in your github page (on the right)
+               * Lecture slides are at [Data Discovery](https://github.com/fdac/presentations/dd.pdf)
+               * Sep 5 lecture recording failed as 323Link (host for the recording) went down
+               ......
+      Parameter 1:
+         *  # Syllabus for "Fundamentals of Digital Archeology"\n\n## News\n\n* Assignment1 due Monday Sep 8 before 2:30PM\n* Be ready to present your findings from Assignment1 on Monday\n* Project 1 teams are formed! You should see Team? where ? is 1-5 in your github page (on the right)\n* Lecture slides are at [Data Discovery](https://github.com/fdac/presentations/dd.pdf)\n* Sep 5 lecture recording failed as 323Link (host for the recording) went down\n
    
 ```
 -----------
@@ -404,13 +385,13 @@ The below commands were all run on the da4 server due to SSDS requirements.
 
 
 Run Command 2 to get a list of File Names made by an Author:
-   echo "Adam Tutko <atutko@vols.utk.edu>" | /da3_data/lookup/Prj2FileShow.perl /da0_data/basemaps/a2fFullO 1 32
+   echo "Adam Tutko <atutko@vols.utk.edu>" | ~/lookup/Prj2FileShow.perl /da0_data/basemaps/a2fFullO 1 32
 Output: 
 Adam Tutko <atutko@vols.utk.edu>;4;diffences.md;diffences.txt;proposal.md;atutko.md
 
 
 Run Command 6 with one of the File Names to get Commit-IDs associated with the chosen File Name:
-   echo atutko.md |/da3_data/lookup/Prj2CmtShow.perl /da0_data/basemaps/f2cFullO 1 32
+   echo atutko.md |~/lookup/Prj2CmtShow.perl /da0_data/basemaps/f2cFullO 1 32
 Output: 
 atutko.md;5;0a26e5acd9444f97f1a9e903117d957772a59c1d;3fc5c3db76306440a43460ab0fb52b27a01a2ab9;
 6176db8cb561292c5f0fdcd7d52eb3f1bca23b36;c21fb159cd8fcb2c1674d353b0a0aaad1f7ed822;
@@ -418,7 +399,7 @@ c9ec77f6434319f9f9c417cf7f9c95ff64540223
 
 
 Run Command 5 using any of the Commit-IDs to get the Project Name associated with the Commit:
-   echo 0a26e5acd9444f97f1a9e903117d957772a59c1d | /da3_data/lookup/Cmt2PrjShow.perl /da0_data/basemaps/c2pFullP 1 32
+   echo 0a26e5acd9444f97f1a9e903117d957772a59c1d | ~/lookup/Cmt2PrjShow.perl /da0_data/basemaps/c2pFullP 1 32
 Output: 
 0a26e5acd9444f97f1a9e903117d957772a59c1d;1;CS340-19_students
 
@@ -534,76 +515,235 @@ for i in {0..127}; do time zcat RS$i.cs  | perl -I ~/lookup -I ~/lib64/perl5 ~/l
 (i=0;zcat RS$i.gz|perl -I $HOME/lib64/perl5 -I $HOME/lookup -e 'use cmt; while(<STDIN>){ chop (); s|;/|;|g; @r = split(/;/); $r[$#r] = "long" if $r[$#r] =~ / /&& length($r[$#r]) > 300; print "".(join ";", @r)."\n" if ! defined $badCmt{$r[0]};}' | lsort 5G | gzip > RS$i.s)
 
 (i=0; lsort 3G -t\; -k1,1 --merge <(zcat c2fbbFullR$i.s) <(zcat RS$i.s) | gzip > c2fbbFullS$i.s) &
-```
+````
 
-#on dad2
+#on dad2 (also in c2ta.pbs)
 #do Authors
 ```
 ver=S
 cd /store/cmts
-#fix timestamp to sort properly and make nonsense (11 digit) time zero
-for j in {0..127..4}; do $HOME/lookup/lstCmt.perl 1 $j | perl -ane '@x=split(/;/, $_, -1); $x[1] = 0 if length($x[1]) > 10; $x[1] = sprintf "%.10d", $x[1]; print "".(join ";", @x);' | lsort 30G -t\; -k1,2 | gzip > c2taFull$ver$j.s; done &
-for j in {1..127..4}; do $HOME/lookup/lstCmt.perl 1 $j | perl -ane '@x=split(/;/, $_, -1); $x[1] = 0 if length($x[1]) > 10; $x[1] = sprintf "%.10d", $x[1]; print "".(join ";", @x);' | lsort 30G -t\; -k1,2 | gzip > c2taFull$ver$j.s; done &
-for j in {2..127..4}; do $HOME/lookup/lstCmt.perl 1 $j | perl -ane '@x=split(/;/, $_, -1); $x[1] = 0 if length($x[1]) > 10; $x[1] = sprintf "%.10d", $x[1]; print "".(join ";", @x);' | lsort 30G -t\; -k1,2 | gzip > c2taFull$ver$j.s; done &
-for j in {3..127..4}; do $HOME/lookup/lstCmt.perl 1 $j | perl -ane '@x=split(/;/, $_, -1); $x[1] = 0 if length($x[1]) > 10; $x[1] = sprintf "%.10d", $x[1]; print "".(join ";", @x);' | lsort 30G -t\; -k1,2 | gzip > c2taFull$ver$j.s; done &
-wait
-for j in {0..31..4}; do zcat c2taFull$ver$j.s | lsort 30G -t\; -k1,2 --merge - <(zcat c2taFull$ver$(($j+32)).s) <(zcat c2taFull$ver$(($j+64)).s) <(zcat c2taFull$ver$(($j+96)).s) | awk -F\; '{print $3";"$1}' | ~/lookup/splitSecCh.perl a2cFull$ver.$j. 32; done &
-for j in {1..31..4}; do zcat c2taFull$ver$j.s | lsort 30G -t\; -k1,2 --merge - <(zcat c2taFull$ver$(($j+32)).s) <(zcat c2taFull$ver$(($j+64)).s) <(zcat c2taFull$ver$(($j+96)).s) | awk -F\; '{print $3";"$1}' | ~/lookup/splitSecCh.perl a2cFull$ver.$j. 32; done & 
-for j in {2..31..4}; do zcat c2taFull$ver$j.s | lsort 30G -t\; -k1,2 --merge - <(zcat c2taFull$ver$(($j+32)).s) <(zcat c2taFull$ver$(($j+64)).s) <(zcat c2taFull$ver$(($j+96)).s) | awk -F\; '{print $3";"$1}' | ~/lookup/splitSecCh.perl a2cFull$ver.$j. 32; done & 
-for j in {3..31..4}; do zcat c2taFull$ver$j.s | lsort 30G -t\; -k1,2 --merge - <(zcat c2taFull$ver$(($j+32)).s) <(zcat c2taFull$ver$(($j+64)).s) <(zcat c2taFull$ver$(($j+96)).s) | awk -F\; '{print $3";"$1}' | ~/lookup/splitSecCh.perl a2cFull$ver.$j. 32; done & 
-wait
-for j in {0..31}
-do for i in {0..31}
-  do zcat a2cFull$ver.$i.$j.gz | lsort 4G -t\; -k1,2 | gzip > a2cFull$ver.$i.$j.s &
-  done
-  wait
-  echo done $j
-done
-for j in {0..31}; do str="lsort 30G -u --merge -t\; -k1,2"; for i in {0..31}; do str="$str <(zcat a2cFull$ver.$i.$j.s)"; done; eval $str | gzip > a2cFull$ver.$j.s; done &
-wait
-for j in {0..31}; do zcat a2cFull$ver.$j.s | cut -d\; -f1 | uniq | gzip > a$ver$j.s & done
-wait
-str="lsort 30G -u --merge -t\; -k1,1"
-for i in {0..31}; do str="$str <(zcat a$ver$i.s)"; done; 
-eval $str | gzip > a$ver.s
-# create databases
-for j in {0..31}; do zcat a2cFull$ver.$j.s | ~/lookup/s2hBinSorted.perl /fast/a2cFull$ver.$j.tch; done &
-for i in {0..31}; do zcat c2taFull$ver$i.s c2taFull$ver$(($i+32)).s c2taFull$ver$(($i+64)).s c2taFull$ver$(($i+96)).s  | ~/lookup/Cmt2taBin.perl /fast/c2taFull$ver.$i.tch 1; done &
-wait
 
-scp -p a$ver.s c2taFull$ver{[0-9],[1-9][0-9],1[0-9][0-9]}.s da3:/data/basemaps/gz
-scp -p /fast/a2cFull$ver.{[0-9],[1-3][0-9]}.tch da0:/data/basemaps/
+for i in {0..31}; do sed "s|WHAT|c2dat|g;s|FROM|$i|g;s|MACHINE|beacon|" ~/lookup/c2ta.pbs  | qsub ; sleep 1; done
 
-# commit to parent commit
-for i in {0..31..4}; do ~/lookup/Cmt2Par.perl $i $ver | gzip > cnpFull$ver.$i; done &
-...
-wait
-scp -p cnpFull$ver.* da0:/data/basemaps/gz
-for i in {0..31}; do ~/lookup/lst.perl /fast/c2pcFullS.$i.tch  | perl -ane 'chop();($c,@pc)=split(/;/,$_,-1);for $p (@pc){print "$p;$c\n";}' | gzip > pc2c.$i; done
-# run on beacon to produce c2ccFullS*.s
-# create small (0) tch files via h2h
-for j in {0..31}; do zcat c2ccFull$ver$j.s | ~/lookup/h2hBinSorted.perl /fast/c2ccFull$ver.$j.tch 0; done 
-# commit to child commit - takes long and misses some commits: don't use, removed
-# time ~/lookup/Cmt2ChldCUpdt.perl /fast/c2ccFull$ver 2480391
-# 2564m33
+for i in {0..15}; do sed "s|WHAT|c2tasplit|g;s|FROM|$i|g;s|MACHINE|beacon|" ~/lookup/c2ta.pbs  | qsub ; sleep 1; done
+for i in {0..7}; do sed "s|WHAT|a2cmerge|g;s|FROM|$i|g;s|MACHINE|beacon|" ~/lookup/c2ta.pbs  | qsub ; sleep 1; done
+sed "s|WHAT|as|g;s|FROM|$i|g;s|MACHINE|beacon|" ~/lookup/c2ta.pbs  | qsub
+
+for i in {0..15}; do sed "s|WHAT|pc2csplit|g;s|FROM|$i|g;s|MACHINE|beacon|" ~/lookup/c2ta.pbs  | qsub ; sleep 1; done
+for i in {0..15}; do sed "s|WHAT|t2csplit|g;s|FROM|$i|g;s|MACHINE|beacon|" ~/lookup/c2ta.pbs  | qsub ; sleep 1; done
+
+for i in {0..7}; do sed "s|WHAT|t2cmerge|g;s|FROM|$i|g;s|MACHINE|beacon|" ~/lookup/c2ta.pbs  | qsub ; sleep 1; done
+for i in {0..7}; do sed "s|WHAT|c2ccmerge|g;s|FROM|$i|g;s|MACHINE|beacon|" ~/lookup/c2ta.pbs  | qsub ; sleep 1; done
+
+
+scp -p a$ver.s c2datFull${ver}{[0-9],[1-9][0-9],1[0-9][0-9]}.s {a2c,t2c,c2cc}Full${ver}{[0-9],[12][0-9],3[01]}.s da3:/data/basemaps/gz
+
+# create databases a2c, c2ta, t2c, c2cc, c2pc
+
+for j in {0..31}; do zcat a2cFull$ver$j.s | ~/lookup/s2hBinSorted.perl ../a2cFull$ver.$j.tch; done &
+for i in {0..31}; do zcat c2datFull$ver$i.s c2datFull$ver$(($i+32)).s c2datFull$ver$(($i+64)).s c2datFull$ver$(($i+96)).s  | ~/lookup/Cmt2taBin.perl /fast/c2taFull$ver.$i.tch 1; done &
+for i in {0..31}; do zcat t2cFull$ver$i.s | ~/lookup/h2hBinSorted.perl ../t2cFull$ver.$i.tch 1; done &
+
+scp -p ../{a2c,t2c,c2ta}Full$ver.{[0-9],[1-3][0-9]}.tch da0:/data/basemaps/
+
+
+# create from scratch
+for j in {0..31}; do zcat c2ccFull$ver$j.s | ~/lookup/h2hBinSorted.perl ../c2ccFull$ver.$j.tch 0; done &
+for j in {0..31}; do zcat c2datFull$ver$j.s c2datFull$ver$(($j+32)).s c2datFull$ver$(($j+64)).s c2datFull$ver$(($j+96)).s  | perl -ane 'chop();($c,$ti,$a,$t,$pp)=split(/;/,$_,-1);for $p (split(/:/,$pp,-1)){print "$c;$p\n" if $p=~/^[0-9a-f]{40}$/}'  | ~/lookup/h2hBinSorted.perl ../c2pcFull$ver.$j.tch 0; done &
+
+# or update c2pc/c2cc
+for i in {0..127}; do to=$(tail -1 /data/All.blobs/commit_$i.idx | cut -d\; -f1); fr=$(head -$((1+$i)) /data/All.commits.$pVer|tail -1| cut -d\; -f1); tail -$(($to-$fr+1)) /data/All.blobs/commit_$i.idx | ~/lookup/c2pc.perl /data/All.blobs/commit_$i.bin /fast/c2pcFullS.$((i%32)).tch; done # >> /data/cnpFull$pVer-$ver.$i
+for i in {0..127}; do to=$(tail -1 /data/All.blobs/commit_$i.idx | cut -d\; -f1); fr=$(head -$((1+$i)) /data/All.commits.$pVer|tail -1| cut -d\; -f1); tail -$(($to-$fr+1)) /data/All.blobs/commit_$i.idx | ~/lookup/c2cc.perl /data/All.blobs/commit_$i.bin $ver; done 
+
+
 
 # c2r may change if the formerly undefined commit is retrieved and
 # has a parent
 # first seed with roots/leaves up to 10th-level
 time for k in {0..9}; do ~/lookup/Cmt2RootNew.perl S $k; done
 #218m21.025s
-time for i in 0; do echo $i; time ~/lookup/Cmt2Root.perl $i ${ver}; done
+time for i in {0..31}; do echo $i; time ~/lookup/Cmt2Root.perl $i ${ver}; done
+0-th 13354m; 1-2286m; 2-3643m, 3-983m,...6-257m, ...28-213m
 
-time for i in {0..9}; do ~/lookup/Cmt2HeadNew.perl $ver $i; done
+time for i in {0..31}; do ~/lookup/Cmt2HeadNew.perl $ver $i; done
 #996m
-time for i in 0; do echo $i; time ~/lookup/Cmt2Head.perl $i ${ver}; done
-
+time for i in {0..31}; do echo $i; time ~/lookup/Cmt2Head.perl $i ${ver}; done
+#0-th 18357m 1-2341m 2-1242m, 4-609m, ..., 7-341m
 
 # now deal with the remaining commits
 time for i in {0..31}; do echo $i; ~/lookup/Cmt2Root.perl $i ${ver}; done 
 time for i in {0..31}; do time ~/lookup/Cmt2Head.perl $i ${ver}; done
 # 6926m on i=0, 758m on i=1 481m on i=2 347m on i=3 262m on i=4 221m on i=5...117m on i=10 79m i=19 65m i=30
-```
+
+for i in {0..127}; do sed "s/VER/S/g;s|WHAT|p2p|g;s|FROM|$i|g;s|MACHINE|beacon|" ~/lookup/fork.pbs  | qsub ; sleep 1; done
+for i in {0..15}; do sed "s/VER/S/g;s|WHAT|MERGE|g;s|FROM|$i|g;s|MACHINE|beacon|" ~/lookup/fork.pbs  | qsub ; sleep 1; done
+sed "s/VER/S/g;s|WHAT|MERGEM|g;s|FROM|$i|g;s|MACHINE|beacon|;s|ppn=1|ppn=2|" ~/lookup/fork.pbs  | qsub ; sleep 1
+
+# once community detection is done: defork (c2P, P2c)
+#produces c2P
+for i in {0..63}; do sed "s|WHAT|defork|g;s|FROM|$i|g;s|VER|S|;s|MACHINE|beacon|;s|ppn=1|ppn=2|" ~/lookup/fork.pbs  | qsub ; sleep 1; done
+#produces P2c (P2p2c may be too slow)
+for i in {0..15}; do sed "s|WHAT|deforkP|g;s|FROM|$i|g;s|VER|S|;s|MACHINE|beacon|" ~/lookup/fork.pbs  | qsub ; sleep 1; done
+for i in {0..15}; do sed "s|WHAT|deforkPm|g;s|FROM|$i|g;s|VER|S|;s|MACHINE|beacon|" ~/lookup/fork.pbs  | qsub ; sleep 1; done
+
+
+#create project-based social network (needs c2P and c2dat), produces .na2a.s
+#produces P2a
+for i in {0..15}; do sed "s|WHAT|P2asplit|g;s|FROM|$i|g;s|VER|S|;s|MACHINE|beacon|" ~/lookup/a2p.pbs | qsub; sleep 1; done 
+for i in {0..15}; do sed "s|WHAT|P2amerge|g;s|FROM|$i|g;s|VER|S|;s|MACHINE|beacon|" ~/lookup/a2p.pbs | qsub; sleep 1; done 
+
+#produces .na2a. needs P2amerge
+for i in {0..31}; do sed "s|WHAT|a2a|g;s|FROM|$i|g;s|VER|S|;s|MACHINE|beacon|" ~/lookup/a2p.pbs | qsub; sleep 1; done
+sed "s|WHAT|a2amerge|g;s|FROM|$i|g;s|VER|S|;s|MACHINE|beacon|;s|ppn=1|ppn=2|" ~/lookup/a2p.pbs | qsub
+
+#produces a2P, needs P2amerge
+for i in {0..3}; do sed "s|WHAT|a2Pmerge|g;s|FROM|$i|g;s|VER|S|;s|MACHINE|beacon|" ~/lookup/a2p.pbs | qsub; sleep 1; done 
+for i in {0..15}; do sed "s|WHAT|a2A|g;s|FROM|$i|g;s|VER|S|;s|MACHINE|beacon|" ~/lookup/a2p.pbs | qsub; sleep 1; done 
+for i in {0..15}; do sed "s|WHAT|a2Asrt|g;s|FROM|$i|g;s|VER|S|;s|MACHINE|beacon|" ~/lookup/a2p.pbs | qsub; sleep 1; done 
+for i in {0..3}; do sed "s|WHAT|A2Pmerge|g;s|FROM|$i|g;s|VER|S|;s|MACHINE|beacon|" ~/lookup/a2p.pbs | qsub; sleep 1; done 
+
+
+#clean by cut
+sed "s|WHAT|top|g;s|FROM|$i|g;s|VER|S|;s|MACHINE|beacon|" ~/lookup/a2p.pbs | qsub
+
+
+for cut in 1000 100 10
+do for i in {0..7}; do sed "s|WHAT|A2Acut|g;s|CUT|$cut|g;s|FROM|$i|g;s|VER|S|;s|MACHINE|beacon|" ~/lookup/a2p.pbs | qsub; sleep 1; done
+done
+for cut in 1000 100 10
+do sed "s|WHAT|A2Acutm|g;s|CUT|$cut|g;s|VER|S|;s|MACHINE|beacon|;s|ppn=1|ppn=2|" ~/lookup/a2p.pbs | qsub
+done
+
+scp -p P2AFull$ver.nA2A*.s da5:/data/play/forks
+
+zcat pS.s| awk -F\; '{print $1";"$1}' | perl ~/lookup/mp.perl 1 c2pFullS.np2pu.PLMmap.forks  | gzip > p2PS.s
+zcat p2PS.s | awk -F\; '{print $2"\;"$1}' | lsort 5G -t\; -k1,2 | gzip > P2pS.s 
+scp -p P2pS.s p2PS.s {a2P,P2a}Full${ver}{[0-9],[12][0-9],3[01]}.s da3:/data/basemaps/gz
+scp -p {P2c,c2P}Full${ver}{[0-9],[1-9][0-9],1[0-2][0-9]}.s da3:/data/basemaps/gz
+
+# p2a/a2p
+for i in {0..127}; do sed "s|WHAT|split|g;s|FROM|$i|g;s|VER|S|;s|MACHINE|beacon|" ~/lookup/a2p.pbs | qsub; sleep 1; done 
+for i in {0..31}; do sed "s|WHAT|merge|g;s|FROM|$i|g;s|VER|S|;s|MACHINE|beacon|" ~/lookup/a2p.pbs | qsub; sleep 1; done 
+for i in {0..7}; do sed "s|WHAT|a2psplit|g;s|FROM|$i|g;s|VER|S|;s|MACHINE|beacon|" ~/lookup/a2p.pbs | qsub; sleep 1; done 
+for i in {0..31}; do sed "s|WHAT|a2pmerge|g;s|FROM|$i|g;s|VER|S|;s|MACHINE|beacon|" ~/lookup/a2p.pbs | qsub; sleep 1; done 
+scp -p {a2p,p2a}Full${ver}{[0-9],[12][0-9],3[01]}.s da3:/data/basemaps/gz
+
+
+#produce a2p, p2a, p2P, P2p, a2P, P2a, c2P, P2c
+for j in {0..31}; do zcat a2pFull$ver$j.s | ~/lookup/s2sBinSorted.perl ../a2pFull$ver.$j.tch; done &
+for j in {0..31}; do zcat p2aFull$ver$j.s | ~/lookup/s2sBinSorted.perl ../p2aFull$ver.$j.tch; done &
+
+for j in {0..31}; do zcat a2PFull$ver$j.s | ~/lookup/s2sBinSorted.perl ../a2PFull$ver.$j.tch; done &
+for j in {0..31}; do zcat P2aFull$ver$j.s | ~/lookup/s2sBinSorted.perl ../P2aFull$ver.$j.tch; done &
+zcat p2P$ver.s | ~/lookup/s2sBinSorted.perl ../p2PFull$ver.tch 1 &
+zcat P2p$ver.s | ~/lookup/s2sBinSorted.perl ../P2pFull$ver.tch 1 &
+for i in {0..31}; do zcat c2PFull$ver{$i,$(($i+32)),$(($i+64)),$(($i+96)).s | ~/lookup/h2sBinSorted.perl ../c2PFull$ver.$i.tch; done &
+for i in {0..31}; do zcat P2cFull${ver}{$i,$(($i+32)),$(($i+64)),$(($i+96))}.s  | ~/lookup/s2hBinSorted.perl ../P2cFull$ver.$i.tch; done &
+
+
+#do ctags
+for i in {0..127}
+do mkdir -p /fast/tags$i; 
+cd /fast/tags$i; 
+lst=$(head -$((i+1)) /da4_data/All.blobs.R | tail -1|cut -d\; -f1)
+tot=$(tail -1 /da4_data/All.blobs/blob_$i.idx|cut -d\; -f1)
+tail -$(($tot-$lst)) /da4_data/All.blobs/blob_$i.idx | awk -F\; '{if(NF>5){print $5";"$2";"$3}else{print $4";"$2";"$3}}' | perl -I ~/lookup/ -I ~/lib64/perl5 ~/lookup/ctags2.perl $i tkns$i
+
+| ~/lookup/lstShow.perl /fast/b2ffFull${ver}.$i.tch h s 2> /data/basemaps/gz/blob_$i.idx.noFname | gzip > /data/basemaps/gz/blob_$i.idx.fname
+time zcat /data/basemaps/gz/blob_$i.idx.fname | perl -I ~/lookup/ -I ~/lib64/perl5 ~/lookup/ctags1.perl $i tkns$i 2> tkns$i.err
+done
+
+
+#after the diffs do b/f maps
+
+for i in {0..63}; do sed "s|WHAT|prep|g;s|FROM|$i|g;s|VER|S|;s|MACHINE|beacon|" ~/lookup/b2ob.pbs | qsub; sleep 1; done
+wait
+for t in c2b b2f c2f b2ta b2ob ob2b; do for i in {0..63}; do sed "s|WHAT|$t|g;s|FROM|$i|g;s|VER|S|;s|MACHINE|beacon|" ~/lookup/b2ob.pbs | qsub; sleep 1; done; done
+#after b2ta, b2ob, b2f, ob2b, 
+for t in b2fm  b2tam b2obm ob2bm; do for i in {0..63}; do sed "s|WHAT|$t|g;s|FROM|$i|g;s|VER|S|;s|MACHINE|beacon|" ~/lookup/b2ob.pbs | qsub; sleep 1; done; done
+#after b2tam, c2f, c2b
+for t in P2b b2P a2f P2f b2fa; do for i in {0..15}; do sed "s|WHAT|$t|g;s|FROM|$i|g;s|VER|S|;s|MACHINE|beacon|" ~/lookup/b2ob.pbs | qsub; sleep 1; done; done
+#after b2fa
+for t in a2fb; do for i in {0..15}; do sed "s|WHAT|$t|g;s|FROM|$i|g;s|VER|S|;s|MACHINE|beacon|" ~/lookup/b2ob.pbs | qsub; sleep 1; done; done
+#after b2fm and c2f c2b
+for t in f2b b2c f2c; do for i in {0..63}; do sed "s|WHAT|$t|g;s|FROM|$i|g;s|VER|S|;s|MACHINE|beacon|" ~/lookup/b2ob.pbs | qsub; sleep 1; done; done
+#after f2c, f2b
+for t in f2cm f2bm b2cm; do for i in {0..63}; do sed "s|WHAT|$t|g;s|FROM|$i|g;s|VER|S|;s|MACHINE|beacon|" ~/lookup/b2ob.pbs | qsub; sleep 1; done; done
+#after a2f a2fb, P2b, P2f
+for t in a2fbm a2fm P2bm b2Pm P2fm; do for i in {0..15}; do sed "s|WHAT|$t|g;s|FROM|$i|g;s|VER|S|;s|MACHINE|beacon|" ~/lookup/b2ob.pbs | qsub; sleep 1; done; done
+
+#map files to idx
+for t in addf; do for i in {0..63}; do sed "s|WHAT|$t|g;s|FROM|$i|g;s|VER|S|;s|MACHINE|beacon|" ~/lookup/b2ob.pbs | qsub; sleep 1; done; done
+for t in addf1; do for i in {0..63}; do sed "s|WHAT|$t|g;s|FROM|$i|g;s|VER|S|;s|MACHINE|beacon|" ~/lookup/b2ob.pbs | qsub; sleep 1; done; done
+
+#get tokens and imports (requires corresponding blob_*.bin)
+for fr in {0..127}; do for t in ctags; do for j in {0..31}; do sed "s|WHAT|$t|g;s|FROM|$fr|g;s|PRT|$j|;s|VER|S|;s|MACHINE|beacon|;s|:ppn=1|:ppn=1|" ~/lookup/b2ob.pbs | qsub; sleep 1; done; donefor t in ; do for j in {0..31}; do sed "s|WHAT|$t|g;s|FROM|$fr|g;s|PRT|$j|;s|VER|S|;s|MACHINE|beacon|;s|:ppn=1|:ppn=1|" ~/lookup/b2ob.pbs | qsub; sleep 1; done; done; done
+#depends on the $fr being complete on the previous stage				      
+for fr in {0..127}; do for t in toparse; do for j in {0..31}; do sed "s|WHAT|$t|g;s|FROM|$fr|g;s|PRT|$j|;s|VER|S|;s|MACHINE|beacon|;s|:ppn=1|:ppn=1|" ~/lookup/b2ob.pbs | qsub; sleep 1; done; done; done
+
+b2tk  | b2P b2c b2ta b2fa b2f b2ob ob2b 
+f2a? | f2b f2c
+| a2f a2fb 
+| b2P P2f P2b
+c2td | c2b c2f
+td2c td2f
+
+
+#run on da5
+ver=S
+where=/data/basemaps/gz
+cvt=h2h
+for w in c2b b2c ob2b b2ob #b2ob and ob2b are on ssh da2
+do for o in {0..3}
+  do for i in $(eval echo "{$o..31..4}"); do ssh -p443 da3.local "zcat $where/${w}Full${ver}{$i,$(($i+32)),$(($i+64)),$(($i+96))}.s" < /dev/null | ~/lookup/${cvt}BinSorted.perl /fast/${w}Full${ver}.$i.tch; done &
+  done
+done
+cvt=h2s
+for w in c2f b2f 
+do for o in {0..3}
+  do for i in $(eval echo "{$o..31..4}"); do ssh -p443 da3.local  "zcat $where/${w}Full${ver}{$i,$(($i+32)),$(($i+64)),$(($i+96))}.s" < /dev/null | ~/lookup/${cvt}BinSorted.perl /fast/${w}Full${ver}.$i.tch; done &
+  done
+done
+(cvt=h2s; w=b2P; for i in {0..31}; do time ssh -p443 da3.local  "zcat $where/${w}Full${ver}{$i,$(($i+32)),$(($i+64)),$(($i+96))}.s" < /dev/null | ~/lookup/${cvt}BinSorted.perl /fast/${w}Full${ver}.$i.tch;done) &
+# c2ta, b2fa
+(cvt=b2fac; w=b2fa; for i in {0..31}; do time ssh -p443 da3.local  "zcat $where/${w}Full${ver}{$i,$(($i+32)),$(($i+64)),$(($i+96))}.s" < /dev/null | ~/lookup/${cvt}BinSorted.perl /fast/${w}Full${ver}.$i.tch;done) &
+(w=c2dat; for i in {0..31}; do ssh -p443 da3.local  "zcat $where/${w}Full${ver}{$i,$(($i+32)),$(($i+64)),$(($i+96))}.s" < /dev/null | ~/lookup/Cmt2FieldsBinSorted.perl /fast/${w}Full${ver}.$i.tch 1;done) &
+(cvt=s2s; w=a2f; for i in {0..31}; do time ssh -p443 da3.local  "zcat $where/${w}Full${ver}$i.s" < /dev/null | ~/lookup/${cvt}BinSorted.perl /fast/${w}Full${ver}.$i.tch;done) &
+(cvt=s2s; w=P2f; for i in {0..31}; do time ssh -p443 da3.local  "zcat $where/${w}Full${ver}$i.s" < /dev/null | ~/lookup/${cvt}BinSorted.perl /fast/${w}Full${ver}.$i.tch;done) &
+(cvt=s2h; w=P2b; for i in {0..31}; do time ssh -p443 da3.local  "zcat $where/${w}Full${ver}$i.s" < /dev/null | ~/lookup/${cvt}BinSorted.perl /fast/${w}Full${ver}.$i.tch;done) &
+cvt=s2h
+for w in f2b f2c 
+do for o in {0..3}
+   do for i in $(eval echo "{$o..31..4}"); do ssh -p443 da3.local  "zcat $where/${w}Full${ver}{$i,$(($i+32)),$(($i+64)),$(($i+96))}.s" < /dev/null | ~/lookup/${cvt}BinSorted.perl /fast/${w}Full${ver}.$i.tch; done &
+  done
+done
+#f2a? no longer relevant?
+
+#prep data for mongodb
+for i in {0..127}; do zcat c2PFullS$i.s | join -t\; - <(zcat c2datFullS$i.s) | cut -d\; -f2,3; done | perl -e 'while (<STDIN>){chop();($p,$t)=split(/;/,$_,-1);$pmi{$p}=$t if ($pmi{$p}>$t || !defined $pmi{$p}) && $t > 100000000;$pma{$p}=$t if $pma{$p}<$t || !defined $pma{$p}} for $p (sort keys %pmi){print "$p;$pmi{$p};$pma{$p}\n"}'  | gzip > P2tspanFullS.s
+for i in {0..127}; do zcat c2datFullS$i.s | cut -d\; -f2,3; done | perl -e 'while (<STDIN>){chop();($t,$p)=split(/;/,$_,-1);$pmi{$p}=$t if ($pmi{$p}>$t || !defined $pmi{$p}) && $t > 100000000;$pma{$p}=$t if $pma{$p}<$t || !defined $pma{$p}} for $p (sort keys %pmi){print "$p;$pmi{$p};$pma{$p}\n"}'  | gzip > a2tspanFullS.s
+zcat P2tspanFullS.s| ~/lookup/splitSecCh.perl P2tspanFullS 32 
+zcat a2tspanFullS.s| ~/lookup/splitSecCh.perl a2tspanFullS 32 
+for i in {0..31}; do zcat P2tspanFullS$i.s | join -t\; - <(zcat P2summFullS$i.s | lsort 40G -t\; -k1,1) | perl ~/lookup/prjToMongo.perl; done 
+for i in {0..31}; do zcat a2tspanFullS$i.gz | join -t\; - <(zcat a2summFullS$i.s | lsort 40G -t\; -k1,1) | perl ~/lookup/authToMongo.perl; done 
+
+
+zcat a2tspanFullS.s| ~/lookup/splitSecCh.perl a2tspanFullS 32
+for i in {0..31}; do time perl ~/lookup/prjSummary.perl S $i | gzip > P2summFullS$i.s; done &
+for i in {0..31}; do time perl ~/lookup/authSummary.perl S $i | gzip > a2summFullS$i.s; done &
+
+
+(w=b2tk; for i in {0..31}; do ssh -p443 da3.local  "zzcat $where/${w}Full${ver}{$i,$(($i+32)),$(($i+64)),$(($i+96))}.s" < /dev/null  | ~/lookup/Cmt2FieldsBinSorted.perl /fast/${w}Full${ver}.$i.tch 1;done) &
+
+# a2fb lookup/updateCFBR.pbs
+for i in {0..31}; do ssh -p443 da3.local  "zcat  $where/a2fbFull$ver{$i,$(($i+32)),$(($i+64)),$(($i+96))}.s" < /dev/null | ~/lookup/s2hBinSorted.perl /fast/a2fbFull$ver.$i.tch; done &
+
+#no new aliasing since version Q
+zcat /da?_data/basemaps/gz/a2AQ.s | ~/lookup/s2sBinSorted.perl /da0_data/basemaps/a2AS.tch 1
+
+
+
+
 
 ### Version R
 
@@ -873,20 +1013,20 @@ sys     48077m54.233s
 
 ### Version P
 ```
-(t=tag; ls -f O.*/*$t.bin  | sed 's/\.bin$//' | while read i; do (echo $i; perl -I ~/lib64/perl5/ /da3_data/lookup/checkBin1in.perl $t $i)&>> O.$t.err; done) &
-(t=commit; ls -f O.*/*$t.bin  | sed 's/\.bin$//' | while read i; do (echo $i; perl -I ~/lib64/perl5/ /da3_data/lookup/checkBin1in.perl $t $i)&>> O.$t.err; done) &
+(t=tag; ls -f O.*/*$t.bin  | sed 's/\.bin$//' | while read i; do (echo $i; perl -I ~/lib64/perl5/ ~/lookup/checkBin1in.perl $t $i)&>> O.$t.err; done) &
+(t=commit; ls -f O.*/*$t.bin  | sed 's/\.bin$//' | while read i; do (echo $i; perl -I ~/lib64/perl5/ ~/lookup/checkBin1in.perl $t $i)&>> O.$t.err; done) &
 
 for r in {00..39} 
 for r in {40..67} 69 70 
 do cd /data/update/O.$r 
- #time ls -f *.tag.bin | /da3_data/lookup/AllUpdateObj.perl tag
- time ls -f *.commit.bin | /da3_data/lookup/AllUpdateObj.perl commit
- #time ls -f *.tree.bin | /da3_data/lookup/AllUpdateObj.perl tree 
- #time ls -f *.blob.bin | /da3_data/lookup/AllUpdateObj.perl blob
+ #time ls -f *.tag.bin | ~/lookup/AllUpdateObj.perl tag
+ time ls -f *.commit.bin | ~/lookup/AllUpdateObj.perl commit
+ #time ls -f *.tree.bin | ~/lookup/AllUpdateObj.perl tree 
+ #time ls -f *.blob.bin | ~/lookup/AllUpdateObj.perl blob
 done
-for i in {0..127}; do /da3_data/lookup/Obj2ContUpdt.perl commit $i $nmax; done
-for i in {0..127}; do /da3_data/lookup/Obj2ContUpdt.perl tree $i $nmax; done
-for i in {0..127}; do /da3_data/lookup/BlobN2Off.perl $i; done
+for i in {0..127}; do ~/lookup/Obj2ContUpdt.perl commit $i $nmax; done
+for i in {0..127}; do ~/lookup/Obj2ContUpdt.perl tree $i $nmax; done
+for i in {0..127}; do ~/lookup/BlobN2Off.perl $i; done
 
 zcat c2pFullP$j.cs | lsort 5G -u --merge  <(zcat c2taFP$j.cs) |  join -v1 - <(zcat c2fFullO$j.cs) | join -v1 - <(zcat emptycsO.$j) | gzip > s12.$j.gz
 
@@ -951,14 +1091,14 @@ cd /data/update
 lst="android.googlesource.com bioconductor.org bitbucket.org drupal.com git.eclipse.org git.kernel.org git.postgresql.org git.savannah.gnu.org git.zx2c4.com gitlab.gnome.org kde.org repo.or.cz salsa.debian.org sourceforge.net"
 for r in {00..24}  $lst
 do cd /data/update/N.$r 
- time ls -f *.tag.bin | /da3_data/lookup/AllUpdateObj.perl tag
- time ls -f *.tree.bin | /da3_data/lookup/AllUpdateObj.perl tree
- time ls -f *.blob.bin | /da3_data/lookup/AllUpdateObj.perl blob
- time ls -f *.commit.bin | /da3_data/lookup/AllUpdateObj.perl commit
+ time ls -f *.tag.bin | ~/lookup/AllUpdateObj.perl tag
+ time ls -f *.tree.bin | ~/lookup/AllUpdateObj.perl tree
+ time ls -f *.blob.bin | ~/lookup/AllUpdateObj.perl blob
+ time ls -f *.commit.bin | ~/lookup/AllUpdateObj.perl commit
 
- zcat *.olist.gz | ssh  dad2 '~/lookup/Prj2CmtChk.perl /fast/p2cFullN 32' | lsort 120G -u -t\; -k1b,2 | /da3_data/lookup/splitSecCh.perl p2c. 32 
+ zcat *.olist.gz | ssh  dad2 '~/lookup/Prj2CmtChk.perl /fast/p2cFullN 32' | lsort 120G -u -t\; -k1b,2 | ~/lookup/splitSecCh.perl p2c. 32 
  for j in {0..31}; do gunzip -c p2c.$j.gz | awk -F\; '{print $2";"$1}'
- done | lsort 120G -u -t\; -k1b,2 | /da3_data/lookup/splitSec.perl c2p. 3
+ done | lsort 120G -u -t\; -k1b,2 | ~/lookup/splitSec.perl c2p. 3
 done 
 
 ver=O
@@ -972,7 +1112,7 @@ for j in {0..31}; do zcat /data/basemaps/gz/c2taFull$ver$j.s | lsort 9G -t\; -k1
 wait
 
 for i in {0..31}; do zcat s11.$i.c2fb | cut -d\; -f1 | uniq | gzip > s11.$i.got; zcat s11.$i.got | join -v2 - <(zcat s11.$i.gz) | gzip > s11.$i.left; grep ^identical s11.new.$i.err | sed 's/.* for //;s/ and.*//' | lsort 1G -u > s11.$i.empty; (zcat /data/basemaps/gz/badcs$pVer.$i; join -v1 <(zcat s11.$i.left) <(zcat s11.$i.got) | join -v1 - s11.$i.empty) | lsort 1G -u > s11.$i.try;
-cat s11.$i.try | /da3_data/lookup/cmputeDiff2.perl 2>  s11.$i.try.err | gzip > s11.$i.try.c2fb;
+cat s11.$i.try | ~/lookup/cmputeDiff2.perl 2>  s11.$i.try.err | gzip > s11.$i.try.c2fb;
 (zcat  /data/basemaps/gz/emptycs$pVer.$i; cat s11.$i.empty; grep ^identical s11.$i.try.err | sed 's/.* for //;s/ and.*//')|lsort 1G -u | gzip > /data/basemaps/gz/emptycs$ver.$i;
 zcat s11.$i.try.c2fb | cut -d\; -f1 | uniq | gzip > s11.$i.try.got;
 zcat s11.$i.try.got | join -v2 - s11.$i.try | join -v1 - <(zcat  /data/basemaps/gz/emptycs$ver.$i) | gzip >  /data/basemaps/gz/badcs$ver.$i;
@@ -1067,22 +1207,22 @@ cd /data/update
 # 2019025
 for r in {00..32} bioconductor.org bitbucket.org kde.org repo.or.cz sourceforge.net gitlab.com
 do cd /data/update/M.$r 
-   time ls -f *.tag.bin | /da3_data/lookup/AllUpdateObj.perl tag
-   time ls -f *.commit.bin | /da3_data/lookup/AllUpdateObj.perl commit
-   time ls -f *.tree.bin | /da3_data/lookup/AllUpdateObj.perl tree
-   time ls -f *.blob.bin | /da3_data/lookup/AllUpdateObj.perl blob
+   time ls -f *.tag.bin | ~/lookup/AllUpdateObj.perl tag
+   time ls -f *.commit.bin | ~/lookup/AllUpdateObj.perl commit
+   time ls -f *.tree.bin | ~/lookup/AllUpdateObj.perl tree
+   time ls -f *.blob.bin | ~/lookup/AllUpdateObj.perl blob
 
-   gunzip -c *.olist.gz | /da3_data/lookup/Prj2CmtChk.perl /da0_data/basemaps/p2cFullM 32 | lsort 120G -u -t\; -k1b,2 | /da3_data/lookup/splitSecCh.perl p2c. 32 
+   gunzip -c *.olist.gz | ~/lookup/Prj2CmtChk.perl /da0_data/basemaps/p2cFullM 32 | lsort 120G -u -t\; -k1b,2 | ~/lookup/splitSecCh.perl p2c. 32 
    for j in {0..31}; do gunzip -c p2c.$j.gz | awk -F\; '{print $2";"$1}'
-   done | lsort 120G -u -t\; -k1b,2 | /da3_data/lookup/splitSec.perl c2p. 32
+   done | lsort 120G -u -t\; -k1b,2 | ~/lookup/splitSec.perl c2p. 32
 done
-for i in {0..127}; do /da3_data/lookup/checkBin.perl commit /data/All.blobs/commit_$i 703111; done
-for i in {0..127}; do /da3_data/lookup/checkBin.perl tree /data/All.blobs/tree_$i 2579370; done
-for i in {0..127}; do /da3_data/lookup/checkBin.perl tag /data/All.blobs/tag_$i 30000; done
-for i in {0..127}; do /da3_data/lookup/checkBin.perl blob /data/All.blobs/blob_$i 2507276; done
+for i in {0..127}; do ~/lookup/checkBin.perl commit /data/All.blobs/commit_$i 703111; done
+for i in {0..127}; do ~/lookup/checkBin.perl tree /data/All.blobs/tree_$i 2579370; done
+for i in {0..127}; do ~/lookup/checkBin.perl tag /data/All.blobs/tag_$i 30000; done
+for i in {0..127}; do ~/lookup/checkBin.perl blob /data/All.blobs/blob_$i 2507276; done
 
-for i in {0..127}; do /da3_data/lookup/Obj2ContUpdt.perl commit $i 705111; done
-for i in {0..127}; do /da3_data/lookup/Obj2ContUpdt.perl tree $i 2579370; done
+for i in {0..127}; do ~/lookup/Obj2ContUpdt.perl commit $i 705111; done
+for i in {0..127}; do ~/lookup/Obj2ContUpdt.perl tree $i 2579370; done
 
 #prepare for processing
 zcat asN.s | perl -I /home/audris/lib64/perl5 -I /home/audris/lib/x86_64-linux-gnu/perl -I /home/audris/lookup -ane 'use cmt; chop();@x=splitSignature($_);@n = split(/ /, $x[0]); @e = split(/\@/, $x[1]); print "$_;$x[0];$x[1];$n[0];$n[$#n];$e[0];$e[1]\n";' | gzip > asN.split
@@ -1096,18 +1236,18 @@ eval $str | ~/lookup/splitSecCh.perl a2mN. 32
 zcat /data/basemaps/gz/a2mN.s| perl -e 'while(<STDIN>){chop();($a,$m)=split(/;/);$m2n{$m}++;}; while (($m,$v)=each %m2n){ print "$v;$m\n" if $v > 30; }' | gzip > /data/basemaps/gz/mFreqN.gz
 
 
-for i in {0..31}; do zcat s10.$i.gz | /da3_data/lookup/cmputeDiff2.perl 2> s10.new.$i.err | gzip > s10.$i.c2fb; done&
+for i in {0..31}; do zcat s10.$i.gz | ~/lookup/cmputeDiff2.perl 2> s10.new.$i.err | gzip > s10.$i.c2fb; done&
 for i in {0..31}
 do zcat s9.$i.c2fb | cut -d\; -f1 | uniq | gzip > s9.$i.got
   zcat s10.$i.c2fb | cut -d\; -f1 | uniq | gzip > s10.$i.got
   (zcat s9.$i.got| join -v2 - <(zcat s9.$i.gz); zcat s10.$i.got| join -v2 - <(zcat s10.$i.gz)) | lsort 1G -u > $i.left
   grep ^identical s9.new.$i.err s10.new.$i.err | sed 's/.* for //;s/ and.*//' | lsort 1G -u > $i.empty
   (zcat /data/basemaps/gz/badcs.$i; join -v1 $i.left $i.empty)  | lsort 1G -u > $i.try
-  cat $i.try | /da3_data/lookup/cmputeDiff2.perl 2>  $i.try.err | gzip > $i.try.c2fb
+  cat $i.try | ~/lookup/cmputeDiff2.perl 2>  $i.try.err | gzip > $i.try.c2fb
   (zcat /data/basemaps/gz/emptycs.$i; cat $i.empty; grep ^identical $i.try.err | sed 's/.* for //;s/ and.*//') | lsort 1G -u | gzip > /data/basemaps/gz/emptycsN.$i
   zcat $i.try.c2fb | cut -d\; -f1 | uniq | gzip > $i.try.got
   zcat $i.try.got | join -v2 -  $i.try | join -v1 - <(zcat  /data/basemaps/gz/emptycsN.$i) | gzip >  /data/basemaps/gz/badcsN.$i
-  zcat /data/basemaps/gz/badcs.$i | join -v1 - <(zcat /data/basemaps/gz/badcsN.$i) | /da3_data/lookup/cmputeDiff2.perl > /dev/null 2> check$i
+  zcat /data/basemaps/gz/badcs.$i | join -v1 - <(zcat /data/basemaps/gz/badcsN.$i) | ~/lookup/cmputeDiff2.perl > /dev/null 2> check$i
   grep -v ^iden check$i |grep -v ^mdir | sed 's/.* for //' | uniq | gzip > /data/basemaps/gz/badcsPartialN.$i
 done   
 
@@ -1117,20 +1257,20 @@ cd /data/update
 # 201813
 for r in BB.02 L.BB.03 L.18 L.19 L.20 L.21 L.22 L.23 L.24 L.GL.0 L.GL.1 L.SF L.SF.1
 do cd $r 
-  time ls -f *.tag.bin | /da3_data/lookup/AllUpdateObj.perl tag
-  time ls -f *.commit.bin | /da3_data/lookup/AllUpdateObj.perl commit
-  time ls -f *.tree.bin | /da3_data/lookup/AllUpdateObj.perl tree
-  time ls -f *.blob.bin |  /da3_data/lookup/AllUpdateObj.perl blob
+  time ls -f *.tag.bin | ~/lookup/AllUpdateObj.perl tag
+  time ls -f *.commit.bin | ~/lookup/AllUpdateObj.perl commit
+  time ls -f *.tree.bin | ~/lookup/AllUpdateObj.perl tree
+  time ls -f *.blob.bin |  ~/lookup/AllUpdateObj.perl blob
   cd ..
 done
 
 for r in BB.02 L.BB.03 L.18 L.19 L.20 L.21 L.22 L.23 L.24 L.GL.0 L.GL.1 L.SF L.SF.1
 do cd /data/update/$r
-   gunzip -c *.olist.gz | /da3_data/lookup/Prj2CmtChk.perl /da0_data/basemaps/p2cFullK 32 ../p2cL 32 | gzip > p2c.gz
+   gunzip -c *.olist.gz | ~/lookup/Prj2CmtChk.perl /da0_data/basemaps/p2cFullK 32 ../p2cL 32 | gzip > p2c.gz
    gunzip -c p2c.gz   | lsort 120G -u -t\; -k1b,2 | gzip > p2c.s
    gunzip -c p2c.gz | awk -F\; '{print $2";"$1}' | lsort 120G -u -t\; -k1b,2 | gzip > c2p.s
-   zcat c2p.s | /da3_data/lookup/splitSec.perl c2p. 32
-   zcat p2c.s | /da3_data/lookup/splitSecCh.perl p2c. 32   
+   zcat c2p.s | ~/lookup/splitSec.perl c2p. 32
+   zcat p2c.s | ~/lookup/splitSecCh.perl p2c. 32   
    zcat c2p.s | cut -d\; -f1 | uniq | ~/bin/hasObj1.perl commit | gzip > cs.gz1
    cut -d\; -f4 *.commit.idx | lsort 20G -u | gzip > cs.gz
 done
@@ -1140,15 +1280,15 @@ for j in {0..31}; do str="$HOME/bin/lsort 120G -u --merge -t\; -k1b,2"; for i in
 wait
 cd /data/update/c2fb
 zcat ../{BB.02,L.BB.03,L.18,L.19,L.20,L.21,L.22,L.23,L.24,L.GL.0,L.GL.1,L.SF,L.SF.1}/cs.gz | lsort 100G -u | ~/lookup/splitSec.perl s9. 32
-for i in {0..15..4}; do zcat s9.$i.gz | /da3_data/lookup/cmputeDiff2.perl 2> s9.new.$i.err | gzip > s9.$i.c2fb; done&
-for i in {1..15..4}; do zcat s9.$i.gz | /da3_data/lookup/cmputeDiff2.perl 2> s9.new.$i.err | gzip > s9.$i.c2fb; done&
-for i in {2..15..4}; do zcat s9.$i.gz | /da3_data/lookup/cmputeDiff2.perl 2> s9.new.$i.err | gzip > s9.$i.c2fb; done&
-for i in {3..15..4}; do zcat s9.$i.gz | /da3_data/lookup/cmputeDiff2.perl 2> s9.new.$i.err | gzip > s9.$i.c2fb; done&
+for i in {0..15..4}; do zcat s9.$i.gz | ~/lookup/cmputeDiff2.perl 2> s9.new.$i.err | gzip > s9.$i.c2fb; done&
+for i in {1..15..4}; do zcat s9.$i.gz | ~/lookup/cmputeDiff2.perl 2> s9.new.$i.err | gzip > s9.$i.c2fb; done&
+for i in {2..15..4}; do zcat s9.$i.gz | ~/lookup/cmputeDiff2.perl 2> s9.new.$i.err | gzip > s9.$i.c2fb; done&
+for i in {3..15..4}; do zcat s9.$i.gz | ~/lookup/cmputeDiff2.perl 2> s9.new.$i.err | gzip > s9.$i.c2fb; done&
 
-for i in {16..31..4}; do zcat s9.$i.gz | /da3_data/lookup/cmputeDiff2.perl 2> s9.new.$i.err | gzip > s9.$i.c2fb; done&
-for i in {17..31..4}; do zcat s9.$i.gz | /da3_data/lookup/cmputeDiff2.perl 2> s9.new.$i.err | gzip > s9.$i.c2fb; done&
-for i in {18..31..4}; do zcat s9.$i.gz | /da3_data/lookup/cmputeDiff2.perl 2> s9.new.$i.err | gzip > s9.$i.c2fb; done&
-for i in {19..31..4}; do zcat s9.$i.gz | /da3_data/lookup/cmputeDiff2.perl 2> s9.new.$i.err | gzip > s9.$i.c2fb; done&
+for i in {16..31..4}; do zcat s9.$i.gz | ~/lookup/cmputeDiff2.perl 2> s9.new.$i.err | gzip > s9.$i.c2fb; done&
+for i in {17..31..4}; do zcat s9.$i.gz | ~/lookup/cmputeDiff2.perl 2> s9.new.$i.err | gzip > s9.$i.c2fb; done&
+for i in {18..31..4}; do zcat s9.$i.gz | ~/lookup/cmputeDiff2.perl 2> s9.new.$i.err | gzip > s9.$i.c2fb; done&
+for i in {19..31..4}; do zcat s9.$i.gz | ~/lookup/cmputeDiff2.perl 2> s9.new.$i.err | gzip > s9.$i.c2fb; done&
 #do empty commit stuff
 
 #this is comprehensive and quite fast 
@@ -1215,11 +1355,11 @@ L.{00..15}
 bb?
 for i in {00..17} 
 do cd /data/update/L.$i
-   gunzip -c *.olist.gz | /da3_data/lookup/Prj2CmtChk.perl /da0_data/basemaps/p2cFullJK 32 | gzip > p2c.gz
+   gunzip -c *.olist.gz | ~/lookup/Prj2CmtChk.perl /da0_data/basemaps/p2cFullJK 32 | gzip > p2c.gz
    gunzip -c p2c.gz   | lsort 120G -u -t\; -k1b,2 | gzip > p2c.s
    gunzip -c p2c.gz | awk -F\; '{print $2";"$1}' | lsort 120G -u -t\; -k1b,2 | gzip > c2p.s
-   zcat c2p.s | /da3_data/lookup/splitSec.perl c2p. 32
-   zcat p2c.s | /da3_data/lookup/splitSecCh.perl p2c. 32   
+   zcat c2p.s | ~/lookup/splitSec.perl c2p. 32
+   zcat p2c.s | ~/lookup/splitSecCh.perl p2c. 32   
    zcat c2p.s | cut -d\; -f1 | uniq | ~/bin/hasObj1.perl commit | gzip > cs.gz1
    cut -d\; -f4 *.commit.idx | lsort 20G -u | gzip > cs.gz
 done
@@ -1233,10 +1373,10 @@ zcat ../L.0[0-5]/cs.gz | lsort 100G -u | ~/lookup/splitSec.perl s8a. 32
 
 zcat ../L.{0[6-9],1[0-7]}/cs.gz | lsort 100G -u | ~/lookup/splitSec.perl s8b. 32
 for i in {00..31}
-do zcat s8a.$i.gz | /da3_data/lookup/cmputeDiff2.perl 2> s8a.new.$i.err | gzip > s8a.$i.c2fb
-   zcat s8b.$i.gz | /da3_data/lookup/cmputeDiff2.perl 2> s8b.new.$i.err | gzip > s8b.$i.c2fb
-   zcat s8c.$i.gz | /da3_data/lookup/cmputeDiff2.perl 2> s8c.new.$i.err | gzip > s8c.$i.c2fb
-   zcat s8d.$i.gz | /da3_data/lookup/cmputeDiff2.perl 2> s8d.new.$i.err | gzip > s8d.$i.c2fb
+do zcat s8a.$i.gz | ~/lookup/cmputeDiff2.perl 2> s8a.new.$i.err | gzip > s8a.$i.c2fb
+   zcat s8b.$i.gz | ~/lookup/cmputeDiff2.perl 2> s8b.new.$i.err | gzip > s8b.$i.c2fb
+   zcat s8c.$i.gz | ~/lookup/cmputeDiff2.perl 2> s8c.new.$i.err | gzip > s8c.$i.c2fb
+   zcat s8d.$i.gz | ~/lookup/cmputeDiff2.perl 2> s8d.new.$i.err | gzip > s8d.$i.c2fb
 done
 #do empty commit stuff
 for i in {0..31}
@@ -1345,20 +1485,20 @@ done
 #see Update All.sha1c commit and tree  below, 
 for i in {00..13} 
 do cd /data/update/updt.$i
-   gunzip -c *.olist.gz | /da3_data/lookup/Prj2CmtChk.perl /data/basemaps/p2cFullJ 32 | gzip > p2c.gz
+   gunzip -c *.olist.gz | ~/lookup/Prj2CmtChk.perl /data/basemaps/p2cFullJ 32 | gzip > p2c.gz
    gunzip -c p2c.gz   | lsort 120G -u -t\; -k1b,2 | gzip > p2c.s
    gunzip -c p2c.gz | awk -F\; '{print $2";"$1}' | lsort 120G -u -t\; -k1b,2 | gzip > c2p.s
-   zcat c2p.s | /da3_data/lookup/splitSec.perl c2p. 32
-   zcat p2c.s | /da3_data/lookup/splitSecCh.perl p2c. 32   
+   zcat c2p.s | ~/lookup/splitSec.perl c2p. 32
+   zcat p2c.s | ~/lookup/splitSecCh.perl p2c. 32   
    cut -d\; -f4 *.commit.idx | lsort 20G -u | gzip > cs.gz
 done
 for i in {00..11} 
 do cd /data/update/new.$i
-   gunzip -c *.olist.gz | /da3_data/lookup/Prj2CmtChk.perl /data/basemaps/p2cFullJ 32 ../p2cKb | gzip > p2c.gz
+   gunzip -c *.olist.gz | ~/lookup/Prj2CmtChk.perl /data/basemaps/p2cFullJ 32 ../p2cKb | gzip > p2c.gz
    gunzip -c p2c.gz   | lsort 120G -u -t\; -k1b,2 | gzip > p2c.s
    gunzip -c p2c.gz | awk -F\; '{print $2";"$1}' | lsort 120G -u -t\; -k1b,2 | gzip > c2p.s
-   zcat c2p.s | /da3_data/lookup/splitSec.perl c2p. 32
-   zcat p2c.s | /da3_data/lookup/splitSecCh.perl p2c. 32
+   zcat c2p.s | ~/lookup/splitSec.perl c2p. 32
+   zcat p2c.s | ~/lookup/splitSecCh.perl p2c. 32
    #extract commits from  c2p.$i.s next time 
    cut -d\; -f4 *.commit.idx | lsort 20G -u | gzip > cs.gz
 done
@@ -1384,7 +1524,7 @@ zcat /data/basemaps/cmts.s5 | join -v2 - <(zcat cs.20181110.a) | gzip > cmts.s6a
 zcat cmts.s6a.new | split -l 2075511 -d -a 2 --filter='gzip > $FILE.gz' - /data/update/c2fb/cmts.s6a.new. 
 cd /data/update/c2fb/
 for i in {00..22}
-do zcat cmts.s6a.new.$i.gz | /da3_data/lookup/cmputeDiff2.perl 2> cmts.s6a.new.$i.err | gzip > cmts.s6a.new.$i.c2fb
+do zcat cmts.s6a.new.$i.gz | ~/lookup/cmputeDiff2.perl 2> cmts.s6a.new.$i.err | gzip > cmts.s6a.new.$i.c2fb
 done
 # See  Create c2fb below using cmts.s6a and Inc20181110
 for i in updt.08 updt.09 updt.10 updt.11 updt.12 updt.13 new.00 new.01; do zcat $i/cs.gz; done |  lsort 20G -u |gzip > cs.20181110.b
@@ -1393,7 +1533,7 @@ zcat cmts.s6a | join -v2 - <(zcat cs.20181110.b) | gzip > cmts.s6b.new
 zcat cmts.s6b.new | split -l 2075511 -d -a 2 --filter='gzip > $FILE.gz' - /data/update/c2fb/cmts.s6b.new. 
 cd /data/update/c2fb/
 for i in {00..22}
-do zcat cmts.s6b.new.$i.gz | /da3_data/lookup/cmputeDiff2.perl 2> cmts.s6b.new.$i.err | gzip > cmts.s6b.new.$i.c2fb
+do zcat cmts.s6b.new.$i.gz | ~/lookup/cmputeDiff2.perl 2> cmts.s6b.new.$i.err | gzip > cmts.s6b.new.$i.c2fb
 done
 
 for i in new.02 new.03 new.04 new.05 new.06; do zcat $i/cs.gz; done |  lsort 30G -u |gzip > cs.20181110.c
@@ -1657,7 +1797,7 @@ perl connectImport.perl c2pFullJ | gzip > c2pFullJ.forks
 
 i=withNthng
 cd /data/update/$i
-gunzip -c *.olist.gz | /da3_data/lookup/Prj2CmtChk.perl p2cFullI 32 | gzip > p2c.gz
+gunzip -c *.olist.gz | ~/lookup/Prj2CmtChk.perl p2cFullI 32 | gzip > p2c.gz
 gunzip -c p2c.gz   | lsort 120G -u -t\; -k1b,2 | gzip > p2c.s
 gunzip -c p2c.gz | awk -F\; '{print $2";"$1}' | lsort 120G -u -t\; -k1b,2 | gzip > c2p.s
 cut -d\; -f4 *.commit.idx | lsort 20G -u | gzip > cs
@@ -1672,7 +1812,7 @@ zcat /data/basemaps/cmts.s5.new | split -l 2075511 -d -a 2 --filter='gzip > $FIL
 # 20180710
 for i in withDnld emr gl 
 do cd /data/update/$i
-   gunzip -c *.olist.gz | /da3_data/lookup/Prj2CmtChk.perl /data/basemaps/Prj2CmtH 8 | gzip > p2c.gz
+   gunzip -c *.olist.gz | ~/lookup/Prj2CmtChk.perl /data/basemaps/Prj2CmtH 8 | gzip > p2c.gz
    gunzip -c p2c.gz   | lsort 120G -u -t\; -k1b,2 | gzip > p2c.s
    gunzip -c p2c.gz | awk -F\; '{print $2";"$1}' | lsort 120G -u -t\; -k1b,2 | gzip > c2p.s
    cut -d\; -f4 *.commit.idx | lsort 20G -u > cs
@@ -1683,8 +1823,8 @@ zcat /data/basemaps/cmts.s3 | lsort 10G -u --merge - <(zcat cs.20180710) | gzip 
 zcat /data/basemaps/cmts.s3 | join -v2 - <(zcat cs.20180710) | gzip > /data/basemaps/cmts.s4.new
 zcat /da4_data/basemaps/cmts.s4.new | split -l 2075511 -d -a 2 --filter="gzip ? $FILE.gz" - cmts.s4.new. 
 
-lsort 20G -t\; -k1b,2 --merge <(gunzip -c emr/p2c.s) <(gunzip -c withDnld/p2c.s) <(gunzip -c gl/p2c.s|awk '{print "gl_"$0}') | uniq | /da3_data/lookup/splitSecCh.perl Inc20180710.p2c. 8
-lsort 20G -t\; -k1b,2 --merge <(gunzip -c emr/c2p.s) <(gunzip -c withDnld/c2p.s) <(gunzip -c gl/c2p.s|sed 's/;/;gl_/') | uniq | /da3_data/lookup/splitSec.perl Inc20180710.c2p. 8
+lsort 20G -t\; -k1b,2 --merge <(gunzip -c emr/p2c.s) <(gunzip -c withDnld/p2c.s) <(gunzip -c gl/p2c.s|awk '{print "gl_"$0}') | uniq | ~/lookup/splitSecCh.perl Inc20180710.p2c. 8
+lsort 20G -t\; -k1b,2 --merge <(gunzip -c emr/c2p.s) <(gunzip -c withDnld/c2p.s) <(gunzip -c gl/c2p.s|sed 's/;/;gl_/') | uniq | ~/lookup/splitSec.perl Inc20180710.c2p. 8
 
 
 # 20180510
@@ -1703,54 +1843,54 @@ do cd /data/update/$i
    #for m in {00..25}; do zcat *.$m.[0-9][0-9].olist.gz |cut -d\; -f1 | lsort 3G -u | gzip > $m; done 
    #for m in {00..25}; do zcat olist.todo | ~/bin/grepField.perl $m 1 | gzip > olist.todo.$m; done
 
-   gunzip -c *.olist.gz | /da3_data/lookup/Prj2CmtChk.perl /data/basemaps/Prj2CmtH 8 | gzip > p2c.gz
+   gunzip -c *.olist.gz | ~/lookup/Prj2CmtChk.perl /data/basemaps/Prj2CmtH 8 | gzip > p2c.gz
    gunzip -c p2c.gz   | lsort 120G -u -t\; -k1b,2 | gzip > p2c.s
    gunzip -c p2c.gz | awk -F\; '{print $2";"$1}' | lsort 120G -u -t\; -k1b,2 | gzip > c2p.s
 done
 cd /data/update
-lsort 20G -t\; -k1b,2 --merge <(gunzip -c with/p2c.s) <(gunzip -c withFrk/p2c.s) <(gunzip -c withWch/p2c.s) <(gunzip -c withIssues/p2c.s) <(gunzip -c chris/p2c.s) <(gunzip -c chrisB/p2c.s) <(gunzip -c py/p2c.s)  | uniq | /da3_data/lookup/splitSecCh.perl Inc20180510.p2c. 8
+lsort 20G -t\; -k1b,2 --merge <(gunzip -c with/p2c.s) <(gunzip -c withFrk/p2c.s) <(gunzip -c withWch/p2c.s) <(gunzip -c withIssues/p2c.s) <(gunzip -c chris/p2c.s) <(gunzip -c chrisB/p2c.s) <(gunzip -c py/p2c.s)  | uniq | ~/lookup/splitSecCh.perl Inc20180510.p2c. 8
 
-lsort 20G -t\; -k1b,2 --merge <(gunzip -c with/c2p.s) <(gunzip -c withFrk/c2p.s) <(gunzip -c withWch/c2p.s) <(gunzip -c withIssues/c2p.s) <(gunzip -c chris/c2p.s) <(gunzip -c chrisB/c2p.s) <(gunzip -c py/c2p.s)  | uniq | /da3_data/lookup/splitSec.perl Inc20180510.c2p. 8
+lsort 20G -t\; -k1b,2 --merge <(gunzip -c with/c2p.s) <(gunzip -c withFrk/c2p.s) <(gunzip -c withWch/c2p.s) <(gunzip -c withIssues/c2p.s) <(gunzip -c chris/c2p.s) <(gunzip -c chrisB/c2p.s) <(gunzip -c py/c2p.s)  | uniq | ~/lookup/splitSec.perl Inc20180510.c2p. 8
 
 ```
 1. Verify input is good
 ```
-   for t in commit blob tree tag; do ls -f *.$t.idx | sed 's/\.idx$//' | while read i; do /da3_data/lookup/checkBin1in.perl $t $i; done; done
+   for t in commit blob tree tag; do ls -f *.$t.idx | sed 's/\.idx$//' | while read i; do ~/lookup/checkBin1in.perl $t $i; done; done
 ```
 1. Update da4:/data/All.blobs
 
 ```
-   ls -f *.commit.bin | /da3_data/lookup/AllUpdateObj.perl commit
-   ls -f *.tree.bin | /da3_data/lookup/AllUpdateObj.perl tree
-   ls -f *.blob.bin |  /da3_data/lookup/AllUpdateObj.perl blob
-   ls -f *.tag.bin | /da3_data/lookup/AllUpdateObj.perl tag
+   ls -f *.commit.bin | ~/lookup/AllUpdateObj.perl commit
+   ls -f *.tree.bin | ~/lookup/AllUpdateObj.perl tree
+   ls -f *.blob.bin |  ~/lookup/AllUpdateObj.perl blob
+   ls -f *.tag.bin | ~/lookup/AllUpdateObj.perl tag
 ```
 1. Verify it worked (up to 4K (or more if needed) records
 ```		
-   for i in {0..127}; do /da3_data/lookup/checkBin.perl commit /data/All.blobs/commit_$i 10000; done
-   for i in {0..127}; do /da3_data/lookup/checkBin.perl tree /data/All.blobs/tree_$i 10000; done
-   for i in {0..127}; do /da3_data/lookup/checkBin.perl tag /data/All.blobs/tag_$i 10000; done
-   for i in {0..127}; do /da3_data/lookup/checkBin.perl blob /data/All.blobs/blob_$i 10000; done
+   for i in {0..127}; do ~/lookup/checkBin.perl commit /data/All.blobs/commit_$i 10000; done
+   for i in {0..127}; do ~/lookup/checkBin.perl tree /data/All.blobs/tree_$i 10000; done
+   for i in {0..127}; do ~/lookup/checkBin.perl tag /data/All.blobs/tag_$i 10000; done
+   for i in {0..127}; do ~/lookup/checkBin.perl blob /data/All.blobs/blob_$i 10000; done
 ```
 1. Update All.sha1c commit and tree needed for c2fb and cmptDiff2.perl
 ```
    nmax=2000000
    #  1475976;
-   for i in {0..127}; do /da3_data/lookup/Obj2ContUpdt.perl commit $i $nmax; done
+   for i in {0..127}; do ~/lookup/Obj2ContUpdt.perl commit $i $nmax; done
    nmax=8227751
-   for i in {0..127}; do /da3_data/lookup/Obj2ContUpdt.perl tree $i $nmax; done
+   for i in {0..127}; do ~/lookup/Obj2ContUpdt.perl tree $i $nmax; done
 ```
 1. Update All.sha1o needed for f2b tree-based stuff
 ```
-	for i in {0..127}; do /da3_data/lookup/BlobN2Off.perl $i; done
+	for i in {0..127}; do ~/lookup/BlobN2Off.perl $i; done
 ```
 1. Update Author to commit map
 ```
-#/da3_data/lookup/Auth2Cmt.perl /data/basemaps/Auth2CmtNew.tch
+#~/lookup/Auth2Cmt.perl /data/basemaps/Auth2CmtNew.tch
 # The above may be more correct
 # 394525: how much back to go from the end of All.blobs/commit_X.idx
-#time /da3_data/lookup/Auth2CmtUpdt.perl Auth2CmtNew 394525
-#time /da3_data/lookup/Auth2CmtMrg.perl Auth2CmtNew Auth2CmtNew.new Auth2CmtH
+#time ~/lookup/Auth2CmtUpdt.perl Auth2CmtNew 394525
+#time ~/lookup/Auth2CmtMrg.perl Auth2CmtNew Auth2CmtNew.new Auth2CmtH
 #Alternative
 ./lstCmt.perl 4 | awk -F\; '{print $2 ";" $1}' | lsort 200G -t\; -k1b,2  | gzip > a2c.s
 gunzip -c a2c.s | ./Prj2CmtBinSorted.perl Auth2CmtH.tch
@@ -1872,7 +2012,7 @@ cd /data/update/c2fb
 #c2f
 zcat cmts.s4.new.*.c2fb \
 perl -I $HOME/lookup -e 'use cmt; while(<STDIN>){ ($c, @r) = split(/;/); print $_ if ! defined $badCmt{$c};}' |\
- /da3_data/lookup/splitSec.perl Inc20180710.c2f. 32
+ ~/lookup/splitSec.perl Inc20180710.c2f. 32
 
 #J contains extra (see below)
 for j in {0..31}; do 
@@ -1880,7 +2020,7 @@ for j in {0..31}; do
   lsort 10G --merge -u -t\; -k1b,2 <(zcat c2fFullJ$j.s) \ 
   <(zcat Inc20180710.c2f.$j.s| cut -d\; -f1,2 | uniq) | \
     gzip > c2fFullI$j.s
-  zcat c2fFullI$j.s | /da3_data/lookup/Cmt2FileBinSorted.perl c2fFullI.$j.tch 1
+  zcat c2fFullI$j.s | ~/lookup/Cmt2FileBinSorted.perl c2fFullI.$j.tch 1
 done
 
 #b2c 
@@ -1914,7 +2054,7 @@ for i in {0..32}; do gunzip -c c2bFullI$i.gz | awk -F\; '{print $1";;"$2}'| $HOM
 done
 
 #fix missing for c2f
-(j=0; lsort 10G --merge -u -t\; -k1b,2 <(zcat /data/basemaps/gz/c2fFullH$j.s)  <(zcat /da3_data/update/c2fb/cmts.s.extra.c2fb.$j.gz| cut -d\; -f1,2 | sed 's|;/|;|') |perl -I ~/lib64/perl5/ -I /da3_data/lookup/ -e 'use cmt; while(<STDIN>){ ($c, @r) = split(/;/); print $_ if ! defined $badCmt{$c};}' | gzip > /data/basemaps/gz/c2fFullJ$j.s) &
+(j=0; lsort 10G --merge -u -t\; -k1b,2 <(zcat /data/basemaps/gz/c2fFullH$j.s)  <(zcat ~/update/c2fb/cmts.s.extra.c2fb.$j.gz| cut -d\; -f1,2 | sed 's|;/|;|') |perl -I ~/lib64/perl5/ -I ~/lookup/ -e 'use cmt; while(<STDIN>){ ($c, @r) = split(/;/); print $_ if ! defined $badCmt{$c};}' | gzip > /data/basemaps/gz/c2fFullJ$j.s) &
 
 ##################################
 #cut -d\; -f4 /data/All.blobs/commit_*.idx | lsort 40G | gzip > /data/basemaps/cmts.s1
@@ -1922,11 +2062,11 @@ gunzip -c /data/basemaps/cmts.s | join -v1 <(gunzip -c /data/basemaps/cmts.s1) -
 gunzip -c cmts.s1.new | split -l 2075511 -d -a2 --filter='gzip > $FILE.gz' - cmts.s1.new.
 #this takes a while and requires All.sha1c/{commit,tree}_{0..127}.tch
 for i in {00..99}
-do gunzip -c cmts.s1.new.$i.gz | /da3_data/lookup/cmputeDiff2.perl 2> cmts.s1.new.$i.err | gzip > cmts.s1.new.$i.c2fb
+do gunzip -c cmts.s1.new.$i.gz | ~/lookup/cmputeDiff2.perl 2> cmts.s1.new.$i.err | gzip > cmts.s1.new.$i.c2fb
 done
 
 #now put all of that good into one place
-zcat cmts.s[1-3].new.*.c2fb | /da3_data/lookup/splitSec.perl /data/update/Inc20180510.c2f. 8 
+zcat cmts.s[1-3].new.*.c2fb | ~/lookup/splitSec.perl /data/update/Inc20180510.c2f. 8 
 cd /data/update
 
 #now create c2f and b2c (potentially using debugging from below)
@@ -1934,37 +2074,37 @@ for j in {0..7}; do
   zcat Inc20180510.c2f.$j.gz | lsort 80G -t\; -k1b,2 | gzip > Inc20180510.c2f.$j.s
   lsort 10G --merge -u -t\; -k1b,2 <(zcat /data/basemaps/gz/c2fFullF$j.s) \ 
     <(zcat Inc20180510.c2f.$j.s| cut -d\; -f1,2 | sed 's|;/|;|') | gzip > /data/basemaps/gz/c2fFullH$j.s
-  zcat /da4_data/basemaps/gz/c2fFullH$j.s | /da3_data/lookup/Cmt2FileBin.perl /da4_data/basemaps/c2fFullH.$j.tch 1
+  zcat /da4_data/basemaps/gz/c2fFullH$j.s | ~/lookup/Cmt2FileBin.perl /da4_data/basemaps/c2fFullH.$j.tch 1
 done
 
 zcat cmts.s[1-3].new.*.c2fb | cut -d\; -f1,3 | grep -v '^;'| grep -v '^$' | awk -F\; '{ print $2";"$1}' | \
-  /da3_data/lookup/splitSec.perl /data/update/Inc20180510.b2c. 16 
+  ~/lookup/splitSec.perl /data/update/Inc20180510.b2c. 16 
 for j in {0..15}; do
    zcat /data/update/Inc20180510.b2c.$j.gz| grep -v '^;' | grep -v '^$' | lsort 20G -t\; -k1b,2 | gzip > /data/update/Inc20180510.b2c.$j.s
    lsort 10G --merge -u -t\; -k1b,2 <(zcat /da4_data/basemaps/gz/b2cFullF$j.s) <(zcat /da4_data/update/Inc20180510.b2c.$j.s) |
      gzip > /data/basemaps/gz/b2cFullH$j.s
-   zcat /data/basemaps/gz/b2cFullH$j.s | awk -F\; '{print $1";;"$2}'| /da3_data/lookup/Cmt2BlobBin.perl /da4_data/basemaps/b2cFullH.$j.tch 1 
+   zcat /data/basemaps/gz/b2cFullH$j.s | awk -F\; '{print $1";;"$2}'| ~/lookup/Cmt2BlobBin.perl /da4_data/basemaps/b2cFullH.$j.tch 1 
 done
 
 #finally invert c2f to f2c and b2c to c2b
 for i in {0..7}; do 
   gunzip -c /da4_data/update/Inc20180510.c2f.$i.s
-done | perl -I /da3_data/lookup -I ~/lib64/perl5 -ane 'use cmt;@x=split(/\;/);next if defined $badCmt{$x[0]}; print;' |\
-  awk -F\; '{print $2";"$1}' | /da3_data/lookup/splitSecCh.perl Inc20180213.f2c. 8 &
+done | perl -I ~/lookup -I ~/lib64/perl5 -ane 'use cmt;@x=split(/\;/);next if defined $badCmt{$x[0]}; print;' |\
+  awk -F\; '{print $2";"$1}' | ~/lookup/splitSecCh.perl Inc20180213.f2c. 8 &
 
-for i in {0..7}; do zcat /da4_data/update/Inc20180510.c2f.$i.s; done | perl -I /da3_data/lookup -I ~/lib64/perl5 \
+for i in {0..7}; do zcat /da4_data/update/Inc20180510.c2f.$i.s; done | perl -I ~/lookup -I ~/lib64/perl5 \
    -ane 'use cmt;s|;/|;|;@x=split(/\;/);next if defined $badCmt{$x[0]}; print;' | \
-   awk -F\; '{print $2";"$1}' | /da3_data/lookup/splitSecCh.perl Inc20180510.f2c. 8 &
+   awk -F\; '{print $2";"$1}' | ~/lookup/splitSecCh.perl Inc20180510.f2c. 8 &
 for i in {0..7}; do   lsort 30G --merge -u -t\; -k1b,2 <(zcat Inc20180510.f2c.$i.gz|lsort 5G -u  -t\; -k1b,2) \
       <(zcat /da4_data/basemaps/gz/f2cFullF$i.s) | \
     gzip > f2cFullH$i.s
-    gunzip -c f2cFullH$i.s | awk -F\; '{print $2";"$1}' | /da3_data/lookup/File2CmtBin.perl f2cFullH.$i.tch 1 
+    gunzip -c f2cFullH$i.s | awk -F\; '{print $2";"$1}' | ~/lookup/File2CmtBin.perl f2cFullH.$i.tch 1 
 done
 
-for i in {0..15}; do gunzip -c /da4_data/basemaps/gz/b2cFullH$i.s; done | perl -I /da3_data/lookup -I ~/lib64/perl5 \
+for i in {0..15}; do gunzip -c /da4_data/basemaps/gz/b2cFullH$i.s; done | perl -I ~/lookup -I ~/lib64/perl5 \
    -ane 'use cmt;@x=split(/\;/);next if defined $badCmt{$x[1]} || defined $badBlob{$x[0]}; print;' | \
-  awk -F\; '{print $2";"$1}' | /da3_data/lookup/splitSec.perl c2bFullH 16
-for i in {0..15}; do gunzip -c c2bFullH$i.gz | awk -F\; '{print $1";;"$2}'| /da3_data/lookup/Cmt2BlobBin.perl c2bFullH.$i.tch 1
+  awk -F\; '{print $2";"$1}' | ~/lookup/splitSec.perl c2bFullH 16
+for i in {0..15}; do gunzip -c c2bFullH$i.gz | awk -F\; '{print $1";;"$2}'| ~/lookup/Cmt2BlobBin.perl c2bFullH.$i.tch 1
 done
 
 ```
@@ -1972,10 +2112,10 @@ done
 1. Update various maps
 ```
 cd /data/basemaps
-/da3_data/lookup/Auth2File.perl Auth2CmtH.tch /fast1/All.sha1c/c2fFullH Auth2FileH.tch 
+~/lookup/Auth2File.perl Auth2CmtH.tch /fast1/All.sha1c/c2fFullH Auth2FileH.tch 
 
 #the following is slow: needs > 250G of ram
-/da3_data/lookup/Cmt2Par.perl /data/basemaps/Cmt2Chld.tch
+~/lookup/Cmt2Par.perl /data/basemaps/Cmt2Chld.tch
 
 ls -l /da4_data/basemaps/{Auth2Cmt,Cmt2Chld,Auth2File}.tch
 
@@ -2014,7 +2154,7 @@ do gunzip -c $i/*.olist*.gz| cut -d\; -f1-3 | grep ';commit;' |\
    perl -ane 'chop();($p,$c)=split(/\;/,$_,-1);next if $c !~ m/^[a-f0-9]{40}$/; $p=~s/.*github.com_(.*_.*)/$1/;$p=~s/^bitbucket.org_/bb_/;$p=~s|\.git$||;$p=~s|/*$||;$p=~s/\;/SEMICOLON/g;$p = "EMPTY" if $p eq "";print "$c;$p\n";'\
    | lsort 20G -t\; -k1b,2 -u | gzip > $i/c2p.$i.gz 
 done
-lsort 10G -t\; -k1b,2 -u --merge <(gunzip -c CRAN/c2p.CRAN.gz)  <(gunzip -c secure/c2p.secure.gz) <(gunzip -c cve/c2p.cve.gz) <(gunzip -c js/c2p.js.gz) | /da3_data/lookup/splitSec.perl Inc20180213.c2p. 8
+lsort 10G -t\; -k1b,2 -u --merge <(gunzip -c CRAN/c2p.CRAN.gz)  <(gunzip -c secure/c2p.secure.gz) <(gunzip -c cve/c2p.cve.gz) <(gunzip -c js/c2p.js.gz) | ~/lookup/splitSec.perl Inc20180213.c2p. 8
 
 
 #debug: look for missing commits/trees
@@ -2022,7 +2162,7 @@ lsort 10G -t\; -k1b,2 -u --merge <(gunzip -c CRAN/c2p.CRAN.gz)  <(gunzip -c secu
 for i in CRAN cve secure js
 do cd $i
   gunzip -c c2p.$i.gz | cut -d\; -f1 | lsort 10G -u | gzip > c.$i.cs
-  gunzip -c c.$i.cs | /da3_data/lookup/splitSec.perl c.$i.cs. 8 
+  gunzip -c c.$i.cs | ~/lookup/splitSec.perl c.$i.cs. 8 
   cd ..
 done
 for j in {0..7}
@@ -2032,7 +2172,7 @@ do for i in CRAN cve secure js bbnew
 done
 for j in {0..7}; do gunzip -c /data/basemaps/gz/c2fFullE$j.s | cut -d\; -f1 | uniq | join -v2 - <(gunzip -c Inc20180213.c2f.$j.gz) | gzip > Inc20180213.c2f.$j.todo & done
 for j in {0..7} 
-do gunzip -c Inc20180213.c2f.$j.todo | /da3_data/lookup/cmputeDiff2.perl 2> Inc20180213.c2f.$j.err | gzip > Inc20180213.c2f.$j.c2fb &
+do gunzip -c Inc20180213.c2f.$j.todo | ~/lookup/cmputeDiff2.perl 2> Inc20180213.c2f.$j.err | gzip > Inc20180213.c2f.$j.c2fb &
 done
 
 
@@ -2057,11 +2197,11 @@ cat Inc20180213.err | grep '^no tree:' | grep -v 'for parent' | sed 's/.* for //
 cat Inc20180213.err | grep '^no tree:' | sed 's/^no tree://;s/ .*//' | lsort 10G -u > Inc20180213.nt
 cat Inc20180213.{nc,ncs.par,npc,c[1-3]} | lsort 10G -u | join -v1 - Inc20180213.c2f.in >  Inc20180213.c2f.bad
 #double check these are really bad 
-cat Inc20180213.c2f.bad | /da3_data/lookup/cmputeDiff2.perl 2> /dev/null >  Inc20180213.c2f.bad.c2fb
+cat Inc20180213.c2f.bad | ~/lookup/cmputeDiff2.perl 2> /dev/null >  Inc20180213.c2f.bad.c2fb
 wc -l Inc20180213.c2f.bad.c2fb
 join -v1 Inc20180213.c2f.new Inc20180213.c2f.in | join -v1 - Inc20180213.c2f.bad > Inc20180213.c2f.empty
 #verify empty
-cat Inc20180213.c2f.empty | /da3_data/lookup/cmputeDiff2.perl
+cat Inc20180213.c2f.empty | ~/lookup/cmputeDiff2.perl
 
 #now update empty, nt, bad
 #empty
@@ -2070,17 +2210,17 @@ mv /data/basemaps/empty.cs1 /data/basemaps/empty.cs
 
 #nt
 #did we find any new trees
-gunzip -c /data/basemaps/nt.ts | /da3_data/lookup/showTree.perl -1 | sort -u > Inc20180213.c2f.ts
+gunzip -c /data/basemaps/nt.ts | ~/lookup/showTree.perl -1 | sort -u > Inc20180213.c2f.ts
 lsort 10G -u --merge <(gunzip -c /data/basemaps/nt.ts) Inc20180213.nt | join -v1 - Inc20180213.c2f.ts | gzip > /data/basemaps/nt.ts1
 #make sure all are missing
-gunzip -c /data/basemaps/nt.ts1 | /da3_data/lookup/showTree.perl -1
+gunzip -c /data/basemaps/nt.ts1 | ~/lookup/showTree.perl -1
 mv /data/basemaps/nt.ts1 /data/basemaps/nt.ts
 
 # bad
 lsort 10G -u --merge <(gunzip -c /data/basemaps/bad.cs) Inc20180213.c2f.bad | gzip > /data/basemaps/bad.cs1
-gunzip -c  /data/basemaps/bad.cs1 | /da3_data/lookup/cmputeDiff2.perl 2> /dev/null > seeIfBad
+gunzip -c  /data/basemaps/bad.cs1 | ~/lookup/cmputeDiff2.perl 2> /dev/null > seeIfBad
 cut -d\; -f1 seeIfBad | uniq | lsort 10G -u | join -v1 - Inc20180213.c2f.in > Inc20180213.c2f.in.extra
-grep -Ff Inc20180213.c2f.in.extra seeIfBad | /da3_data/lookup/splitSec.perl Inc20180213.c2f.extra. 8
+grep -Ff Inc20180213.c2f.in.extra seeIfBad | ~/lookup/splitSec.perl Inc20180213.c2f.extra. 8
 
 gunzip -c /data/basemaps/bad.cs1 | join -v1 - <(cut -d\; -f1 seeIfBad | uniq | lsort 10G -u) | gzip > /data/basemaps/bad.cs
 rm  /data/basemaps/bad.cs1
@@ -2110,12 +2250,12 @@ c2fbp map split into 80 (1B line) chunks (see below).
 
 # Update commit message map
 ```
-cd /da3_data/delta
-/da3_data/lookup/lstCmt.perl 1 | gzip > /da3_data/delta/cmt.lst
+cd ~/delta
+~/lookup/lstCmt.perl 1 | gzip > /da3_data/delta/cmt.lst
 
 
-gunzip -c /da4_data/update/Inc20180213.c2f.[0-7].gz |uniq | /da3_data/lookup/showCmt.perl 1 | gzip > Inc20180213.delta
-#gunzip -c /da4_data/update/Inc20180213.c2p.[0-7].gz | cut -d\; -f1 | uniq | /da3_data/lookup/showCmt.perl 1 | gzip > Inc20180213.delta
+gunzip -c /da4_data/update/Inc20180213.c2f.[0-7].gz |uniq | ~/lookup/showCmt.perl 1 | gzip > Inc20180213.delta
+#gunzip -c /da4_data/update/Inc20180213.c2p.[0-7].gz | cut -d\; -f1 | uniq | ~/lookup/showCmt.perl 1 | gzip > Inc20180213.delta
 gunzip -c Inc20180213.delta | perl -I ~/lib64/perl5/ deltaHash.perl
 perl -I ~/lib64/perl5 /home/audris/bin/listTC.perl delta.tch 1 | gzip > delta.id2content.gz
 
@@ -2123,15 +2263,15 @@ cat delta.idx | perl -ane 'chop();@x=split(/\;/, $_,-1); $c=$x[2];next if length
 lsort 20G --merge -t\; -k1b,2 -u <(gunzip -c delta.idx.37.c2mid) <(gunzip -c delta.idx.c2mid) | gzip > delta.idx.c2mid1
 mv delta.idx.c2mid1 delta.idx.c2mid
 
-# ? gunzip -c /da3_data/delta/delta.idx.c2mid | sed 's/;/;;;/' | perl /da3_data/lookup/Cmt2PrjBinSorted.perl mid2cmt.tch 1
-# ? gunzip -c /da3_data/delta/delta.idx.c2mid | awk -F\; '{print $2";"$1}' | /da3_data/lookup/File2CmtBin.perl delta.idx.mid2c 1
+# ? gunzip -c /da3_data/delta/delta.idx.c2mid | sed 's/;/;;;/' | perl ~/lookup/Cmt2PrjBinSorted.perl mid2cmt.tch 1
+# ? gunzip -c /da3_data/delta/delta.idx.c2mid | awk -F\; '{print $2";"$1}' | ~/lookup/File2CmtBin.perl delta.idx.mid2c 1
 gunzip -c delta.id2content.gz | grep -iw cve > ALLCVEs
 cut -d\; -f1 ALLCVEs | gzip > ALLCVEs.ids
 gunzip -c delta.idx.c2mid | ~/bin/grepField.perl ALLCVEs.ids 2 | cut -d\; -f1 | gzip > ALLCVEs.cs
-gunzip -c ALLCVEs.cs | /da3_data/lookup/showCmt.perl 2> CVEbadcmt | gzip > CVECommitInfo
-gunzip -c ALLCVEs.cs | /da3_data/lookup/Cmt2PrjShow.perl /da4_data/basemaps/Cmt2PrjG 1 8 | gzip > ALLCVEs.c2p
-gunzip -c ALLCVEs.cs | /da3_data/lookup/Cmt2PrjShow.perl /da4_data/basemaps/c2fFullF 1 8 | gzip > ALLCVEs.c2f
-gunzip -c ALLCVEs.cs | /da3_data/lookup/Cmt2BlobShow.perl /da4_data/basemaps/c2bFullE 1 16 | gzip > ALLCVEs.c2b
+gunzip -c ALLCVEs.cs | ~/lookup/showCmt.perl 2> CVEbadcmt | gzip > CVECommitInfo
+gunzip -c ALLCVEs.cs | ~/lookup/Cmt2PrjShow.perl /da4_data/basemaps/Cmt2PrjG 1 8 | gzip > ALLCVEs.c2p
+gunzip -c ALLCVEs.cs | ~/lookup/Cmt2PrjShow.perl /da4_data/basemaps/c2fFullF 1 8 | gzip > ALLCVEs.c2f
+gunzip -c ALLCVEs.cs | ~/lookup/Cmt2BlobShow.perl /da4_data/basemaps/c2bFullE 1 16 | gzip > ALLCVEs.c2b
 #get file names without path and search of them in /da4_data/basemaps/f2cFullF
 gunzip -c ALLCVEs.c2f| perl -ane 'chop();($c,$n,@fs)=split(/;/,$_,-1);for my $f (@fs){print "$f\n";}' | lsort 10G -u | gzip > ALLCVEs.fs
 gunzip -c /da4_data/basemaps/f2cFullF.[0-7].lst | ~/bin/grepFile.perl ALLCVEs.fs 1 | cut -d\; -f1 | lsort 10G -u > ALLCVEs.fs.all

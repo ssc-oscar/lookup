@@ -4,7 +4,7 @@ use warnings;
 use Compress::LZF;
 use TokyoCabinet;
 use Digest::FNV::XS;
-
+use MIME::Base64;
 
 require Exporter;
 our @ISA = qw (Exporter);
@@ -179,21 +179,19 @@ sub git_signature_parse {
 sub extrCmt {
   my ($codeC, $str) = @_;
   my $code = safeDecomp ($codeC, $str);
-  my ($tree, $parent, $auth, $cmtr, $ta, $tc) = ("","","","","","");
+  my ($tree, $parent, $auth, $cmtr, $ta, $tc, $taz, $tcz) = ("","","","","","");
   my ($pre, @rest) = split(/\n\n/, $code, -1);
   for my $l (split(/\n/, $pre, -1)){
      #print "$l\n";
      $tree = $1 if ($l =~ m/^tree (.*)$/);
      $parent .= ":$1" if ($l =~ m/^parent (.*)$/);
-     #($auth, $ta) = ($1, $2) if ($l =~ m/^author (.*)\s([0-9]+\s[\+\-]*\d+)$/);
-     #($cmtr, $tc) = ($1, $2) if ($l =~ m/^committer (.*)\s([0-9]+\s[\+\-]*\d+)$/);
      ($auth) = ($1) if ($l =~ m/^author (.*)$/);
      ($cmtr) = ($1) if ($l =~ m/^committer (.*)$/);
   }
-  ($auth, $ta) = ($1, $2) if ($auth =~ m/^(.*)\s(-?[0-9]+\s+[\+\-]*\d+)$/);
-  ($cmtr, $tc) = ($1, $2) if ($cmtr =~ m/^(.*)\s(-?[0-9]+\s+[\+\-]*\d+)$/);
+  ($auth, $ta, $taz) = ($1, $2, $3) if ($auth =~ m/^(.*)\s(-?[0-9]+)\s+([\+\-]*\d+)$/);
+  ($cmtr, $tc, $tcz) = ($1, $2, $3) if ($cmtr =~ m/^(.*)\s(-?[0-9]+)\s+([\+\-]*\d+)$/);
   $parent =~ s/^:// if defined $parent;
-  return ($tree, $parent, $auth, $cmtr, $ta, $tc, @rest);
+  return ($tree, $parent, $auth, $cmtr, $ta, $tc, $taz, $tcz, @rest);
 }
 
 sub extrPar {
@@ -231,18 +229,18 @@ sub splitSignature {
 sub cleanCmt {
   my ($cont, $cmt, $debug) = @_;
   if ($debug == 6){
-    my ($tree, $parents, $auth, $cmtr, $ta, $tc, @rest) = extrCmt ($cont, $cmt);
-    $ta=~s/ .*//;
+    my ($tree, $parents, $auth, $cmtr, $ta, $tc, $taz, $tcz, @rest) = extrCmt ($cont, $cmt);
+    $ta =~ s/ .*//;
     $ta = 0 if length($ta) > 10; 
     $ta = sprintf "%.10d", $ta;
-    print "$cmt;$ta;$auth;$tree;$parents\n";
+    print "$cmt;$ta;$taz;$auth;$tree;$parents\n";
     return;
   }
   if ($debug == 5){
     print "$cmt;".(extrPar($cont))."\n";
     return;
   }
-  my ($tree, $parents, $auth, $cmtr, $ta, $tc, @rest) = extrCmt ($cont, $cmt);
+  my ($tree, $parents, $auth, $cmtr, $ta, $tc, $taz, $tcz, @rest) = extrCmt ($cont, $cmt);
   my $msg = join '\n\n', @rest;
   if ($debug){
     if ($debug == 3){
@@ -250,22 +248,30 @@ sub cleanCmt {
       $c =~ s/\r/ /g;
       print "$c\n";
     }else{
-      $msg =~ s/[\r\n;]/ /g;
-      $msg =~ s/^\s*//;
-      $msg =~ s/\s*$//;
-      $auth =~ s/;/ /g;
-      if ($debug == 2){
-        print "$cmt;$auth;$ta;$msg\n";
+      if ($debug == 7){
+        my $c = safeDecomp($cont, $cmt);
+        my $res = encode_base64 ($c);
+        $res =~ s/\r/\\r/g;
+        $res =~ s/\n/\\n/g;
+        print "$cmt;$res\n";
       }else{
-        #if ($debug == 3){
-        #  my ($a, $e) = git_signature_parse ($auth, $msg);
-        #  print "$msg;$cmt;$a;$e;$ta;$auth\n";
-        #}else{
-        if ($debug == 4){
-          print "$cmt;$auth\n";
+        $msg =~ s/[\r\n;]/ /g;
+        $msg =~ s/^\s*//;
+        $msg =~ s/\s*$//;
+        $auth =~ s/;/ /g;
+        if ($debug == 2){
+          print "$cmt;$auth;$ta;$taz;$msg\n";
         }else{
-          $ta=~s/ .*//;
-          print "$cmt;$ta;$auth\n";
+          #if ($debug == 3){
+          #  my ($a, $e) = git_signature_parse ($auth, $msg);
+          #  print "$msg;$cmt;$a;$e;$ta;$auth\n";
+          #}else{
+          if ($debug == 4){
+            print "$cmt;$auth\n";
+          }else{
+            $ta=~s/ .*//;
+            print "$cmt;$ta;$auth\n";
+          }
         }
       }
     }

@@ -4,7 +4,7 @@ use warnings;
 use Compress::LZF;
 use TokyoCabinet;
 use Digest::FNV::XS;
-
+use MIME::Base64;
 
 require Exporter;
 our @ISA = qw (Exporter);
@@ -16,18 +16,18 @@ use vars qw(@ISA);
 # basic utilities
 
 # obsolete
-my %toUrlMap = ("bb" => "bitbucket.org", "gl" => "gitlab.org",
-		"android.googlesource.com" => "android.googlesource.com",
-		"bioconductor.org" => "bioconductor.org",
-		"drupal.com" => "git.drupal.org", "git.eclipse.org" => "git.eclipse.org",
-		"git.kernel.org" => "git.kernel.org/pub/scm/",
-		"git.postgresql.org" => "git.postgresql.org" ,
-		"git.savannah.gnu.org" => "git.savannah.gnu.org",
-		"git.zx2c4.com" => "git.zx2c4.com" ,
-		"gitlab.gnome.org" => "gitlab.gnome.org",
-		"kde.org" => "anongit.kde.org",
-		"repo.or.cz" => "repo.or.cz",
-		"salsa.debian.org" => "salsa.debian.org",
+my %toUrlMap = ("bb" => "bitbucket.org","gl" => "gitlab.org",
+"android.googlesource.com" => "android.googlesource.com",
+"bioconductor.org" => "bioconductor.org",
+"drupal.com" => "git.drupal.org", "git.eclipse.org" => "git.eclipse.org",
+"git.kernel.org" => "git.kernel.org/pub/scm/",
+"git.postgresql.org" => "git.postgresql.org" ,
+"git.savannah.gnu.org" => "git.savannah.gnu.org",
+"git.zx2c4.com" => "git.zx2c4.com" ,
+"gitlab.gnome.org" => "gitlab.gnome.org",
+"kde.org" => "anongit.kde.org",
+"repo.or.cz" => "repo.or.cz",
+"salsa.debian.org" => "salsa.debian.org", 
 		"sourceforge.net" => "git.code.sf.net/p"
     # "git.kernel.org" => "git.kernel.org/pub/scm/",
     );
@@ -41,7 +41,7 @@ sub toUrl {
       $found ++;
       last;
     }
-  }
+  }  
   $in =~ s|^|github.com/| if (!$found);
   $in =~ s|_|/|;
   return "https://$in";
@@ -179,21 +179,19 @@ sub git_signature_parse {
 sub extrCmt {
   my ($codeC, $str) = @_;
   my $code = safeDecomp ($codeC, $str);
-  my ($tree, $parent, $auth, $cmtr, $ta, $tc) = ("","","","","","");
+  my ($tree, $parent, $auth, $cmtr, $ta, $tc, $taz, $tcz) = ("","","","","","");
   my ($pre, @rest) = split(/\n\n/, $code, -1);
   for my $l (split(/\n/, $pre, -1)){
      #print "$l\n";
      $tree = $1 if ($l =~ m/^tree (.*)$/);
      $parent .= ":$1" if ($l =~ m/^parent (.*)$/);
-     #($auth, $ta) = ($1, $2) if ($l =~ m/^author (.*)\s([0-9]+\s[\+\-]*\d+)$/);
-     #($cmtr, $tc) = ($1, $2) if ($l =~ m/^committer (.*)\s([0-9]+\s[\+\-]*\d+)$/);
      ($auth) = ($1) if ($l =~ m/^author (.*)$/);
      ($cmtr) = ($1) if ($l =~ m/^committer (.*)$/);
   }
-  ($auth, $ta) = ($1, $2) if ($auth =~ m/^(.*)\s(-?[0-9]+\s+[\+\-]*\d+)$/);
-  ($cmtr, $tc) = ($1, $2) if ($cmtr =~ m/^(.*)\s(-?[0-9]+\s+[\+\-]*\d+)$/);
+  ($auth, $ta, $taz) = ($1, $2, $3) if ($auth =~ m/^(.*)\s(-?[0-9]+)\s+([\+\-]*\d+)$/);
+  ($cmtr, $tc, $tcz) = ($1, $2, $3) if ($cmtr =~ m/^(.*)\s(-?[0-9]+)\s+([\+\-]*\d+)$/);
   $parent =~ s/^:// if defined $parent;
-  return ($tree, $parent, $auth, $cmtr, $ta, $tc, @rest);
+  return ($tree, $parent, $auth, $cmtr, $ta, $tc, $taz, $tcz, @rest);
 }
 
 sub extrPar {
@@ -231,18 +229,18 @@ sub splitSignature {
 sub cleanCmt {
   my ($cont, $cmt, $debug) = @_;
   if ($debug == 6){
-    my ($tree, $parents, $auth, $cmtr, $ta, $tc, @rest) = extrCmt ($cont, $cmt);
-    $ta=~s/ .*//;
+    my ($tree, $parents, $auth, $cmtr, $ta, $tc, $taz, $tcz, @rest) = extrCmt ($cont, $cmt);
+    $ta =~ s/ .*//;
     $ta = 0 if length($ta) > 10; 
     $ta = sprintf "%.10d", $ta;
-    print "$cmt;$ta;$auth;$tree;$parents\n";
+    print "$cmt;$ta;$taz;$auth;$tree;$parents\n";
     return;
   }
   if ($debug == 5){
     print "$cmt;".(extrPar($cont))."\n";
     return;
   }
-  my ($tree, $parents, $auth, $cmtr, $ta, $tc, @rest) = extrCmt ($cont, $cmt);
+  my ($tree, $parents, $auth, $cmtr, $ta, $tc, $taz, $tcz, @rest) = extrCmt ($cont, $cmt);
   my $msg = join '\n\n', @rest;
   if ($debug){
     if ($debug == 3){
@@ -250,22 +248,30 @@ sub cleanCmt {
       $c =~ s/\r/ /g;
       print "$c\n";
     }else{
-      $msg =~ s/[\r\n;]/ /g;
-      $msg =~ s/^\s*//;
-      $msg =~ s/\s*$//;
-      $auth =~ s/;/ /g;
-      if ($debug == 2){
-        print "$cmt;$auth;$ta;$msg\n";
+      if ($debug == 7){
+        my $c = safeDecomp($cont, $cmt);
+        my $res = encode_base64 ($c);
+        $res =~ s/\r/\\r/g;
+        $res =~ s/\n/\\n/g;
+        print "$cmt;$res\n";
       }else{
-        #if ($debug == 3){
-        #  my ($a, $e) = git_signature_parse ($auth, $msg);
-        #  print "$msg;$cmt;$a;$e;$ta;$auth\n";
-        #}else{
-        if ($debug == 4){
-          print "$cmt;$auth\n";
+        $msg =~ s/[\r\n;]/ /g;
+        $msg =~ s/^\s*//;
+        $msg =~ s/\s*$//;
+        $auth =~ s/;/ /g;
+        if ($debug == 2){
+          print "$cmt;$auth;$ta;$taz;$msg\n";
         }else{
-          $ta=~s/ .*//;
-          print "$cmt;$ta;$auth\n";
+          #if ($debug == 3){
+          #  my ($a, $e) = git_signature_parse ($auth, $msg);
+          #  print "$msg;$cmt;$a;$e;$ta;$auth\n";
+          #}else{
+          if ($debug == 4){
+            print "$cmt;$auth\n";
+          }else{
+            $ta=~s/ .*//;
+            print "$cmt;$ta;$auth\n";
+          }
         }
       }
     }
@@ -609,7 +615,7 @@ our %badCmt = (
   "e601b95f45dde98dd4d1f80a1d3304905a340ab8" => 1004542, # [Automatic commit] Errors from geogebra/geogebra
   "7140aaf36cca2e8ecf01cd765608208f44f108e7" =>  851015, # Add data author manhcuongk55 <dmcksclck55@gmail.com> 1579495353 +0700
   "0e2bfc6cfacfb1567b094e7f09e81fc925e83303" => 1359989, # LiamOSullivan/dd-ver1-data-archive rm sound data
-  
+
   "0a36c08880da83a84209efe5aa90ca3f9b1dc453" => 10000000000, # tons of fake blobs
   "12ef405ef13a47da699aa2b8e86c4d49edc57e5d" => 10000000000, # tons of fake blobs
   "2c1e65d57edc4a9e57b74d17fec019be8d3afac0" => 10000000000, # tons of fake blobs
