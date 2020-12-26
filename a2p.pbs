@@ -116,7 +116,8 @@ if test 'WHAT' == 'a2A'; then
 
 for i in {0..1}
 do j=$((FROM*2+i))
-   zcat P2aFull$ver$j.s | perl ~/lookup/mp.perl 1 a2AQ.s | $HOME/bin/lsort ${maxM}M -t\; -k1,2 -u  | gzip > P2AFull$ver$j.s
+   zcat P2aFull$ver$j.s | perl ~/lookup/mapA.perl 1 a2AFullH$ver.s | $HOME/bin/lsort ${maxM}M -t\; -k1,2 -u  | gzip > P2AFull$ver$j.s
+   #zcat P2aFull$ver$j.s | perl ~/lookup/mp.perl 1 a2AQ.s | $HOME/bin/lsort ${maxM}M -t\; -k1,2 -u  | gzip > P2AFull$ver$j.s
    echo P2AFull$ver$j.s
 done
 
@@ -185,6 +186,14 @@ for j in {0..31}
 do zcat P2AFull$ver$j.s
 done | perl -e 'while (<STDIN>){chop();s/\;.*//;$c{$_}++;};while (($k, $v)=each %c){ print "$k;$v\n" if $v > '$cut'}'  | gzip > PManyA
 
+
+fi
+if test 'WHAT' = 'runManual'; then
+
+# AManyP1000S.gz is manually curated!
+for j in {0..31}; do zcat P2AFull${ver}$j.s; done | perl $HOME/bin/grepFieldv.perl PManyA2000.gz 1 | perl $HOME/bin/grepFieldv.perl AManyP1000S.gz 2 | perl $HOME/lookup/connectExportPreNoExclude.perl | gzip > P2AFull${ver}.A2A.2000
+zcat P2AFull${ver}.A2A.2000 | perl -ane 'chop();($c,@x) = split(/;/); print "".(join ";", (sort @x))."\n";' | gzip > P2AFull${ver}.A2A.2000.gz
+zcat P2AFull${ver}.A2A.2000.gz | lsort  ${maxM}M -t\| | uniq -c | perl -ane 'chop();s|^\s*([0-9]*) ||;print "$_;$1\n"' | gzip > P2AFull${ver}.A2A.2000.s
 
 fi
 if test 'WHAT' = 'A2Acut'; then

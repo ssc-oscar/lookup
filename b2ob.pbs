@@ -233,6 +233,51 @@ done
 
 
 fi
+if test 'WHAT' = 'b2fA'; then
+
+l=FROM
+for i in {0..7}
+do j=$(($i+$l*8))
+ zcat b2faFull$ver$j.s |  perl ~/lookup/mapA.perl 2 ../gz/a2AFullH$ver.s | gzip > b2fAFull$ver$j.s
+ echo b2fAFull$ver$j.s
+done
+
+
+fi
+if test 'WHAT' = 'A2fb'; then
+
+l=FROM   
+for i in {0..7}
+do j=$(($i+$l*8))
+ zcat a2fbFull$ver$j.s |  perl ~/lookup/mapA.perl 0 ../gz/a2AFullH$ver.s | gzip > A2fbFull$ver.$j.gz
+ echo A2fbFull$ver.$j.gz
+done
+
+for i in {0..7}
+do j=$(($i+$l*8))
+   zcat A2fbFull$ver.$j.gz 
+done | perl -I $HOME/lib/perl5 -I $HOME/lookup $HOME/lookup/splitSecCh.perl A2fbFull$ver.$l. 32
+echo A2fbFull$ver.$l.
+
+for i in {0..31}
+do $HOME/bin/lsort ${maxM}M -t\; -k1,2 -u <(zcat A2fbFull$ver.$l.$i.gz) | gzip > A2fbFull$ver.$l.$i.s
+   echo A2fbFull$ver.$l.$i.s
+done
+#now just need to merge 
+
+fi
+if test 'WHAT' = 'A2fbmerge'; then
+
+l=FROM
+for i in {0..7}
+do j=$(($i+$l*8))
+  str="$HOME/bin/lsort ${maxM}M -t\; -k1,3 -u --merge"
+  for k in {0..3}; do str="$str <(zcat A2fbFull$ver.$k.$j.s)"; done
+  eval $str | gzip > A2fbFull$ver$j.s
+  echo A2fbFull$ver$j.s
+done
+
+fi
 if test 'WHAT' = 'a2fb'; then
 
 l=FROM
@@ -281,7 +326,7 @@ if test 'WHAT' = 'a2f'; then
 
 
 l=FROM
-for i in {0..7}
+for i in {0..7} 
 do j=$(($i+$l*8));
   zcat c2fFull$ver$j.s | join -t\; <(zcat ../gz/c2datFull$ver$j.s| cut -d\; -f1,3) - | cut -d\; -f2-3 | uniq
 done | perl -I $HOME/lib/perl5 -I $HOME/lookup $HOME/lookup/splitSecCh.perl a2fFull$ver.$l. 32
@@ -290,6 +335,47 @@ echo a2fFull$ver.$l.
 for i in {0..31}
 do zcat a2fFull$ver.$l.$i.gz | $HOME/bin/lsort ${maxM}M -t\; -k1,4 -u | gzip > a2fFull$ver.$l.$i.s
    echo a2fFull$ver.$l.$i.s
+done
+
+fi
+if test 'WHAT' = 'A2f'; then
+
+l=FROM
+for i in {0..3}
+do j=$(($i+$l*4))
+ zcat a2fFull$ver$j.s |  perl ~/lookup/mapA.perl 0 ../gz/a2AFullH$ver.s | gzip > A2fFull$ver.$j.gz
+ echo A2fFull$ver.$j.gz
+done
+
+for i in {0..3}
+do j=$(($i+$l*4))
+   zcat A2fFull$ver.$j.gz
+done | perl -I $HOME/lib/perl5 -I $HOME/lookup $HOME/lookup/splitSecCh.perl A2fFull$ver.$l. 32
+echo A2fFull$ver.$l.
+
+for i in {0..31}
+do $HOME/bin/lsort ${maxM}M -t\; -k1,2 -u <(zcat A2fbFull$ver.$l.$i.gz) | gzip > A2fbFull$ver.$l.$i.s
+   echo A2fFull$ver.$l.$i.s
+done
+
+fi
+if test 'WHAT' = 'A2fmerge'; then
+
+l=FROM
+for i in {0..7}
+do j=$(($i+$l*8))
+  str="$HOME/bin/lsort ${maxM}M -t\; -k1,3 -u --merge"
+  for k in {0..7}; do str="$str <(zcat A2fFull$ver.$k.$j.s)"; done
+  eval $str | gzip > A2fFull$ver$j.s
+  echo A2fbFull$ver$j.s
+done
+
+fi
+if test 'WHAT' = 'a2ffix'; then
+
+for i in {1..31}
+do lsort 3G -t\; -k1,2 -u --merge <(zcat a2f1FullS.0.$i.s) <(zcat a2f2FullS.2.$i.s) <(zcat a2f2FullS.3.$i.s) <(zcat a2f1FullS.2.$i.s) <(zcat a2f1FullS.3.$i.s) | gzip > a2fFullS.0.$i.s
+   echo a2fFull$ver.0.$i.s
 done
 
 fi
