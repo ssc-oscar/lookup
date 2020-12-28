@@ -353,8 +353,12 @@ do j=$(($i+$l*4))
 done | perl -I $HOME/lib/perl5 -I $HOME/lookup $HOME/lookup/splitSecCh.perl A2fFull$ver.$l. 32
 echo A2fFull$ver.$l.
 
+fi
+if test 'WHAT' = 'A2f1'; then
+l=FROM
+
 for i in {0..31}
-do $HOME/bin/lsort ${maxM}M -t\; -k1,2 -u <(zcat A2fbFull$ver.$l.$i.gz) | gzip > A2fbFull$ver.$l.$i.s
+do $HOME/bin/lsort ${maxM}M -t\; -k1,2 -u <(zcat A2fFull$ver.$l.$i.gz) | gzip > A2fFull$ver.$l.$i.s
    echo A2fFull$ver.$l.$i.s
 done
 
@@ -362,13 +366,31 @@ fi
 if test 'WHAT' = 'A2fmerge'; then
 
 l=FROM
-for i in {0..7}
-do j=$(($i+$l*8))
+for i in 0
+do j=$(($i+$l))
   str="$HOME/bin/lsort ${maxM}M -t\; -k1,3 -u --merge"
   for k in {0..7}; do str="$str <(zcat A2fFull$ver.$k.$j.s)"; done
   eval $str | gzip > A2fFull$ver$j.s
-  echo A2fbFull$ver$j.s
+  echo A2fFull$ver$j.s
 done
+
+fi
+if test 'WHAT' = 'A2summ'; then
+
+c=/lustre/haven/user/audris/gz
+cd $c
+l=FROM
+t=PRT
+perl $HOME/lookup/AuthSummary.perl $ver $l $t | gzip > A2summFull.$t.$ver$l.gz
+
+fi
+if test 'WHAT' = 'P2summ'; then
+
+c=/lustre/haven/user/audris/gz
+cd $c
+l=FROM
+t=PRT
+perl $HOME/lookup/prjSummary.perl $ver $l $t | gzip > P2summFull.$t.$ver$l.gz
 
 fi
 if test 'WHAT' = 'a2ffix'; then
@@ -447,6 +469,65 @@ echo tkns$i.$j.parse
 zcat tkns$i.$j.parse | perl -I ~/lookup -I ~/lib/perl/perl5 ~/lookup/parseA.perl $i $((inc*j)) $((inc*(j+1))) | gzip > tkns$i.$j.pkg
 echo tkns$i.$j.pkg
 
+
+fi
+if test 'WHAT' = 'pkgMerge'; then
+
+c=/lustre/haven/user/audris/tkns
+cd $c
+
+l=FROM
+j=PRT
+for i in {0..7}
+do j=$((i+l*8))
+  for k in {0..31}
+  do zcat tkns$j.$k.pkg
+  done | $HOME/bin/lsort ${maxM}M -t\; -k1,1 | gzip > b2lPkg$ver$j.s
+  echo b2lPkg$ver$j.s
+done
+
+#for i in {0..127}; do cat tkns$i.*.idx |cut -d\; -f5-6 | awk -F\; '{print $2";"$1}' | lsort 3G -t\; -k1,2 -u | gzip > b2tkFullS$i.s; done &
+#for i in {0..127}; do cat tkns$i.*.idx |cut -d\; -f5-6; done | ~/lookup/splitSec.perl tk2bFullS. 128 &
+#for i in {0..127}; do zcat tk2bFullS.$i.gz |lsort 3G -t\; -k1,2 -u | gzip > tk2bFullS$i.s; done &
+
+fi
+if test 'WHAT' = 'cjoin'; then
+
+c=/lustre/haven/user/audris/tkns
+cd $c
+
+l=FROM
+for i in {0..7}
+do j=$((i+l*8))
+   for k in {0..31}; do zcat tkns$j.$k.parse; done | $HOME/bin/lsort ${maxM}M -t\; -k1,1 | gzip > b2lFile$ver$j.s
+done
+
+for i in {0..7}
+do j=$((i+l*8))
+   zcat b2lFile$ver$j.s | join -t\; - <(zcat b2lPkg$ver$j.s) | join -t\; <(zcat ../c2fb/b2cFull$ver$j.s) - 
+done | perl -ane 'chop(),($a,$b,@x)=split(/;/);print "$b;$a;".(join ";", @x)."\n"' | perl -I ~/lookup -I ~/lib/perl/perl5 ~/lookup/splitSec.perl c2blfPkg$ver.$l. 32
+echo c2blfPkg$ver.$l.
+
+for i in {0..31}
+do zcat c2blfPkg$ver.$l.$i.gz | $HOME/bin/lsort ${maxM}M -t\; -k1,2 | gzip > c2blfPkg$ver.$l.$i.s
+   echo c2blfPkg$ver.$l.$i.s
+done
+
+fi
+if test 'WHAT' = 'cmerge'; then
+
+c=/lustre/haven/user/audris/tkns
+cd $c
+
+for k in {0..7}
+do i=$((FROM*8+k))
+  str="$HOME/bin/lsort ${maxM}M -t\; -k1,2 -u --merge"
+  for l in {0..15}
+  do str="$str <(zcat c2blfPkg$ver.$l.$i.s)"
+  done
+  eval $str | gzip > c2blfPkg$ver$i.s
+  echo c2blfPkg$ver$i.s
+done
 
 fi
 if test 'WHAT' = 'toparse'; then
