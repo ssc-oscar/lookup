@@ -7,51 +7,21 @@ my $s = $ARGV[1];
 my %d = ();
 my $pP = "";
 my %tmp = ();
-open A, "zcat A2cFull$v$s.s|";
 my $cnt = 0;
-while (<A>){
-  chop ();
-  #print "$_\n";
-  my ($p, $c) = split (/;/, $_, -1);
-  if ($pP ne "" && $pP ne $p){
-    $d{c}{$pP} = scalar(keys %tmp);
-    %tmp = ();
-    print STDERR "$s a2c $cnt\n" if (!($cnt++%500000));
-    #last if $cnt > 10000;
-  }
-  $tmp{$c}++;
-  $pP = $p;
-}
-$d{c}{$pP} = scalar(keys %tmp);
-print STDERR "done $s a2c $cnt\n";
 
-open A, "zcat A2aFull$v.s |";
-$pP = "";
-while (<A>){
-  chop();
-  my ($p, $c) = split (/;/, $_, -1);
-  if ($pP ne "" && $pP){
-    for my $c1 (keys %tmp){
-      $d{p}{$pP}{$c1}++;
-    }
-    %tmp = ();
-  }
-  $pP = $p;
-  $tmp{$c}++;
-}
-$d{p}{$pP} = scalar(keys %tmp);
-print STDERR "done $s A2a\n";
-
-for my $ty ("A2P", "A2fb", "A2f"){
+for my $ty ($ARGV[2]){
   $cnt = 0;
   %tmp = ();
   $pP = "";
-  open A, "zcat ${ty}Full$v$s.s |";
+  my $pre = "";
+  $pre = "../c2fb/" if $ty =~/A2[bf]/;
+  open A, "zcat $pre${ty}Full$v$s.s |";
   while (<A>){
     chop ();
     my ($p, $c) = split (/;/, $_, -1);
     if ($pP ne "" && $pP ne $p){
-      $d{$ty}{$pP} = scalar(keys %tmp);
+      print "$pP;$ty=".(scalar(keys %tmp))."\n";
+      #$d{$ty}{$pP} = scalar(keys %tmp);
       if ($ty eq "a2f"){
         doExt ($pP, \%tmp);
       }
@@ -62,28 +32,10 @@ for my $ty ("A2P", "A2fb", "A2f"){
     $tmp{$c}++;
     $pP = $p;
   }
-  $d{$ty}{$pP} = scalar(keys %tmp);
+  print "$pP;$ty=".(scalar(keys %tmp))."\n";
+  #$d{$ty}{$pP} = scalar(keys %tmp);
   doExt ($pP, \%tmp) if ($ty eq "P2f");
   print STDERR "done $s $ty $cnt\n";
-}
-
-my @a = keys %{$d{c}};
-print STDERR "$#a\n";
-for my $p (keys %{$d{c}}){
-  my $alias = "";
-  if (defined $d{p}{$pP}){
-    my @aa = keys %{$d{p}{$pP}};
-    $alias=join "|", @aa;
-  }
-  defined $parent && $parent ne "") ? $d{p}{$parent} : 0;
-  my $nPrj = defined $d{a2P}{$p} ? $d{a2P}{$p} : 0;
-  my $fb = defined $d{a2fb}{$p} ? $d{a2fb}{$p} : 0;
-  my $fs = defined $d{a2f}{$p} ? $d{a2f}{$p} : 0;
-  print "$p;$alias;$d{c}{$p};$nPrj;$fb;$fs";
-  for my $e (keys %{$d{e}{$p}}){
-    print ";$e=$d{e}{$p}{$e}";
-  }
-  print "\n";
 }
 
 sub doExt {
@@ -92,7 +44,12 @@ sub doExt {
   my %e = ();
   for my $fi (@a){ ext ($fi, \%e, $tmp->{$fi}) if $fi ne ""; }
   #my @a = sort { $e{$b} <=> $e{$a} }  keys %e;
-  for my $i (keys %e){ $d{e}{$p}{$i}=$e{$i}; }
+  print "$p;exts";
+  for my $i (keys %e){
+    print ";$i=$e{$i}";
+    #$d{e}{$p}{$i}=$e{$i}; 
+  }
+  print "\n"
 }
 
 sub ext {
