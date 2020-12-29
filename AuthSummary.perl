@@ -22,7 +22,7 @@ for my $ty ($ARGV[2]){
     if ($pP ne "" && $pP ne $p){
       print "$pP;$ty=".(scalar(keys %tmp))."\n";
       #$d{$ty}{$pP} = scalar(keys %tmp);
-      if ($ty eq "a2f"){
+      if ($ty eq "A2f"){
         doExt ($pP, \%tmp);
       }
       %tmp = ();
@@ -34,7 +34,7 @@ for my $ty ($ARGV[2]){
   }
   print "$pP;$ty=".(scalar(keys %tmp))."\n";
   #$d{$ty}{$pP} = scalar(keys %tmp);
-  doExt ($pP, \%tmp) if ($ty eq "P2f");
+  doExt ($pP, \%tmp) if ($ty eq "A2f");
   print STDERR "done $s $ty $cnt\n";
 }
 

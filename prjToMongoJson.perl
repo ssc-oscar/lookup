@@ -1,51 +1,87 @@
 use strict;
 use warnings;
 
-use BSON;
-use BSON::Types ':all';
-use MongoDB;
 use utf8;
 no utf8;
-use JSON
+use JSON;
 
 my $counter = 0;
-my $codec = BSON->new;
+my $codec = JSON->new;
 my @docs;
 
-while (<STDIN>){
-  chop ();
-  my ($p, $fr, $to, $par, $stars, $forks, $prjs, $numCommits, $numAuth, $blobs, $files, @ext) = split (/;/, $_, -1); 
-  my $dstats = "";
-  my %stats;
-  for my $ee (@ext){
-    my ($e, $n) = split(/=/, $ee, -1);
-    $e =~ s/TypesSript/TypeScript/;
-    $stats{$e} = $n+0;
+my $v = $ARGV[0];
+my $s = $ARGV[1];
+my %d;
+for my $ty ("P2tspan", "P2c","P2A","P2f","P2b","P2p"){
+  my $str = "zcat P2summFull.$ty.$v$s.gz|";
+  $str = "zcat ${ty}Full$v$s.gz|" if $ty eq "P2tspan";
+  open A, $str;
+  while (<A>){
+    chop(); 
+    my ($a, @x) = split (/;/);
+    if ($ty eq "P2tspan"){
+      $d{$a}{EarlistCommitDate} = $x[0]+0;
+      $d{$a}{LatestCommitDate} = $x[1]+0;
+      next;
+    }
+    #par=VictorFursa_simple_php_framework;star=;frk=0;comunity=2
+    if ($ty eq "P2p"){
+      for my $k (@x){
+        my ($ke, $va) = split (/=/, $k, -1);
+        $ke = "RootFork" if $ke eq "par";
+        $ke = 'NumStars' if $ke eq "star";
+        $ke = 'NumForks' if $ke eq "frk";
+        $ke = 'CommunitySize' if $ke eq "comunity";
+        $d{$a}{$ke} = $va if $va ne "";
+      }
+      next;
+    } 
+    my $k = shift @x;
+    next if !defined $k;
+    if ($k =~ /=/){
+      my ($ke, $va) = split (/=/, $k, -1);
+      $ke = 'NumCommits' if $ke eq "A2c";
+      $ke = 'NumFiles' if $ke eq "A2f";
+      $ke = 'NumBlobs' if $ke eq "A2fb";
+      $ke = 'NumAuthors' if $ke eq "A2P";
+      $d{$a}{$ke} = $va;
+    }else{
+      for $k (@x){
+        my ($ke, $va) = split (/=/, $k, -1);  
+        $d{$a}{e}{$ke} = $va;
+      }
+    }
   }
-  if ($#ext >= 0){
-    my $bson = $codec->encode_one( \%stats );
-    $dstats = $codec->decode_one( $bson );
-  }
-  $blobs = $blobs ne "" ? $blobs : 0;
-  $files = $files ne "" ? $files : 0;
+}
+my $c = JSON->new;
+for my $a (keys %d){
   my $doc = {
-    ProjectID => $p,
-    NumAuthors => $numAuth+0,
-    NumCommits => $numCommits+0,
-    NumBlobs => $blobs + 0,
-    NumFiles => $files +0,
-    EarlistCommitDate => $fr + 0,
-    LatestCommitDate => $to + 0,
-    CommunitySize => $prjs + 0
+    ProjectID => $a
   };
-  $doc->{FileInfo} = $dstats if ($dstats ne "");
-  $doc->{NumStars} = $stars+0 if $stars ne "";
-  $doc->{NumForks} = $forks+0 if $forks != 0;
-  $doc->{RootFork} = $par if $par ne "";
-  push @docs, $doc;
+  for my $f ('NumCommits', "RootFork", 'NumStars', 'NumForks', 'CommunitySize', "NumFiles", "NumBlobs", "NumAuthors", "EarlistCommitDate", "LatestCommitDate"){
+    if (defined $d{$a}{$f}){
+      my $val = $d{$a}{$f};
+      $val += 0 if $f =~ /^Num/;
+      $doc->{$f} = $val;
+    }
+  }
+  if (defined $d{$a}{Alias}){
+    my @as = keys %{$d{$a}{Alias}};
+    $doc->{NumAlias} = $#as+1;
+    my $bson = $codec->encode( \@as );
+    $doc->{Alias} = $codec->decode( $bson );
+  }
+  my @ext = keys %{$d{$a}{e}};
+  my %stats = ();
+  for my $ee (@ext){
+    $v = $d{$a}{e}{$ee} + 0;
+    $ee =~ s/TypesSript/TypeScript/;
+    $stats{$ee} = $v;
+  }
+  if ($#ext>=0){
+    my $bson = $codec->encode( \%stats );
+    $doc->{FileInfo} = $codec->decode( $bson );
+  }
+  print "".($c->encode( $doc ))."\n";
 }
 
-my $c = JSON->new;
-for my $d (@docs){
-  print "".($c->encode( $d ))."\n";
-}

@@ -1,54 +1,82 @@
 use strict;
 use warnings;
 
-use BSON;
-use BSON::Types ':all';
-use MongoDB;
 use utf8;
 no utf8;
 use JSON;
 
 my $counter = 0;
-my $codec = BSON->new;
+my $codec = JSON->new;
 my @docs;
 
-while (<STDIN>){
-  chop ();
-  my ($p, $fr, $to, $alias, $numCommits, $numProjects, $blobs, $files, @ext) = split (/;/, $_, -1); 
-  $numProjects = $numProjects ne "" ? $numProjects : 0;
-  $blobs = $blobs ne "" ? $blobs : 0;
-  $files = $files ne "" ? $files : 0;
-  @as = split (/|/, $alias, -1);
-  my $doc = {
-    AuthorID => $p,
-    NumProjects => $numProjects+0,
-    NumCommits => $numCommits+0,
-    NumFirstBlobs => $blobs + 0,
-    NumFiles => $files + 0,
-    EarlistCommitDate => $fr + 0,
-    LatestCommitDate => $to + 0,
-  };
-  if ($#ext >= 0){
-    my %stats;
-    for my $ee (@ext){
-      my ($e, $n) = split(/=/, $ee, -1);
-      $e =~ s/TypesSript/TypeScript/;
-      $stats{$e} = $n+0;
+my $v = $ARGV[0];
+my $s = $ARGV[1];
+my %d;
+for my $ty ("A2tspan", "A2c","A2a","A2f","A2fb","A2P"){
+  my $str = "zcat A2summFull.$ty.$v$s.gz|";
+  $str = "zcat ${ty}FullH$v.$s.gz|" if $ty eq "A2a";
+  $str = "zcat ${ty}Full$v$s.gz|" if $ty eq "A2tspan";
+  open A, $str;
+  while (<A>){
+    chop(); 
+    my ($a, @x) = split (/;/);
+    if ($ty eq "A2tspan"){
+      $d{$a}{EarlistCommitDate} = $x[0]+0;
+      $d{$a}{LatestCommitDate} = $x[1]+0;
+      next;
     }
-    my $bson = $codec->encode_one( \%stats );
-    $doc->{FileInfo} = $codec->decode_one( $bson );
+    if ($ty eq "A2a"){
+      $d{$a}{Alias}{$x[0]}++;
+      next;
+    } 
+    my $k = shift @x;
+    next if !defined $k;
+    if ($k =~ /=/){
+      my ($ke, $va) = split (/=/, $k, -1);
+      $ke = 'NumCommits' if $ke eq "A2c";
+      $ke = 'NumFiles' if $ke eq "A2f";
+      $ke = 'NumFirstBlobs' if $ke eq "A2fb";
+      $ke = 'NumProjects' if $ke eq "A2P";
+      $d{$a}{$ke} = $va;
+    }else{
+      for $k (@x){
+        my ($ke, $va) = split (/=/, $k, -1);  
+        $d{$a}{e}{$ke} = $va;
+      }
+    }
   }
-  if ($#as > 0){
-    $doc->{NumAlias} = $#as+1;
-    my $bson = $codec->encode_one( \@as );
-    $doc->{Alias} = $codec->decode_one( $bson );
-  }
-  push @docs, $doc;
 }
-
 my $c = JSON->new;
-for my $d (@docs){
-  print "".($c->encode( $d ))."\n";
+for my $a (keys %d){
+  my $doc = {
+    AuthorID => $a,
+    NumCommits => $d{$a}{NumCommits}+0
+  };
+  for my $f ("NumFiles", "NumFirstBlobs", "NumProjects", "EarlistCommitDate", "LatestCommitDate"){
+    if (defined $d{$a}{$f}){
+      my $val = $d{$a}{$f};
+      $val += 0 if $f =~ /^Num/;
+      $doc->{$f} = $val;
+    }
+  }
+  if (defined $d{$a}{Alias}){
+    my @as = keys %{$d{$a}{Alias}};
+    next if $#as <= 0;
+    $doc->{NumAlias} = $#as+1;
+    my $bson = $codec->encode( \@as );
+    $doc->{Alias} = $codec->decode( $bson );
+  }
+  my @ext = keys %{$d{$a}{e}};
+  my %stats = ();
+  for my $ee (@ext){
+    $v = $d{$a}{e}{$ee} + 0;
+    $ee =~ s/TypesSript/TypeScript/;
+    $stats{$ee} = $v;
+  }
+  if ($#ext>=0){
+    my $bson = $codec->encode( \%stats );
+    $doc->{FileInfo} = $codec->decode( $bson );
+  }
+  print "".($c->encode( $doc ))."\n";
 }
-
 
