@@ -61,7 +61,7 @@ for my $a (keys %d){
   for my $f ('NumCommits', "RootFork", 'NumStars', 'NumForks', 'CommunitySize', "NumFiles", "NumBlobs", "NumAuthors", "EarlistCommitDate", "LatestCommitDate"){
     if (defined $d{$a}{$f}){
       my $val = $d{$a}{$f};
-      $val += 0 if $f =~ /^Num/;
+      $val += 0 if $f =~ /^(Num|CommunitySize)/;
       $doc->{$f} = $val;
     }
   }
