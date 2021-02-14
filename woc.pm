@@ -8,7 +8,7 @@ use MIME::Base64;
 
 require Exporter;
 our @ISA = qw (Exporter);
-our @EXPORT = qw(toUrl segB segH sHash sHashV toHex fromHex safeDecomp safeComp 
+our @EXPORT = qw(toUrl segB segH sHash sHashV toHex fromHex safeDecomp safeComp getFL
 		splitSignature signature_error contains_angle_brackets extract_trimmed git_signature_parse extrCmt getTime cleanCmt	
 		addForks %badProjects %badAuthors %badCmt %badBlob %badTree %largeBlobPrj %largeTreePrj);
 use vars qw(@ISA);
@@ -45,6 +45,56 @@ sub toUrl {
   $in =~ s|^|github.com/| if (!$found);
   $in =~ s|_|/|;
   return "https://$in";
+}
+
+sub getFL {
+  my $a = $_[0];
+  my $a0 = $a;
+  $a =~ s/\s+\<.*//;
+  $a =~ s|^[\s\("\r]*||;
+  $a =~ s|["\)\r]*$||;
+  $a =~ s|[\.,\-\s]+| |g;
+  $a =~ s|([a-z])([A-Z])|$1 $2|g; #Camelback
+  $a =~ tr/[A-Z]/[a-z]/;
+  $a =~ s/^\s*$//;
+  if ($a ne ""){
+    my @as=split(/ /,$a);
+    pop @as if ($#as > 1 && $as[$#as] =~ m/^([iv]|[iv][iv]|ii[iv]|vii|jr|sr|phd|md|dds)$/);
+    return "$as[0] $as[$#as]" if $#as > 0;
+    # handle singleword concatenated firstlast names in the future
+    return $as[0];
+  }else{
+    $a = $a0;
+    $a =~ s/.*\<//;
+    $a =~ s/\>.*//;
+    $a =~ s/^[\s\("\r]*//;
+    $a =~ s/["\)\r]*$//;
+    my @as = split (/ /, $a);
+    my $res = "";
+    for my $i (0..$#as){
+      $res .= " $as[$i]" if $as[$i] ne "" && $as[$i] !~ /\@/;
+    }
+    $res =~ s/^ //;
+    if ($res ne ""){
+      $res =~ tr/[A-Z]/[a-z]/;
+      @as = split (/ /, $res);
+      pop @as if ($#as > 1 && $as[$#as] =~ m/^([iv]|[iv][iv]|ii[iv]|vii|jr|sr|phd|md|dds)$/);
+      return "$as[0] $as[$#as]" if $#as > 0;
+      return $as[0];
+    }else{
+      if ($#as >= 0 && $as[0] =~ /\@/){
+        $as[0] =~ s/\@.*//;
+        $as[0] =~ s/\./ /g;
+        $as[0] =~ s|([a-z])([A-Z])|$1 $2|;
+        @as = split (/ /, $as[0]);
+        pop @as if ($#as > 1 && $as[$#as] =~ m/^([iv]|[iv][iv]|ii[iv]|vii|jr|sr|phd|md|dds)$/);
+        return "$as[0] $as[$#as]" if $#as > 0;
+        # handle singleword concatenated firstlast usrnames in the future
+        # return $as[0];
+      }
+    }
+  }
+  return "";
 }
 
 
