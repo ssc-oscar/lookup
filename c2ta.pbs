@@ -28,6 +28,35 @@ do j=$((FROM*4+$i))
 done 
 
 fi
+if test 'WHAT' == 'c2tAsplit'; then
+
+for i in {0..7}
+do j=$((FROM*8+$i))
+   zcat ../gz/c2datFull$ver$j.s
+done | perl -ane 'chop();@x=split(/;/, $_, -1); print "$x[2];$x[0]\n"' | perl ~/lookup/mapA.perl 0 a2AFullH$ver.s | ~/lookup/splitSecCh.perl A2cFull$ver.FROM. 32
+echo A2cFull$ver.FROM.
+
+for j in {0..31}
+  do zcat A2cFull$ver.FROM.$j.gz | $HOME/bin/lsort ${maxM}M -t\; -k1,2 -u | gzip > A2cFull$ver.FROM.$j.s
+  echo A2cFull$ver.FROM.$j.s
+done
+
+fi
+if test 'WHAT' == 'A2cmerge'; then
+
+for i in {0..3}
+do j=$((FROM*4+$i))
+  str="$HOME/bin/lsort ${maxM}M -t\; -k1,2 -u --merge"
+  for k in {0..15}
+  do str="$str <(zcat A2cFull${ver}.$k.$j.s)"
+  done
+  eval $str | gzip > ../gz/A2cFull${ver}$j.s
+  echo ../gz/A2cFull${ver}$j.s
+  zcat ../gz/A2cFull$ver$j.s | cut -d\; -f1 | uniq | gzip > ../gz/A$ver$j.s
+  echo ../gz/A$ver$j.s
+done
+
+fi
 if test 'WHAT' == 'c2tasplit'; then
 
 for i in {0..7}

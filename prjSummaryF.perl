@@ -3,76 +3,38 @@ use warnings;
 
 my $v = $ARGV[0];
 my $s = $ARGV[1];
-my $type = $ARGV[2];
+
 my %d = ();
 my $pP = "";
 my %tmp = ();
+open A, 'zcat P2cFull'.$v.'{'.$s.",".($s+32).",".($s+64).",".($s+96).'}'.'.s|';
 my $cnt = 0;
-
-
-if ($type eq "P2p"){
-  open A, "zcat ${type}Full$v.$s.gz |";
-  $cnt = 0;
-  while (<A>){
-    my ($p, $c) = split (/;/, $_, -1);
-    if ($pP ne "" && $pP ne $p){
-      $d{ff}{$pP}++; for my $a (keys %tmp){ $d{p2P}{$a} = $pP; $d{ff}{$a}++;$d{P2p}{$pP}{$a}++ };
-      %tmp = ();
-    }
-    $tmp{$c}++;
-    $pP = $p;
+while (<A>){
+  chop ();
+  #print "$_\n";
+  my ($p, $c) = split (/;/, $_, -1);
+  if ($pP ne "" && $pP ne $p){
+    $d{c}{$pP} = scalar(keys %tmp);
+    %tmp = ();
+    print STDERR "$s P2c $cnt\n" if (!($cnt++%1000000));
+    #last if $cnt > 1000;
   }
-  $d{ff}{$pP}++; for my $a (keys %tmp){  $d{p2P}{$a} = $pP;  $d{ff}{$a}++;$d{P2p}{$pP}{$a}++ };
-  %tmp = ();  $pP = "";
-
-  #get forks/stars
-  open A, "zcat ghForkMapR.gz1|";
-  $cnt = 0;
-  while (<A>){
-    chop();
-    my ($p, $r, $ps, $rs) = split (/;/, $_, -1);
-    next if !defined $d{ff}{$p} && !defined $d{ff}{$r};
-    if (defined $d{P2p}{$r}){
-      my $star = $rs eq "" ? $ps : $rs;
-      $d{s}{$r} = $star if ($star ne "");
-      $d{f}{$r}{$p}++;
-    }elsif (defined $d{P2p}{$p}){
-      my $star = $rs eq "" ? $ps : $rs;
-      $d{parent}{$p} = $r;
-      $d{s}{$p} = $star if ($star ne "" && (!defined $d{s}{$p} || $d{s}{$p} < $star)); # select the largest star from the group
-    }elsif (defined $d{ff}{$p}){
-      my $star = $rs eq "" ? $ps : $rs;
-      $d{parent}{$d{p2P}{$p}} = $r;
-      $d{s}{$d{p2P}{$p}} = $star if ($star ne "" && (!defined $d{s}{$d{p2P}{$p}} || $d{s}{$d{p2P}{$p}} < $star)); # select the largest star from the group
-    }
-  }
-  for my $p (keys %{$d{P2p}}){
-    my $stars = defined $d{s}{$p} ? $d{s}{$p} : "";
-    my $forks = defined $d{f}{$p} ? scalar (keys %{$d{f}{$p}}) : 0;
-    my $parent = defined $d{parent}{$p} ? $d{parent}{$p} : "";
-    my $cSize = scalar(keys %{$d{P2p}{$p}});
-    print "$p;par=$parent;star=$stars;frk=$forks;comunity=$cSize\n";
-  } 
-  print STDERR "done $s Stars\n";
-  exit;
+  $tmp{$c}++;
+  $pP = $p;
 }
+$d{c}{$pP} = scalar(keys %tmp);
+print STDERR "done $s P2c $cnt\n";
 
-
-for my $ty ($type){
+for my $ty ("P2f"){
   $cnt = 0;
   %tmp = ();
   $pP = "";
-  my $pre ="";
-  $pre = "../c2fb/" if $ty =~ /P2[bf]/;
-  my $str = "zcat $pre${ty}Full$v$s.s |";
-  $str = 'zcat P2cFull'.$v.'{'.$s.",".($s+32).",".($s+64).",".($s+96).'}'.'.s|' if $ty eq "P2c"; 
-  open A, $str;
+  open A, "zcat ${ty}Full$v$s.s |";
   while (<A>){
     chop ();
     my ($p, $c) = split (/;/, $_, -1);
     if ($pP ne "" && $pP ne $p){
-      #$d{$ty}{$pP} = scalar(keys %tmp);
-      print "$pP;$ty=".(scalar(keys %tmp))."\n";
+      $d{$ty}{$pP} = scalar(keys %tmp);
       if ($ty eq "P2f"){
         doExt ($pP, \%tmp);
       }
@@ -83,10 +45,20 @@ for my $ty ($type){
     $tmp{$c}++;
     $pP = $p;
   }
-  #$d{$ty}{$pP} = scalar(keys %tmp);
-  print "$pP;$ty=".(scalar(keys %tmp))."\n";
+  $d{$ty}{$pP} = scalar(keys %tmp);
   doExt ($pP, \%tmp) if ($ty eq "P2f");
   print STDERR "done $s $ty $cnt\n";
+}
+
+my @a = keys %{$d{c}};
+print STDERR "$#a\n";
+for my $p (keys %{$d{c}}){
+  my $fs = defined $d{P2f}{$p} ?  $d{P2f}{$p} : "";
+  print "$p;$d{c}{$p};$fs";
+  for my $e (keys %{$d{e}{$p}}){
+    print ";$e=$d{e}{$p}{$e}";
+  }
+  print "\n";
 }
 
 sub doExt {
@@ -95,12 +67,7 @@ sub doExt {
   my %e = ();
   for my $fi (@a){ ext ($fi, \%e, $tmp->{$fi}) if $fi ne ""; }
   #my @a = sort { $e{$b} <=> $e{$a} }  keys %e;
-  print "$p;exts";
-  for my $i (keys %e){
-     print ";$i=$e{$i}";
-     #$d{e}{$p}{$i}=$e{$i}; 
-  }
-  print "\n";
+  for my $i (keys %e){ $d{e}{$p}{$i}=$e{$i}; }
 }
 
 sub ext {

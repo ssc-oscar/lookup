@@ -96,6 +96,8 @@ while(<STDIN>){
     my ($treeP, $parentP) = getCT ($parent);
     if ($treeP eq ""){
       print STDERR "no parent commit: $parent for $rev\n";
+      # what to do with missing parent commit?
+      #printTR ($rev, getTO ($tree), "", 1);
       next;
     }
     if ($treeP eq $tree){
