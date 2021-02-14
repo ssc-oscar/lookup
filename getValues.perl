@@ -55,6 +55,10 @@ if ($types eq "p2P" || $types eq "P2p" ||  $types eq "a2A" || $types eq "A2a"){
   $f2 = "cs";
   $f2 = "cs" if ($types eq "P2p" ||$types eq "A2a");
 }
+if ($types =~ /^[aA]2fb/ || $types =~ /^[aA]2[bc]/){
+  $f1 = "s";
+  $f2 = "h";
+}
 $split = $ARGV[3] if defined $ARGV[3];
 
 sub get {
