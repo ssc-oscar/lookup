@@ -49,6 +49,7 @@ my %parse = (
 	'jl' => \&jl,
 	'pl' => \&pl,
 	'rb' => \&rb,
+        'Groovy' => \&java,
 );
 
 while (<STDIN>){    
