@@ -76,6 +76,7 @@ for my $ty ($type){
       if ($ty eq "P2f"){
         doExt ($pP, \%tmp);
       }
+      doG ($pP, \%tmp) if ($ty eq "P2g");
       %tmp = ();
       print STDERR "$s $ty $cnt prs\n" if (!($cnt++%1000000));
       #last if $cnt > 1000;
@@ -86,7 +87,18 @@ for my $ty ($type){
   #$d{$ty}{$pP} = scalar(keys %tmp);
   print "$pP;$ty=".(scalar(keys %tmp))."\n";
   doExt ($pP, \%tmp) if ($ty eq "P2f");
+  doG ($pP, \%tmp) if ($ty eq "P2g");
   print STDERR "done $s $ty $cnt\n";
+}
+
+sub doG {
+  my ($p, $tmp) = @_;
+  my @a = keys %$tmp;
+  print "$p;Gender";
+  for my $i (@a){
+    print ";$i=$tmp->{$i}";
+  }
+  print "\n";
 }
 
 sub doExt {

@@ -12,10 +12,10 @@ my $v = $ARGV[0];
 my $s = $ARGV[1];
 my %d;
 my $cnt = 0;
-for my $ty ("A2tspan", "A2c","A2a","A2f","A2fb","A2g","A2P"){
-  my $str = "zcat ../gz/A2summFull.$ty.$v$s.gz|";
-  $str = "zcat ../gz/${ty}FullH$v.$s.gz|" if $ty eq "A2a";
-  $str = "zcat ../c2fb/${ty}Full$v$s.s|" if $ty eq "A2tspan";
+for my $ty ("A2tspan", "A2c","A2a","A2f","A2fb","A2P"){
+  my $str = "zcat A2summFull.$ty.$v$s.gz|";
+  $str = "zcat ${ty}FullH$v.$s.gz|" if $ty eq "A2a";
+  $str = "zcat ${ty}Full$v$s.gz|" if $ty eq "A2tspan";
   open A, $str;
   while (<A>){
     chop(); 
@@ -29,10 +29,6 @@ for my $ty ("A2tspan", "A2c","A2a","A2f","A2fb","A2g","A2P"){
       $d{$a}{Alias}{$x[0]}++;
       next;
     } 
-    if ($ty eq "A2g"){
-      $d{$a}{Gender} = $x[0];
-      next;
-    }
     my $k = shift @x;
     next if !defined $k;
     if ($k =~ /=/){
@@ -53,14 +49,12 @@ for my $ty ("A2tspan", "A2c","A2a","A2f","A2fb","A2g","A2P"){
 }
 #print STDERR "read $cnt\n";
 $cnt = 0;
-my $cout = JSON->new;
-my $codec = JSON->new;
 for my $a (keys %d){
   my $doc = {
     AuthorID => $a,
     NumCommits => $d{$a}{NumCommits}+0
   };
-  for my $f ("Gender","NumFiles", "NumFirstBlobs", "NumProjects", "EarlistCommitDate", "LatestCommitDate"){
+  for my $f ("NumFiles", "NumFirstBlobs", "NumProjects", "EarlistCommitDate", "LatestCommitDate"){
     if (defined $d{$a}{$f}){
       my $val = $d{$a}{$f};
       $val += 0 if $f =~ /^Num/;
@@ -71,8 +65,6 @@ for my $a (keys %d){
     my @as = keys %{$d{$a}{Alias}};
     if ($#as > 0){
       $doc->{NumAlias} = $#as+1;
-      my $bson = $codec->encode (\@as);
-      $doc->{Alias} = $codec->decode ($bson);
     }
   }
   my @ext = keys %{$d{$a}{e}};
@@ -83,10 +75,11 @@ for my $a (keys %d){
     $stats{$ee} = $v;
   }
   if ($#ext>=0){
-    my $bson = $codec->encode (\%stats);
-    $doc->{FileInfo} = $codec->decode ($bson);
+    $doc->{FileInfo} = \%stats;
   }
   $cnt++;
-  print "".($cout ->encode ($doc))."\n";
+  print "$doc->{AuthorID};$doc->{NumCommits};$doc->{NumFiles};$doc->{NumFirstBlobs};$doc->{NumProjects};$doc->{EarlistCommitDate};$doc->{LatestCommitDate};$doc->{NumAlias}";
+  for my $e (keys %stats){ print ";$e=$stats{$e}"; }
+  print "\n";
 }
 #print STDERR "wrote $cnt\n";

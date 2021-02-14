@@ -20,7 +20,9 @@ open A, "gunzip -c $str|";
 while(<A>){
   s/\n$//;
   next if $_ eq "";
-  $match{$_}++;
+  my $str = $_;
+  my @x = split(/\./, $str);
+  $match{$#x}{$_}++;
 }
 
 my $line = 0;
@@ -30,13 +32,24 @@ while(<STDIN>){
   my @x = split(/\;/, $_, -1);
   for my $o ($off..$#x){
     next if !defined $x[$o] || $x[$o] eq "";
-    if (defined $match{$x[$o]}){
-      if ($lines){
-        print "$line:$_\n";
-      }else{
-        print "$_\n";
-      }
+    my @x = split(/\./, $x[$o]);
+    my $s = $x[0];
+    next if !defined $s || $s eq "";
+    if (defined $match{0}{$s}){
+      if ($lines){ print "$line:$_\n"; }else {print "$_\n";};
+      #print STDERR "$o;$s\n";
       last;
+    }
+    for my $i (1..$#x){
+      $s .= ".$x[$i]"; 
+      if (defined $match{$i}{$s}){
+        if ($lines){
+          print "$line:$_\n";
+        }else{
+          print "$_\n";
+        }
+        last;
+      }
     }
   }
 }

@@ -3,7 +3,7 @@ use lib ("$ENV{HOME}/lookup", "$ENV{HOME}/lib64/perl5", "/home/audris/lib64/perl
 use strict;
 use warnings;
 use Error qw(:try);
-use cmt;
+use woc;
 use Compress::LZF;
 
 my $debug = 0;
@@ -13,7 +13,7 @@ my $sec = -1;
 $sec = $ARGV[1]+0 if defined $ARGV[1];
 my $tail = 0;
 $tail = $ARGV[2]+0 if defined $ARGV[2];
-my $fbase="/data/All.blobs/commit_";
+my $fbase="commit_";
 for my $s (0..($sections-1)){
   next if $sec >= 0 && $sec != $s;
   open A, "$fbase$s.idx";

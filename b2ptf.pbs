@@ -1,0 +1,143 @@
+#PBS -N WHAT.FROM
+#PBS -A ACF-UTK0011
+#PBS -l feature=MACHINE
+#PBS -l partition=MACHINE
+#PBS -l nodes=1:ppn=16,walltime=23:50:00
+#PBS -j oe
+#PBS -S /bin/bash
+LD_LIBRARY_PATH=$HOME/lib:$HOME/lib64:$LD_LIBRARY_PATH
+c=/lustre/haven/user/audris/All.blobs
+cd $c
+
+machine=MACHINE
+maxM=12000
+[[ $machine == monster ]] && maxM=30000
+[[ $machine == rho ]] && maxM=900
+[[ $machine == sigma ]] && maxM=2900
+module load python3/3.6.5
+
+ver=R
+if test 'WHAT' == 'b2ptfsplit'; then
+
+for i in {0..3}
+do j=$((FROM*4+i))
+   zcat b2ptf$j.gz 
+done | grep ^b | cut -d\; -f2- | perl -I $HOME/lib/perl5 -I $HOME/lookup  $HOME/lookup/splitSec.perl b2ptf.FROM. 128
+
+fi
+if test "WHAT" = 'b2ptfsrt'; then
+#to complet b2f
+
+for i in {0..127}
+do zcat b2ptf.FROM.$i.gz | cut -d\; -f1,3 | $HOME/bin/lsort 12G -t\; -k1,2 -u | gzip > b2tf.FROM.$i.s
+   echo b2tf.FROM.$i.s
+done
+
+fi
+if test "WHAT" = 'b2ptfall'; then
+
+for i in {0..7}
+do j=$((FROM*8+i))
+   str="$HOME/bin/lsort ${maxM}M -t\; -k1,2 --merge -u"
+   for k in {0..31}
+   do str="$str <(zcat b2tf.$k.$j.s)"
+   done
+   eval $str | gzip > b2tfFull$ver$j.s 
+   echo b2tfFull$ver$j.s
+done
+
+fi
+if test "WHAT" = 'b2ptsrt'; then
+#to track where blob was introduced, hopefully gettting to a commit containing the tree
+
+for i in {0..127}
+do zcat b2ptf.FROM.$i.gz | cut -d\; -f1,2 | $HOME/bin/lsort 12G -t\; -k1,2 -u | gzip > b2pt.FROM.$i.s
+   echo b2pt.FROM.$i.s
+done
+
+fi
+if test 'WHAT' == 't2ptfsplit'; then
+
+for i in {0..3}
+do j=$((FROM*4+i))
+   zcat b2ptf$j.gz
+done | grep ^t | cut -d\; -f2- | perl -I $HOME/lib/perl5 -I $HOME/lookup  $HOME/lookup/splitSec.perl t2ptf.FROM. 128
+echo t2ptf.FROM.
+
+fi
+if test "WHAT" = 't2ptsrt'; then
+# for recursing up to find a commit creating the tree
+
+for i in {0..127}
+do zcat t2ptf.FROM.$i.gz | cut -d\; -f1,2 | $HOME/bin/lsort 12G -t\; -k1 -u | gzip > t2pt.FROM.$i.s
+   echo t2pt.FROM.$i.s
+done
+
+fi
+if test "WHAT" = 't2ptall'; then
+
+for i in {0..7}
+do j=$((FROM*8+i))
+   str="$HOME/bin/lsort ${maxM}M -t\; -k1,2 --merge -u"
+   for k in {0..31}
+   do str="$str <(zcat t2pt.$k.$j.s)"
+   done
+   eval $str | gzip > t2ptFull$ver$j.s
+   echo t2ptFull$ver$j.s
+done
+
+fi
+if test "WHAT" = 'b2ptall'; then
+
+for i in {0..7}
+do j=$((FROM*8+i))
+   str="$HOME/bin/lsort ${maxM}M -t\; -k1,2 --merge -u"
+   for k in {0..31}
+   do str="$str <(zcat b2pt.$k.$j.s)"
+   done
+   eval $str | gzip > b2ptFull$ver$j.s
+   echo b2ptFull$ver$j.s
+done
+
+fi
+if test "WHAT" = 'b2fExtra'; then
+
+for i in {0..7}
+do j=$((FROM*8+i))
+   zcat b2tfFullR$j.s | cut -d\; -f1 | uniq | gzip > inb2tf.$j.s
+   zcat ../c2fb/b2fallFullR$j.s | cut -d\; -f1 | uniq | gzip >  inb2fall.$j.s
+   zcat inb2tf.$j.s | join -v1 - <(zcat inb2fall.$j.s) | join -t\; - <(zcat b2tfFullR$j.s) | gzip > b2fExtra$j.s
+   echo inb2tf.$j.s inb2fall.$j.s b2fExtra$j.s
+done
+
+fi
+if test "WHAT" = 'b2falle'; then
+
+for i in {0..7}
+do j=$((FROM*8+i))
+  $HOME/bin/lsort 12G -t\; -k1,2 --merge -u <(zcat ../c2fb/b2fallFullR$j.s) <(zcat b2fExtra$j.s) | gzip > ../c2fb/b2falleFullR$j.s
+  echo ../c2fb/b2falleFullR$j.s
+done
+
+fi
+if test 'WHAT' == 'b2size'; then
+
+for i in {0..7}
+do j=$((FROM*8+i))
+   awk -F\; '{ if (NF>4){print $5";"$3}else{print $4";"$3} }' blob_$j.idx | $HOME/bin/lsort 12G -t\; -k1,1 | gzip > b2size$j.s
+done
+
+
+fi
+if test 'WHAT' == 'lasrt'; then
+
+
+for i in {0..7}
+do j=$((FROM*8+i))
+   cut -d\; -f6- ../c2fb/tkns$j.idx | $HOME/bin/lsort 12G -t\; -k1,3 | gzip > b2la$j.s
+   echo b2la$j.s
+   zcat b2la$j.s | join -t\; <(zcat b2size$j.s) - | gzip > b2sla$j.s
+   echo b2sla$j.s
+done
+
+fi

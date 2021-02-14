@@ -4,7 +4,7 @@ use lib ("$ENV{HOME}/lookup", "$ENV{HOME}/lib64/perl5", "/home/audris/lib64/perl
 use strict;
 use warnings;
 use Error qw(:try);
-use cmt;
+use woc;
 use Getopt::Long qw(GetOptions);
 
 use TokyoCabinet;
@@ -30,9 +30,9 @@ my $types = $fname;
 $types =~ s|.*/||;
 $types =~ s|Full[A-Z]$||;
 my ($t1, $t2) = split(/2/, $types);
-$f1 = "s" if ($t1 =~ /^[afpP]$/);
+$f1 = "s" if ($t1 =~ /^[aAfpP]$/);
 
-$f2 = "cs" if ($t2 =~ /^[afpP]$/);
+$f2 = "cs" if ($t2 =~ /^[AafpP]$/);
 
 $f1 = "h" if ($t1 =~ /^[cb]$/ || $t1 =~ /^(ob|td)$/);
 $f2 = "h" if ($t2 =~ /^[cb]$/ || $t2 =~ /^(cc|pc|ob|td)$/);
@@ -49,7 +49,7 @@ $f2 = "s" if ($t2 eq "PS" || $t2 eq "PF" || $t2 eq "PFS");
 $f1 = $ARGV[1] if defined $ARGV[1];
 $f2 = $ARGV[2] if defined $ARGV[2];
 
-if ($types eq "p2P" || $types eq "P2p" ||  $types eq "a2A" || $types eq "A2a"){
+if ($types =~ /^[pP]2[pP]/ || $types =~ /^[aA]2[aA]/){
   $split = 1;
   $f1 = "s";
   $f2 = "cs";
@@ -63,19 +63,21 @@ $split = $ARGV[3] if defined $ARGV[3];
 
 sub get {
   my ($c, $s) = @_;
-  return $clones{$s}{$c} if defined $clones{$s};
-  if ($split > 1){
-    if(!tie(%{$clones{$s}}, "TokyoCabinet::HDB", "$fname.$s.tch",
-       TokyoCabinet::HDB::OREADER | TokyoCabinet::HDB::ONOLCK)){
-      die "tie error for $fname.$s.tch\n";
-    }
-  }else{
-    if(!tie(%{$clones{"0"}}, "TokyoCabinet::HDB", "$fname.tch", 
-        TokyoCabinet::HDB::OREADER | TokyoCabinet::HDB::ONOLCK)){
-      die "tie error for $fname.tch\n";
+  if (!defined $clones{$s}){
+    if ($split > 1){
+      if(!tie(%{$clones{$s}}, "TokyoCabinet::HDB", "$fname.$s.tch",
+         TokyoCabinet::HDB::OREADER | TokyoCabinet::HDB::ONOLCK)){
+        die "tie error for $fname.$s.tch\n";
+      }
+    }else{
+      if(!tie(%{$clones{"0"}}, "TokyoCabinet::HDB", "$fname.tch", 
+          TokyoCabinet::HDB::OREADER | TokyoCabinet::HDB::ONOLCK)){
+        die "tie error for $fname.tch\n";
+      }
     }
   }
-  return $clones{$s}{$c};
+  return $clones{$s}{$c} if defined $clones{$s}{$c};
+  return undef;
 }
 
 while (<STDIN>){
@@ -118,8 +120,12 @@ while (<STDIN>){
       #print "$ch\n";
     }else{
       #print "$ch\n";
-      print STDERR "no $ch in $fname\n";
-      next;
+      print STDERR "no $ch in $fname $f1 $f2\n";
+      if ($f1 eq "s" && $f2 eq "cs"){
+        $v = safeComp ($c);
+      }else{
+        next;
+      }
     }
   }
   if ($f2 =~ /r/){
@@ -155,7 +161,7 @@ while (<STDIN>){
       }
     }else{
       $res =~ s/^;//;
-	  $ch .= ";$extra" if $extra ne "";
+      $ch .= ";$extra" if $extra ne "";
       for my $vv (split(/;/, $res, -1)){
         print "$ch;$vv\n";
       }

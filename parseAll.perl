@@ -165,6 +165,7 @@ $grepStr{ObjectiveC} = '\.(m|mm)$'; #also MatLab: 92842;m;MatLab vs 180971;m;Obj
 $grepStr{Asp} = '\.(X86|asa|A51|68k|x86|X68|ASM|asp|asm|[sS])$';
 $grepStr{Cuda} = '\.(cuh|cu)$';
 $grepStr{Cob} = '\.(COB|cob|CBL|cbl)$';
+$grepStr{Groovy} = '\.(groovy|gvy|gy|gsh)$';
 
 my %mapT;
 $mapT{'C++'} = 'C';
@@ -184,6 +185,7 @@ $mapT{'Asm'} = 'Asp';
 $mapT{'Pascal'} = 'Pascal';
 $mapT{'Scheme'} = 'Lisp';
 $mapT{'Fortran'} = 'F';
+$mapT{'Groovy'} = 'Groovy';
 
 
 my %doParse = (
@@ -203,7 +205,9 @@ my %doParse = (
 'java' => 1,
 'jl' => 1,
 'pl' => 1,
-'rb' => 1);
+'rb' => 1,
+'Groovy' => 1
+);
 
 my $s = $ARGV[0];
 my $from = $ARGV[1];
