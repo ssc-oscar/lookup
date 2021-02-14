@@ -16,12 +16,20 @@ while (<A>){
   }
 }
 
-my $col = $ARGV[0]+0;
+my @cols = ($ARGV[0]+0);
+for my $i (2..$#ARGV){
+  push @cols, $ARGV[$i];
+}
+  
 while(<STDIN>){
   chop();
   my @x=split(/;/);
-  if (defined $x[$col] && !defined $bad{$x[$col]}){
-    $x[$col] = $p2P{$x[$col]} if defined $p2P{$x[$col]};
-    print "".(join ';', @x)."\n";
+  my $pr = 0;
+  for my $col (@cols){
+    if (defined $x[$col] && !defined $bad{$x[$col]}){
+      $pr ++;
+      $x[$col] = $p2P{$x[$col]} if defined $p2P{$x[$col]};
+    }
   }
+  print "".(join ';', @x)."\n" if $pr == $#cols+1;
 }

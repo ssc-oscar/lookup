@@ -233,7 +233,42 @@ sub cleanCmt {
     $ta =~ s/ .*//;
     $ta = 0 if length($ta) > 10; 
     $ta = sprintf "%.10d", $ta;
+    $taz =~ s/;/ /g;
+    $auth =~ s/;/ /g;
     print "$cmt;$ta;$taz;$auth;$tree;$parents\n";
+    return;
+  }
+  if ($debug == 8){
+    my ($tree, $parents, $auth, $cmtr, $ta, $tc, $taz, $tcz, @rest) = extrCmt ($cont, $cmt);
+    $ta =~ s/ .*//;
+    $ta = 0 if length($ta) > 10; 
+    $ta = sprintf "%.10d", $ta;
+    $tc = 0 if length($tc) > 10; 
+    $tc = sprintf "%.10d", $tc;
+    $auth =~ s/;/ /g;
+    $cmtr =~ s/;/ /g;
+    print "$cmt;$ta;$tc;$auth;$cmtr;$parents\n";
+    return;
+  }
+  if ($debug == 9){
+    my ($tree, $parents, $auth, $cmtr, $ta, $tc, $taz, $tcz, @rest) = extrCmt ($cont, $cmt);
+    $ta =~ s/ .*//;
+    $ta = 0 if length($ta) > 10;
+    $ta = sprintf "%.10d", $ta;
+    $tc = 0 if length($tc) > 10;
+    $tc = sprintf "%.10d", $tc;
+    $auth =~ s/;/ /g;
+    $cmtr =~ s/;/ /g;
+    $taz =~ s/;/ /g;
+    $tcz =~ s/;/ /g;
+    my $cm = join '\n', @rest;
+    $cm =~ s/^\n*//;
+    $cm =~ s/\n*$//;
+    $cm =~ s/\r//g;
+    $cm =~ s/\n+/\n/g;
+    $cm =~ s/\n/__NEWLINE__/g;
+    $cm =~ s/;/__SEMICOLON__/g;
+    print "$cmt;$tree;$parents;$auth;$cmtr;$ta;$tc;$taz;$tcz;$cm\n";
     return;
   }
   if ($debug == 5){
