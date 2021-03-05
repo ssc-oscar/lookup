@@ -4,23 +4,22 @@ use lib ("$ENV{HOME}/lookup", "$ENV{HOME}/lib64/perl5", "/home/audris/lib64/perl
 use strict;
 use warnings;
 
+my $off = (pop @ARGV)-1;
 
 my $lines = 0;
 if ($ARGV[0] eq "-n"){
   $lines = 1;
   shift @ARGV;
 }
-
-my $str = $ARGV[0];
-my $off = 0;
-$off = $ARGV[1]-1 if defined $ARGV[1];
-
 my %match;
-open A, "gunzip -c $str|";
-while(<A>){
-  s/\n$//;
-  next if $_ eq "";
-  $match{$_}++;
+for my $str (@ARGV){
+  open A, "gunzip -c $str|";
+  while(<A>){
+    s/\n$//;
+   #chop();
+    next if $_ eq "";
+    $match{$_}++;
+  }
 }
 
 my $line = 0;
