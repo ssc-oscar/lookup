@@ -99,7 +99,7 @@ for my $a (keys %d){
       $doc->{$f} = $codec->decode( $bson );
     }
   }
-  @ext = keys %{$d{$a}{ext}};
+  @ext = keys %{$d{$a}{exts}};
   %stats = ();
   for my $ee (@ext){
     $v = $d{$a}{ext}{$ee} + 0;
