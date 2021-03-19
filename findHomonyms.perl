@@ -3,6 +3,7 @@
 use warnings;
 use strict;
 use File::Temp qw/ :POSIX /;
+use woc;
 
 my %fix;
 open A, "eMap.fix";
@@ -11,8 +12,9 @@ while (<A>){
   my ($a, $b) = split (/\;/);
   $fix{$a} = $b;
 }
-
 open A, "zcat /data/basemaps/gz/a2AFullS.s /data/basemaps/gz/a2AFullS.s.ext|";
+
+
 
 my %bad;
 #can add some bad authors that are robots/homonyms
@@ -1579,64 +1581,94 @@ linux-can.vger.kernel.org <linux-can@vger.kernel.org>
 android-build-merger <android-build-merger@google.com>
 linux-bluetooth <linux-bluetooth@vger.kernel.org>
 EOT
+my $badEmailHere =  <<'EOT';
+username@users.noreply.github.com
+{username}@users.noreply.github.com
+gb96@users.noreply.github.com
+users.noreply.github.com
+@users.noreply.github.com
+webcommauto@users.noreply.github.com
+spmiller@users.noreply.github.com
+fcrobot@users.noreply.github.com
+github-actions[bot]@users.noreply.github.com
+aokromes@users.noreply.github.com
+cethric@users.noreply.github.com
+bt3gl@users.noreply.github.com
+actions@users.noreply.github.com
+user_info@users.noreply.github.com
+ircle_username@users.noreply.github.com
+xunnamius@users.noreply.github.com
+{id?}-{username}@users.noreply.github.com
+jonathanneve@users.noreply.github.com
+circleci@users.noreply.github.com
+hansroelants1979@users.noreply.github.com
+maxmoulds@users.noreply.github.com
+initbar@users.noreply.github.com
+autumnswind@users.noreply.github.com
+user@users.noreply.github.com
+unknown@users.noreply.github.com
+dependabot[bot]@users.noreply.github.com
+noreply@users.noreply.github.com
+github@users.noreply.github.com
+dev7060@users.noreply.github.com
+github-actions@users.noreply.github.com
+EOT
+
 
 for my $a (split(/\n/, $badAuthHere)){
-  $a =~ s/^\s*//;
-  $a =~ s/\s*$//;
+  $a =~ s|^["\s\{\}\(\)\r#!%\$'/\&\*\+]*||; 
+  $a =~ s|["\s\{\}\(\)\r#!%\$'/\&\*\+]*$||; 
   $bad{lc($a)} = 1;
 }
+
+my %badE;
+for my $e (split(/\n/, $badEmailHere)){
+  $e =~ s/^\s*//;
+  $e =~ s/\s*$//;
+  $badE{lc($e)} = 1;
+}
+
+
 
 sub isBad {
   my $nn = $_[0];
   my $lnn = lc($nn);
-  $lnn =~ s/^\s*//; $lnn =~ s/\s*$//;
+  $lnn =~ s|^["\s\{\}\(\)\r#!%\$'/\&\*\+]*||; 
+  $lnn =~ s|["\s\{\}\(\)\r#!%\$'/\&\*\+]*$||; 
   return 1 if defined $bad{$lnn};
+  
+  # Very long ids
   if (length($lnn) > 100){
     $bad{$nn}++;
     return 1;
   }
-  my ($n, $e) = ("","");
-  $n = $lnn;
-  if ($lnn =~ /</){
-    ($n, $e) = split (/</, $lnn, -1);
-    $e =~ s/>.*//;
-    $e =~ s/^\s*//; 
-    $e =~ s/\s*$//;
-  }
+  my ($fn, $ln, $u, $h, $e, $gh) = parseAuthorId ($nn);
+
+  my $n = "$fn $ln";
+  # Known productive homonyms detected by observing names associated with that email
   if ($e eq 'thomas.petazzoni@free-electrons.com' || $e eq 'alth7512@gmail.com' || $e eq 'heather@live.ru'  || $e eq 'student@epicodus.com'
       || $e eq 'dwayner@microsoft.com' || $e eq 'gdc676463@gmail.com' || $e eq 'saikumar.k@autorabit.com' || $e eq 'mmol@grockit.com' 
-      || $e eq 'yy.liu@foxmail.com' || $e eq '10izzygeorge@gmail.com' || $e eq 'emberplugin@mail.ru' || $e eq 'erosen@wikimedia.org'){
+      || $e eq 'yy.liu@foxmail.com' || $e eq '10izzygeorge@gmail.com' || $e eq 'emberplugin@mail.ru' || $e eq 'erosen@wikimedia.org'
+      || defined $badE{$e}){
     $bad{$lnn}++;
     return 1;
   }
-
-  $n =~ s/\s+/ /g; 
-  $n =~ s/^ //; 
-  $n =~ s/ $//; 
   
   if ($n =~ /no.author|\bbot\b|\brobot\b|\bjenkins\b|\bgerrit\b/){
     $bad{$lnn}++;
     return 1;
   }
 
-  my ($f, $u, $h, $la) = ("", "", "", "");
-  if ($n =~ / /){
-    my @l;
-    ($f, @l) = split (/ /, $n);
-    $la = $l[$#l];
-  }
-  my $fl = length($f);
-  my $lal = length($la);
-  if ($e =~ /@/){
-    ($u, $h) = split(/@/, $e, -1);
-  } 
-  if ($n =~ /facebook-github-bot|tip-bot for|no.author|\bbot\b|\bjenkins\b/ || $u =~ /\bbot\b/){
+  my $fnl = length ($fn);
+  my $lnl = length ($ln);
+  if ($n =~ /facebook-github-bot|tip-bot for|no.author|\bbot\b|\bjenkins\b/ || 
+      $u =~ /\bbot\b/){
     $bad{$lnn}++;
     return 1;
   }
   my $le = length($e);
   my $lu = length($u);
-  my $minL = $fl > $lal ? $lal : $fl;
+  my $minL = $fnl > $lnl ? $lnl : $fnl;
   if ($u =~ /nobody|root|admin|noauthor|unknown|someone|no.author/){
     #these appear potentially problematic
     if ($minL <= 3 ||  #no name info
@@ -1651,7 +1683,7 @@ sub isBad {
     }
   }else{
     if ($e =~ /localhost/ || $le < 5 || $lu < 2){
-      if ($fl + $lal < 5 || $n =~ /test|user|nombre|name|travis.ci|vagrant|glitch/ || $e =~ /fake/){
+      if ($fnl + $lnl < 5 || $n =~ /test|user|nombre|name|travis.ci|vagrant|glitch/ || $e =~ /fake/){
         $bad{$lnn}++;
         return 1;
       }else{

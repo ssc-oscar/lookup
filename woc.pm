@@ -133,7 +133,7 @@ sub parseAuthorId{
   $e =~ tr/[A-Z]/[a-z]/;
   my $ghid = "";
   if ($e =~ m/([^\+ ]+)\@(users.noreply.github.com|users.github.com|noreply.users.github.com)/ && defined $1){ #get github hadnle
-    $e = $1;
+    $e = $1.'@users.noreply.github.com';
     $ghid = $e;
     $ghid =~ s/\@\.*//;
   }
