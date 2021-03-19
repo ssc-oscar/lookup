@@ -1,4 +1,4 @@
-#PBS -N WHATFROM
+#PBS -N WHATFROMVER
 #PBS -A ACF-UTK0011
 #PBS -l feature=MACHINE
 #PBS -l partition=MACHINE
@@ -9,7 +9,7 @@ LD_LIBRARY_PATH=$HOME/lib:$HOME/lib64:$LD_LIBRARY_PATH
 c=/lustre/haven/user/audris/All.blobs/
 cd $c
 
-ver=S
+ver=VER
 machine=MACHINE
 maxM=10000
 
@@ -32,10 +32,10 @@ if test 'WHAT' == 'c2ch'; then
 
 for i in {0..1}
 do j=$((FROM*2+$i))
-   zcat ../gz/c2PFullS$j.s | $HOME/bin/lsort ${maxM}M -t\; -k1,2 -u --merge - <(zcat ../gz/MissS/c2PMissS.$j.s) | gzip > ../gz/c2PFullS$j.s1
-   echo ../gz/c2PFullS$j.s1
+   #zcat ../gz/c2PFullS$j.s | $HOME/bin/lsort ${maxM}M -t\; -k1,2 -u --merge - <(zcat ../gz/MissS/c2PMissS.$j.s) | gzip > ../gz/c2PFullS$j.s1
+   #echo ../gz/c2PFullS$j.s1
    $HOME/lookup/lstCmt.perl 9 $j |  \
-   $HOME/bin/lsort ${maxM}M -t\; -k1,5 | join -t\; <(zcat ../gz/c2PFullS$j.s1) - | gzip > ../gz/c2chFull$ver$j.s
+   $HOME/bin/lsort ${maxM}M -t\; -k1,5 | join -t\; <(zcat ../gz/c2PFullS$j.s) - | gzip > ../gz/c2chFull$ver$j.s
    echo ../gz/c2chFull$ver$j.s
 done
 
@@ -59,6 +59,22 @@ do j=$((FROM*4+$i))
    $HOME/bin/lsort ${maxM}M -t\; -k1,5| gzip > ../gz/c2acpFull$ver$j.s
    echo c2acpFull$ver$j.s
 done
+
+fi
+if test 'WHAT' == 'Cmt'; then
+
+for k in {0..31}
+do for i in {0..3}
+ do j=$(($k*4+$i))
+   zcat ../gz/c2acpFull$ver$j.s
+ done | perl -ane '@x=split(/;/);print "$x[3]\n$x[4]\n";' | uniq  | $HOME/bin/lsort ${maxM}M -t\; -k1,1 -u | gzip > Cmt$ver$k.s
+done
+
+str="$HOME/bin/lsort ${maxM}M -t\; -k1,1 -u --merge"
+for k in {0..31}
+do str="$str <(zcat Cmt$ver$k.s)"
+done 
+eval $str | perl -I ~/lookup/ -I ~/lib/perl5/ -ane 'use woc;chop($_);print "$_;".(join ";", parseAuthorId($_))."\n";'|gzip > ../gz/Cmt$ver.split
 
 fi
 if test 'WHAT' == 'pc2cacp'; then
@@ -259,7 +275,7 @@ if test 'WHAT' == 'pc2csplit'; then
 for i in {0..7}
 do j=$((FROM*8+$i))
    zcat ../gz/c2datFull$ver$j.s
-done | perl -ane 'chop();($c,$ta,$tz,$a,$t,$pc)=split(/;/,$_,-1); for $p (split /:/, $pc, -1) { print "$p;$c\n" if $p=~/^[0-9a-f]{40}$/;}' | ~/lookup/splitSecCh.perl c2ccFull$ver.FROM. 32
+done | perl -ane 'chop();($c,$ta,$tz,$a,$t,$pc)=split(/;/,$_,-1); for $p (split /:/, $pc, -1) { print "$p;$c\n" if $p=~/^[0-9a-f]{40}$/;}' | ~/lookup/splitSec.perl c2ccFull$ver.FROM. 32
 echo c2ccFull$ver.FROM.
 
 for j in {0..31}

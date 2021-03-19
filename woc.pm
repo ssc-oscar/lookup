@@ -8,7 +8,7 @@ use MIME::Base64;
 
 require Exporter;
 our @ISA = qw (Exporter);
-our @EXPORT = qw(toUrl segB segH sHash sHashV toHex fromHex safeDecomp safeComp getFL
+our @EXPORT = qw(toUrl segB segH sHash sHashV toHex fromHex safeDecomp safeComp getFL parseAuthorId
 		splitSignature signature_error contains_angle_brackets extract_trimmed git_signature_parse extrCmt getTime cleanCmt	
 		addForks %badProjects %badAuthors %badCmt %badBlob %badTree %largeBlobPrj %largeTreePrj);
 use vars qw(@ISA);
@@ -51,15 +51,29 @@ sub getFL {
   my $a = $_[0];
   my $a0 = $a;
   $a =~ s/\s+\<.*//;
-  $a =~ s|^[\s\("\r]*||;
-  $a =~ s|["\)\r]*$||;
+  if ($a =~ /[a-zA-Z0-9_\.]+@[a-zA-Z0-9]+\.[a-z]+/){
+    $a0 = $a;
+    $a =~ s/@.*//;
+    $a =~ s|^["\s\{\}\(\)\r#!%\$'/\&\*\+@]*||;
+    $a =~  s|["\s\{\}\(\)\r#!%\$'/\&\*\+@]*$||;
+    my @as = split (/[\._]/, $a);
+    return "" if $#as < 0;
+    my $res = $as[0];
+    $res .= " $as[$#as]" if $#as > 0;
+    return $res;
+  }
+  $a =~ s|^["\s\{\}\(\)\r#!%\$'/\&\*\+@]*||;
+  $a =~  s|["\s\{\}\(\)\r#!%\$'/\&\*\+@]*$||;
   $a =~ s|[\.,\-\s]+| |g;
   $a =~ s|([a-z])([A-Z])|$1 $2|g; #Camelback
   $a =~ tr/[A-Z]/[a-z]/;
   $a =~ s/^\s*$//;
+  $a =~ s/^[0-9]*$//;
   if ($a ne ""){
+    #print STDERR "here0;$a;\n";
     my @as=split(/ /,$a);
     pop @as if ($#as > 1 && $as[$#as] =~ m/^([iv]|[iv][iv]|ii[iv]|vii|jr|sr|phd|md|dds)$/);
+    #print STDERR "here0:$a:$a0\n";
     return "$as[0] $as[$#as]" if $#as > 0;
     # handle singleword concatenated firstlast names in the future
     return $as[0];
@@ -79,15 +93,17 @@ sub getFL {
       $res =~ tr/[A-Z]/[a-z]/;
       @as = split (/ /, $res);
       pop @as if ($#as > 1 && $as[$#as] =~ m/^([iv]|[iv][iv]|ii[iv]|vii|jr|sr|phd|md|dds)$/);
+      #print STDERR "here1\n";
       return "$as[0] $as[$#as]" if $#as > 0;
       return $as[0];
     }else{
       if ($#as >= 0 && $as[0] =~ /\@/){
         $as[0] =~ s/\@.*//;
-        $as[0] =~ s/\./ /g;
+        $as[0] =~ s/[\._]/ /g;
         $as[0] =~ s|([a-z])([A-Z])|$1 $2|;
         @as = split (/ /, $as[0]);
         pop @as if ($#as > 1 && $as[$#as] =~ m/^([iv]|[iv][iv]|ii[iv]|vii|jr|sr|phd|md|dds)$/);
+        #print STDERR "here2\n";
         return "$as[0] $as[$#as]" if $#as > 0;
         # handle singleword concatenated firstlast usrnames in the future
         # return $as[0];
@@ -96,7 +112,32 @@ sub getFL {
   }
   return "";
 }
-
+sub parseAuthorId{
+  my $a = $_[0];
+  my $a0 = $a;
+  my $eBare = $a;
+  $eBare =~ s/\s+\<.*//;
+  if ($eBare !~ /@/){
+    $eBare = "";
+  }
+ 
+  my ($f, $l) = split (/ /, getFL($a));
+  my $e = $a;
+  $e =~ s/.*\<//;
+  $e = $eBare if ($e !~ /@/);
+  $e =~ s/\>.*//;
+  $e =~ s|^[\s\{\}\(\)\r#!%\$'/\&\*\+]*||;
+  $e =~ s|[\s\{\}\(\)\r#!%\$'/\&\*\+]*$||;
+  $e =~ tr/[A-Z]/[a-z]/;
+  my $ghid = "";
+  if ($e =~ m/([^\+ ]+)\@(users.noreply.github.com|users.github.com|noreply.users.github.com)/ && defined $1){ #get github hadnle
+    $e = $1;
+    $ghid = $e;
+    $ghid =~ s/\@\.*//;
+  }
+  my ($u, $d) = split(/\@/, $e);
+  return ($f, $l, $u, $d, $e, $ghid);
+} 
 
 sub segB {
   my ($s, $n) = @_;

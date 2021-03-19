@@ -216,11 +216,13 @@ cut=CUT;
 #if test 'WHAT' = 'P2Pb'; then
 j=FROM
 l=FROM
+zcat b2PFull${ver}$j.s | cut -d\; -f1 | uniq -c | awk '{ if ($1 > 10) print $2";"$1}' | gzip > largeb2P${ver}$j.s
+zcat largeb2P${ver}$j.s | perl -ane 'chop();@x=split(/;/);print "$x[0]\n" if $x[1] > '$cut';'  | gzip > largeb2P${ver}$j.$cut.s
 #for i in {0..1}
 #do j=$((FROM*2+i))
 #   zcat largeb2P$i.s | perl -ane 'chop();@x=split(/;/);print "$x[0]\n" if $x[1] > '$cut';' | gzip > largeb2P$j.$cut.s
 #   cat ../tkns/tkns{$j,$((j+32)),$((j+64)),$((j+96))}.*.idx  | perl ~/lookup/filterByLaSz.perl 450 | lsort ${maxM}M -u | gzip > bSelect$j.s
-zcat b2PFull${ver}$j.s | join -t\; - <(zcat bSelect$j.s) | perl $HOME/bin/grepFieldv.perl largeb2P$j.$cut.s 1 \
+zcat b2PFull${ver}$j.s | join -t\; - <(zcat bSelect$j.s) | perl $HOME/bin/grepFieldv.perl largeb2P${ver}$j.$cut.s 1 \
 | perl $HOME/lookup/connectExportPreNoExclude.perl | gzip > P2PFull${ver}$l.b2b.$cut
 echo P2PFull${ver}$l.b2b.$cut
 zcat P2PFull${ver}$l.b2b.$cut | perl -ane 'chop();($c,@x) = split(/;/); print "".(join ";", (sort @x))."\n";' | gzip > P2PFull${ver}$l.b2b.$cut.gz
@@ -238,6 +240,13 @@ done
 eval $str | perl -e '$pstr="";$nn=0;while(<STDIN>){chop;(@x)=split(/;/);$n=pop @x;$str=join ";", @x; if ($pstr ne $str && $pstr ne ""){ print "$nn;$pstr\n";$pstr=$str;$nn=$n }else{ $pstr=$str;$nn+=$n}};print "$nn;$pstr\n";'  | \
    gzip > P2PFull$ver.nb2b.CUT.s
 echo P2PFull$ver.nb2b.CUT.s
+
+fi
+if test 'WHAT' = 'P2Pcran'; then
+cut=2000
+for j in {0..31}
+do zcat P2PFullS$j.b2b.2000 |grep ';cran_' 
+done | gzip > P2PFullSCRAN.b2b.2000
 
 fi
 if test 'WHAT' = 'A2Afb'; then
