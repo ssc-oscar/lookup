@@ -1580,7 +1580,19 @@ linux-efi.vger.kernel.org <linux-efi@vger.kernel.org>
 linux-can.vger.kernel.org <linux-can@vger.kernel.org>
 android-build-merger <android-build-merger@google.com>
 linux-bluetooth <linux-bluetooth@vger.kernel.org>
+<Test@test.com>
+<UserName@gmail.com>
+AnotherGitProfile <username@gmail.com>
+Name <username@gmail.com>
+User Name <username@gmail.com>
+Your Name <username@gmail.com>
+unknown <username@gmail.com>
+userName <userName@gmail.com>
+userName <username@gmail.com>
+username <username@gmail.com>
+yourname <username@gmail.com>
 EOT
+
 my $badEmailHere =  <<'EOT';
 username@users.noreply.github.com
 {username}@users.noreply.github.com
@@ -1622,13 +1634,47 @@ for my $a (split(/\n/, $badAuthHere)){
 }
 
 my %badE;
+my %RealBadE;
 for my $e (split(/\n/, $badEmailHere)){
   $e =~ s/^\s*//;
   $e =~ s/\s*$//;
   $badE{lc($e)} = 1;
+  $RealBadE{lc($e)} = 1;
 }
 
-
+open BE, "bad.e";
+while (<BE>){
+  chop();
+  my ($e, $n) = split(/;/, $_);
+  $badE{lc($e)} = 1 if $n > 15;
+}
+$badE{""}++;
+my %badFN;
+open BE, "bad.fn";
+while (<BE>){
+  chop();
+  my ($fn, $ln, $c) = split(/;/, $_);
+  my $n = "";
+  if ($fn ne ""){
+    if ($ln ne ""){
+      $n = "$fn $ln";
+    }else{
+      $n = $fn;
+    }
+  }else{
+    $n = $ln if ($ln ne "");
+  }
+  $badFN{lc($n)} = 1 if $c > 15;
+}
+$badFN{""}++;
+my %badGH;
+open BE, "bad.gh";
+while (<BE>){
+  chop();
+  my ($gh, $n) = split(/;/, $_);
+  $badGH{lc($gh)} = 1 if $n > 15;
+}
+$badGH{""}++;
 
 sub isBad {
   my $nn = $_[0];
@@ -1639,29 +1685,42 @@ sub isBad {
   
   # Very long ids
   if (length($lnn) > 100){
-    $bad{$nn}++;
+    $bad{$lnn}++;
     return 1;
   }
   my ($fn, $ln, $u, $h, $e, $gh) = parseAuthorId ($nn);
+  my $n = "";
+  if ($fn ne ""){
+    if ($ln ne ""){
+      $n = "$fn $ln";
+    }else{
+      $n = $fn;
+    }
+  }else{
+    $n = $ln if ($ln ne "");
+  }
+  if (defined $badFN{lc($n)} && defined $badGH{lc($gh)} && defined $badE{lc($e)}){
+    $bad{$lnn}++;
+    return 1;
+  }
 
-  my $n = "$fn $ln";
   # Known productive homonyms detected by observing names associated with that email
   if ($e eq 'thomas.petazzoni@free-electrons.com' || $e eq 'alth7512@gmail.com' || $e eq 'heather@live.ru'  || $e eq 'student@epicodus.com'
       || $e eq 'dwayner@microsoft.com' || $e eq 'gdc676463@gmail.com' || $e eq 'saikumar.k@autorabit.com' || $e eq 'mmol@grockit.com' 
       || $e eq 'yy.liu@foxmail.com' || $e eq '10izzygeorge@gmail.com' || $e eq 'emberplugin@mail.ru' || $e eq 'erosen@wikimedia.org'
-      || defined $badE{$e}){
+      || defined $RealBadE{lc($e)}){
     $bad{$lnn}++;
     return 1;
   }
   
-  if ($n =~ /no.author|\bbot\b|\brobot\b|\bjenkins\b|\bgerrit\b/){
+  if ($n =~ /no.author|no author|\bbot\b|\brobot\b|\bjenkins\b|\bgerrit\b/){
     $bad{$lnn}++;
     return 1;
   }
 
   my $fnl = length ($fn);
   my $lnl = length ($ln);
-  if ($n =~ /facebook-github-bot|tip-bot for|no.author|\bbot\b|\bjenkins\b/ || 
+  if ($lnn =~ /facebook-github-bot|tip-bot for|no.author|\bbot\b|\bjenkins\b/ || 
       $u =~ /\bbot\b/){
     $bad{$lnn}++;
     return 1;

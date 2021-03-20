@@ -121,7 +121,9 @@ sub parseAuthorId{
     $eBare = "";
   }
  
-  my ($f, $l) = split (/ /, getFL($a));
+  my ($f, $l) = split (/ /, getFL($a), -1);
+  $f = "" if !defined $f;
+  $l = "" if !defined $l;
   my $e = $a;
   $e =~ s/.*\<//;
   $e = $eBare if ($e !~ /@/);
@@ -135,9 +137,11 @@ sub parseAuthorId{
   if ($e =~ m/([^\+ ]+)\@(users.noreply.github.com|users.github.com|noreply.users.github.com)/ && defined $1){ #get github hadnle
     $e = $1.'@users.noreply.github.com';
     $ghid = $e;
-    $ghid =~ s/\@\.*//;
+    $ghid =~ s/\@.*//;
   }
   my ($u, $d) = split(/\@/, $e);
+  $u = "" if !defined $u;
+  $d = "" if !defined $d;
   return ($f, $l, $u, $d, $e, $ghid);
 } 
 
