@@ -51,19 +51,23 @@ sub getFL {
   my $a = $_[0];
   my $a0 = $a;
   $a =~ s/\s+\<.*//;
-  if ($a =~ /[a-zA-Z0-9_\.]+@[a-zA-Z0-9]+\.[a-z]+/){
-    $a0 = $a;
-    $a =~ s/@.*//;
-    $a =~ s|^["\s\{\}\(\)\r#!%\$'/\&\*\+@]*||;
-    $a =~  s|["\s\{\}\(\)\r#!%\$'/\&\*\+@]*$||;
-    my @as = split (/[\._]/, $a);
-    return "" if $#as < 0;
-    my $res = $as[0];
-    $res .= " $as[$#as]" if $#as > 0;
-    return $res;
+  if ($a =~ /([a-zA-Z0-9_\.]+@[a-zA-Z0-9]+\.[a-z]+)/){#has email in the name space
+    my $e0 = $1;
+    my $e = $e0;
+    $e0 =~ s/@.*//;
+    $e0 =~ s|^["\s\{\}\(\)\r#!%\$'/\&\*\+]*||;
+    $e0 =~  s|["\s\{\}\(\)\r#!%\$'/\&\*\+]*$||;
+    $e0 =~ s|([a-z])([A-Z])|$1.$2|g; #Camelback
+    my @as1 = split (/[\._\-]/, $e0);
+    if ($#as1 > 1){ #use names derived from email
+      return "$as1[0] $as1[$#as1]";
+    }else{
+      #remove email
+      $a =~ s/$e0//;
+    }
   }
-  $a =~ s|^["\s\{\}\(\)\r#!%\$'/\&\*\+@]*||;
-  $a =~  s|["\s\{\}\(\)\r#!%\$'/\&\*\+@]*$||;
+  $a =~ s|^["\s\{\}\(\)\r#!%\$'/\&\*\+\.\-@]*||;
+  $a =~  s|["\s\{\}\(\)\r#!%\$'/\&\*\+\.\-@]*$||;
   $a =~ s|[\.,\-\s]+| |g;
   $a =~ s|([a-z])([A-Z])|$1 $2|g; #Camelback
   $a =~ tr/[A-Z]/[a-z]/;
@@ -76,38 +80,31 @@ sub getFL {
     #print STDERR "here0:$a:$a0\n";
     return "$as[0] $as[$#as]" if $#as > 0;
     # handle singleword concatenated firstlast names in the future
-    return $as[0];
-  }else{
+    return "$as[0]";
+  }else{#check email
     $a = $a0;
     $a =~ s/.*\<//;
     $a =~ s/\>.*//;
-    $a =~ s/^[\s\("\r]*//;
-    $a =~ s/["\)\r]*$//;
+    $a =~ s|^["\s\{\}\(\)\r#!%\$'/\&\*\+,\.\-]*||;
+    $a =~ s|["\s\{\}\(\)\r#!%\$'/\&\*\+,\.\-@]*$||;
+    $a =~ s/@.*//;
+    $a =~ s|([a-z])([A-Z])|$1 $2|g;
+    $a =~ s/[\._-]/ /g;
     my @as = split (/ /, $a);
     my $res = "";
     for my $i (0..$#as){
-      $res .= " $as[$i]" if $as[$i] ne "" && $as[$i] !~ /\@/;
+      $res .= ";$as[$i]" if $as[$i] ne "" && $as[$i] !~ /^[0-9]*$/;
     }
-    $res =~ s/^ //;
+    $res =~ s/^;//;
     if ($res ne ""){
       $res =~ tr/[A-Z]/[a-z]/;
-      @as = split (/ /, $res);
+      @as = split (/;/, $res);
       pop @as if ($#as > 1 && $as[$#as] =~ m/^([iv]|[iv][iv]|ii[iv]|vii|jr|sr|phd|md|dds)$/);
       #print STDERR "here1\n";
       return "$as[0] $as[$#as]" if $#as > 0;
-      return $as[0];
-    }else{
-      if ($#as >= 0 && $as[0] =~ /\@/){
-        $as[0] =~ s/\@.*//;
-        $as[0] =~ s/[\._]/ /g;
-        $as[0] =~ s|([a-z])([A-Z])|$1 $2|;
-        @as = split (/ /, $as[0]);
-        pop @as if ($#as > 1 && $as[$#as] =~ m/^([iv]|[iv][iv]|ii[iv]|vii|jr|sr|phd|md|dds)$/);
-        #print STDERR "here2\n";
-        return "$as[0] $as[$#as]" if $#as > 0;
-        # handle singleword concatenated firstlast usrnames in the future
-        # return $as[0];
-      }
+      return "$as[0]";
+      # handle singleword concatenated firstlast usernames in the future
+      # e.g., fabianlevin88@hotmail.com, amockus1@gmail.com 
     }
   }
   return "";
@@ -130,12 +127,15 @@ sub parseAuthorId{
   $e =~ s|{ID}\+{||;
   $e =~ s|[}{]||g;
   $e =~ s/\>.*//;
-  $e =~ s|^[\s\{\}\(\)\r#!%\$'/\&\*\+]*||;
-  $e =~ s|[\s\{\}\(\)\r#!%\$'/\&\*\+]*$||;
+  $e =~ s|^[\s\{\}\(\)\r#!%\$"'/\&\*\+,\.\-]*||;
+  $e =~ s|[\s\{\}\(\)\r#!%\$"'/\&\*\+,\.\-]*$||;
   $e =~ tr/[A-Z]/[a-z]/;
   my $ghid = "";
   if ($e =~ m/([^\+ ]+)\@(users.noreply.github.com|users.github.com|noreply.users.github.com)/ && defined $1){ #get github hadnle
-    $e = $1.'@users.noreply.github.com';
+    $e = $1;
+    $e =~ s|^["\s\{\}\(\)\r#!%\$'/\&\*\+,\.\-]*||;
+    $e =~ s|["\s\{\}\(\)\r#!%\$'/\&\*\+,\.\-]*$||;
+    $e .= '@users.noreply.github.com';
     $ghid = $e;
     $ghid =~ s/\@.*//;
   }

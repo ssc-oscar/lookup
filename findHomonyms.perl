@@ -1,4 +1,5 @@
 #!/usr/bin/perl
+use lib ("$ENV{HOME}/lookup", "$ENV{HOME}/lib64/perl5", "/home/audris/lib64/perl5","$ENV{HOME}/lib/perl5", "$ENV{HOME}/lib/x86_64-linux-gnu/perl", "$ENV{HOME}/share/perl5");
 
 use warnings;
 use strict;
@@ -12,9 +13,6 @@ while (<A>){
   my ($a, $b) = split (/\;/);
   $fix{$a} = $b;
 }
-open A, "zcat /data/basemaps/gz/a2AFullS.s /data/basemaps/gz/a2AFullS.s.ext|";
-
-
 
 my %bad;
 #can add some bad authors that are robots/homonyms
@@ -1591,6 +1589,33 @@ userName <userName@gmail.com>
 userName <username@gmail.com>
 username <username@gmail.com>
 yourname <username@gmail.com>
+TGUI <action@github.com>
+k <Guest@epicodus-2.local>
+JobId 441139812 <gitlab-ci@scaledynamics.io>
+MB <deploy@travis-ci.org>
+Bot <actions@github.com>
+<a@a.a>
+= <unknown@unknown.com>
+Katya and Reeve <reeve@>
+Jo Pedersen <jo@ii.coop>
+oscar <oscar@>
+cidsinga <cidsinga@gmail.com>
+amalieri <rbshayla@protonmail.com>
+jean.pihet@newoldbits.com <gregkh@linuxfoundation.org>
+jean.pihet@newoldbits.com <mingo@kernel.org>
+jean.pihet@newoldbits.com <uwe@kleine-koenig.org>
+jean.pihet@newoldbits.com <ville.syrjala@linux.intel.com>
+zwu.kernel@gmail.com <mingo@kernel.org>
+mail <mail@kyg.kr>
+eg <Guest@epicodus-38.local>
+Sebastien <sebastien@mapstr.com>
+khalasa@piap.pl (Krzysztof Hałasa) <dianders@chromium.org>
+khalasa@piap.pl (Krzysztof Hałasa) <dingtianhong@huawei.com>
+khalasa@piap.pl (Krzysztof Hałasa) <lgxue@hotmail.com>
+khalasa@piap.pl (Krzysztof Hałasa) <moinejf@free.fr>
+me@anmolsarma.in <arnd@arndb.de>
+me@anmolsarma.in <moinejf@free.fr>
+Matteo De Paoli <matteo@>
 EOT
 
 my $badEmailHere =  <<'EOT';
@@ -1624,6 +1649,35 @@ noreply@users.noreply.github.com
 github@users.noreply.github.com
 dev7060@users.noreply.github.com
 github-actions@users.noreply.github.com
+root@vultr.guest
+Ms2ger@gmail.com
+gitlab-ci@scaledynamics.io
+x@x.x
+student@epicodus.com
+test@test.com
+admin@masuit.com
+git@github.com
+a@a.a
+unknown@unknown.com
+actions@github.com
+deploy@travis-ci.org
+rbshayla@protonmail.com
+google-dl-platform@googlegroups.com
+robert@Roberts-MacBook-Pro.local
+dylan@Dylans-MacBook-Pro.local
+ab6c98090e52fae4a18d1beafed47fe7d3912898@cloudflare.com
+dylan@MacBook-Pro-de-Dylan.local
+tobias@Tobiass-MacBook-Pro.local
+qemu-devel@nongnu.org
+mail@kyg.kr
+busra@Busra-MacBook-Pro.local
+Nick@Nicholass-MacBook-Pro.local
+sebastien@MacBook-Pro-de-Sebastien.local
+Votre@email.com
+michelle@Michelles-MacBook-Pro.local
+kbuffardi@csuchico.edu
+marmalade@unrulygroup.com
+kapil@Apples-MacBook-Pro.local
 EOT
 
 
@@ -1708,6 +1762,9 @@ sub isBad {
   if ($e eq 'thomas.petazzoni@free-electrons.com' || $e eq 'alth7512@gmail.com' || $e eq 'heather@live.ru'  || $e eq 'student@epicodus.com'
       || $e eq 'dwayner@microsoft.com' || $e eq 'gdc676463@gmail.com' || $e eq 'saikumar.k@autorabit.com' || $e eq 'mmol@grockit.com' 
       || $e eq 'yy.liu@foxmail.com' || $e eq '10izzygeorge@gmail.com' || $e eq 'emberplugin@mail.ru' || $e eq 'erosen@wikimedia.org'
+      || $e =~ /apprentice\@dbc[0-9][0-9]\.local/
+      || $e =~ /[a-f0-9]{40}\@cloudflare\.com/
+      || $e =~ /\@pivotal\.io/
       || defined $RealBadE{lc($e)}){
     $bad{$lnn}++;
     return 1;
@@ -1753,10 +1810,14 @@ sub isBad {
   return 0;
 }
 
-while(<A>){
+#open A, "zcat /data/basemaps/gz/a2AFullS.s /data/basemaps/gz/a2AFullS.s.ext|";
+#open A, "zcat links.map.u.cs|";
+while(<STDIN>){
   chop();
-  my ($nn, $nnr, $bad) = split(/\;/, $_, -1);
+# my ($nn, $nnr) = split(/\;/, $_, -1);
+  my ($nn, $nnr) = split(/\;/, $_, -1);
   $nnr = $fix{$nnr} if defined $fix{$nnr};
-  my $bb = isBad ($nn) || isBad ($nnr);
-  print "$nn;$nnr;$bad;$bb\n";
+  my $bb = isBad ($nn);
+  my $bb1 = isBad ($nnr);
+  print "$nn;$nnr;$bb;$bb1\n";
 }
