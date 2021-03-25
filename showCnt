@@ -8,13 +8,12 @@ fmt=${2:-0}
 
 if [[ $h == da5.eecs.utk.edu ]] 
 then 
-  off=0
-  ~/lookup/showCnt.perl $t $fmt $off
+  ~/lookup/showCnt.perl $t $fmt 0
 else
  if [[ $t == 'blob' ]]
   then
     if [[ $h == 'da4.eecs.utk.edu' ]]
-    then ~/lookup/showCnt.perl $t $fmt
+    then ~/lookup/showCnt.perl $t $fmt 1
     else ssh da4 ~/lookup/showCnt.perl $t $fmt
     fi
  else

@@ -37,7 +37,7 @@ $f2 = "cs" if ($t2 =~ /^[AafpP]$/);
 $f1 = "h" if ($t1 =~ /^[cb]$/ || $t1 =~ /^(ob|td)$/);
 $f2 = "h" if ($t2 =~ /^[cb]$/ || $t2 =~ /^(cc|pc|ob|td)$/);
 
-$f2 = "sh" if $types eq "b2a";
+$f2 = "sh" if $types eq "b2fa";
 $f2 = "s" if $t2 =~ /^ta$/;
 $f2 = "s" if $types eq "b2tk"; 
 $f2 = "s" if $types eq "td2f"; 
