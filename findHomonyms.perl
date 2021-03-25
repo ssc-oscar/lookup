@@ -1,8 +1,10 @@
 #!/usr/bin/perl
+use lib ("$ENV{HOME}/lookup", "$ENV{HOME}/lib64/perl5", "/home/audris/lib64/perl5","$ENV{HOME}/lib/perl5", "$ENV{HOME}/lib/x86_64-linux-gnu/perl", "$ENV{HOME}/share/perl5");
 
 use warnings;
 use strict;
 use File::Temp qw/ :POSIX /;
+use woc;
 
 my %fix;
 open A, "eMap.fix";
@@ -11,8 +13,6 @@ while (<A>){
   my ($a, $b) = split (/\;/);
   $fix{$a} = $b;
 }
-
-open A, "zcat /data/basemaps/gz/a2AFullS.s /data/basemaps/gz/a2AFullS.s.ext|";
 
 my %bad;
 #can add some bad authors that are robots/homonyms
@@ -1578,65 +1578,213 @@ linux-efi.vger.kernel.org <linux-efi@vger.kernel.org>
 linux-can.vger.kernel.org <linux-can@vger.kernel.org>
 android-build-merger <android-build-merger@google.com>
 linux-bluetooth <linux-bluetooth@vger.kernel.org>
+<Test@test.com>
+<UserName@gmail.com>
+AnotherGitProfile <username@gmail.com>
+Name <username@gmail.com>
+User Name <username@gmail.com>
+Your Name <username@gmail.com>
+unknown <username@gmail.com>
+userName <userName@gmail.com>
+userName <username@gmail.com>
+username <username@gmail.com>
+yourname <username@gmail.com>
+TGUI <action@github.com>
+k <Guest@epicodus-2.local>
+JobId 441139812 <gitlab-ci@scaledynamics.io>
+MB <deploy@travis-ci.org>
+Bot <actions@github.com>
+<a@a.a>
+= <unknown@unknown.com>
+Katya and Reeve <reeve@>
+Jo Pedersen <jo@ii.coop>
+oscar <oscar@>
+cidsinga <cidsinga@gmail.com>
+amalieri <rbshayla@protonmail.com>
+jean.pihet@newoldbits.com <gregkh@linuxfoundation.org>
+jean.pihet@newoldbits.com <mingo@kernel.org>
+jean.pihet@newoldbits.com <uwe@kleine-koenig.org>
+jean.pihet@newoldbits.com <ville.syrjala@linux.intel.com>
+zwu.kernel@gmail.com <mingo@kernel.org>
+mail <mail@kyg.kr>
+eg <Guest@epicodus-38.local>
+Sebastien <sebastien@mapstr.com>
+khalasa@piap.pl (Krzysztof Hałasa) <dianders@chromium.org>
+khalasa@piap.pl (Krzysztof Hałasa) <dingtianhong@huawei.com>
+khalasa@piap.pl (Krzysztof Hałasa) <lgxue@hotmail.com>
+khalasa@piap.pl (Krzysztof Hałasa) <moinejf@free.fr>
+me@anmolsarma.in <arnd@arndb.de>
+me@anmolsarma.in <moinejf@free.fr>
+Matteo De Paoli <matteo@>
 EOT
 
+my $badEmailHere =  <<'EOT';
+username@users.noreply.github.com
+{username}@users.noreply.github.com
+gb96@users.noreply.github.com
+users.noreply.github.com
+@users.noreply.github.com
+webcommauto@users.noreply.github.com
+spmiller@users.noreply.github.com
+fcrobot@users.noreply.github.com
+github-actions[bot]@users.noreply.github.com
+aokromes@users.noreply.github.com
+cethric@users.noreply.github.com
+bt3gl@users.noreply.github.com
+actions@users.noreply.github.com
+user_info@users.noreply.github.com
+ircle_username@users.noreply.github.com
+xunnamius@users.noreply.github.com
+{id?}-{username}@users.noreply.github.com
+jonathanneve@users.noreply.github.com
+circleci@users.noreply.github.com
+hansroelants1979@users.noreply.github.com
+maxmoulds@users.noreply.github.com
+initbar@users.noreply.github.com
+autumnswind@users.noreply.github.com
+user@users.noreply.github.com
+unknown@users.noreply.github.com
+dependabot[bot]@users.noreply.github.com
+noreply@users.noreply.github.com
+github@users.noreply.github.com
+dev7060@users.noreply.github.com
+github-actions@users.noreply.github.com
+root@vultr.guest
+Ms2ger@gmail.com
+gitlab-ci@scaledynamics.io
+x@x.x
+student@epicodus.com
+test@test.com
+admin@masuit.com
+git@github.com
+a@a.a
+unknown@unknown.com
+actions@github.com
+deploy@travis-ci.org
+rbshayla@protonmail.com
+google-dl-platform@googlegroups.com
+robert@Roberts-MacBook-Pro.local
+dylan@Dylans-MacBook-Pro.local
+ab6c98090e52fae4a18d1beafed47fe7d3912898@cloudflare.com
+dylan@MacBook-Pro-de-Dylan.local
+tobias@Tobiass-MacBook-Pro.local
+qemu-devel@nongnu.org
+mail@kyg.kr
+busra@Busra-MacBook-Pro.local
+Nick@Nicholass-MacBook-Pro.local
+sebastien@MacBook-Pro-de-Sebastien.local
+Votre@email.com
+michelle@Michelles-MacBook-Pro.local
+kbuffardi@csuchico.edu
+marmalade@unrulygroup.com
+kapil@Apples-MacBook-Pro.local
+EOT
+
+
 for my $a (split(/\n/, $badAuthHere)){
-  $a =~ s/^\s*//;
-  $a =~ s/\s*$//;
+  $a =~ s|^["\s\{\}\(\)\r#!%\$'/\&\*\+]*||; 
+  $a =~ s|["\s\{\}\(\)\r#!%\$'/\&\*\+]*$||; 
   $bad{lc($a)} = 1;
 }
+
+my %badE;
+my %RealBadE;
+for my $e (split(/\n/, $badEmailHere)){
+  $e =~ s/^\s*//;
+  $e =~ s/\s*$//;
+  $badE{lc($e)} = 1;
+  $RealBadE{lc($e)} = 1;
+}
+
+open BE, "bad.e";
+while (<BE>){
+  chop();
+  my ($e, $n) = split(/;/, $_);
+  $badE{lc($e)} = 1 if $n > 15;
+}
+$badE{""}++;
+my %badFN;
+open BE, "bad.fn";
+while (<BE>){
+  chop();
+  my ($fn, $ln, $c) = split(/;/, $_);
+  my $n = "";
+  if ($fn ne ""){
+    if ($ln ne ""){
+      $n = "$fn $ln";
+    }else{
+      $n = $fn;
+    }
+  }else{
+    $n = $ln if ($ln ne "");
+  }
+  $badFN{lc($n)} = 1 if $c > 15;
+}
+$badFN{""}++;
+my %badGH;
+open BE, "bad.gh";
+while (<BE>){
+  chop();
+  my ($gh, $n) = split(/;/, $_);
+  $badGH{lc($gh)} = 1 if $n > 15;
+}
+$badGH{""}++;
 
 sub isBad {
   my $nn = $_[0];
   my $lnn = lc($nn);
-  $lnn =~ s/^\s*//; $lnn =~ s/\s*$//;
+  $lnn =~ s|^["\s\{\}\(\)\r#!%\$'/\&\*\+]*||; 
+  $lnn =~ s|["\s\{\}\(\)\r#!%\$'/\&\*\+]*$||; 
   return 1 if defined $bad{$lnn};
+  
+  # Very long ids
   if (length($lnn) > 100){
-    $bad{$nn}++;
+    $bad{$lnn}++;
     return 1;
   }
-  my ($n, $e) = ("","");
-  $n = $lnn;
-  if ($lnn =~ /</){
-    ($n, $e) = split (/</, $lnn, -1);
-    $e =~ s/>.*//;
-    $e =~ s/^\s*//; 
-    $e =~ s/\s*$//;
+  my ($fn, $ln, $u, $h, $e, $gh) = parseAuthorId ($nn);
+  my $n = "";
+  if ($fn ne ""){
+    if ($ln ne ""){
+      $n = "$fn $ln";
+    }else{
+      $n = $fn;
+    }
+  }else{
+    $n = $ln if ($ln ne "");
   }
+  if (defined $badFN{lc($n)} && defined $badGH{lc($gh)} && defined $badE{lc($e)}){
+    $bad{$lnn}++;
+    return 1;
+  }
+
+  # Known productive homonyms detected by observing names associated with that email
   if ($e eq 'thomas.petazzoni@free-electrons.com' || $e eq 'alth7512@gmail.com' || $e eq 'heather@live.ru'  || $e eq 'student@epicodus.com'
       || $e eq 'dwayner@microsoft.com' || $e eq 'gdc676463@gmail.com' || $e eq 'saikumar.k@autorabit.com' || $e eq 'mmol@grockit.com' 
-      || $e eq 'yy.liu@foxmail.com' || $e eq '10izzygeorge@gmail.com' || $e eq 'emberplugin@mail.ru' || $e eq 'erosen@wikimedia.org'){
+      || $e eq 'yy.liu@foxmail.com' || $e eq '10izzygeorge@gmail.com' || $e eq 'emberplugin@mail.ru' || $e eq 'erosen@wikimedia.org'
+      || $e =~ /apprentice\@dbc[0-9][0-9]\.local/
+      || $e =~ /[a-f0-9]{40}\@cloudflare\.com/
+      || $e =~ /\@pivotal\.io/
+      || defined $RealBadE{lc($e)}){
     $bad{$lnn}++;
     return 1;
   }
-
-  $n =~ s/\s+/ /g; 
-  $n =~ s/^ //; 
-  $n =~ s/ $//; 
   
-  if ($n =~ /no.author|\bbot\b|\brobot\b|\bjenkins\b|\bgerrit\b/){
+  if ($n =~ /no.author|no author|\bbot\b|\brobot\b|\bjenkins\b|\bgerrit\b/){
     $bad{$lnn}++;
     return 1;
   }
 
-  my ($f, $u, $h, $la) = ("", "", "", "");
-  if ($n =~ / /){
-    my @l;
-    ($f, @l) = split (/ /, $n);
-    $la = $l[$#l];
-  }
-  my $fl = length($f);
-  my $lal = length($la);
-  if ($e =~ /@/){
-    ($u, $h) = split(/@/, $e, -1);
-  } 
-  if ($n =~ /facebook-github-bot|tip-bot for|no.author|\bbot\b|\bjenkins\b/ || $u =~ /\bbot\b/){
+  my $fnl = length ($fn);
+  my $lnl = length ($ln);
+  if ($lnn =~ /facebook-github-bot|tip-bot for|no.author|\bbot\b|\bjenkins\b/ || 
+      $u =~ /\bbot\b/){
     $bad{$lnn}++;
     return 1;
   }
   my $le = length($e);
   my $lu = length($u);
-  my $minL = $fl > $lal ? $lal : $fl;
+  my $minL = $fnl > $lnl ? $lnl : $fnl;
   if ($u =~ /nobody|root|admin|noauthor|unknown|someone|no.author/){
     #these appear potentially problematic
     if ($minL <= 3 ||  #no name info
@@ -1651,7 +1799,7 @@ sub isBad {
     }
   }else{
     if ($e =~ /localhost/ || $le < 5 || $lu < 2){
-      if ($fl + $lal < 5 || $n =~ /test|user|nombre|name|travis.ci|vagrant|glitch/ || $e =~ /fake/){
+      if ($fnl + $lnl < 5 || $n =~ /test|user|nombre|name|travis.ci|vagrant|glitch/ || $e =~ /fake/){
         $bad{$lnn}++;
         return 1;
       }else{
@@ -1662,10 +1810,14 @@ sub isBad {
   return 0;
 }
 
-while(<A>){
+#open A, "zcat /data/basemaps/gz/a2AFullS.s /data/basemaps/gz/a2AFullS.s.ext|";
+#open A, "zcat links.map.u.cs|";
+while(<STDIN>){
   chop();
-  my ($nn, $nnr, $bad) = split(/\;/, $_, -1);
+# my ($nn, $nnr) = split(/\;/, $_, -1);
+  my ($nn, $nnr) = split(/\;/, $_, -1);
   $nnr = $fix{$nnr} if defined $fix{$nnr};
-  my $bb = isBad ($nn) || isBad ($nnr);
-  print "$nn;$nnr;$bad;$bb\n";
+  my $bb = isBad ($nn);
+  my $bb1 = isBad ($nnr);
+  print "$nn;$nnr;$bb;$bb1\n";
 }
