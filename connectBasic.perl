@@ -6,8 +6,8 @@ print STDERR "starting ".(localtime())."\n";
 #my $tmp = defined $ENV{TMP} ? File::Temp->new(DIR=>$ENV{TMP}) : tmpnam();
 my $tmp = $ARGV[0];
 
-open A, ">$tmp.names";
-open B, ">$tmp.versions";
+open A, "| gzip >$tmp.names";
+open B, "| gzip >$tmp.versions";
 my (%f2num);
 my $i = 0;
 while(<STDIN>){
@@ -23,15 +23,15 @@ while(<STDIN>){
 	print B "$f2num{$b0} $f2num{$b1}\n";
 }
 undef %f2num;
-system ("$ENV{HOME}/bin/connect < $tmp.versions > $tmp.clones");
+system ("zcat $tmp.versions | $ENV{HOME}/bin/connect | gzip > $tmp.clones");
 my @num2f;
-open A, "$tmp.names";
+open A, "zcat $tmp.names|";
 while (<A>){
 	chop($_);
 	push @num2f, $_;
 }
 
-open B, "$tmp.clones";
+open B, "zcat $tmp.clones|";
 my $cn = "";
 my %cluster = ();
 while (<B>){
@@ -51,9 +51,9 @@ while (my ($k, $v) = each %cluster){
 undef @num2f;
 
 #once everything works out remove temps
-#unlink "$tmp.versions";
-#unlink "$tmp.names";
-#unlink "$tmp.clones";
+unlink "$tmp.versions";
+unlink "$tmp.names";
+unlink "$tmp.clones";
 
 sub output {
 	my $cl = $_[0];
