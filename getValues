@@ -23,15 +23,17 @@ if [[ $h == 'da5.eecs.utk.edu' ]]
 then 
   [[ -f /fast/${t}Full$ver.31.tch ]] || ([[ -f /fast/${t}Full$pVer.31.tch ]] && ver=$pVer)
   ~/lookup/getValues.perl --flat=$flat /fast/${t}Full$ver
-else
-  if [[ $ssh != "" ]] 
-  then $ssh "~/lookup/getValues.perl --flat=$flat $path"
-  else ~/lookup/getValues.perl --flat=$flat $path
-  fi
+  exit
+#else
+#  if [[ $ssh != "" ]] 
+#  then $ssh "~/lookup/getValues.perl --flat=$flat $path"
+#  else ~/lookup/getValues.perl --flat=$flat $path
+#  fi
 fi
 
 #determine the fastest database
 ssh=""
+#echo $h $t
 if [[ -f /fast/${t}Full$ver.31.tch ]]
 then path=/fast/${t}Full$ver
 else
@@ -49,6 +51,7 @@ else
         path=${path%%.31.tch}
         ssh=${path%%_data*}
         ssh="ssh "${ssh##/}
+        #echo "$path;$ssh"
       else
         path=$(ls -f /da?_data/basemaps/${t}Full$ver.tch 2> /dev/null | head -1)
         if [[ -f $path ]]
@@ -67,4 +70,10 @@ else
     fi
   fi
 fi
+if [[ $ssh != "" ]]
+then 
+  $ssh "~/lookup/getValues.perl --flat=$flat $path"
+else ~/lookup/getValues.perl --flat=$flat $path
+fi
+
 
