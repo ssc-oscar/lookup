@@ -1,8 +1,8 @@
 #!/bin/bash
 
 h=$(hostname)
-ver=S
-pVer=R
+ver=T
+pVer=S
 flat=n
 pass=""
 while getopts "fv:" option
@@ -21,8 +21,10 @@ fi
 
 if [[ $h == 'da5.eecs.utk.edu' ]] 
 then 
-  [[ -f /fast/${t}Full$ver.31.tch ]] || ([[ -f /fast/${t}Full$pVer.31.tch ]] && ver=$pVer)
-  ~/lookup/getValues.perl --flat=$flat /fast/${t}Full$ver
+  if [[ -f /fast/${t}Full$ver.31.tch ]]
+  then ~/lookup/getValues.perl --flat=$flat /fast/${t}Full$ver
+  else ~/lookup/getValues.perl --flat=$flat /fast/${t}Full$pVer
+  fi
   exit
 #else
 #  if [[ $ssh != "" ]] 
