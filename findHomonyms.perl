@@ -1616,8 +1616,139 @@ khalasa@piap.pl (Krzysztof Hałasa) <moinejf@free.fr>
 me@anmolsarma.in <arnd@arndb.de>
 me@anmolsarma.in <moinejf@free.fr>
 Matteo De Paoli <matteo@>
+Guest User <Guest@wg401-i-01-07.mddn.vuw.ac.nz>
+a <Daniel@Daniel-PC.home>
+user <user@SEC>
+ImgBotApp <ImgBotHelp@gmail.com>
+angular-cli <angular-cli@angular.io>
+CCUser <ccuser@codecademy.com>
+codeserver-test <codeserver@yandex.ru>
+codacy-badger <badger@codacy.com>
+pscbot <pscbot@saas.bg>
+fossabot <badges@fossa.io>
+Travis-CI on github.com/conda-forge/staged-recipes <conda-forge@googlegroups.com>
+Azure <opensource@microsoft.com>
+Greenkeeper <support@greenkeeper.io>
+System <system@tech.io>
+Packt-ITService <62882280+Packt-ITService@users.noreply.github.com>
+thinkbot <thinkbot@outlook.de>
+conda-forge-admin <pelson.pub+conda-forge@gmail.com>
+android-build-prod (mdb) <android-build-team-robot@google.com>
+OCA Transbot <transbot@odoo-community.org>
+jlbuild <juliabuildbot@gmail.com>
+BBot <support@vectree.ru>
+Deppbot <deppbot@jollygoodcode.com>
+git <git@yydrobot.com>
+dpebot <dpebot@google.com>
+buildslave <buildslave@buildbot.tl.intel.com>
+Testy Test <sqrbot@lsst.org>
+discoursebot <team@discourse.org>
+Build Machine <buildmachine-sou-jenkins2@hpe.com>
+Builder Service <serv-builder@int-ubuntu-jenkins02.dc1.lan>
+HubSpot PaaS Team <tpetr+jenkinsbot@hubspot.com>
+gittestcc <gittestcc@gmail.com>
+OPSTest <OPSE2ETesting@outlook.com>
+octokit-test <octokit-test@users.noreply.github.com>
+skillzone-test-aditshri <aditshri@cisco.com>
+AzureMLTest <jocier@microsoft.com>
+oltest <openloc@microsoft.com>
+stuart <stuart@testtrack4.com>
+octokit-test <octokit-test@users.noreply.github.com>
+renovate-tests <renovate-tests@redgc.com>
+sagi <testuser@test.com>
+Air PairOne <airpairtest1@gmail.com>
+drogus-travis-testing <drogus+testing@gmail.com>
+ci-automated-tests <ci-automated-tests@broadinstitute.org>
+hail-ci-test-1 <43152844+hail-ci-test-1@users.noreply.github.com>
+mergify-test1 <38494943+mergify-test1@users.noreply.github.com>
+test <422538722@qq.com>
+Test <developersworkspace@gmail.com>
+stella-test-gaushar5 <stella-test-gaushar5@users.noreply.github.com>
+Test User <60107403+github-terraform-test-user@users.noreply.github.com>
+circle-api-test <circle-api-test@circleci.com>
+codegraph-test <60816655+codegraph-test@users.noreply.github.com>
+testbot <testbot@balabit.com>
+test <webuimaker@gmail.com>
+apptest <appTest1@wavemaker.com>
+testbot <testbot@balabit.com>
+tester <testuser@gmail.com>
+vagrant <vagrant@homestead.test>
+Tester <Tester@10.0.84.87>
+Travis <builds@travis-ci.com>
+Travis CI <ci@iilab.org>
+Travis <ci@denali.js.org>
+lnxbuild <lnxbuild@localhost>
+rasharab <help@buddybuild.com>
+Prelang <builder@prelang.com>
+jlbuild <juliabuildbot@gmail.com>
+Automerger Merge Worker <android-build-automerger-merge-worker@system.gserviceaccount.com>
+gitbuildkicker <android-build@google.com>
+Travis <builds@travis-ci.com>
+Bamboo <build@saylor.org>
+WSO2 Builder <builder@wso2.org>
+Android Merger <android-build-merger@google.com>
+ebuildy <ebuildy@gmail.com>
+ci-build <cloud8421@gmail.com>
+builder <builder@ip-10-0-0-53.eu-west-1.compute.internal>
+sci-bots-build <build@sci-bots.com>
+tek <colebuildanddevelop@gmail.com>
+buildsample <buildsampletest@gmail.com>
+Build Slave <dave+modbot@boostpro.com>
+drone <build@drone.io>
+Mr Build <build@adaptavist.com>
+= <buildthatapp@gmail.com>
+build <buildautomation@syncfusion.com>
+builduser <builduser@wix.com>
+nodemcu-custom-build <mail@shamasis.net>
+srv-build <build@lbi.com>
+Travis <builds@travis-ci.org>
+Linux Build Service Account <lnxbuild@quicinc.com>
+clojure-build <build@clojure.com>
+AzureMLTest <jocier@microsoft.com>
+windowsazure <windowsazure>
+Azure-Fluent <azfluent@microsoft.com>
+azuredevopsproject <azuredevopsproject>
+AzureMentor <30055505+AzureMentor@users.noreply.github.com>
+Automated Account <admin@azuredevops.com>
+unknown <iguest@is-m440m27-14.ischool.uw.edu>
+user <user@SEC>
+radeonprorender <radeonprorender.buildmaster@gmail.com>
+Guest User <Guest@wg401-i-01-07.mddn.vuw.ac.nz>
+SELab <labsesdt@gmail.com>
+cd <tp@puppetlabs.com>
+dated <hello@dated.fun>
+git <git@3562635.no-reply.drupal.org>
+CloudBees <no-reply@cloudbees.com>
+Begin <support@begin.com>
+Scrutinizer <auto-fixer@scrutinizer-ci.com>
+AlexPomo <frankensteinbot@gmail.com>
+Restyled.io <commits@restyled.io>
+Scala <me@scala-steward.org>
+root <support@sideci.com>
+stripe-certification <andre@crowdbotics.com>
+vagrant <vagrant@stretch.localdomain>
+SwaggerHub <SwaggerHub@smartbear.com>
+Bitbucket CI <ci@bitbucket.org>
+javascriptru <67475495+jsru-1@users.noreply.github.com>
+vagrant <vagrant@stretch.localdomain>
+cloudpossebot <cloudpossebot@users.noreply.github.com>
+Pootle daemon <pootle@pootle.sugarlabs.org>
+git <git@3427175.no-reply.drupal.org>
+Bitdeli Chef <bitdeli-chef@users.noreply.github.com>
+scala-steward <43047562+scala-steward@users.noreply.github.com>
+Quan <git-tutorial@joinscrapbook.com>
+root <coding@coding.net>
+Git @ JazzHub <hub@jazz.net>
+Ghost <ghost@github.com>
+Staticman <hello@staticman.net>
+Deleted user <ghost@github.com>
+Microsoft <ghost@github.com>;Ghost <ghost@github.com>
+Yud <hubot@github.com>
+GitHub Actions <hubot@github.com>
+Hubot <Hubot@github.com>
+Hubot2 <hubot@github.com>
+Travis CI <hubot@github.com>
 EOT
-
 my $badEmailHere =  <<'EOT';
 username@users.noreply.github.com
 {username}@users.noreply.github.com
