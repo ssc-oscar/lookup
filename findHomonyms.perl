@@ -1748,6 +1748,9 @@ GitHub Actions <hubot@github.com>
 Hubot <Hubot@github.com>
 Hubot2 <hubot@github.com>
 Travis CI <hubot@github.com>
+Lint Action <lint-action@samuelmeuli.com>
+GitHub Trainer <training+githubtrainer@github.com>
+HackerRank <hackerrank@example.com>
 EOT
 my $badEmailHere =  <<'EOT';
 username@users.noreply.github.com
