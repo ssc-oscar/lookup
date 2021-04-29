@@ -59,6 +59,10 @@ if ($types =~ /^[aA]2fb/ || $types =~ /^[aA]2[bc]/){
   $f1 = "s";
   $f2 = "h";
 }
+if ($types eq "c2dat"){
+  $f1 = "h";
+  $f2 = "s";
+}
 $split = $ARGV[3] if defined $ARGV[3];
 
 sub get {
