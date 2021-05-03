@@ -113,7 +113,8 @@ while (<STDIN>){
       if ($f2 =~ /h/){
         open VAL, $lF;
         $v="";
-        read (VAL, $v, $len);
+        seek (VAL, length($c)+1, 0);
+        read (VAL, $v, $len-length($c));
       }else{
         open VAL, "zcat $lF|";
         <VAL>; #drop first line: it is just the key
