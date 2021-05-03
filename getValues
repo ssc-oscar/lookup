@@ -52,7 +52,7 @@ else
         path=$(ls -f /da?_data/basemaps/${t}Full$ver.31.tch 2> /dev/null | head -1)
         path=${path%%.31.tch}
         ssh=${path%%_data*}
-        ssh="ssh "${ssh##/}
+        ssh="ssh -p443 "${ssh##/}
         #echo "$path;$ssh"
       else
         path=$(ls -f /da?_data/basemaps/${t}Full$ver.tch 2> /dev/null | head -1)
@@ -60,7 +60,7 @@ else
         then
           path=${path%%.tch}
           ssh=${path%%_data*}
-          ssh="ssh "${ssh##/}
+          ssh="ssh -p443 "${ssh##/}
           #echo "$path;$ssh"
         else
           ver=$pVer
@@ -69,12 +69,12 @@ else
           then
             path=${path%%.31.tch}
             ssh=${path%%_data*}
-            ssh="ssh "${ssh##/}
+            ssh="ssh -p443 "${ssh##/}
           else
             path=$(ls -f /da?_data/basemaps/${t}Full$ver.tch 2> /dev/null | head -1)
             path=${path%%.tch}
             ssh=${path%%_data*}
-            ssh="ssh "${ssh##/}
+            ssh="ssh -p443 "${ssh##/}
           fi
         fi
       fi
