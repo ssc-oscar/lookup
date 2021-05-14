@@ -75,6 +75,7 @@ for k in {0..31}
 do str="$str <(zcat Cmt$ver$k.s)"
 done 
 eval $str | perl -I ~/lookup/ -I ~/lib/perl5/ -ane 'use woc;chop($_);print "$_;".(join ";", parseAuthorId($_))."\n";'|gzip > ../gz/Cmt$ver.split
+zcat Cmt$ver.split|cut -d\; -f2,3 | grep -v '^;'|grep -v ';$' |lsort ${maxM}M -t\; -u -k1,2 |gzip > fl$ver.s & 
 
 fi
 if test 'WHAT' == 'pc2cacp'; then
@@ -310,6 +311,61 @@ do j=$((FROM*4+$i))
   done
   eval $str | gzip > ../gz/c2ccFull${ver}$j.s
   echo ../gz/c2ccFull${ver}$j.s
+done
+
+fi
+if test 'WHAT' == 'c2pc'; then
+
+for i in {0..7}
+do j=$((FROM*8+$i))
+  zcat ../gz/c2datFull$ver$j.s
+done | perl -ane 'chop();($c,$ta,$tz,$a,$t,$pc)=split(/;/,$_,-1); for $p (split /:/, $pc, -1) { print "$c;$p\n" if $p=~/^[0-9a-f]{40}$/;}' | ~/lookup/splitSec.perl c2pcFull$ver.FROM. 32
+echo c2pcFull$ver.FROM.
+
+for j in {0..31}
+  do zcat c2pcFull$ver.FROM.$j.gz | $HOME/bin/lsort ${maxM}M -t\; -k1,2 -u | gzip > c2pcFull$ver.FROM.$j.s
+  echo c2pcFull$ver.FROM.$j.s
+done
+
+fi
+if test 'WHAT' == 'c2pcmerge'; then
+
+for i in {0..3}
+do j=$((FROM*4+$i))
+  str="$HOME/bin/lsort ${maxM}M -t\; -k1,2 -u --merge"
+  for k in {0..15}
+  do str="$str <(zcat c2pcFull${ver}.$k.$j.s)"
+  done
+  eval $str | gzip > ../gz/c2pcFull${ver}$j.s
+  echo ../gz/c2pcFull${ver}$j.s
+done
+
+fi
+if test 'WHAT' == 'c22pc'; then
+
+for i in {0..3}
+do j=$((FROM*4+$i))
+   zcat ../gz/c2ccFull$ver$j.s |join -t\; - ../gz/c2pcFull$ver$j.s 
+done | cut -d\; -f2,3 |  ~/lookup/splitSec.perl ../gz/c22pcFull$ver.FROM. 32
+echo ../gz/c22pcFull$ver.FROM.
+
+for j in {0..31}
+  do zcat ../gz/c22pcFull$ver.FROM.$j.gz | $HOME/bin/lsort ${maxM}M -t\; -k1,2 -u | gzip > ../gz/c22pcFull$ver.FROM.$j.s
+  echo ../gz/c22pcFull$ver.FROM.$j.s
+done
+
+fi
+if test 'WHAT' == 'c22cc'; then
+
+for i in {0..3}
+do j=$((FROM*4+$i))
+   zcat ../gz/c2ccFull$ver$j.s |join -t\; ../gz/c2pcFull$ver$j.s -
+done | cut -d\; -f2,3 |  ~/lookup/splitSec.perl ../gz/c22ccFull$ver.FROM. 32
+echo ../gz/c22ccFull$ver.FROM.
+
+for j in {0..31}
+  do zcat ../gz/c22ccFull$ver.FROM.$j.gz | $HOME/bin/lsort ${maxM}M -t\; -k1,2 -u | gzip > ../gz/c22ccFull$ver.FROM.$j.s
+  echo ../gz/c22ccFull$ver.FROM.$j.s
 done
 
 fi

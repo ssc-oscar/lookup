@@ -3,6 +3,7 @@ use strict;
 use File::Temp qw/ :POSIX /;
 
 my %badPrj = (
+"repo.or.cz_src" => 1,
 "docker-library_commit-warehouse" => 1, 
 "FER-HT_chef-repo" => 1, 
 "devillnside_AcerRecovery" => 1, 

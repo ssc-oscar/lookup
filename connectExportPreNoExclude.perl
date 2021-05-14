@@ -2,7 +2,9 @@ use warnings;
 use strict;
 use File::Temp qw/ :POSIX /;
 
-
+my $limit = 0;
+$limit = $ARGV[0] if defined $ARGV[0]; #don't print if exceeds $limit members
+ 
 print STDERR "starting ".(localtime())."\n";
 my $n = 0;
 my $i = 0;
@@ -27,7 +29,7 @@ prt($pid);
 sub prt {
   my $pid = $_[0];
   my @vs = sort keys %tmp;
-  return if $#vs < 1;
+  return if $#vs < 1 || ($limit != 0 && $#vs >= $limit);
   my $v0 = shift @vs;
   my $pre = "$v0";
   $pre = "$pid;$v0" if (!defined $tmp{$pid});
