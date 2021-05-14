@@ -37,7 +37,7 @@ $f2 = "cs" if ($t2 =~ /^[AafpP]$/);
 $f1 = "h" if ($t1 =~ /^[cb]$/ || $t1 =~ /^(ob|td)$/);
 $f2 = "h" if ($t2 =~ /^[cb]$/ || $t2 =~ /^(cc|pc|ob|td)$/);
 
-$f2 = "sh" if $types eq "b2fa";
+$f2 = "sh" if $types =~ /b2f[aA]/;
 $f2 = "s" if $t2 =~ /^ta$/;
 $f2 = "s" if $types eq "b2tk"; 
 $f2 = "s" if $types eq "td2f"; 
@@ -58,6 +58,10 @@ if ($types =~ /^[pP]2[pP]/ || $types =~ /^[aA]2[aA]/){
 if ($types =~ /^[aA]2fb/ || $types =~ /^[aA]2[bc]/){
   $f1 = "s";
   $f2 = "h";
+}
+if ($types eq "c2dat"){
+  $f1 = "h";
+  $f2 = "s";
 }
 $split = $ARGV[3] if defined $ARGV[3];
 
@@ -109,7 +113,8 @@ while (<STDIN>){
       if ($f2 =~ /h/){
         open VAL, $lF;
         $v="";
-        read (VAL, $v, $len);
+        seek (VAL, length($c)+1, 0);
+        read (VAL, $v, $len-length($c));
       }else{
         open VAL, "zcat $lF|";
         <VAL>; #drop first line: it is just the key
