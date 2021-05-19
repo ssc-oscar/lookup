@@ -55,6 +55,11 @@ if ($types =~ /^[pP]2[pP]/ || $types =~ /^[aA]2[aA]/){
   $f2 = "cs";
   $f2 = "cs" if ($types eq "P2p" ||$types eq "A2a");
 }
+if ($types eq "b2BadDate" || $types eq "b2ManyP"){
+  $split = 1;
+  $f1 = "h";
+  $f2 = "cs";
+}
 if ($types =~ /^[aA]2fb/ || $types =~ /^[aA]2[bc]/){
   $f1 = "s";
   $f2 = "h";
@@ -125,7 +130,7 @@ while (<STDIN>){
       #print "$ch\n";
     }else{
       #print "$ch\n";
-      print STDERR "no $ch in $fname $f1 $f2\n";
+      #print STDERR "no $ch in $fname $f1 $f2\n";
       if ($f1 eq "s" && $f2 eq "cs"){
         $v = safeComp ($c);
       }else{

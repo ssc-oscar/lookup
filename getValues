@@ -26,7 +26,11 @@ then
   else ~/lookup/getValues.perl --flat=$flat /fast/${t}Full$pVer
   fi
   exit
-#else
+else
+  if [[ -f /da5_fast/${t}Full$ver.31.tch || -f /da5_fast/${t}Full$ver.tch ]]
+  then ~/lookup/getValues.perl --flat=$flat /da5_fast/${t}Full$ver
+      exit
+  fi
 #  if [[ $ssh != "" ]] 
 #  then $ssh "~/lookup/getValues.perl --flat=$flat $path"
 #  else ~/lookup/getValues.perl --flat=$flat $path
