@@ -12,10 +12,10 @@ my $v = $ARGV[0];
 my $s = $ARGV[1];
 my %d;
 my $cnt = 0;
-for my $ty ("A2tspan", "A2c","A2a","A2f","A2fb","A2P"){
-  my $str = "zcat A2summFull.$ty.$v$s.gz|";
-  $str = "zcat ${ty}FullH$v.$s.gz|" if $ty eq "A2a";
-  $str = "zcat ${ty}Full$v$s.gz|" if $ty eq "A2tspan";
+for my $ty ("A2a","A2c","A2f","A2fb","A2g","A2P","A2tspan"){
+  my $str = "zcat ../gz/A2summFull.$ty.$v$s.gz|";
+  $str = "zcat ../gz/${ty}FullH$v.$s.gz|" if $ty eq "A2a";
+  $str = "zcat ../c2fb/${ty}Full$v$s.s|" if $ty eq "A2tspan";
   open A, $str;
   while (<A>){
     chop(); 
@@ -28,7 +28,11 @@ for my $ty ("A2tspan", "A2c","A2a","A2f","A2fb","A2P"){
     if ($ty eq "A2a"){
       $d{$a}{Alias}{$x[0]}++;
       next;
-    } 
+    }
+    if ($ty eq "A2g"){
+      $d{$a}{Gender} = $x[0];
+      next;
+    }
     my $k = shift @x;
     next if !defined $k;
     if ($k =~ /=/){
@@ -50,11 +54,16 @@ for my $ty ("A2tspan", "A2c","A2a","A2f","A2fb","A2P"){
 #print STDERR "read $cnt\n";
 $cnt = 0;
 for my $a (keys %d){
+  if (!defined $d{$a}{NumCommits}){
+    my @k = keys %{$d{$a}};
+    print STDERR "@a;@k\n";
+    last;
+  }
   my $doc = {
     AuthorID => $a,
     NumCommits => $d{$a}{NumCommits}+0
   };
-  for my $f ("NumFiles", "NumFirstBlobs", "NumProjects", "EarlistCommitDate", "LatestCommitDate"){
+  for my $f ("Gender","NumFiles", "NumFirstBlobs", "NumProjects", "EarlistCommitDate", "LatestCommitDate"){
     if (defined $d{$a}{$f}){
       my $val = $d{$a}{$f};
       $val += 0 if $f =~ /^Num/;
@@ -78,7 +87,11 @@ for my $a (keys %d){
     $doc->{FileInfo} = \%stats;
   }
   $cnt++;
-  print "$doc->{AuthorID};$doc->{NumCommits};$doc->{NumFiles};$doc->{NumFirstBlobs};$doc->{NumProjects};$doc->{EarlistCommitDate};$doc->{LatestCommitDate};$doc->{NumAlias}";
+  print "$doc->{AuthorID}";
+  for my $k ("Gender","NumCommits", "NumFiles", "NumFirstBlobs", "NumProjects", "EarlistCommitDate", "LatestCommitDate", "NumAlias"){
+     my $val = defined $doc ->{$k} ? $doc ->{$k} : "";
+     print ";$val";
+  }
   for my $e (keys %stats){ print ";$e=$stats{$e}"; }
   print "\n";
 }

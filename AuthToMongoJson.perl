@@ -58,7 +58,14 @@ my $codec = JSON->new;
 for my $a (keys %d){
   my $doc = {
     AuthorID => $a,
-    NumCommits => $d{$a}{NumCommits}+0
+  };
+  if (!defined $d{$a}{NumCommits}){
+    my @k = keys %{$d{$a}};
+    print STDERR "$a;@k\n";
+    $doc->{NumCommits} = 0;
+    next; #ignore author ids who cam from from committer field
+  }else{
+    $doc->{"NumCommits"} = $d{$a}{NumCommits}+0
   };
   for my $f ("Gender","NumFiles", "NumFirstBlobs", "NumProjects", "EarlistCommitDate", "LatestCommitDate"){
     if (defined $d{$a}{$f}){

@@ -23,7 +23,7 @@ if test 'WHAT' = 'p2p'; then
 
 #for i in {0..3}
 #do j=$(($prt*4+$i))
-j=PRT
+j=FROM
 zcat c2pFull${ver}$j.s | perl $HOME/lookup/connectExportPreNoExclude.perl | gzip > c2pFull$ver$j.p2p
 echo c2pFull$ver$j.p2p
 zcat c2pFull$ver$j.p2p | perl -ane 'chop();($c,@x) = split(/;/); print "".(join ";", (sort @x))."\n";' | gzip > c2pFull$ver$j.p2p.gz 
@@ -59,12 +59,29 @@ fi
 if test 'WHAT' = 'defork'; then
 # use community detection on c2pFull$ver.np2p to get
 # c2pFullS.np2p.PLMmap.forks and c2pFullS.np2pw.PLMmap.forks
+#zcat p$ver.s | awk -F\; '{print $1";"$1}' | perl ~/lookup/mp.perl 1 c2pFull$ver.np2pu.PLMmap.forks | gzip > p2P$ver.s
+#zcat p2P$ver.s | awk -F\; '{print $2";"$1}' | lsort 3G -t\; -k1,2 | gzip > P2p$ver.s 
 
 for i in {0..1}
 do j=$((FROM*2+$i))
   zcat c2pFull$ver$j.s | perl ~/lookup/mp.perl 1 c2pFull$ver.np2pu.PLMmap.forks | uniq | lsort ${maxM}M -t\; -k1,2 -u | gzip > c2PFull$ver$j.s
   echo c2PFull$ver$j.s
 done
+
+fi
+if test 'WHAT' = 'deforkTT'; then
+
+zcat p2PT.s | perl ~/lookup/mp.perl 1 t2PFull$ver.np2pw.crank.map | gzip > p2TT.s
+
+fi
+if test 'WHAT' = 'deforkT'; then
+
+for i in 0
+do j=$((FROM+$i))
+  zcat ../c2fb/b2P128Full$ver.$j.gz | perl ~/lookup/mp.perl 1 t2PFull$ver.np2pw.crank.map | uniq | lsort ${maxM}M -t\; -k1,2 -u | gzip > ../c2fb/b2TFull$ver$j.s
+  echo ../c2fb/b2TFull$ver$j.s
+done
+
 
 fi
 if test 'WHAT' = 'deforklw'; then

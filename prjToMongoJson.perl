@@ -12,7 +12,7 @@ my @docs;
 my $v = $ARGV[0];
 my $s = $ARGV[1];
 my %d;
-for my $ty ("P2A", "P2b", "P2c", "P2f", "P2g", "P2p", "P2tspan","P2core","P2mnc"){
+for my $ty ("B2b", "P2A", "P2b", "P2c", "P2f", "P2g", "Pnfb", "P2p", "P2tspan","P2core","P2mnc"){
   my $str = "zcat ../gz/P2summFull.$ty.$v$s.gz|";
   $str = "zcat ../gz/${ty}Full$v$s.gz|" if $ty =~ /P2tspan/;
   $str = "zcat ../gz/${ty}Full$v$s.s|" if $ty =~ /P2(core|mnc)/;
@@ -35,6 +35,24 @@ for my $ty ("P2A", "P2b", "P2c", "P2f", "P2g", "P2p", "P2tspan","P2core","P2mnc"
     if ($ty eq "P2mnc"){
       $d{$a}{MonNcmt}{$x[0]} = $x[1];
     }
+    if ($ty eq "B2b"){
+      if ($x[0] eq "B2B"){
+        shift @x;
+        for my $aa (@x){
+          $d{$a}{BlobCommunity}{$aa}++;
+        }
+      }else{
+        for my $k (@x){
+          for my $k (@x){
+            my ($ke, $va) = split (/=/, $k, -1);
+            $ke = "BlobParent" if $ke eq "B";
+            $ke = "BlobCommunitySize" if $ke eq "comunity";
+            $d{$a}{$ke} = $va if $va ne "";
+          }
+        }
+      }
+    }
+   
     #par=VictorFursa_simple_php_framework;star=;frk=0;comunity=2
     if ($ty eq "P2p"){
       for my $k (@x){
@@ -54,6 +72,7 @@ for my $ty ("P2A", "P2b", "P2c", "P2f", "P2g", "P2p", "P2tspan","P2core","P2mnc"
       $ke = 'NumCommits' if $ke eq "P2c";
       $ke = 'NumFiles' if $ke eq "P2f";
       $ke = 'NumBlobs' if $ke eq "P2b";
+      $ke = 'NumOriginalBlobs' if $ke eq "Pnfb";
       $ke = 'NumAuthors' if $ke eq "P2A";
       $ke = 'NumWithGender' if $ke eq "P2g";
       $d{$a}{$ke} = $va;
@@ -71,7 +90,7 @@ for my $a (keys %d){
   my $doc = {
     ProjectID => $a
   };
-  for my $f ('NumCommits', "RootFork", 'NumStars', 'NumForks', 'CommunitySize', "NumCore", "NumFiles", "NumBlobs", "NumAuthors", "EarlistCommitDate", "LatestCommitDate"){
+  for my $f ('NumCommits', "RootFork", 'NumStars', 'NumForks', 'CommunitySize', "NumCore", "NumFiles", "NumBlobs", "NumOriginalBlobs", "NumAuthors", "EarlistCommitDate", "LatestCommitDate", "BlobCommunitySize", "BlobParent"){
     if (defined $d{$a}{$f}){
       my $val = $d{$a}{$f};
       $val += 0 if $f =~ /^(Num|CommunitySize)/;
@@ -102,7 +121,7 @@ for my $a (keys %d){
   @ext = keys %{$d{$a}{exts}};
   %stats = ();
   for my $ee (@ext){
-    $v = $d{$a}{ext}{$ee} + 0;
+    $v = $d{$a}{exts}{$ee} + 0;
     $ee =~ s/TypesSript/TypeScript/;
     $stats{$ee} = $v;
   }

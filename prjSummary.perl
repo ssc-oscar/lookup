@@ -1,5 +1,8 @@
+#!/usr/bin/perl
+use lib ("$ENV{HOME}/lookup", "$ENV{HOME}/lib64/perl5", "/home/audris/lib64/perl5","$ENV{HOME}/lib/perl5", "$ENV{HOME}/lib/x86_64-linux-gnu/perl", "$ENV{HOME}/share/perl5");
 use strict;
 use warnings;
+use woc;
 
 my $v = $ARGV[0];
 my $s = $ARGV[1];
@@ -9,7 +12,35 @@ my $pP = "";
 my %tmp = ();
 my $cnt = 0;
 
-
+if ($type eq "B2b"){
+  my %Ps;
+  open A, "zcat b2BFull$v.s |";
+  while (<A>){
+    chop();
+    my ($p0, $P) = split (/;/, $_, -1);
+    my $ss = sHash ($p0, 32);
+    next if $s != $ss;
+    $d{P}{$p0} = $P;
+    $Ps{$P}{$p0}++;
+  }
+  open A, "zcat b2BFull$v.s |";
+  while (<A>){
+    chop();
+    my ($P, $p0) = split (/;/, $_, -1);
+    next if !defined $Ps{$P};
+    $Ps{$P}{$p0}++;
+  }
+  for my $p0 (keys %{$d{P}}){
+    next if !defined $d{P}{$p0};
+    my $P = $d{P}{$p0};
+    my @cmnt = keys %{$Ps{$P}};
+    next if $#cmnt ==0 && $cmnt[0] eq $p0;
+    my $cSize = scalar(@cmnt);
+    print "$p0;B=$P;comunity=$cSize\n";
+    print "$p0;B2B;".(join ';', @cmnt)."\n" if $cSize <= 100;;
+  }
+  exit();
+}
 if ($type eq "P2p"){
   open A, "zcat ${type}Full$v.$s.gz |";
   $cnt = 0;
@@ -63,26 +94,29 @@ for my $ty ($type){
   %tmp = ();
   $pP = "";
   my $pre ="";
-  $pre = "../c2fb/" if $ty =~ /P2[bf]/;
+  $pre = "../c2fb/" if $ty =~ /P2[bf]|Pnfb/;
   my $str = "zcat $pre${ty}Full$v$s.s |";
   $str = 'zcat P2cFull'.$v.'{'.$s.",".($s+32).",".($s+64).",".($s+96).'}'.'.s|' if $ty eq "P2c"; 
   open A, $str;
   while (<A>){
     chop ();
     my ($p, $c) = split (/;/, $_, -1);
-    if ($pP ne "" && $pP ne $p){
-      #$d{$ty}{$pP} = scalar(keys %tmp);
-      print "$pP;$ty=".(scalar(keys %tmp))."\n";
-      if ($ty eq "P2f"){
-        doExt ($pP, \%tmp);
+    if ($ty eq "Pnfb"){
+      print "$p;$ty=$c\n";
+    }else{ 
+      if ($pP ne "" && $pP ne $p){
+        print "$pP;$ty=".(scalar(keys %tmp))."\n";
+        if ($ty eq "P2f"){
+          doExt ($pP, \%tmp);
+        }
+        doG ($pP, \%tmp) if ($ty eq "P2g");
+        %tmp = ();
+        print STDERR "$s $ty $cnt prs\n" if (!($cnt++%1000000));
+        #last if $cnt > 1000;
       }
-      doG ($pP, \%tmp) if ($ty eq "P2g");
-      %tmp = ();
-      print STDERR "$s $ty $cnt prs\n" if (!($cnt++%1000000));
-      #last if $cnt > 1000;
+      $tmp{$c}++;
+      $pP = $p;
     }
-    $tmp{$c}++;
-    $pP = $p;
   }
   #$d{$ty}{$pP} = scalar(keys %tmp);
   print "$pP;$ty=".(scalar(keys %tmp))."\n";

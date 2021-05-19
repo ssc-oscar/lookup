@@ -15,27 +15,59 @@ for my $ty ($ARGV[2]){
   $pP = "";
   my $pre = "";
   $pre = "../c2fb/" if $ty =~/A2[bf]/;
+  $pre = "../tkns/" if $ty =~/A2tPllPkg/;
   open A, "zcat $pre${ty}Full$v$s.s |";
   while (<A>){
     chop ();
-    my ($p, $c) = split (/;/, $_, -1);
+    my ($p, $c, @rest) = split (/;/, $_, -1);
     if ($pP ne "" && $pP ne $p){
       print "$pP;$ty=".(scalar(keys %tmp))."\n";
       #$d{$ty}{$pP} = scalar(keys %tmp);
       if ($ty eq "A2f"){
         doExt ($pP, \%tmp);
       }
+      if ($ty eq "A2tPllPkg"){
+        doAPI ($pP, \%tmp);
+      }
       %tmp = ();
       print STDERR "$s $ty $cnt\n" if (!($cnt++%500000));
       #last if $cnt > 10000;
     }
-    $tmp{$c}++;
+    if ($ty eq "A2tPllPkg"){
+      $tmp{$c}{join ";", @rest}++; 
+    }else{
+      $tmp{$c}++;
+    }
     $pP = $p;
   }
   print "$pP;$ty=".(scalar(keys %tmp))."\n";
   #$d{$ty}{$pP} = scalar(keys %tmp);
   doExt ($pP, \%tmp) if ($ty eq "A2f");
+  doAPI ($pP, \%tmp) if ($ty eq "A2tPllPkg");
   print STDERR "done $s $ty $cnt\n";
+}
+
+
+sub doAPI {
+  my ($p, $tmp) = @_;
+  my %api;
+  for my $t (keys %$tmp){
+    for my $v (keys %{$tmp->{$t}}){
+      my ($p, $l, $l1, @pkg) = split (/;/, $v);
+      for my $pk (@pkg){
+        $api{$l}{$pk}++;
+      }
+    }
+  }
+  for my $i (keys %api){
+    print "$p;api;$i";
+    for my $v (keys %{$api{$i}}){
+      my $v1 = $v;
+      $v1 =~ s/=/EQ/g;
+      print ";$v1=$api{$i}{$v}";
+    }
+    print "\n";
+  }
 }
 
 sub doExt {
@@ -46,7 +78,9 @@ sub doExt {
   #my @a = sort { $e{$b} <=> $e{$a} }  keys %e;
   print "$p;exts";
   for my $i (keys %e){
-    print ";$i=$e{$i}";
+    my $i1 = $i;
+    $i1 =~ s/=/EQ/g;
+    print ";$i1=$e{$i}";
     #$d{e}{$p}{$i}=$e{$i}; 
   }
   print "\n"

@@ -9,7 +9,7 @@ LD_LIBRARY_PATH=$HOME/lib:$HOME/lib64:$LD_LIBRARY_PATH
 c=/lustre/haven/user/audris/gz
 cd $c
 
-ver=S
+ver=VER
 machine=MACHINE
 maxM=10000
 
@@ -48,11 +48,11 @@ if test 'WHAT' == 'cntCA'; then
 
 j=FROM
 zcat P2tacFull$ver$j.s | perl -ane 'chop();@x=split(/;/);@a=localtime($x[1]);$m=$a[4]+1;$m="0$m" if $m<10;print "$x[0];$x[2];".($a[5]+1900)."-$m\n";' | uniq -c | \
-  perl -ane 'chop();s|^\s*||;s| |;|;($n,$p,$a,$t)=split(/;/);print "$p;$t;$a;$n\n"' | $HOME/bin/lsort ${maxM}M -t\; -k1,3 |  perl -e '$pt="";while(<STDIN>){chop();($p,$t,$a,$n)=split(/;/);if($pt ne "$p;$t" && $pt ne ""){print "$pt;$na;$nc\n";$nc=0;$na=0;$pa=""}$pt="$p;$t";$na++ if $pa ne $a;$nc+=$n;$pa=$a} print "$pt;$na;$nc\n";' | gzip > P2mncFullS$j.s;
+  perl -ane 'chop();s|^\s*||;s| |;|;($n,$p,$a,$t)=split(/;/);print "$p;$t;$a;$n\n"' | $HOME/bin/lsort ${maxM}M -t\; -k1,3 |  perl -e '$pt="";while(<STDIN>){chop();($p,$t,$a,$n)=split(/;/);if($pt ne "$p;$t" && $pt ne ""){print "$pt;$na;$nc\n";$nc=0;$na=0;$pa=""}$pt="$p;$t";$na++ if $pa ne $a;$nc+=$n;$pa=$a} print "$pt;$na;$nc\n";' | gzip > P2mncFull$ver$j.s;
 
 zcat P2tacFull$ver$j.s | perl ~/lookup/mapA.perl 2 a2AFullH$ver.s | perl -ane 'chop();@x=split(/;/);print "$x[0];$x[2]\n";' | uniq -c | \
   perl -ane 'chop();s|^\s*||;s| |;|;($n,$p,$a)=split(/;/);print "$p;$a;$n\n"' | \
-    perl -e '$pp="";$s=0;while(<STDIN>){chop();($p,$aa,$n)=split(/;/);if ($pp ne "" && $pp ne $p){ $cm=0;print "$pp";for $au (sort {$t{$b}<=>$t{$a}} keys %t){$cm+=$t{$au};print ";$au";last if $cm >= $s*.8;};print "\n";%t=();$s=0;};$pp=$p;$t{$aa}+=$n;$s+=$n};print "$pp";for $au (sort {$t{$b}<=>$t{$a}} keys %t){$cm+=$t{$au};print ";$au";last if $cm >= $s*.8;};print "\n";' | gzip > P2coreFullS$j.s
+    perl -e '$pp="";$s=0;while(<STDIN>){chop();($p,$aa,$n)=split(/;/);if ($pp ne "" && $pp ne $p){ $cm=0;print "$pp";for $au (sort {$t{$b}<=>$t{$a}} keys %t){$cm+=$t{$au};print ";$au";last if $cm >= $s*.8;};print "\n";%t=();$s=0;};$pp=$p;$t{$aa}+=$n;$s+=$n};print "$pp";for $au (sort {$t{$b}<=>$t{$a}} keys %t){$cm+=$t{$au};print ";$au";last if $cm >= $s*.8;};print "\n";' | gzip > P2coreFull$ver$j.s
 
 fi
 if test 'WHAT' == 'splitCAA'; then
@@ -88,12 +88,39 @@ if test 'WHAT' == 'merge'; then
 
 j=FROM
 str="$HOME/bin/lsort ${maxM}M -t\; -k1,2 -u --merge"
-for k in {0..31}
+for k in {0..127}
 do str="$str <(zcat p2aFull$ver.$k.$j.s)"
 done
 eval $str | gzip > p2aFull$ver$j.s 
 echo p2aFull$ver$j.s
 
+fi
+if test 'WHAT' == 't2P'; then
+
+for i in {0..1}
+do j=$((FROM*2+$i))
+   zcat c2PFull$ver$j.s | join -t\; - <(zcat c2datFull$ver$j.s|perl -ane 'chop();@x=split(/;/, $_, -1); print "$x[0];$x[4]\n";')
+done | perl -ane 'chop();@x=split(/;/, $_, -1); print "$x[2];$x[1]\n" if $x[2] =~ /^[0-9a-f]{40}$/ && $x[1] ne "";' | uniq | perl -I ~/lib/perl5 -I ~/lookup $HOME/lookup/splitSec.perl t2PFull$ver.FROM. 128
+echo t2PFull$ver.FROM.
+
+for j in {0..127}
+do zcat t2PFull$ver.FROM.$j.gz | $HOME/bin/lsort ${maxM}M -t\; -k1,2 -u | gzip > t2PFull$ver.FROM.$j.s
+   echo t2PFull$ver.FROM.$j.s
+done
+
+
+fi
+if test 'WHAT' == 't2Pm'; then
+
+for i in {0..3}
+do j=$((FROM*4+$i))
+   str="$HOME/bin/lsort ${maxM}M -t\; -k1,2 -u --merge"
+   for k in {0..63}
+   do str="$str <(zcat t2PFull$ver.$k.$j.s)"
+   done
+   eval $str | gzip > t2PFull$ver$j.s
+   echo t2PFull$ver$j.s
+done
 
 fi
 if test 'WHAT' == 'a2psplit'; then
@@ -178,8 +205,8 @@ do j=$((FROM*2+i))
    zcat P2AFull$ver$j.s
 done | perl -ane 'chop();@x=split(/;/, $_, -1); print "$x[1];$x[0]\n";' | perl -I ~/lib/perl5 -I ~/lookup $HOME/lookup/splitSecCh.perl A2PFull$ver.FROM. 32
 
-#fi
-#if test 'WHAT' == 'a2Asrt'; then
+fi
+if test 'WHAT' == 'a2Asrt'; then
 
 
 for i in {0..1}
@@ -203,6 +230,41 @@ do j=$((FROM*8+$i))
    echo A2PFull${ver}$j.s
 done
 
+
+fi
+if test 'WHAT' == 't2Pgraph'; then
+
+for i in {0..1}
+do j=$((FROM*2+$i))
+   zcat t2PFull${ver}$j.s
+done | cut -d\; -f1 | uniq -c | awk '{if ($1 > 2)print $0}' | sed 's|^\s*||;s| |;|' | gzip > largeTreesCnt${ver}FROM.gz
+echo  largeTreesCnt${ver}FROM.gz
+
+j=FROM
+zcat largeTreesCnt${ver}$j.gz | awk -F\; '{if ($1 > CUT)print $2}' | gzip > largeTrees$j.CUT.gz
+echo largeTrees$j.CUT.gz
+
+for i in {0..1}
+do j=$((FROM*2+$i))
+   zcat t2PFull${ver}$j.s 
+done | ~/lookup/grepFieldv.perl largeTrees$j.CUT.gz 1 | perl $HOME/lookup/connectExportPreNoExclude.perl | gzip > t2PFull${ver}FROM.CUT.p2p
+
+j=FROM
+zcat t2PFull$ver$j.CUT.p2p | perl -ane 'chop();($c,@x) = split(/;/); print "".(join ";", (sort @x))."\n";' | gzip > t2PFull$ver$j.CUT.p2p.gz
+echo t2PFull$ver$j.CUT.p2p.gz
+zcat t2PFull$ver$j.CUT.p2p.gz | lsort  ${maxM}M -t\| | uniq -c | perl -ane 'chop();s|^\s*([0-9]*) ||;print "$_;$1\n"' | gzip > t2PFull$ver$j.CUT.p2p.s
+echo t2PFull$ver$j.CUT.p2p.s
+
+fi
+if test 'WHAT' = 't2Pgraphm'; then
+
+str="lsort $(($maxM*3))M -t\| --merge"
+for i in {0..63}
+do str="$str <(zcat  t2PFull$ver$i.p2p.s)"
+done
+eval $str | perl -e '$pstr="";$nn=0;while(<STDIN>){chop;(@x)=split(/;/);$n=pop @x;$str=join ";", @x; if ($pstr ne $str && $pstr ne ""){ print "$nn;$pstr\n";$pstr=$str;$nn=$n }else{ $pstr=$str;$nn+=$n}};print "$nn;$pstr\n";'  | \
+   gzip > t2PFull$ver.np2p.s
+echo t2PFull$ver.np2p.s
 
 fi
 if test 'WHAT' == 'A2Pgraph'; then
@@ -247,10 +309,11 @@ done | perl -e 'while (<STDIN>){chop();s/\;.*//;$c{$_}++;};while (($k, $v)=each 
 
 
 fi
+
 if test 'WHAT' = 'runManual'; then
 
 # AManyP1000S.gz is manually curated!
-for j in {0..31}; do zcat P2AFull${ver}$j.s; done | perl $HOME/bin/grepFieldv.perl PManyA2000.gz 1 | perl $HOME/bin/grepFieldv.perl AManyP1000S.gz 2 | perl $HOME/lookup/connectExportPreNoExclude.perl | gzip > P2AFull${ver}.A2A.2000
+for j in {0..31}; do zcat P2AFull${ver}$j.s; done | perl $HOME/bin/grepFieldv.perl PManyA2000.gz 1 | perl $HOME/bin/grepFieldv.perl AManyP1000$ver.gz 2 | perl $HOME/lookup/connectExportPreNoExclude.perl | gzip > P2AFull${ver}.A2A.2000
 zcat P2AFull${ver}.A2A.2000 | perl -ane 'chop();($c,@x) = split(/;/); print "".(join ";", (sort @x))."\n";' | gzip > P2AFull${ver}.A2A.2000.gz
 zcat P2AFull${ver}.A2A.2000.gz | lsort  ${maxM}M -t\| | uniq -c | perl -ane 'chop();s|^\s*([0-9]*) ||;print "$_;$1\n"' | gzip > P2AFull${ver}.A2A.2000.s
 
@@ -259,8 +322,8 @@ if test 'WHAT' = 'A2Acut'; then
 
 
 cut=CUT;
-zcat AManyP | perl -ane 'chop();@x=split(/;/);print "$x[0]\n" if $x[1] > '$cut';' | gzip > AManyP$cut.gz
-zcat PManyA | perl -ane 'chop();@x=split(/;/);print "$x[0]\n" if $x[1] > '$cut';' | gzip > PManyA$cut.gz
+[[ -f AManyP$cut.gz ]] || zcat AManyP | perl -ane 'chop();@x=split(/;/);print "$x[0]\n" if $x[1] > '$cut';' | gzip > AManyP$cut.gz
+[[ -f PManyA$cut.gz ]] || zcat PManyA | perl -ane 'chop();@x=split(/;/);print "$x[0]\n" if $x[1] > '$cut';' | gzip > PManyA$cut.gz
 
 for i in {0..3}
 do j=$((FROM*4+i))
@@ -338,14 +401,15 @@ echo P2aFull$ver.na2a.s
 
 fi
 if test 'WHAT' == 'cut'; then
-CUT=1000
+CUT=100
 
-for i in {0..3}
-do j=$((FROM*4+$i))
+#for i in {0..3}
+#do j=$((FROM*4+$i))
+j=FROM
    #need to remove awk here
    zcat p2aFull$ver$j.s | cut -d\; -f1 | uniq -c | awk '{ if($1>'$CUT')print $2}' | gzip > p$CUT.$j
    echo p$CUT.$j
-   zcat p2aFull$ver$j.s | perl $HOME/bin/grepFieldv.perl p$CUT.$j 1 | join -t\; - <(zcat p2aFull$ver$j.s | perl $HOME/bin/grepFieldv.perl p$CUT.$j 1) | perl -ane 'chop();@x=split(/;/, $_, -1); print "$x[1];$x[0]\n" if $x[1] ne "" && $x[0] ne "";' | uniq | gzip > a2aFull${ver}$CUT.$j.gz 
+   zcat p2aFull$ver$j.s | perl $HOME/bin/grepFieldv.perl p$CUT.$j 1 | join -t\; - <(zcat p2aFull$ver$j.s | perl $HOME/bin/grepFieldv.perl p$CUT.$j 1) | perl -ane 'chop();@x=split(/;/, $_, -1); print "$x[1];$x[2]\n" if $x[1] ne "" && $x[2] ne "";' | uniq | gzip > a2aFull${ver}$CUT.$j.gz 
    echo a2aFull${ver}$CUT.$j.gz
    zcat a2aFull${ver}$CUT.$j.gz | perl -I ~/lib/perl5 -I ~/lookup $HOME/lookup/splitSecCh.perl a2aFull${ver}$CUT.$j. 32 
    echo a2aFull${ver}$CUT.$j. 
@@ -353,11 +417,11 @@ do j=$((FROM*4+$i))
    do zcat a2aFull${ver}$CUT.$j.$k.gz | $HOME/bin/lsort ${maxM}M -t\; -k1,2 -u | gzip > a2aFull${ver}$CUT.$j.$k.s 
       echo a2aFull${ver}$CUT.$j.$k.s
    done
-done
+#done
 
 fi
 if test 'WHAT' == 'cmerge'; then
-
+CUT=100
 for i in {0..3}
 do j=$((FROM*4+$i)) 
   str="$HOME/bin/lsort ${maxM}M -t\; -k1,2 -u --merge"
