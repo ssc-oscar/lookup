@@ -9,5 +9,5 @@ cat $i.fb | ~/lookup/getValues b2BadDate | cut -d\; -f1 > $i.badfb
 join -v1 $i.fb $i.badfb | ~/lookup/getValues b2ManyP | /home/audris/bin/lsort 10G -t\; -k2 -n | head | sort -t\; -k1 > $i.fb2n
 echo "commit;file;blob;oldBlob;NumberOfProjectsUsingThatCommit"
 join -t\; $i.fb2n $i.b2c | head | awk -F\; '{print $3";"$1";"$2}' | while IFS=\; read c b n
-do echo $c | ssh da5 ~/lookup/cmputeDiff3.perl |grep $b | awk '{print $0";'$n'"}'
+do echo $c | ssh -p443 da5 ~/lookup/cmputeDiff3.perl |grep $b | awk '{print $0";'$n'"}'
 done
