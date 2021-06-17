@@ -12,6 +12,14 @@ echo $i |~/lookup/getValues -f P2fb | cut -d\; -f2 |sort > $i.fb
 echo $j |~/lookup/getValues -f P2fb | cut -d\; -f2 |sort > $j.fb
 
 #output summary
-echo $i $j $(join $i.fb $j|wc -l) $(join $i $j.fb|wc -l) $(join $i $j|wc -l) $(join -v1 $i $j|wc -l) $(join -v2 $i $j|wc -l) 
+echo comparing $i and $j 
+echo $(join $i.fb $j|wc -l) created in $i used in $j
+echo $(join $i $j.fb|wc -l) created in $j used in $i
+echo $(join $i $j|wc -l) shared 
+echo $(join -v1 $i $j|wc -l) uniq to $i
+echo $(join -v2 $i $j|wc -l) unique to $j
 #list shared blobs
-join $i $j
+echo "creted in $i and present in $j
+join $i.fb $j|~/lookup/getValues  b2f|cut -d\; -f1,2
+echo "creted in $j and present in $i
+join $j.fb $i|~/lookup/getValues  b2f|cut -d\; -f1,2
