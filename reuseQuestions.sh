@@ -20,7 +20,7 @@ echo;
 
 #Q3
 echo "Q3: Look at the result of following command:";
-echo "echo $repo | ~/lookup/getValues -f P2f | cut -d\; -f2 | sed 's/.*\///' | grep '\.' | sed 's/.*\.//' | /home/audris/bin/lsort 1G | uniq -c | sort -n | sed 's/ *//'"
+echo "echo $repo | ~/lookup/getValues -f P2f | cut -d\; -f2 | sed 's/.*\///' | grep '\.' | sed 's/.*\.//' | ~/lookup/lsort 1G | uniq -c | sort -n | sed 's/ *//'"
 echo;
 
 #Q4

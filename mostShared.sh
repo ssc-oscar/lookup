@@ -3,15 +3,15 @@
 i=$1
 #get canonical form of the repo in case non-canonical form is provided as argument
 i=$(echo $i |~/lookup/getValues p2P| cut -d\; -f2)
-echo $i |~/lookup/getValues -f P2fb | cut -d\; -f2 |/home/audris/bin/lsort 10G > $i.fb
+echo $i |~/lookup/getValues -f P2fb | cut -d\; -f2 |~/lookup/lsort 10G > $i.fb
 #now get all commits
-echo $i |~/lookup/getValues -f P2c | cut -d\; -f2 |/home/audris/bin/lsort 10G > $i.c
+echo $i |~/lookup/getValues -f P2c | cut -d\; -f2 | ~/lookup/lsort 10G > $i.c
 #finally get all blobs
-cat $i.c |~/lookup/getValues -f c2b | awk -F\; '{print $2";"$1}' | /home/audris/bin/lsort 10G > $i.b2c
+cat $i.c |~/lookup/getValues -f c2b | awk -F\; '{print $2";"$1}' | ~/lookup/lsort 10G > $i.b2c
 #exclude blobs created via commits that have invalid date
 cat $i.fb | ~/lookup/getValues b2BadDate | cut -d\; -f1 > $i.badfb
 #count Ps for each blob
-join -v1 $i.fb $i.badfb | ~/lookup/getValues b2ManyP | /home/audris/bin/lsort 10G -t\; -k2 -n | head | sort -t\; -k1 > $i.fb2n
+join -v1 $i.fb $i.badfb | ~/lookup/getValues b2ManyP | ~/lookup/lsort 10G -t\; -k2 -n | head | sort -t\; -k1 > $i.fb2n
 
 #now run diffs for all commits and join with #projects for that commit
 echo "commit;file;blob;oldBlob;NumberOfProjectsUsingThatCommit"
