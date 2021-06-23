@@ -172,7 +172,8 @@ while (<STDIN>){
     }else{
       $res =~ s/^;//;
       $ch .= ";$extra" if $extra ne "";
-      for my $vv (split(/;/, $res, -1)){
+      my @vvs = split(/;/, $res, -1);
+      for my $vv (@vvs){
         print "$ch;$vv\n";
       }
     }

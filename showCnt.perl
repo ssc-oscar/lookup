@@ -94,13 +94,14 @@ sub getBlob {
      return "";
   }
   my ($off, $len) = unpack ("w w", $fhosc{$sec}{$bB});
+  return "" if $len == 0;
   my $f = $fhob{$sec};
   seek ($f, $off, 0);
   my $curpos = tell($f);
   my $codeC = "";
   my $rl = read ($f, $codeC, $len);
   my $code = safeDecomp ($codeC, "$sec;$curpos;$blob");
-  #print "blob;$sec;$rl;$curpos;$off;$len\;$blob\n";
+  #print STDERR "blob;$sec;$rl;$curpos;$off;$len\;$blob\n";
   if ($debug == 1){
     $code = encode_base64($code);
     $code =~ s/\r/\\r/g;

@@ -707,6 +707,7 @@ our %badAuthors = ( 'one-million-repo <mikigal.acc@gmail.com>' => "1M commits",
 our %badCmt = (
   "c89423063a78259e6a7d13d9b00278a0c5e637b0" => 10000000005,
   "45546f17e5801791d4bc5968b91253a2f4b0db72" => 10000000000,
+  "6b4ea721e0b9158d26c4f8fc85ab60c6933f73d1" => 10000000000,
   "03cb3eb9c22e21e2475fee4fb6013718a2fa39fb" => 100000000,
   "0f17bf2e73149f60302a0a2464b3fadf3ea3e6f9" => 16777217,
   "ce1407a59c910ac5dead8cb1b8b4841cabfce000" => 6649016,

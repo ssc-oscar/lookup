@@ -208,7 +208,13 @@ sub separate2T {
         }
       }
     }else{
-      #potential rename, no need to catch these
+#     potential rename, no need to catch these
+#     my @ns = keys %{$v};
+#     my @ns1 = keys %{$mapP{$v0}};
+#     if ($ns1[0] ne $ns[0]){
+#       print STDERR "rename $pre;@ns;@ns1;$v0H\n";
+#     }
+
     }
   }
   # handle deleted trees
@@ -219,6 +225,7 @@ sub separate2T {
       for my $n (@ns){
         if (!defined $mapI{$n}){
           printTR ($c, getTO ($v0H), "$pre/$n", 0);
+          #print STDERR "del tree :$pre/$n:$v0H\n";
         }
       }
     }
