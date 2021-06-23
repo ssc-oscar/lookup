@@ -30,7 +30,7 @@ while (<STDIN>){
   $hh = unpack 'H*', $b2 if length($b2) == 20;
   my $code = $codeC;
   $code = safeDecomp ($codeC, "$offset;$hh");
-  $code =~ s/\r//g;
+  $code =~ s/\r/\n/g;
   # two types of match
   my %matches = ();
   for my $l (split(/\n/, $code, -1)){
