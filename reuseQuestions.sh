@@ -73,6 +73,8 @@ echo;
 #Q13
 echo "Q13: Look at the result of following command:";
 echo "~/lookup/mostWidelyUsed.sh $repo > $repo.mostUsed; cat $repo.mostUsed"
+echo "You can also use the following command to look at the most used file extention counts among those projects found through Q12:"
+echo "~/lookup/mostUsedFiles.sh $repo"
 echo;
 
 #Q14
