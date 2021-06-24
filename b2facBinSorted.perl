@@ -6,7 +6,7 @@ use warnings;
 use Error qw(:try);
 use Compress::LZF;
 use TokyoCabinet;
-use cmt;
+use woc;
 
 my (%tmp, %c2p, %c2p1);
 

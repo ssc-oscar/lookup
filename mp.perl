@@ -7,8 +7,8 @@ my %p2P;
 open A, "zcat $map|";
 while (<A>){
   chop();
-  my ($f, $t) = split(/;/);
-  $p2P{$f} = $t if $f ne $t; # don't store identity
+  my ($f, @ts) = split(/;/);
+  $p2P{$f} = join ';', @ts if $f ne $ts[0]; # don't store identity
 }
 my $printNoMatch = 1;
 $printNoMatch = $ARGV[2]+0 if defined $ARGV[2];

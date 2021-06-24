@@ -172,7 +172,21 @@ while (<STDIN>){
     }else{
       $res =~ s/^;//;
       $ch .= ";$extra" if $extra ne "";
-      for my $vv (split(/;/, $res, -1)){
+      my @vvs;
+      my $lres = length($res);
+      if ($lres < 100000*41){
+        @vvs = split(/;/, $res, -1);
+      }else{#handle super long strings
+        my $inc = 41*100000;
+        for my $part (0..int(($lres+1)/$inc)){
+          my $from = $inc * $part;
+          my $to   = $inc + $from - 1;
+          $to = $lres if $to > $lres;
+          push @vvs, (split(/;/, substr($res, $from, $to-$from), -1));
+          #print STDERR "els=".(($lres+1)/41)." got=".($#vvs+1)." part=$part from=$from to=$to lres=$lres ".(substr(substr($res, $from, $to-$from), 0, 42))."\n";
+        }
+      }
+      for my $vv (@vvs){
         print "$ch;$vv\n";
       }
     }
