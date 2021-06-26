@@ -78,10 +78,35 @@ eval $str | perl -I ~/lookup/ -I ~/lib/perl5/ -ane 'use woc;chop($_);print "$_;"
 zcat Cmt$ver.split|cut -d\; -f2,3 | grep -v '^;'|grep -v ';$' |lsort ${maxM}M -t\; -u -k1,2 |gzip > fl$ver.s & 
 
 fi
+if test 'WHAT' == 'checkTime'; then
+
+for i in {0..3}
+do j=$((FROM*4+$i))
+  zcat ../gz/c2acpFull$ver$j.s 
+done | perl -ane 'chop();@x=split(/;/);if($#x>=5){ for $i (5..$#x){ print "$x[$i];$x[0];$x[1];$x[2];$x[3];$x[4]\n"; }}' | ~/lookup/splitSec.perl ../gz/checkTime$ver.FROM. 128
+echo checkTime$ver.FROM.
+
+for j in {0..127}
+do zcat ../gz/checkTime$ver.FROM.$j.gz | $HOME/bin/lsort ${maxM}M -t\; -k1,5 | gzip > ../gz/checkTime$ver.FROM.$j.s
+   echo checkTime$ver.FROM.$j.s
+done
+fi
+if test 'WHAT' == 'checkTimeMerge'; then
+
+for i in {0..3}
+do j=$((FROM*4+$i))
+  str="$HOME/bin/lsort ${maxM}M -t\; -k1,5 -u --merge"
+  for k in {0..31}
+  do str="$str <(zcat ../gz/checkTime$ver.$k.$j.s)"
+  done
+  eval $str | join -t\; <(zcat ../gz/c2acpFull$ver$j.s | cut -d\; -f1-5) - | gzip > ../gz/checkTime$ver$j.s
+done
+
+fi
 if test 'WHAT' == 'pc2cacp'; then
 
-for i in {0..31}
-do j=$((FROM*32+$i))
+for i in {0..3}
+do j=$((FROM*4+$i))
   zcat ../gz/c2acpFull$ver$j.s 
 done | perl -ane 'chop();@x=split(/;/);if($#x>5){print "$x[5];$x[0];$x[1];$x[2];$x[3];$x[4]"; for $i (6..$#x){print ";$x[$i]";}print "\n";}' | ~/lookup/splitSec.perl ../gz/pc2cacp$ver.FROM. 128
 echo pc2cacp$ver.FROM.
@@ -94,10 +119,10 @@ done
 fi
 if test 'WHAT' == 'pc2cacpMerge'; then
 
-for i in {0..31}
-do j=$((FROM*32+$i))
+for i in {0..3}
+do j=$((FROM*4+$i))
   str="$HOME/bin/lsort ${maxM}M -t\; -k1,5 -u --merge"
-  for k in {0..3}
+  for k in {0..31}
   do str="$str <(zcat ../gz/pc2cacp$ver.$k.$j.s)"
   done
   eval $str | join -t\; <(zcat ../gz/c2acpFull$ver$j.s | cut -d\; -f1-5) - | gzip > ../gz/pcac2cacp$ver$j.s
