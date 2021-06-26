@@ -101,7 +101,7 @@ do j=$((FROM*4+$i))
   done
   eval $str | join -t\; <(zcat ../gz/c2acpFull$ver$j.s | cut -d\; -f1-5) - | gzip > ../gz/checkTime$ver$j.s
 done
-
+#zcat checkTimeT0.s|awk -F\; '{if ($2>$3|| $7>$8||$8<$2){print $0}}'|head
 fi
 if test 'WHAT' == 'pc2cacp'; then
 
