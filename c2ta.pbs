@@ -1,4 +1,4 @@
-#PBS -N WHATFROMVER
+#PBS -N WHAT.FROM.VER.PRT
 #PBS -A ACF-UTK0011
 #PBS -l feature=MACHINE
 #PBS -l partition=MACHINE
@@ -288,13 +288,13 @@ done
 fi
 if test 'WHAT' == 't2csplit'; then
 
-for i in {0..7}
-do j=$((FROM*8+$i))
+for i in {0..1}
+do j=$((FROM*2+$i))
    zcat ../gz/c2datFull$ver$j.s
-done | perl -ane 'chop();($c,$ta,$tz,$a,$t,$pc)=split(/;/,$_,-1); print "$t;$c\n" if $t=~/^[0-9a-f]{40}$/;' | ~/lookup/splitSec.perl t2cFull$ver.FROM. 32
+done | perl -ane 'chop();($c,$ta,$tz,$a,$t,$pc)=split(/;/,$_,-1); print "$t;$c\n" if $t=~/^[0-9a-f]{40}$/;' | ~/lookup/splitSec.perl t2cFull$ver.FROM. 128
 echo t2cFull$ver.FROM.
 
-for j in {0..31}
+for j in {0..127}
   do zcat t2cFull$ver.FROM.$j.gz | $HOME/bin/lsort ${maxM}M -t\; -k1,2 -u | gzip > t2cFull$ver.FROM.$j.s
   echo t2cFull$ver.FROM.$j.s
 done
@@ -343,38 +343,96 @@ done
 fi
 if test 'WHAT' == 'c22pc'; then
 
-for i in {0..3}
-do j=$((FROM*4+$i))
-   zcat ../gz/c2ccFull$ver$j.s |join -t\; - ../gz/c2pcFull$ver$j.s 
-done | cut -d\; -f2,3 |  ~/lookup/splitSec.perl ../gz/c22pcFull$ver.FROM. 32
-echo ../gz/c22pcFull$ver.FROM.
+n=PRT
+n1=$((n+1))
+[[ $n == '1' ]] && n=
+for i in 0
+do j=$((FROM+$i))
+   zcat ../gz/c2${n}ccFull$ver$j.s | grep ';' |join -t\; -a1  - <(zcat ../gz/c2pcFull$ver$j.s) 
+done | cut -d\; -f2,3 |  ~/lookup/splitSec.perl ../gz/c2${n1}pcFull$ver.FROM. 32
+echo ../gz/c2${n1}pcFull$ver.FROM.
 
 for j in {0..31}
-  do zcat ../gz/c22pcFull$ver.FROM.$j.gz | $HOME/bin/lsort ${maxM}M -t\; -k1,2 -u | gzip > ../gz/c22pcFull$ver.FROM.$j.s
-  echo ../gz/c22pcFull$ver.FROM.$j.s
+  do zcat ../gz/c2${n1}pcFull$ver.FROM.$j.gz | $HOME/bin/lsort ${maxM}M -t\; -k1,2 -u | gzip > ../gz/c2${n1}pcFull$ver.FROM.$j.s
+  echo ../gz/c2${n1}pcFull$ver.FROM.$j.s
 done
+
+fi
+if test 'WHAT' == 'cs32'; then
+
+for i in 0
+do j=$FROM
+  $HOME/bin/lsort ${maxM}M -t\; -k1,1 --merge <(zcat ../gz/csFull$ver$j.s) <(zcat ../gz/csFull$ver$((j+32)).s) <(zcat ../gz/csFull$ver$((j+64)).s) <(zcat ../gz/csFull$ver$((j+96)).s) <(zcat ../gz/c2ccFull$ver$j.s|cut -d\; -f1) |\
+    gzip > ../gz/cs32Full$ver$j.s
+  zcat ../gz/cs32Full$ver$j.s|join -t\; -v1 - <(zcat ../gz/c2ccFull$ver$j.s) | uniq | gzip > ../gz/c2h0$ver$j.s
+  zcat ../gz/cs32Full$ver$j.s|join -t\; -v1 - <(zcat ../gz/c2pcFull$ver$j.s) | uniq | gzip > ../gz/c2r0$ver$j.s
+done 
 
 fi
 if test 'WHAT' == 'c22cc'; then
 
-for i in {0..3}
-do j=$((FROM*4+$i))
-   zcat ../gz/c2ccFull$ver$j.s |join -t\; ../gz/c2pcFull$ver$j.s -
-done | cut -d\; -f2,3 |  ~/lookup/splitSec.perl ../gz/c22ccFull$ver.FROM. 32
-echo ../gz/c22ccFull$ver.FROM.
+n=PRT
+n1=$((n+1))
+[[ $n == '1' ]] && n=
+for i in 0
+do j=$((FROM+$i))
+   zcat ../gz/c2${n}ccFull$ver$j.s |grep ';' |join -t\; -a1 <(zcat ../gz/c2pcFull$ver$j.s) -
+done | cut -d\; -f2,3 |  ~/lookup/splitSec.perl ../gz/c2${n1}ccFull$ver.FROM. 32
+echo ../gz/c2${n1}ccFull$ver.FROM.
 
 for j in {0..31}
-  do zcat ../gz/c22ccFull$ver.FROM.$j.gz | $HOME/bin/lsort ${maxM}M -t\; -k1,2 -u | gzip > ../gz/c22ccFull$ver.FROM.$j.s
-  echo ../gz/c22ccFull$ver.FROM.$j.s
+  do zcat ../gz/c2${n1}ccFull$ver.FROM.$j.gz | $HOME/bin/lsort ${maxM}M -t\; -k1,2 -u | gzip > ../gz/c2${n1}ccFull$ver.FROM.$j.s
+  echo ../gz/c2${n1}ccFull$ver.FROM.$j.s
+done
+
+
+fi
+if test 'WHAT' == 'c22ccm'; then
+
+n=PRT
+n1=$((n+1))
+n0=$n
+[[ $n == '1' ]] && n=
+w=c2${n1}cc
+for i in 0
+do j=$((FROM+$i))
+  str="$HOME/bin/lsort ${maxM}M -t\; -k1,2 -u --merge"
+  for k in {0..31}
+  do str="$str <(zcat ../gz/${w}Full${ver}.$k.$j.s)"
+  done
+  eval $str | gzip > ../gz/${w}PreFull${ver}$j.s
+  echo ../gz/${w}PreFull${ver}$j.s
+  zcat ../gz/${w}PreFull${ver}$j.s | grep -v ';' | join -t\; - <(zcat ../gz/c2ccFull$ver$j.s) | gzip > ../gz/c2h${n0}$ver$j.s
+  zcat ../gz/${w}PreFull${ver}$j.s | join -t\; -v1 - <(zcat ../gz/c2h${n0}$ver$j.s|cut -d\; -f1) | gzip >  ../gz/${w}Full${ver}$j.s
+done
+
+fi
+if test 'WHAT' == 'c22pcm'; then
+
+n=PRT
+n0=$n
+n1=$((n+1))
+[[ $n == '1' ]] && n=
+w=c2${n1}pc
+for i in 0
+do j=$((FROM+$i))
+  str="$HOME/bin/lsort ${maxM}M -t\; -k1,2 -u --merge"
+  for k in {0..31}
+  do str="$str <(zcat ../gz/${w}Full${ver}.$k.$j.s)"
+  done
+  eval $str | gzip > ../gz/${w}PreFull${ver}$j.s
+  echo ../gz/${w}PreFull${ver}$j.s
+  zcat ../gz/${w}PreFull${ver}$j.s|grep -v ';' | join -t\; - <(zcat ../gz/c2pcFull$ver$j.s) | gzip > ../gz/c2r${n0}$ver$j.s 
+  zcat ../gz/${w}PreFull${ver}$j.s | join -t\; -v1 - <(zcat ../gz/c2r${n0}$ver$j.s|cut -d\; -f1) | gzip >  ../gz/${w}Full${ver}$j.s
 done
 
 fi
 if test 'WHAT' == 't2cmerge'; then
 
-for i in {0..3}
-do j=$((FROM*4+$i))
+for i in {0..1}
+do j=$((FROM*2+$i))
   str="$HOME/bin/lsort ${maxM}M -t\; -k1,2 -u --merge"
-  for k in {0..15}
+  for k in {0..63}
   do str="$str <(zcat t2cFull${ver}.$k.$j.s)"
   done
   eval $str | gzip > ../gz/t2cFull${ver}$j.s
