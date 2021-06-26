@@ -12,10 +12,11 @@ my $v = $ARGV[0];
 my $s = $ARGV[1];
 my %d;
 my $cnt = 0;
-for my $ty ("A2tspan", "A2c","A2a","A2f","A2fb","A2g","A2P"){
+for my $ty ("A2tspan", "A2c","A2a","A2f","A2fb","A2g","A2P","A2mnc"){
   my $str = "zcat ../gz/A2summFull.$ty.$v$s.gz|";
   $str = "zcat ../gz/${ty}FullH$v.$s.gz|" if $ty eq "A2a";
   $str = "zcat ../c2fb/${ty}Full$v$s.s|" if $ty eq "A2tspan";
+  $str = "zcat ../gz/${ty}Full$v$s.s|" if $ty eq "A2mnc";
   open A, $str;
   while (<A>){
     chop(); 
@@ -32,6 +33,10 @@ for my $ty ("A2tspan", "A2c","A2a","A2f","A2fb","A2g","A2P"){
     if ($ty eq "A2g"){
       $d{$a}{Gender} = $x[0];
       next;
+    }
+    if ($ty eq "A2mnc"){
+      $d{$a}{MonNprj}{$x[0]} = $x[1];
+      $d{$a}{MonNcmt}{$x[0]} = $x[2];
     }
     my $k = shift @x;
     next if !defined $k;
@@ -59,6 +64,7 @@ for my $a (keys %d){
   my $doc = {
     AuthorID => $a,
   };
+  $d{$a}{"NumActiveMon"} = scalar (keys %{$d{$a}{"MonNprj"}});
   if (!defined $d{$a}{NumCommits}){
     my @k = keys %{$d{$a}};
     print STDERR "$a;@k\n";
@@ -67,7 +73,7 @@ for my $a (keys %d){
   }else{
     $doc->{"NumCommits"} = $d{$a}{NumCommits}+0
   };
-  for my $f ("Gender","NumFiles", "NumFirstBlobs", "NumProjects", "EarlistCommitDate", "LatestCommitDate"){
+  for my $f ("Gender","NumFiles", "NumFirstBlobs", "NumProjects", "NumActiveMon", "EarlistCommitDate", "LatestCommitDate"){
     if (defined $d{$a}{$f}){
       my $val = $d{$a}{$f};
       $val += 0 if $f =~ /^Num/;
@@ -82,8 +88,21 @@ for my $a (keys %d){
       $doc->{Alias} = $codec->decode ($bson);
     }
   }
-  my @ext = keys %{$d{$a}{e}};
-  my %stats = ();
+  my (@ext, %stats);
+  for my $f ("MonNcmt","MonNprj"){
+    @ext = keys %{$d{$a}{$f}};
+    %stats = ();
+    for my $ee (@ext){
+      $v = $d{$a}{$f}{$ee} + 0;
+      $stats{$ee} = $v;
+    }
+    if ($#ext>=0){
+      my $bson = $codec->encode( \%stats );
+      $doc->{$f} = $codec->decode( $bson );
+    }
+  }
+  @ext = keys %{$d{$a}{e}};
+  %stats = ();
   for my $ee (@ext){
     $v = $d{$a}{e}{$ee} + 0;
     $ee =~ s/TypesSript/TypeScript/;

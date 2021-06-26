@@ -14,7 +14,7 @@ my $s = $ARGV[1];
 my %d;
 for my $ty ("B2b", "P2A", "P2b", "P2c", "P2f", "P2g", "Pnfb", "P2p", "P2tspan","P2core","P2mnc"){
   my $str = "zcat ../gz/P2summFull.$ty.$v$s.gz|";
-  $str = "zcat ../gz/${ty}Full$v$s.gz|" if $ty =~ /P2tspan/;
+  $str = "zcat ../c2fb/${ty}Full$v$s.s|" if $ty =~ /P2tspan/;
   $str = "zcat ../gz/${ty}Full$v$s.s|" if $ty =~ /P2(core|mnc)/;
   open A, $str;
   while (<A>){
@@ -33,7 +33,8 @@ for my $ty ("B2b", "P2A", "P2b", "P2c", "P2f", "P2g", "Pnfb", "P2p", "P2tspan","
       next;
     }
     if ($ty eq "P2mnc"){
-      $d{$a}{MonNcmt}{$x[0]} = $x[1];
+      $d{$a}{MonNauth}{$x[0]} = $x[1];
+      $d{$a}{MonNcmt}{$x[0]} = $x[2];
     }
     if ($ty eq "B2b"){
       if ($x[0] eq "B2B"){
@@ -90,7 +91,8 @@ for my $a (keys %d){
   my $doc = {
     ProjectID => $a
   };
-  for my $f ('NumCommits', "RootFork", 'NumStars', 'NumForks', 'CommunitySize', "NumCore", "NumFiles", "NumBlobs", "NumOriginalBlobs", "NumAuthors", "EarlistCommitDate", "LatestCommitDate", "BlobCommunitySize", "BlobParent"){
+  $d{$a}{"NumActiveMon"} = scalar (keys %{$d{$a}{"MonNauth"}});
+  for my $f ('NumCommits', "RootFork", 'NumStars', 'NumForks', 'CommunitySize', "NumCore", "NumActiveMon", "NumFiles", "NumBlobs", "NumOriginalBlobs", "NumAuthors", "EarlistCommitDate", "LatestCommitDate", "BlobCommunitySize", "BlobParent"){
     if (defined $d{$a}{$f}){
       my $val = $d{$a}{$f};
       $val += 0 if $f =~ /^(Num|CommunitySize)/;
@@ -106,7 +108,7 @@ for my $a (keys %d){
   my $bson = $codec->encode( \%{$d{$a}{Core}} );
   $doc->{Core} = $codec->decode( $bson );
   my (@ext, %stats);
-  for my $f ("Gender","MonNcmt"){ 
+  for my $f ("Gender","MonNcmt","MonNauth"){ 
     @ext = keys %{$d{$a}{$f}};
     %stats = ();
     for my $ee (@ext){

@@ -124,6 +124,16 @@ do j=$(($prt*8+$i))
 done
 
 fi
+if test 'WHAT' = 'MPS'; then
+
+str="$HOME/bin/lsort ${maxM}M -t\; -k1,1 --merge"
+for k in {0..127}
+do str="$str <(zcat p$ver.$k.s)"
+done
+eval $str | uniq | gzip > p$ver.s
+echo p$ver.s
+
+fi
 if test 'WHAT' = 'DEFORK'; then
 #see defork in forks.pbs 
 #
