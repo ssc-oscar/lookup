@@ -46,9 +46,9 @@ my $split = 32;
 my %dat; 
 sub myOpen {
   my ($k, $s) = @_;
-  my $ver = "S";
-  my $pVer= "R";
-  $ver = $pVer if (-f "/da0_data/basemaps/${k}Full$pVer.$s.tch");
+  my $ver = "T";
+  my $pVer= "S";
+  $ver = $pVer if (! -f "/da5_fast/${k}Full$ver.$s.tch");
   # print STDERR "${k}Full$ver.$s.tch\n";
   if (!defined $dat{$k}{$s}){
     if (!tie (%{$dat{$k}{$s}}, "TokyoCabinet::HDB", "/da0_data/basemaps/${k}Full$ver.$s.tch",

@@ -2,8 +2,8 @@
 
 
 h=$(hostname)
-ver=S
-pVer=R
+ver=T
+pVer=S
 t=$1
 d=${2:-0}
 

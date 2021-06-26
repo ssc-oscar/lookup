@@ -7,23 +7,7 @@ my $s = $ARGV[1];
 my %d = ();
 my $pP = "";
 my %tmp = ();
-open A, 'zcat P2cFull'.$v.'{'.$s.",".($s+32).",".($s+64).",".($s+96).'}'.'.s|';
 my $cnt = 0;
-while (<A>){
-  chop ();
-  #print "$_\n";
-  my ($p, $c) = split (/;/, $_, -1);
-  if ($pP ne "" && $pP ne $p){
-    $d{c}{$pP} = scalar(keys %tmp);
-    %tmp = ();
-    print STDERR "$s P2c $cnt\n" if (!($cnt++%1000000));
-    #last if $cnt > 1000;
-  }
-  $tmp{$c}++;
-  $pP = $p;
-}
-$d{c}{$pP} = scalar(keys %tmp);
-print STDERR "done $s P2c $cnt\n";
 
 for my $ty ("P2f"){
   $cnt = 0;
@@ -34,7 +18,8 @@ for my $ty ("P2f"){
     chop ();
     my ($p, $c) = split (/;/, $_, -1);
     if ($pP ne "" && $pP ne $p){
-      $d{$ty}{$pP} = scalar(keys %tmp);
+      print "$pP;$ty=".(scalar(keys %tmp))."\n";
+      #$d{$ty}{$pP} = scalar(keys %tmp);
       if ($ty eq "P2f"){
         doExt ($pP, \%tmp);
       }
@@ -45,21 +30,14 @@ for my $ty ("P2f"){
     $tmp{$c}++;
     $pP = $p;
   }
-  $d{$ty}{$pP} = scalar(keys %tmp);
+  print "$pP;$ty=".(scalar(keys %tmp))."\n";
+  #$d{$ty}{$pP} = scalar(keys %tmp);
   doExt ($pP, \%tmp) if ($ty eq "P2f");
   print STDERR "done $s $ty $cnt\n";
 }
 
 my @a = keys %{$d{c}};
 print STDERR "$#a\n";
-for my $p (keys %{$d{c}}){
-  my $fs = defined $d{P2f}{$p} ?  $d{P2f}{$p} : "";
-  print "$p;$d{c}{$p};$fs";
-  for my $e (keys %{$d{e}{$p}}){
-    print ";$e=$d{e}{$p}{$e}";
-  }
-  print "\n";
-}
 
 sub doExt {
   my ($p, $tmp) = @_;
@@ -67,7 +45,12 @@ sub doExt {
   my %e = ();
   for my $fi (@a){ ext ($fi, \%e, $tmp->{$fi}) if $fi ne ""; }
   #my @a = sort { $e{$b} <=> $e{$a} }  keys %e;
-  for my $i (keys %e){ $d{e}{$p}{$i}=$e{$i}; }
+  print "$p;exts";
+  for my $i (keys %e){
+    print ";$i=$e{$i}";
+    #$d{e}{$p}{$i}=$e{$i}; 
+  }
+  print "\n";
 }
 
 sub ext {

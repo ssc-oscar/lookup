@@ -17,7 +17,6 @@ sub fromHex {
 
 my $debug = 0;
 my $sections = 128;
-my $parts = 2;
 
 my $type = $ARGV[0];
 my $sec = $ARGV[1];
@@ -34,7 +33,8 @@ tie %fhos, "TokyoCabinet::HDB", "${fbase}$sec.tch", TokyoCabinet::HDB::OWRITER |
 open INI, "$fbasei$sec.idx" or die ($!);
 while (<INI>){
   chop();
-  my ($n, $offset, $siz, $hsha1Full) = split(/\;/, $_, -1);
+  my ($n, $offset, $siz, $hsha1Full, @x) = split(/\;/, $_, -1);
+  $hsha1Full = $x[0] if ($#x > 0);
   my $sha1Full = fromHex ($hsha1Full);
   $fhos{$sha1Full} = pack "w", $n;
 }

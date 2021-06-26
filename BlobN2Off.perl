@@ -30,7 +30,8 @@ tie %{$fhoso{$sec}}, "TokyoCabinet::HDB", "$pre/${fbaseo}$sec.tch", TokyoCabinet
    or die "cant open $pre/$fbaseo$sec.tch\n";
 my $nn = 0;
 if ( -f "$fbasei$sec.idx"){
-  open A, "tac $fbasei$sec.idx|" or die ($!);
+  #open A, "tac $fbasei$sec.idx|" or die ($!);
+  open A, "cat $fbasei$sec.idx|" or die ($!);
   while (<A>){
     chop ();
     my @x = split (/\;/, $_, -1);
@@ -42,8 +43,13 @@ if ( -f "$fbasei$sec.idx"){
     }
     my $h = fromHex ($hash);
     if (defined $fhoso{$sec}{$h}){
-       print "done/updated $nn\n";
-       last;
+      my ($ofO, $lenO) = unpack "w w", $fhoso{$sec}{$h};
+      if ($ofO != $of || $lenO != $len){
+        print STDERR "mismatch: @x, $ofO, $lenO\n";
+        last;
+      }
+#     print "done/updated $nn\n";
+#     last;
     }
     $nn ++;
     $fhoso{$sec}{$h} = pack ("w w", $of, $len);      

@@ -55,6 +55,11 @@ if ($types =~ /^[pP]2[pP]/ || $types =~ /^[aA]2[aA]/){
   $f2 = "cs";
   $f2 = "cs" if ($types eq "P2p" ||$types eq "A2a");
 }
+if ($types eq "b2BadDate" || $types eq "b2ManyP"){
+  $split = 1;
+  $f1 = "h";
+  $f2 = "cs";
+}
 if ($types =~ /^[aA]2fb/ || $types =~ /^[aA]2[bc]/){
   $f1 = "s";
   $f2 = "h";
@@ -125,7 +130,7 @@ while (<STDIN>){
       #print "$ch\n";
     }else{
       #print "$ch\n";
-      print STDERR "no $ch in $fname $f1 $f2\n";
+      #print STDERR "no $ch in $fname $f1 $f2\n";
       if ($f1 eq "s" && $f2 eq "cs"){
         $v = safeComp ($c);
       }else{
@@ -167,7 +172,21 @@ while (<STDIN>){
     }else{
       $res =~ s/^;//;
       $ch .= ";$extra" if $extra ne "";
-      for my $vv (split(/;/, $res, -1)){
+      my @vvs;
+      my $lres = length($res);
+      if ($lres < 100000*41){
+        @vvs = split(/;/, $res, -1);
+      }else{#handle super long strings
+        my $inc = 41*100000;
+        for my $part (0..int(($lres+1)/$inc)){
+          my $from = $inc * $part;
+          my $to   = $inc + $from - 1;
+          $to = $lres if $to > $lres;
+          push @vvs, (split(/;/, substr($res, $from, $to-$from), -1));
+          #print STDERR "els=".(($lres+1)/41)." got=".($#vvs+1)." part=$part from=$from to=$to lres=$lres ".(substr(substr($res, $from, $to-$from), 0, 42))."\n";
+        }
+      }
+      for my $vv (@vvs){
         print "$ch;$vv\n";
       }
     }
