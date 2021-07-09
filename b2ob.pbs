@@ -500,6 +500,38 @@ do j=$(($i+$l*2))
 done
 
 fi
+if test 'WHAT' = 'ct2BPm1'; then
+
+j=FROM
+zcat fc2B${sel}PFull${ver}$j.s | $HOME/lookup/grepFieldv.perl CommonBlobs.gz 2 | join -t\; - <(zcat ../gz/c2datFull$ver$j.s | cut -d\; -f1-2)  | join -t\; <(zcat ../gz/c2PFull$ver$j.s) - | perl -ane 'chop(); ($c,$t,$P,$b,$p)=split(/;/);print "$P;$b;$t;$p\n";' | perl -I $HOME/lib/perl5 -I $HOME/lookup $HOME/lookup/splitSecCh.perl fP2${sel}btP.$j. 32
+echo fP2${sel}btP.$j.
+
+
+fi
+if test 'WHAT' = 'ct2BPm2'; then
+
+j=FROM
+
+for i in {0..31}
+do $HOME/bin/lsort $((maxM*mul))M -t\; -k1,3 -u <(zcat fP2${sel}btP.$j.$i.gz) | gzip > fP2${sel}btP.$j.$i.s
+echo fP2${sel}btP.$j.$i.s
+done
+
+
+fi
+if test 'WHAT' = 'ct2BPm3'; then
+
+j=FROM
+str="$HOME/bin/lsort $((maxM*mul))M -t\; -k1,3 --merge"
+for k in {0..127}
+do str="$str <(zcat fP2${sel}btP.$k.$j.s)"
+done
+eval $str |  sed 's/;/|/2' | join -t\| - <(zcat P2${sel}bFull${ver}$j.s|sed 's/;/|/2') | sed 's/|/;/' | gzip > fP2${sel}btPFull$ver$j.s
+echo fP2${sel}btPFull$ver$j.s
+
+
+
+fi
 if test 'WHAT' = 'c2BPm1'; then
 ########################################################################
 # #### **** join dies quietly here with too many combinations **** 
