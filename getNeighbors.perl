@@ -51,9 +51,9 @@ sub myOpen {
   $ver = $pVer if (! -f "/da5_fast/${k}Full$ver.$s.tch");
   # print STDERR "${k}Full$ver.$s.tch\n";
   if (!defined $dat{$k}{$s}){
-    if (!tie (%{$dat{$k}{$s}}, "TokyoCabinet::HDB", "/da0_data/basemaps/${k}Full$ver.$s.tch",
+    if (!tie (%{$dat{$k}{$s}}, "TokyoCabinet::HDB", "/da5_fast/${k}Full$ver.$s.tch",
        TokyoCabinet::HDB::OREADER | TokyoCabinet::HDB::ONOLCK)){
-      die "tie error for /da0_data/basemaps/${k}Full$ver.$s.tch\n";
+      die "tie error for /da5_fast/${k}Full$ver.$s.tch\n";
     }
   }
 }
@@ -152,7 +152,7 @@ while ($d <= $depth){
 for my $ch (keys %cs){
   my $c = fromHex ($ch);
   my $s = segB ($c, $split);
-  for my $k ("c2P", "c2f", "c2ta"){
+  for my $k ("c2P", "c2f", "c2dat"){
     myOpen ($k, $s); 
     for my $v (split (/;/, cvt ($k, $dat{$k}{$s}{$c}), -1)){
       $lnk{$k}{$ch}{$v}++;
@@ -164,7 +164,7 @@ sub cvt {
   my ($k, $v) = @_;
   my $f = "h";
   $f = "cs" if $k =~ /2[Pf]$/;
-  $f = "s" if $k =~ /2ta$/;
+  $f = "s" if $k =~ /2dat$/;
   my $res="";
   if ($f eq "h"){
     my $n = length($v)/20;
@@ -174,9 +174,9 @@ sub cvt {
     $res =~ s/^;//;
   }else{
     if ($f eq "cs"){
-		$res = safeDecomp($v);
+		  $res = safeDecomp($v);
     }else{
-		 $res = (split (/;/, $v, -1))[1];
+		  $res = (split (/;/, $v, -1))[2];
     }
   }
   $res;
