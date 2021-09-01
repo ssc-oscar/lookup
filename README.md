@@ -740,7 +740,7 @@ for i in {0..31}; do ssh -p443 da3.local  "zcat  $where/a2fbFull$ver{$i,$(($i+32
 
 #no new aliasing since version Q
 zcat /da?_data/basemaps/gz/a2AQ.s | ~/lookup/s2sBinSorted.perl /da0_data/basemaps/a2AS.tch 1
-
+```
 
 
 
