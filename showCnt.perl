@@ -104,8 +104,8 @@ sub getBlob {
   #print STDERR "blob;$sec;$rl;$curpos;$off;$len\;$blob\n";
   if ($debug == 1){
     $code = encode_base64($code);
-    $code =~ s/\r/\\r/g;
-    $code =~ s/\n/\\n/g;
+    #$code =~ s/\r/\\r/g;
+    $code =~ s/\n//g;
     $code = "$blob;$code";
   }
   print "$code\n";
