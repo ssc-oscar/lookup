@@ -63,7 +63,7 @@ if test 'WHAT' == 'coreCA'; then
 j=FROM
 zcat P2tacFull$ver$j.s | perl ~/lookup/mapA.perl 2 a2AFullH$ver.s | perl -ane 'chop();@x=split(/;/);print "$x[0];$x[2]\n";' | uniq -c | \
   perl -ane 'chop();s|^\s*||;s| |;|;($n,$p,$a)=split(/;/);print "$p;$a;$n\n"' | \
-    perl -e '$pp="";$s=0;while(<STDIN>){chop();($p,$aa,$n)=split(/;/);if ($pp ne "" && $pp ne $p){ $cm=0;print "$pp";for $au (sort {$t{$b}<=>$t{$a}} keys %t){$cm+=$t{$au};print ";$au";last if $cm >= $s*.8;};print "\n";%t=();$s=0;};$pp=$p;$t{$aa}+=$n;$s+=$n};print "$pp";for $au (sort {$t{$b}<=>$t{$a}} keys %t){$cm+=$t{$au};print ";$au";last if $cm >= $s*.8;};print "\n";' | gzip > P2coreFull$ver$j.s
+    perl -e '$pp="";$s=0;while(<STDIN>){chop();($p,$aa,$n)=split(/;/);if ($pp ne "" && $pp ne $p){ $cm=0;print "$pp";for $au (sort {$t{$b}<=>$t{$a}} keys %t){$cm+=$t{$au};print ";$au=$t{$au}";last if $cm >= $s*.8;};print "\n";%t=();$s=0;};$pp=$p;$t{$aa}+=$n;$s+=$n};print "$pp";for $au (sort {$t{$b}<=>$t{$a}} keys %t){$cm+=$t{$au};print ";$au=$t{$au}";last if $cm >= $s*.8;};print "\n";' | gzip > P2coreFull$ver$j.s
 
 fi
 if test 'WHAT' == 'splitCAA'; then
