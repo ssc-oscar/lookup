@@ -12,5 +12,5 @@ if [[ $t == "" ]]; then
  exit 1;
 fi
 
-perl /home/audris/lookup/getNeighbors.perl $*
+perl /home/audris/lookup/getNeighbors.perl $1 $2 $3 
 

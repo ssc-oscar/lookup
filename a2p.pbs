@@ -22,13 +22,19 @@ prt=FROM
 
 if test 'WHAT' == 'splitCA'; then
 
-j=FROM
-zcat c2PFull$ver$j.s | join -t\; - <(zcat c2datFull$ver$j.s|perl -ane 'chop();@x=split(/;/, $_, -1); print "$x[0];$x[1];$x[3]\n";') | perl -ane 'chop();@x=split(/;/, $_, -1); print "$x[1];$x[2];$x[3];$x[0]\n";' | perl -I ~/lib/perl5 -I ~/lookup $HOME/lookup/splitSecCh.perl P2tacFull$ver.FROM. 32
-echo P2tacFull$ver.FROM.
+dt=$((3600*24*365*10))
+l=FROM
+for i in {0..1}
+do j=$((l*2+i)) 
+  zcat c2PFull$ver$j.s | join -t\; - <(zcat c2datFull$ver$j.s|perl -ane 'chop();@x=split(/;/, $_, -1); print "$x[0];$x[1];$x[3]\n" if $x[1] > '$dt';') | \
+     perl -ane 'chop();@x=split(/;/, $_, -1); print "$x[1];$x[2];$x[3];$x[0]\n";' |\
+     perl -I ~/lib/perl5 -I ~/lookup $HOME/lookup/splitSecCh.perl P2tacFull$ver.$j. 32
+  echo P2tacFull$ver.$j.
 
-for j in {0..31}
-do zcat P2tacFull$ver.FROM.$j.gz | $HOME/bin/lsort ${maxM}M -t\; -k1,4 -u | gzip > P2tacFull$ver.FROM.$j.s
-   echo P2tacFull$ver.FROM.$j.s
+  for i in {0..31}
+  do zcat P2tacFull$ver.$j.$i.gz | $HOME/bin/lsort ${maxM}M -t\; -k1,4 -u | gzip > P2tacFull$ver.$j.$i.s
+     echo P2tacFull$ver.$j.$i.s
+  done
 done
 
 fi
@@ -50,9 +56,14 @@ j=FROM
 zcat P2tacFull$ver$j.s | perl -ane 'chop();@x=split(/;/);@a=localtime($x[1]);$m=$a[4]+1;$m="0$m" if $m<10;print "$x[0];$x[2];".($a[5]+1900)."-$m\n";' | uniq -c | \
   perl -ane 'chop();s|^\s*||;s| |;|;($n,$p,$a,$t)=split(/;/);print "$p;$t;$a;$n\n"' | $HOME/bin/lsort ${maxM}M -t\; -k1,3 |  perl -e '$pt="";while(<STDIN>){chop();($p,$t,$a,$n)=split(/;/);if($pt ne "$p;$t" && $pt ne ""){print "$pt;$na;$nc\n";$nc=0;$na=0;$pa=""}$pt="$p;$t";$na++ if $pa ne $a;$nc+=$n;$pa=$a} print "$pt;$na;$nc\n";' | gzip > P2mncFull$ver$j.s;
 
+
+fi
+if test 'WHAT' == 'coreCA'; then
+
+j=FROM
 zcat P2tacFull$ver$j.s | perl ~/lookup/mapA.perl 2 a2AFullH$ver.s | perl -ane 'chop();@x=split(/;/);print "$x[0];$x[2]\n";' | uniq -c | \
   perl -ane 'chop();s|^\s*||;s| |;|;($n,$p,$a)=split(/;/);print "$p;$a;$n\n"' | \
-    perl -e '$pp="";$s=0;while(<STDIN>){chop();($p,$aa,$n)=split(/;/);if ($pp ne "" && $pp ne $p){ $cm=0;print "$pp";for $au (sort {$t{$b}<=>$t{$a}} keys %t){$cm+=$t{$au};print ";$au";last if $cm >= $s*.8;};print "\n";%t=();$s=0;};$pp=$p;$t{$aa}+=$n;$s+=$n};print "$pp";for $au (sort {$t{$b}<=>$t{$a}} keys %t){$cm+=$t{$au};print ";$au";last if $cm >= $s*.8;};print "\n";' | gzip > P2coreFull$ver$j.s
+    perl -e '$pp="";$s=0;while(<STDIN>){chop();($p,$aa,$n)=split(/;/);if ($pp ne "" && $pp ne $p){ $cm=0;print "$pp";for $au (sort {$t{$b}<=>$t{$a}} keys %t){$cm+=$t{$au};print ";$au=$t{$au}";last if $cm >= $s*.8;};print "\n";%t=();$s=0;};$pp=$p;$t{$aa}+=$n;$s+=$n};print "$pp";for $au (sort {$t{$b}<=>$t{$a}} keys %t){$cm+=$t{$au};print ";$au=$t{$au}";last if $cm >= $s*.8;};print "\n";' | gzip > P2coreFull$ver$j.s
 
 fi
 if test 'WHAT' == 'splitCAA'; then
