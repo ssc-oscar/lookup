@@ -759,9 +759,9 @@ fi
 if test 'WHAT' = 'Pt2Ptbannote3'; then
 
 j=FROM
-k=75
+k=104
 [[ -f annote3.$j.gz$k ]] || exit
-for i in {1..99}
+for i in {1..199}
 do [[ $i -lt $k ]] && eval "from$i=$(zcat annote3.$j.gz$i | wc -l)"
 done
 from=$(zcat annote3.$j.gz$k | grep -n . | tail -2 | head -1 | cut -d: -f1)
@@ -769,7 +769,7 @@ zcat annote3.$j.gz$k |head -$from | gzip > annote3.$j.gz
 mv annote3.$j.gz annote3.$j.gz$k
 eval "from$k=$(zcat annote3.$j.gz$k | wc -l)"
 from=0
-for i in {1..99}
+for i in {1..199}
 do [[ $i -le $k ]] && eval "from=$((from+from$i))"
 done
 echo $j $k $from

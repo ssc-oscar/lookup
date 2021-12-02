@@ -102,6 +102,59 @@ do i=$(($j%32)); mv c2pFull$ver$i.$j.gz c2pFull$ver$j.s
 done
 
 fi
+if test "P2f" = "WHAT"; then
+
+l=FROM
+for i in {0..15}; do (j=$(($i+$l*16)); zcat c2fallFullR$j.s | join -t\; <(zcat c2PFull$ver$j.s) -  | cut -d\; -f2,3 | uniq | lsort $maxM -t\; -k1,2 -u  | gzip > P2f$ver$j.s) &
+done 
+wait
+echo P2f$ver$j.gz
+
+fi
+if test "P2f1" = "WHAT"; then
+
+l=FROM
+for i in {0..15}; do j=$(($i+$l*16)); zcat P2f$ver$j.s
+done | perl -I $HOME/lib/perl5 -I $HOME/lookup $HOME/lookup/splitSecCh.perl P2f$ver$l. 128
+echo P2f$ver$l.
+
+fi
+if test "P2fjoin" = "WHAT"; then
+
+l=FROM
+for i in {0..15}
+do j=$(($i+$l*16))
+   str="lsort $maxM -t\; -k1,2 -u --merge"
+   for k in {0..7}
+   do str="$str <(zcat P2f$ver$k.$j.gz)"
+   done
+   eval $str | gzip > P2fFull$ver$j.s
+   echo P2fFull$ver$j.s
+done
+
+fi
+if test "f2P" = "WHAT"; then
+
+l=FROM
+for i in {0..7}; do j=$(($i+$l*16)); zcat P2fFull$ver$j.s
+done | awk -F\; '{print $2";"$1}' | perl -I $HOME/lib/perl5 -I $HOME/lookup $HOME/lookup/splitSecCh.perl f2P1$ver$l. 128
+echo f2P$ver$l.
+
+fi
+if test "f2Pjoin" = "WHAT"; then
+
+l=FROM
+for i in {0..15}
+do j=$(($i+$l*16))
+   str="lsort $maxM -t\; -k1,2 -u --merge"
+   for k in {0..7}
+   do str="$str <(zcat f2P$ver$k.$j.gz)"
+   done
+   eval $str | gzip > f2PFull$ver$j.s
+   echo f2PFull$ver$j.s
+done
+
+fi
 if test "P2c" = "WHAT"; then
 # create 32 chunk P2c (after c2P below)
 
