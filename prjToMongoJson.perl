@@ -27,7 +27,9 @@ for my $ty ("B2b", "P2A", "P2b", "P2c", "P2f", "P2g", "Pnfb", "P2p", "P2tspan","
     }
     if ($ty eq "P2core"){
       for my $ii (@x){
-        $d{$a}{Core}{$ii}++;
+        $ii =~ s/=([0-9]+)$//;
+        my $nc = $1;
+        $d{$a}{Core}{$ii} = $nc;
       }
       $d{$a}{NumCore} = $#x+1;
       next;

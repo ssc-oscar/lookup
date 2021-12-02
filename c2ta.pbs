@@ -30,8 +30,8 @@ done
 fi
 if test 'WHAT' == 'c2ch'; then
 
-for i in {0..1}
-do j=$((FROM*2+$i))
+for i in {0..7}
+do j=$((FROM*8+$i))
    #zcat ../gz/c2PFullS$j.s | $HOME/bin/lsort ${maxM}M -t\; -k1,2 -u --merge - <(zcat ../gz/MissS/c2PMissS.$j.s) | gzip > ../gz/c2PFullS$j.s1
    #echo ../gz/c2PFullS$j.s1
    $HOME/lookup/lstCmt.perl 9 $j |  \
@@ -52,8 +52,8 @@ done
 fi
 if test 'WHAT' == 'c2acp'; then
 
-for i in {0..3}
-do j=$((FROM*4+$i))
+for i in {0..7}
+do j=$((FROM*8+$i))
    $HOME/lookup/lstCmt.perl 8 $j |  \
    perl -ane 'chop();($c,$ta,$tc,$a,$cm,$p)=split(/;/); @ps=split(/:/, $p); $s=join ";",@ps; print "$c;$ta;$tc;$a;$cm;$s\n";'| \
    $HOME/bin/lsort ${maxM}M -t\; -k1,5| gzip > ../gz/c2acpFull$ver$j.s
@@ -102,6 +102,53 @@ do j=$((FROM*4+$i))
   eval $str | join -t\; <(zcat ../gz/c2acpFull$ver$j.s | cut -d\; -f1-5) - | gzip > ../gz/checkTime$ver$j.s
 done
 #zcat checkTimeT0.s|awk -F\; '{if ($2>$3|| $7>$8||$8<$2){print $0}}'|head
+fi
+if test 'WHAT' == 'checkTimeB'; then
+
+for i in {0..3}
+do j=$((FROM*4+$i))
+   zcat ../c2fb/b2faFull$ver$j.s| perl -ane 'chop();@x=split(/;/,$_, -1);print "$x[3];$x[0]\n";'
+done |perl ~/lookup/splitSec.perl ../c2fb/c2fbFull$ver.FROM. 128
+
+for j in {0..127}
+do zcat ../c2fb/c2fbFull$ver.FROM.$j.gz | $HOME/bin/lsort ${maxM}M -t\; -k1,2 -u  | gzip > ../c2fb/c2fbFull$ver.FROM.$j.s
+done
+
+fi
+if test 'WHAT' == 'checkTimeB1'; then
+
+for i in {0..3}
+do j=$((FROM*4+$i))
+  str="$HOME/bin/lsort ${maxM}M -t\; -k1,2 -u --merge"
+  for k in {0..31}
+  do str="$str <(zcat ../c2fb/c2fbFull$ver.$k.$j.s)"
+  done
+  eval $str | gzip > ../c2fb/c2fbFull$ver$j.s
+done
+
+fi
+if test 'WHAT' == 'checkTimeB2'; then
+
+for i in {0..3}
+do j=$((FROM*4+$i))
+  zcat ../gz/checkTime$ver$j.s|awk -F\; '{if ($2>$3|| $7>$8||$8<$2){print $0}}'|cut -d\; -f1|uniq | \
+    join -t\; - <(zcat ../c2fb/c2fbFull$ver$j.s) | awk -F\; '{print $2";"$1}' | \
+     perl ~/lookup/splitSec.perl ../c2fb/badb2fcFull$ver.$j. 128
+done
+for j in {0..127}
+do zcat ../c2fb/badb2fcFull$ver.FROM.$j.gz | $HOME/bin/lsort ${maxM}M -t\; -k1,2 -u  | gzip > ../c2fb/badb2fcFull$ver.FROM.$j.s
+done
+
+fi
+if test 'WHAT' == 'checkTimeBm'; then
+
+for i in {0..3}
+do j=$((FROM*4+$i))
+  str="$HOME/bin/lsort ${maxM}M -t\; -k1,2 -u --merge"
+  for k in {0..31}; do str="$str <(zcat ../c2fb/badb2fcFull$ver.$k.$j.s)"; done
+  eval $str | gzip > ../c2fb/badb2fcFull$ver$j.s
+done
+
 fi
 if test 'WHAT' == 'pc2cacp'; then
 
