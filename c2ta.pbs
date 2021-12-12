@@ -75,7 +75,12 @@ for k in {0..31}
 do str="$str <(zcat Cmt$ver$k.s)"
 done 
 eval $str | perl -I ~/lookup/ -I ~/lib/perl5/ -ane 'use woc;chop($_);print "$_;".(join ";", parseAuthorId($_))."\n";'|gzip > ../gz/Cmt$ver.split
+
 zcat Cmt$ver.split|cut -d\; -f2,3 | grep -v '^;'|grep -v ';$' |lsort ${maxM}M -t\; -u -k1,2 |gzip > fl$ver.s & 
+
+zcat flU.s|perl -ane 's|[0-9_@"\#!\!\%\$\(\)&*\+\}\{\?\<\>\=\[\`\^\~\]/:\\]||g;print'|sed "s|['0-9]||g" | \
+  perl -ane 'chop();($a,$b)=split(/;/);print "$a;$b\n" if(length($a)>1||length($b)>1)'| \
+  lsort 1G -u > flU.s1
 
 fi
 if test 'WHAT' == 'checkTime'; then
