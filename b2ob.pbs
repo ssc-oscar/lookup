@@ -44,7 +44,7 @@ do i=$(($k+$l*2))
  #zcat cnp2bfFullR$i.s | awk -F\; '{print $1";"$3";"$2";"}' | $HOME/bin/lsort ${maxM}M -t\; -k1,4 -u | gzip > cnpc2fbFullR$i.s
  #echo cnpc2fbFullR$i.s
  #lsort 3G -t\; -k1,4 -u --merge <(zcat c2fbbFull$pVer$i.s) <(zcat $pVer$ver$i.s) <(zcat  cUndef$pVer$ver$i.s) <(zcat cnpc2fbFullR$i.s)| gzip > c2fbbFull$ver$i.s
- lsort 3G -t\; -k1,4 -u --merge <(zcat c2fbbFull$pVer$i.s) <(zcat $pVer$ver$i.s) | gzip > c2fbbFull$ver$i.s
+ lsort  -t\; -k1,4 -u --merge <(zcat c2fbbFull$pVer$i.s) <(zcat $pVer$ver$i.s) | gzip > c2fbbFull$ver$i.s
  echo c2fbbFull$ver$i.s
 done
 
@@ -267,7 +267,7 @@ if test 'WHAT' = 'bSelS'; then
 l=FROM
 for i in {0..1}
 do j=$(($i+$l*2))
-   zcat ../All.blobs/blob_$j.idxf2| awk -F\; '{if ($3>450) print $4";"$3}' | $HOME/bin/lsort ${maxM}M -t\; -k1,1 | join -t\; - <(zcat bSelect$ver$j.s) |gzip > bSelectSz$ver$j.s
+   zcat ../All.blobs/blob_$j.idxf| awk -F\; '{if ($3>450) print $4";"$3}' | $HOME/bin/lsort ${maxM}M -t\; -k1,1 | join -t\; - <(zcat bSelect$ver$j.s) |gzip > bSelectSz$ver$j.s
    echo bSelectSz$ver$j.s
 done
 

@@ -65,7 +65,7 @@ if test 'WHAT' == 'Cmt'; then
 
 for k in {0..31}
 do for i in {0..3}
- do j=$(($k*4+$i))
+ do j=$((k*4+i))
    zcat ../gz/c2acpFull$ver$j.s
  done | perl -ane '@x=split(/;/);print "$x[3]\n$x[4]\n";' | uniq  | $HOME/bin/lsort ${maxM}M -t\; -k1,1 -u | gzip > Cmt$ver$k.s
 done
@@ -75,7 +75,8 @@ for k in {0..31}
 do str="$str <(zcat Cmt$ver$k.s)"
 done 
 eval $str | perl -I ~/lookup/ -I ~/lib/perl5/ -ane 'use woc;chop($_);print "$_;".(join ";", parseAuthorId($_))."\n";'|gzip > ../gz/Cmt$ver.split
-zcat Cmt$ver.split|cut -d\; -f2,3 | grep -v '^;'|grep -v ';$' |lsort ${maxM}M -t\; -u -k1,2 |gzip > fl$ver.s & 
+
+zcat ../gz/Cmt$ver.split|cut -d\; -f2,3 | grep -v '^;'|grep -v ';$' |lsort ${maxM}M -t\; -u -k1,2 |gzip > ../gz/fl$ver.s & 
 
 fi
 if test 'WHAT' == 'checkTime'; then
@@ -358,6 +359,20 @@ done
 
 
 fi
+if test 'WHAT' == 'c2ccmerge'; then
+
+for i in {0..3}
+do j=$((FROM*4+$i))
+  str="$HOME/bin/lsort ${maxM}M -t\; -k1,2 -u --merge"
+  for k in {0..15}
+  do str="$str <(zcat c2ccFull${ver}.$k.$j.s)"
+  done
+  eval $str | gzip > ../gz/c2ccFull${ver}$j.s
+  echo ../gz/c2ccFull${ver}$j.s
+done
+
+fi
+
 if test 'WHAT' == 't2csplit'; then
 
 for i in {0..1}
@@ -373,19 +388,6 @@ done
 
 fi
 
-if test 'WHAT' == 'c2ccmerge'; then
-
-for i in {0..3}
-do j=$((FROM*4+$i))
-  str="$HOME/bin/lsort ${maxM}M -t\; -k1,2 -u --merge"
-  for k in {0..15}
-  do str="$str <(zcat c2ccFull${ver}.$k.$j.s)"
-  done
-  eval $str | gzip > ../gz/c2ccFull${ver}$j.s
-  echo ../gz/c2ccFull${ver}$j.s
-done
-
-fi
 if test 'WHAT' == 'c2pc'; then
 
 for i in {0..7}
