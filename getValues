@@ -14,6 +14,8 @@ done
 shift $((OPTIND-1))
 t=$1
 
+
+
 if [[ $t == "" ]]; then
  echo "Usage: getValues [OPTIONS] map";
  exit 1;
@@ -39,7 +41,6 @@ fi
 
 #determine the fastest database
 ssh=""
-#echo $h $t
 if [[ -f /fast/${t}Full$ver.31.tch || -f /fast/${t}Full$ver.tch ]]
 then path=/fast/${t}Full$ver
 else
