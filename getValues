@@ -25,7 +25,21 @@ if [[ $h == 'da5.eecs.utk.edu' ]]
 then 
   if [[ -f /fast/${t}Full$ver.31.tch || -f /fast/${t}Full$ver.tch ]]
   then ~/lookup/getValues.perl --flat=$flat /fast/${t}Full$ver
-  else ~/lookup/getValues.perl --flat=$flat /fast/${t}Full$pVer
+  else
+    if [[ -f /fast/${t}Full$pVer.31.tch || -f /fast/${t}Full$pVer.tch ]]
+    then ~/lookup/getValues.perl --flat=$flat /fast/${t}Full$pVer
+    else
+      if [[ -f /da0_data/basemaps/${t}Full$ver.31.tch || -f /da0_data/basemaps/${t}Full$ver.tch ]]
+      then ssh da0 ~/lookup/getValues.perl --flat=$flat /da0_data/basemaps/${t}Full$ver
+      else 
+        if [[ -f /da0_data/basemaps/${t}Full$pVer.31.tch || -f /da0_data/basemaps/${t}Full$pVer.tch ]]
+        then ssh da0 ~/lookup/getValues.perl --flat=$flat /da0_data/basemaps/${t}Full$pVer
+        else 
+          echo "no map" 
+          echo "" > /dev/null
+        fi
+      fi
+    fi
   fi
   exit
 else
