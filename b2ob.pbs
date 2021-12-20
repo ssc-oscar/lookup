@@ -285,7 +285,7 @@ if test 'WHAT' = 'bSelS'; then
 l=FROM
 for i in {0..1}
 do j=$(($i+$l*2))
-   zcat ../All.blobs/blob_$j.idxf2| awk -F\; '{if ($3>450) print $4";"$3}' | $HOME/bin/lsort ${maxM}M -t\; -k1,1 | join -t\; - <(zcat bSelect$ver$j.s) |gzip > bSelectSz$ver$j.s
+   zcat ../All.blobs/blob_$j.idxf| awk -F\; '{if ($3>450) print $4";"$3}' | $HOME/bin/lsort ${maxM}M -t\; -k1,1 | join -t\; - <(zcat bSelect$ver$j.s) |gzip > bSelectSz$ver$j.s
    echo bSelectSz$ver$j.s
 done
 
