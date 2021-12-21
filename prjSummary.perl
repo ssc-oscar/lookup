@@ -105,23 +105,23 @@ for my $ty ($type){
     chop ();
     my ($p, $c) = split (/;/, $_, -1);
     $process = 1 if ($process == 0 && $p eq $start); 
+    next if ! $process;
     if ($ty ne "Pnfb" && $pP ne "" && $pP ne $p){
-        print "$pP;$ty=".(scalar(keys %tmp))."\n";
-        if ($ty eq "P2f"){
-          doExt ($pP, \%tmp);
-        }
-        doG ($pP, \%tmp) if ($ty eq "P2g");
-        %tmp = ();
-        print STDERR "$s $ty $cnt prs\n" if (!($cnt++%1000000));
-        #last if $cnt > 1000;
+      print "$pP;$ty=".(scalar(keys %tmp))."\n";
+      if ($ty eq "P2f"){
+        doExt ($pP, \%tmp);
       }
-      $tmp{$c}++;
-      $pP = $p;
+      doG ($pP, \%tmp) if ($ty eq "P2g");
+      %tmp = ();
+      print STDERR "$s $ty $cnt prs\n" if (!($cnt++%1000000));
+      #last if $cnt > 1000;
     }else{
       if ($ty eq "Pnfb"){
         print "$p;$ty=$c\n";
       }
     }
+    $tmp{$c}++;
+    $pP = $p;
   } 
 
   #$d{$ty}{$pP} = scalar(keys %tmp);
