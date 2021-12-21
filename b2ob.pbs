@@ -777,7 +777,7 @@ fi
 if test 'WHAT' = 'Pt2Ptbannote3'; then
 
 j=FROM
-k=113
+k=114
 [[ -f annote3.$j.gz$k ]] || exit
 for i in {1..199}
 do [[ $i -lt $k ]] && eval "from$i=$(zcat annote3.$j.gz$i | wc -l)"
