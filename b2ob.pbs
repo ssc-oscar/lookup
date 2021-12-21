@@ -1253,16 +1253,6 @@ zcat P2summFull.$t.$ver$l.gz | head -$((nn-1)) | gzip > P2summFull.$t.$ver$l.gz0
 perl -I ~/lib/perl5/ -I $HOME/lookup $HOME/lookup/prjSummary.perl $ver $l $t $pp | gzip > P2summFull.$t.$ver$l.gz1
 
 fi
-if test 'WHAT' = 'PToFile'; then
-
-c=/lustre/haven/user/audris/gz
-cd $c
-i=FROM
-#perl -I ~/lib/perl5/ ~/lookup/prjToFile.perl $ver $i | gzip > P2summFull$ver$i.s
-perl -I ~/lib/perl5/ ~/lookup/prjToMongoJson.perl $ver $i | gzip > P2summFull$ver$i.json
-
-
-fi
 if test 'WHAT' = 'P2summ'; then
 #(t=P2summ; for j in P2b P2p P2c P2f P2A; do for i in 0; do sed "s|WHAT|$t|g;s|FROM|$i|g;s|PRT|$j|g;s|VER|S|;s|MACHINE|beacon|" ~/lookup/b2ob.pbs | qsub; sleep 1; done; done)
 # for P2p need zcat P2pT.s | ~/lookup/splitSecCh.perl P2pFullT. 32 
