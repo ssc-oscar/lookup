@@ -12,7 +12,10 @@ my $sections = 128;
 my $fbasec="All.sha1c/commit_";
 my $fbase="All.sha1c/tree_";
 my $C = "";
-
+use Sys::Hostname;
+if (hostname !~ /^da5/){
+  die "please run on da5\n";
+}  
 my (%fhob, %fhos, %fhosc);
 for my $sec (0 .. ($sections-1)){
   my $pre = "/fast/";
