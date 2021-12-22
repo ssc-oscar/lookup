@@ -777,7 +777,7 @@ fi
 if test 'WHAT' = 'Pt2Ptbannote3'; then
 
 j=FROM
-k=114
+k=115
 [[ -f annote3.$j.gz$k ]] || exit
 for i in {1..199}
 do [[ $i -lt $k ]] && eval "from$i=$(zcat annote3.$j.gz$i | wc -l)"
@@ -1251,6 +1251,7 @@ pp=$(zcat P2summFull.$t.$ver$l.gz | tail -2 | head -1|cut -d\; -f1);
 nn=$(zcat P2summFull.$t.$ver$l.gz|grep -n "^$pp;" |head -1|cut -d: -f1)
 zcat P2summFull.$t.$ver$l.gz | head -$((nn-1)) | gzip > P2summFull.$t.$ver$l.gz0
 perl -I ~/lib/perl5/ -I $HOME/lookup $HOME/lookup/prjSummary.perl $ver $l $t $pp | gzip > P2summFull.$t.$ver$l.gz1
+zcat P2summFull.$t.$ver$l.gz[01] |gzip > P2summFull.$t.$ver$l.gz
 
 fi
 if test 'WHAT' = 'P2summ'; then
@@ -1280,8 +1281,8 @@ if test 'WHAT' = 'P2b'; then
 l=FROM
 for i in {0..1}
 do j=$(($i+$l*2));
-  zcat c2bFull$ver$j.s | join -t\; <(zcat ../gz/c2PFull$ver$j.s) - | cut -d\; -f2-3 | uniq
-done | perl -I $HOME/lib/perl5 -I $HOME/lookup $HOME/lookup/splitSecCh.perl P2bFull$ver.$l. 32
+  zcat c2bFull$ver$j.s | join -t\; <(zcat ../gz/c2PFull$ver$j.s) - 
+done | cut -d\; -f2-3 | uniq | perl -I $HOME/lib/perl5 -I $HOME/lookup $HOME/lookup/splitSecCh.perl P2bFull$ver.$l. 32
 echo P2bFull$ver.$l.
 
 for i in {0..31}
@@ -1299,8 +1300,8 @@ if test 'WHAT' = 'b2P'; then
 l=FROM
 for i in {0..1}
 do j=$(($i+$l*2));
-  zcat c2bFull$ver$j.s | join -t\; - <(zcat ../gz/c2PFull$ver$j.s) | cut -d\; -f2-3 
-done | perl -I $HOME/lib/perl5 -I $HOME/lookup $HOME/lookup/splitSec.perl b2PFull$ver.$l. 32
+  zcat c2bFull$ver$j.s | join -t\; - <(zcat ../gz/c2PFull$ver$j.s) 
+done | cut -d\; -f2-3 |uniq| perl -I $HOME/lib/perl5 -I $HOME/lookup $HOME/lookup/splitSec.perl b2PFull$ver.$l. 32
 echo b2PFull$ver.$l.
 
 for i in {0..31}
