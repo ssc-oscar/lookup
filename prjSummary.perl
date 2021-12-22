@@ -7,6 +7,9 @@ use woc;
 my $v = $ARGV[0];
 my $s = $ARGV[1];
 my $type = $ARGV[2];
+my $start = defined $ARGV[3] ? $ARGV[3] : "";
+my $process = 1;#process input only once after project is encountered
+$process = 0 if ($start ne "");
 my %d = ();
 my $pP = "";
 my %tmp = ();
@@ -101,23 +104,26 @@ for my $ty ($type){
   while (<A>){
     chop ();
     my ($p, $c) = split (/;/, $_, -1);
-    if ($ty eq "Pnfb"){
-      print "$p;$ty=$c\n";
-    }else{ 
-      if ($pP ne "" && $pP ne $p){
-        print "$pP;$ty=".(scalar(keys %tmp))."\n";
-        if ($ty eq "P2f"){
-          doExt ($pP, \%tmp);
-        }
-        doG ($pP, \%tmp) if ($ty eq "P2g");
-        %tmp = ();
-        print STDERR "$s $ty $cnt prs\n" if (!($cnt++%1000000));
-        #last if $cnt > 1000;
+    $process = 1 if ($process == 0 && $p eq $start); 
+    next if ! $process;
+    if ($ty ne "Pnfb" && $pP ne "" && $pP ne $p){
+      print "$pP;$ty=".(scalar(keys %tmp))."\n";
+      if ($ty eq "P2f"){
+        doExt ($pP, \%tmp);
       }
-      $tmp{$c}++;
-      $pP = $p;
+      doG ($pP, \%tmp) if ($ty eq "P2g");
+      %tmp = ();
+      print STDERR "$s $ty $cnt prs\n" if (!($cnt++%1000000));
+      #last if $cnt > 1000;
+    }else{
+      if ($ty eq "Pnfb"){
+        print "$p;$ty=$c\n";
+      }
     }
-  }
+    $tmp{$c}++;
+    $pP = $p;
+  } 
+
   #$d{$ty}{$pP} = scalar(keys %tmp);
   print "$pP;$ty=".(scalar(keys %tmp))."\n";
   doExt ($pP, \%tmp) if ($ty eq "P2f");
