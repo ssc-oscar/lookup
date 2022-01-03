@@ -212,7 +212,7 @@ my %doParse = (
 my $s = $ARGV[0];
 my $from = $ARGV[1];
 my $to = $ARGV[2];
-
+my $ver = $ARGV[3];
 my %b2v;
 while (<STDIN>){
   chop();
@@ -238,7 +238,7 @@ my ($n, $off, $len, $cb, @x);
 
 #get files ctag does not parse
 my $i = -1;
-open IDX, "zcat blob_ST_${s}.idxf2|";
+open IDX, "zcat blob_${ver}_${s}.idxf|";
 #00000000;0;461;00b31262da21c4f57d5b207372b6ded0bb332911;library/socket/fixtures/classes.rb
 while (<IDX>){
   $i++;

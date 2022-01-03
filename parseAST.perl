@@ -30,6 +30,7 @@ sub safeDecomp {
 my $s = $ARGV[0];
 my $from = $ARGV[1];
 my $to = $ARGV[2];
+my $ver = $ARGV[3];
 my %b2t;
 
 my %parse = (
@@ -59,12 +60,12 @@ while (<STDIN>){
 }
 
 my ($n, $off, $len, $cb, @x);
-open A, "blob_ST_$s.idx";
+open A, "blob_${ver}_$s.idx";
 ($n, $off, @x) = split (/;/, <A>, -1);
 my $offsetStart = $off;
 
-open A, "zcat blob_ST_$s.idxf2|";
-open B, "blob_ST_$s.bin";
+open A, "zcat blob_${ver}_$s.idxf|";
+open B, "blob_${ver}_$s.bin";
 my $nn = -1;
 while (<A>){
   $nn++;
