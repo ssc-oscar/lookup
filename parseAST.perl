@@ -63,16 +63,16 @@ my ($n, $off, $len, $cb, @x);
 open A, "blob_${ver}_$s.idx";
 ($n, $off, @x) = split (/;/, <A>, -1);
 my $offsetStart = $off;
+my $nstart = $n;
 
-open A, "zcat blob_${ver}_$s.idxf|";
+open A, "blob_${ver}_$s.idx";
 open B, "blob_${ver}_$s.bin";
 my $nn = -1;
 while (<A>){
-  $nn++;
-  next if $nn < $from;
-  last if $nn >= $to;
-  chop(); 
+  chop();
   ($n, $off, $len, $cb, @x) = split(/\;/, $_, -1);
+  next if $n < $from+$nstart;
+  last if $n >= $to+$nstart;
   if (defined $b2t{$cb} && $b2t{$cb} ne ""){ 
     my $codeC = getBlob ($cb);
     my $code = safeDecomp ($codeC, "$off;$cb");
