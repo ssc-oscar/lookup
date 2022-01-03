@@ -78,9 +78,9 @@ for my $i (split (/\n/, $bad, -1)){
 }
 my %grepStr;
 $grepStr{JS} ='\.(js|iced|liticed|iced.md|coffee|litcoffee|coffee.md|ls|es6|es|jsx|mjs|sjs|co|eg|json|json.ls|json5)$';
-$grepStr{JS} ='package\.json$';
-#$grepStr{JS} ='^(package\.json|bower\.json|lerna.json|yarn.lock|package-lock.json|packages/[^/]*/package.json|codemods/[^/]*/package.json)$';
-$grepStr{JS} ='^(package\.json|bower\.json|lerna.json|yarn.lock|package-lock.json)$';
+#$grepStr{JS} ='package\.json$';
+$grepStr{JS} ='^(package\.json|bower\.json|lerna.json|yarn.lock|package-lock.json|packages/[^/]*/package.json|codemods/[^/]*/package.json)$';
+$grepStr{JS} ='^(package\.json|bower\.json|lerna.json|yarn.lock|package-lock.json|codemods/[^/]*/package.json)$';
 $grepStr{PY} ='\.(py|py3|pyx|pyo|pyw|pyc|whl|wsgi|pxd)$';
 $grepStr{PY} ='setup\.(py|py3|pyx)$';
 $grepStr{ipy} = '\.(ipynb|IPYNB)$';
@@ -126,7 +126,7 @@ my %parse = (
   'JS' => \&JS,
 	'R' => \&R,
 #	'C' => \&C,
-#	'Cs' => \&Cs,
+	'Cs' => \&Cs,
 #	'Dart' => \&Dart,
 	'Kotlin' => \&Java,
 	'Go' => \&Go,
@@ -162,15 +162,13 @@ while (<A>){
   next if $from >= 0 && $n < $from;
   last if $to >= 0 && $n > $to;
   my $found = "";
-  for my $mt (keys %grepStr){
+  #for my $mt (keys %grepStr){
+  my $mt = "Cs";
     if ($f =~ /$grepStr{$mt}/){
       $found = $mt;
-      last;
-    }
   }
 
   if ($found ne "" && defined $parse{$found}){ 
-    #next if $found eq "PY" && $f !~ /setup\.py/;
     next if $len > 500000; #ignore incredibly large files
     my $codeC = getBlob ($cb, $off, $len);
     my $code = safeDecomp ($codeC, "$off;$cb");
@@ -345,3 +343,26 @@ sub Erlang {
   }
   return "";
 }
+
+sub Cs {
+  my ($code) = $_[0];
+  my $res = "";
+  my %matches = ();
+  for my $l (split(/\n/, $code, -1)){
+    if ($l =~ m/\bnamespace\s+(\S*)/) {
+      $matches{$1}++ if (defined $1 && $l !~ /implements/);
+      #print "$1\n";
+    }
+  }
+  if (%matches){
+    for my $elem (keys %matches) {
+      next if $elem =~ /\{[0-9]\}/;
+      $elem =~ s/\s*{\s*$//;
+      $res .= ';'.$elem;
+    }
+  } 
+  $res =~ s/^;//;
+  $res =~ s/['"]//g;
+  return $res;
+}
+

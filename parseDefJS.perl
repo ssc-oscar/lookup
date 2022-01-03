@@ -122,24 +122,7 @@ $grepStr{Cob} = '\.(COB|cob|CBL|cbl)$';
 $grepStr{Groovy} = '\.(groovy|gvy|gy|gsh)$';
 
 my %parse = (
-  'Rust' => \&Rust,
-  'JS' => \&JS,
-	'R' => \&R,
-#	'C' => \&C,
-#	'Cs' => \&Cs,
-#	'Dart' => \&Dart,
-	'Kotlin' => \&Java,
-	'Go' => \&Go,
-	'PY' => \&PY,
-	'Scala' => \&Java,
-#	'TypeScript' => \&TypeScript,
-#	'ipy' => \&ipy,
-	'Java' => \&Java,
-#	'jl' => \&jl,
-	'pl' => \&Java,
-#	'rb' => \&rb,
-  'Groovy' => \&Java,
-  'Erlang' => \&Erlang,
+  'JS' => \&JSDep,
 );
 
 my $s = $ARGV[0];
@@ -162,15 +145,12 @@ while (<A>){
   next if $from >= 0 && $n < $from;
   last if $to >= 0 && $n > $to;
   my $found = "";
-  for my $mt (keys %grepStr){
-    if ($f =~ /$grepStr{$mt}/){
-      $found = $mt;
-      last;
-    }
+  my $mt = "JS";
+  if ($f =~ /$grepStr{$mt}/){
+    $found = $mt;
   }
 
   if ($found ne "" && defined $parse{$found}){ 
-    #next if $found eq "PY" && $f !~ /setup\.py/;
     next if $len > 500000; #ignore incredibly large files
     my $codeC = getBlob ($cb, $off, $len);
     my $code = safeDecomp ($codeC, "$off;$cb");
@@ -274,7 +254,7 @@ sub PY {
   my %dat;
   my $start = 0;
   for my $l (split(/\n/, $code, -1)){
-#print STDERR "$start;$l\n";
+    #print STDERR "$start;$l\n";
     if ($start == 1){ 
       if ($l =~ m/^\s*(name|author|author_email|summary|version)\s*=\s*['"]?([^'"]*)/){
         if (defined $1 && defined $2){
@@ -295,7 +275,7 @@ sub PY {
   }
   if (defined $dat{'name'} && $dat{'name'} ne "" && !defined $genPkg{$dat{'name'}}){ #otherwise look for setup.cfg
     my $res = "";
-    #for my $k ("name","author","author_email","summary", "version"){
+#for my $k ("name","author","author_email","summary", "version"){
     for my $k ("name"){
       my $v = "";
       $v = $dat{$k} if defined $dat{$k};
