@@ -455,6 +455,10 @@ Merge branch 'master' into master;0a26e5acd9444f97f1a9e903117d957772a59c1d
 
 ### Version U
 
+#auto start once clones are finished
+#crontab -l
+#0-59/10 * * * * /nics/b/home/audris/bin/check1.sh 45
+
 #bring in new *olist.gz
 for type in ght U Otr.U
 do for k in {00..43}
@@ -518,22 +522,22 @@ for i in {0..3}; do sed "s|WHAT|a2Pmerge|g;s|FROM|$i|g;s|VER|U|;s|MACHINE|beacon
 #once TU.*.gz are ready
 for i in {0..63}; do sed "s|WHAT|prep|g;s|FROM|$i|g;s|VER|U|;s|MACHINE|beacon|" ~/lookup/b2ob.pbs | qsub; sleep 1; done
 #-
-for what in c2f  c2b b2ta b2f  b2ob ob2b 
+for what in c2f b2ta c2b b2f b2ob ob2b #b2c - b2ta has  2c
 do for i in {0..63}; do sed "s|WHAT|$what|g;s|FROM|$i|g;s|VER|U|;s|MACHINE|beacon|" ~/lookup/b2ob.pbs | qsub; sleep 1; done; done
 
-for what in b2P P2b b2tam b2fm b2obm ob2bm 
+for what in P2b b2tam b2P b2fm b2obm ob2bm 
 do for i in {0..63}; do sed "s|WHAT|$what|g;s|FROM|$i|g;s|VER|U|;s|MACHINE|beacon|" ~/lookup/b2ob.pbs | qsub; sleep 1; done; done
 
-
-
-#P2tac - nowhere used?
+#P2tac - used below
 for i in {0..63}; do sed "s|WHAT|splitCA|g;s|FROM|$i|g;s|VER|U|;s|MACHINE|beacon|" ~/lookup/a2p.pbs| qsub; sleep 1 ; done
 #-
 for i in {0..31}; do sed "s|WHAT|mergeCA|g;s|FROM|$i|g;s|VER|U|;s|MACHINE|beacon|" ~/lookup/a2p.pbs| qsub; sleep 1 ; done
-#P2anc +?
+#-P2core for summ
+what=coreCA; for i in {0..31}; do sed "s|WHAT|$what|g;s|FROM|$i|g;s|VER|U|;s|MACHINE|beacon|" ~/lookup/a2p.pbs| qsub; sleep 1 ; done
+#P2anc for ???
 for i in {0..31}; do sed "s|WHAT|splitCAA|g;s|FROM|$i|g;s|VER|U|;s|MACHINE|beacon|" ~/lookup/a2p.pbs| qsub; sleep 1 ; done
-#P2mnc?
-for i in {0..31}; do sed "s|WHAT|cntCA|g;s|FROM|$i|g;s|VER|U|;s|MACHINE|beacon|" ~/lookup/a2p.pbs| qsub ; sleep 1 ; done
+#neded for P2mnc for summ
+what=cntCA;for i in {0..31}; do sed "s|WHAT|cntCA|g;s|FROM|$i|g;s|VER|U|;s|MACHINE|beacon|" ~/lookup/a2p.pbs| qsub ; sleep 1 ; done
 
 #a2a based on p: used to count shared projects between devs for a2A
 for i in {0..31}; do sed "s|WHAT|cut|g;s|FROM|$i|g;s|VER|U|;s|MACHINE|beacon|" ~/lookup/a2p.pbs| qsub; sleep 1 ; done
@@ -551,33 +555,118 @@ for i in {0..15}; do sed "s|WHAT|c2tAsplit|g;s|FROM|$i|g;s|PRT|$j|g;s|VER|U|;s|M
 #-
 for i in {0..7}; do sed "s|WHAT|A2cmerge|g;s|FROM|$i|g;s|PRT|$j|g;s|VER|U|;s|MACHINE|beacon|;s|ppn=1|ppn=1|" ~/lookup/c2ta.pbs | qsub; sleep 1; done
 
-
-
+#p2P P2p
+str="lsort 2G -t\; --merge";for i in {0..127}; do str="$str <(zcat p$ver$i.s)";done
+eval $str | gzip > p$ver.s
 zcat p$ver.s| awk -F\; '{print $1";"$1}' | perl ~/lookup/mp.perl 1 c2pFull$ver.np2pu.PLMmap.forks  | gzip > p2P$ver.s
-zcat p2P$ver.s | awk -F\; '{print $2"\;"$1}' | lsort 5G -t\; -k1,2 | gzip > P2p$ver.s 
+zcat p2P$ver.s | awk -F\; '{print $2";"$1}' | lsort 3G -t\; -k1,2 | gzip > P2p$ver.s 
+zcat P2p$ver.s  | perl ~/lookup/splitSecCh.perl  P2pFull$ver. 32
 
 what=P2tspan; for i in {0..15}; do sed "s|WHAT|$what|g;s|FROM|$i|g;s|VER|U|;s|MACHINE|beacon|;s|ppn=1|ppn=1|" ~/lookup/b2ob.pbs | qsub; sleep 1; done
 #-
 what=P2tspanm;for i in {0..3}; do sed "s|WHAT|$what|g;s|FROM|$i|g;s|VER|U|;s|MACHINE|beacon|;s|ppn=1|ppn=1|" ~/lookup/b2ob.pbs | qsub; sleep 1; done
-#still need "B2b",  "P2f", "P2g", "Pnfb", "P2p","P2core","P2mnc"
+#still need "B2b",   "P2g" from A2g from namesor, where is "Pnfb" ??,
 what=P2f;for i in {0..15}; do sed "s|WHAT|$t|g;s|FROM|$i|g;s|VER|U|;s|MACHINE|beacon|" ~/lookup/b2ob.pbs | qsub; sleep 1; done
-#running b2fa
 
-for what in b2fa b2fA bSel b2tA 
+what=A2tspan; for i in {0..15}; do sed "s|WHAT|$what|g;s|FROM|$i|g;s|VER|U|;s|MACHINE|beacon|;s|ppn=1|ppn=1|" ~/lookup/b2ob.pbs | qsub; sleep 1; done
+what=A2tspanm;for i in {0..3}; do sed "s|WHAT|$what|g;s|FROM|$i|g;s|VER|U|;s|MACHINE|beacon|;s|ppn=1|ppn=1|" ~/lookup/b2ob.pbs | qsub; sleep 1; done
+
+
+
+# b2tA < b2tam < b2ta < c2fbb
+# b2fA < b2tam < b2ta < c2fbb
+for what in b2fa b2fA bSel P2f b2tA 
 do for i in {0..63}; do sed "s|WHAT|$what|g;s|FROM|$i|g;s|VER|U|;s|MACHINE|beacon|" ~/lookup/b2ob.pbs | qsub; sleep 1; done; done
 
-for what in A2Afb
+for what in A2b A2f #??
 do for i in {0..31}; do sed "s|WHAT|$what|g;s|FROM|$i|g;s|VER|U|;s|MACHINE|beacon|" ~/lookup/b2ob.pbs | qsub; sleep 1; done; done
 
- 
 
-for what in b2Pm P2bm A2fb a2f a2fb A2times
+for i in {0..63}; do sed "s|WHAT|obb2cfSplit|g;s|FROM|$i|g;s|VER|U|;s|MACHINE|beacon|" ~/lookup/b2ob.pbs | qsub; sleep 1; done
+for i in {0..31}; do sed "s|WHAT|obb2cfMerge|g;s|FROM|$i|g;s|VER|U|;s|MACHINE|beacon|" ~/lookup/b2ob.pbs | qsub; sleep 1; done
+for i in {0..63}; do sed "s|WHAT|bb2cfSplit|g;s|FROM|$i|g;s|VER|U|;s|MACHINE|beacon|" ~/lookup/b2ob.pbs | qsub; sleep 1; done
+for i in {0..63}; do sed "s|WHAT|bb2cfMerge|g;s|FROM|$i|g;s|VER|U|;s|MACHINE|beacon|" ~/lookup/b2ob.pbs | qsub; sleep 1; done
+
+# P2g needs A2g A2g comes from namesor
+
+for what in A2fb 
+do for i in {0..63}; do sed "s|WHAT|$what|g;s|FROM|$i|g;s|VER|U|;s|MACHINE|beacon|" ~/lookup/b2ob.pbs | qsub; sleep 1; done; done
+
+
+for what in  A2bm b2Pm P2bm A2fb P2fm a2f a2fb #A2times?
+do for i in {0..15}; do sed "s|WHAT|$what|g;s|FROM|$i|g;s|VER|U|;s|MACHINE|beacon|" ~/lookup/b2ob.pbs | qsub; sleep 1; done; done
+#-
+for what in a2fm A2fbm a2fbm
 do for i in {0..15}; do sed "s|WHAT|$what|g;s|FROM|$i|g;s|VER|U|;s|MACHINE|beacon|" ~/lookup/b2ob.pbs | qsub; sleep 1; done; done
 
-for what in A2fbmerge export2P A2Afbm
-do for i in {0..7}; do sed "s|WHAT|$what|g;s|FROM|$i|g;s|VER|U|;s|MACHINE|beacon|" ~/lookup/b2ob.pbs | qsub; sleep 1; done; done
+for what in  A2fmerge 
+do for i in {0..31}; do sed "s|WHAT|$what|g;s|FROM|$i|g;s|VER|U|;s|MACHINE|beacon|" ~/lookup/b2ob.pbs | qsub; sleep 1; done; done
 
 
+
+for i in {0..31}; do sed "s|WHAT|splitb2P|g;s|FROM|$i|g;s|PRT||;s|VER|U|;s|MACHINE|beacon|;s|ppn=1|ppn=1|;s|walltime=23|walltime=23|" ~/lookup/b2ob.pbs|qsub; done
+for i in {0..127}; do sed "s|WHAT|b2tP|g;s|FROM|$i|g;s|PRT||;s|VER|U|;s|MACHINE|beacon|;s|ppn=1|ppn=1|;s|walltime=23|walltime=23|" ~/lookup/b2ob.pbs|qsub; done
+for i in {0..127}; do sed "s|WHAT|b2tPm|g;s|FROM|$i|g;s|PRT||;s|VER|U|;s|MACHINE|beacon|;s|ppn=1|ppn=1|;s|walltime=23|walltime=23|" ~/lookup/b2ob.pbs|qsub; done
+for i in {0..127}; do sed "s|WHAT|b2tPsum|g;s|FROM|$i|g;s|PRT||;s|VER|U|;s|MACHINE|beacon|;s|ppn=1|ppn=1|;s|walltime=23|walltime=23|" ~/lookup/b2ob.pbs|qsub; done
+#0-49 
+for i in {0..127}; do sed "s|WHAT|Pt2Ptb|g;s|FROM|$i|g;s|PRT||;s|VER|U|;s|MACHINE|beacon|;s|ppn=1|ppn=1|;s|walltime=23|walltime=23|" ~/lookup/b2ob.pbs|qsub; done
+
+
+
+for i in {0..63}; do sed "s|WHAT|c2BP|g;s|FROM|$i|g;s|VER|U|;s|PRT||;s|MACHINE|beacon|;s|ppn=1|ppn=1|" ~/lookup/b2ob.pbs| qsub ; sleep 1 ; done
+for i in {0..63}; do sed "s|WHAT|c2BPm|g;s|FROM|$i|g;s|VER|U|;s|PRT||;s|MACHINE|beacon|;s|ppn=1|ppn=1|" ~/lookup/b2ob.pbs| qsub ; sleep 1 ; done
+#need CommonBlobs.gz
+#ls -l /fast/b2cFullU.*.tch.large.*|sed 's|.*da \s*||;s| .*tch.large.|;|'|while IFS=\; read s b; do echo $b";"$((($s-20)/20)); done | sort -t\; -k2 -n > CommonBlobs.nc
+#cut -d\; -f1 CommonBlobs.nc |gzip > CommonBlobs.gz
+for i in {0..127}; do sed "s|WHAT|c2BPm1|g;s|FROM|$i|g;s|VER|U|;s|PRT||;s|MACHINE|beacon|;s|ppn=1|ppn=1|" ~/lookup/b2ob.pbs| qsub ; sleep 1 ; done
+
+for i in {0..127}; do sed "s|WHAT|P2Sb|g;s|FROM|$i|g;s|VER|U|;s|PRT||;s|MACHINE|beacon|;s|ppn=1|ppn=1|" ~/lookup/b2ob.pbs| qsub ; sleep 1 ; done
+for i in {0..31}; do sed "s|WHAT|P2Sbm|g;s|FROM|$i|g;s|VER|U|;s|PRT||;s|MACHINE|beacon|;s|ppn=1|ppn=1|" ~/lookup/b2ob.pbs| qsub ; sleep 1 ; done
+
+#0-15 done
+for i in {0..127}; do sed "s|WHAT|w2b|g;s|FROM|$i|g;s|VER|U|;s|PRT||;s|MACHINE|beacon|;s|ppn=1|ppn=1|" ~/lookup/b2ob.pbs| qsub ; sleep 1 ; done
+
+#is this needed? only for P2fb?
+#done {0..3} 15 17..19 22 23 27 35  of 127
+for i in {0..127}; do sed "s|WHAT|P2fP|g;s|FROM|$i|g;s|VER|U|;s|PRT||;s|MACHINE|beacon|;s|ppn=1|ppn=1|" ~/lookup/b2ob.pbs| qsub ; sleep 1 ; done
+for i in {0..15}; do sed "s|WHAT|P2fb|g;s|FROM|$i|g;s|VER|U|;s|PRT||;s|MACHINE|beacon|;s|ppn=1|ppn=1|" ~/lookup/b2ob.pbs| qsub ; sleep 1 ; done
+
+
+for o in {0..127};do [[ -f /data/All.blobs/blob_$o.bin && ! -L /data/All.blobs/blob_$o.bin ]] && ( echo $o; nn=$(tail -1 /data/All.blobs/blob_$o.idx|cut -d\; -f1); no=$(head -$((o+1)) /da5_data/home/audris/update/All.blob.T | tail -1 | cut -d\; -f1); ~/lookup/checkBinFix.perl blob /data/All.blobs/blob_$o $((nn-no-1)) blob_TU_$o &>$o.err ); done 
+for i in {0..127};do for j in {0..7}; do sed "s|WHAT|ctagsTU|g;s|PRT|$j|g;s|FROM|$i|g;s|VER|U|;s|MACHINE|beacon|;s|ppn=1|ppn=1|" ~/lookup/b2ob.pbs| qsub; sleep 1; done; done
+
+#get defs needs  blob_TU_$o.idx only
+time perl ~/lookup/parseDef.perl $o | gzip > blob_TU_$o.defs
+time perl ~/lookup/parseDefPY.perl $o | gzip > blob_$o.pydefs
+time perl ~/lookup/parseDefCs.perl $o | gzip > blob_$o.csdefs
+# parseDefJS.perl - produces deps not defs! defs for JS are in  blob_TU_$o.defs
+time perl ~/lookup/parseDefJS.perl $o | gzip > blob_$o.jsdeps
+
+Argument "2ef6105" isn't numeric in numeric lt (<) at /home/audris/lookup/parseDefJS.perl line 145, <A> line 81987760.
+Use of uninitialized value $f in pattern match (m//) at /home/audris/lookup/parseDefJS.perl line 149, <A> line 81987761.
+Use of uninitialized value $f in pattern match (m//) at /home/audris/lookup/parseDefJS.perl line 149, <A> line 81987762.
+Argument "198712potentb87e-d4b74dd5a" isn't numeric in numeric lt (<) at /home/audris/lookup/parseDefJS.perl line 145, <A> line 81987763.
+Argument "8198ab48a833Z/m156bc89core-3008_20217b1" isn't numeric in numeric lt (<) at /home/audris/lookup/parseDefJS.perl line 145, <A> line 81987764.
+Argument "8d47es+480Ext8c226rie8353170003602" isn't numeric in numeric lt (<) at /home/audris/lookup/parseDefJS.perl line 145, <A> line 81987765.
+Argument "80m2f" isn't numeric in numeric lt (<) at /home/audris/lookup/parseDefJS.perl line 145, <A> line 81987768.
+Argument "81e61-22T20:58:29.167Z/reprap/max-potential-rted.-31-a70..." isn't numeric in numeric lt (<) at /home/audris/lookup/parseDefJS.perl line 145, <A> line 81987770.
+
+
+#do project summary
+for sm in P2p P2c P2A P2f P2b 
+do for i in {0..31};do sed "s|WHAT|P2summ|g;s|PRT|$sm|g;s|FROM|$i|g;s|VER|U|;s|MACHINE|beacon|;s|ppn=1|ppn=1|" ~/lookup/b2ob.pbs| qsub; sleep 1; done
+done
+
+cvt=h2h
+for w in b2ob #c2b ob2b and ob2b are on ssh da2, use b2ta instead of b2c
+do for o in {0..3}
+  do for i in $(eval echo "{$o..31..4}"); do ssh -p443 da5 "zcat $where/${w}Full${ver}{$i,$(($i+32)),$(($i+64)),$(($i+96))}.s" < /dev/null | ~/lookup/${cvt}BinSorted.perl /fast/${w}Full${ver}.$i.tch; done &
+  done
+done
+  
+cvt=h2h;w=b2c
+for o in {0..3}; do for i in $(eval echo "{$o..31..4}"); do
+zcat b2taFull${ver}{$i,$(($i+32)),$(($i+64)),$(($i+96))}.s|cut -d\; -f1,4 | ~/lookup/${cvt}BinSorted.perl /fast/${w}Full${ver}.$i.tch; done &done
 
 ### Version T1
 for i in {0..127}; do zcat /da3_data/basemaps/gz/c2PFullT$i.s|join -t\; - <(zcat /da3_data/basemaps/gz/c2datFullT$i.s|cut -d\; -f1,2,4) | awk -F\; '{ print $4";"$3";"$2}';done | perl ~/lookup/mp.perl 0 /da0_data/basemaps/gz/a2AFullHT.s | ~/lookup/splitSecCh.perl AtP. 32 &
@@ -744,8 +833,7 @@ do for i in {0..63}; do sed "s|WHAT|$what|g;s|FROM|$i|g;s|VER|T|;s|MACHINE|beaco
 for what in b2fa b2fA bSel b2tA 
 do for i in {0..63}; do sed "s|WHAT|$what|g;s|FROM|$i|g;s|VER|T|;s|MACHINE|beacon|" ~/lookup/b2ob.pbs | qsub; sleep 1; done; done
 
-for what in A2Afb
-do for i in {0..31}; do sed "s|WHAT|$what|g;s|FROM|$i|g;s|VER|T|;s|MACHINE|beacon|" ~/lookup/b2ob.pbs | qsub; sleep 1; done; done
+for what in A2Afb; do for i in {0..31}; do sed "s|WHAT|$what|g;s|FROM|$i|g;s|VER|T|;s|MACHINE|beacon|" ~/lookup/b2ob.pbs | qsub; sleep 1; done; done
 
 for what in b2Pm P2bm A2fb a2f a2fb A2times
 do for i in {0..15}; do sed "s|WHAT|$what|g;s|FROM|$i|g;s|VER|T|;s|MACHINE|beacon|" ~/lookup/b2ob.pbs | qsub; sleep 1; done; done
