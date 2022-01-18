@@ -60,6 +60,7 @@ while (<STDIN>){
 }
 
 my ($n, $off, $len, $cb, @x);
+print STDERR "blob_${ver}_$s.idx\n";
 open A, "blob_${ver}_$s.idx";
 ($n, $off, @x) = split (/;/, <A>, -1);
 my $offsetStart = $off;

@@ -783,7 +783,7 @@ j=FROM
 str="$HOME/bin/lsort ${maxM}M -t\; -s -k1,2 --merge"
 for k in {0..127}
 do [[ -f Pt2Ptb.$k.$j.s ]] && str="$str <(zcat Pt2Ptb.$k.$j.s)"
-   [[ -f Pt2Ptb1.$k.$j.s && $(stat --printf="%s" Pt2Ptb1.$k.$j.s) -gt 20 ]] && str="$str <(zcat Pt2Ptb1.$k.$j.s)"
+   #[[ -f Pt2Ptb1.$k.$j.s && $(stat --printf="%s" Pt2Ptb1.$k.$j.s) -gt 20 ]] && str="$str <(zcat Pt2Ptb1.$k.$j.s)"
 done
 eval $str | gzip > Pt2PtbFull${ver}$j.s
 echo Pt2PtbFull${ver}$j.s
@@ -794,6 +794,10 @@ fi
 if test 'WHAT' = 'Pt2Ptbsum'; then
 
 j=FROM
+zcat Pt2PtbFull${ver}$j.s | \
+ cut -d\; -f1,5 | uniq | cut -d\; -f1 | uniq -c | awk '{ print $2";"$1}' | gzip > P2nfbFull${ver}$j.s
+
+
 zcat Pt2PtbFull${ver}$j.s | \
  cut -d\; -f1 | uniq -c | awk '{ i++;if($1==1)k++;j+=$1}END{print i";"k";"j}' > Pt2PtbFull${ver}$j.sum
 
@@ -1322,15 +1326,20 @@ zcat P2summFull.$t.$ver$l.gz[01] |gzip > P2summFull.$t.$ver$l.gz
 
 fi
 if test 'WHAT' = 'P2summ'; then
-#(t=P2summ; for j in P2b P2p P2c P2f P2A; do for i in 0; do sed "s|WHAT|$t|g;s|FROM|$i|g;s|PRT|$j|g;s|VER|S|;s|MACHINE|beacon|" ~/lookup/b2ob.pbs | qsub; sleep 1; done; done)
-# for P2p need zcat P2pT.s | ~/lookup/splitSecCh.perl P2pFullT. 32 
-# these are used in ToJson directly P2mnc, P2core (see p2a)  cp fP2nfbPFullT0.s PnfbFullT.s
+#"B2b", "P2A", "P2b", "P2c", "P2f", "P2g", "Pnfb", "P2p", "P2tspan","P2core","P2mnc"
+
+#(t=P2summ; for j in P2b P2p P2c P2f P2A P2nfb; do for i in 0; do sed "s|WHAT|$t|g;s|FROM|$i|g;s|PRT|$j|g;s|VER|S|;s|MACHINE|beacon|" ~/lookup/b2ob.pbs | qsub; sleep 1; done; done)
+# for P2p need zcat P2p$ver.s | ~/lookup/splitSecCh.perl P2pFull$ver. 32 
+# these are used in ToJson directly P2mnc, P2core (see p2a) 
+# need gender for P2g
+# How to produce B2b?
+# /da5_data/play/forks zcat fP2PStatsT.StrongReuseLinks011-1.crank.map|awk -F\; '{print $2";"$1}' |lsort 100G | gzip > B2bFullT.s
 
 c=/lustre/haven/user/audris/gz
 cd $c
 l=FROM
 t=PRT
-[[ "Pnfb" = $t ]] && cp -p ../c2fb/fP2nfbPFull$ver$j.s ../c2fb/PnfbFull$ver$j.s
+# ../c2fb/PnfbFull$ver$j.s: new approach does it in Pt2Ptbsum - check; old[[ "Pnfb" = $t ]] && cp -p ../c2fb/fP2nfbPFull$ver$j.s ../c2fb/PnfbFull$ver$j.s
 perl -I ~/lib/perl5/ -I $HOME/lookup $HOME/lookup/prjSummary.perl $ver $l $t | gzip > P2summFull.$t.$ver$l.gz
 
 fi
@@ -1568,7 +1577,7 @@ l=FROM
 for i in 0
 do j=$((i+l*1))
    zcat $pp/b2lPkg$ver$j.s | join -t\; <(zcat b2P128Full$ver.$j.gz) - | cut -d\; -f2- 
-done | uniq | perl -ane 'chop();($p,$l,@P)=split(/;/);for $pp (@P){print "$pp;$l;$p\n";}' | perl -I ~/lookup -I ~/lib/perl/perl5 ~/lookup/splitSecCh.perl Pkg2lP$ver.$l. 31 
+done | uniq | perl -ane 'chop();($p,$l,@P)=split(/;/);for $pp (@P){print "$pp;$l;$p\n";}' | perl -I ~/lookup -I ~/lib/perl/perl5 ~/lookup/splitSecCh.perl Pkg2lP$ver.$l. 32
  
 for i in {0..31}
 do zcat Pkg2lP$ver.$l.$i.gz | $HOME/bin/lsort ${maxM}M -t\; -k1,3 -u | gzip > Pkg2lP$ver.$l.$i.s
@@ -1617,8 +1626,8 @@ for k in {0..8}; do [[ -f ../All.blobs/tkns_$pVer$ver$j.$k.parse ]] && zcat ../A
 done
 for i in {0..7}
 do j=$((i+l*8))
-  zcat b2lFile$ver$j.s | join -t\; - <(zcat b2lPkg$ver$j.s) | join -t\; <(zcat ../c2fb/b2cFull$ver$j.s) -
-done | perl -ane 'chop(),($a,$b,@x)=split(/;/);print "$b;$a;".(join ";", @x)."\n"' | perl -I ~/lookup -I ~/lib/perl/perl5 ~/lookup/splitSec.perl c2blfPkg$ver.$l. 128
+  zcat b2lFile$ver$j.s | join -t\; - <(zcat b2lPkg$ver$j.s) | join -t\; <(zcat ../c2fb/b2taFull$ver$j.s) -
+done | perl -ane 'chop(),($b, $t, $au, $c, @x)=split(/;/);print "$c;$b;".(join ";", @x)."\n"' | perl -I ~/lookup -I ~/lib/perl/perl5 ~/lookup/splitSec.perl c2blfPkg$ver.$l. 128
 echo c2blfPkg$ver.$l.
 
 for i in {0..128}
@@ -2155,16 +2164,18 @@ do  zcat w2b.$i.$j.s | cut -d\; -f1 | uniq -c | awk '{if($1>100) print $2";"$1}'
  gzip > w2bL.$i.$j.gz
 done
 
-#fi
-#if test 'WHAT' = 'w2bm'; then
+fi
+if test 'WHAT' = 'w2bm'; then
 
 cd /lustre/haven/user/audris/All.blobs
 i=FROM
 str="$HOME/bin/lsort ${maxM}M -t\; -k1,2 -u --merge"
 for l in {0..127}
-do str="$str <(zcat w2b.$l.$i.s|perl $HOME/bin/grepFieldv.perl w2bL.$l.$i.gz 1)"
+#do str="$str <(zcat w2b.$l.$i.s|perl $HOME/bin/grepFieldv.perl w2bL.$l.$i.gz 1)"
+do str="$str <(zcat w2b.$l.$i.s)"
 done
-eval $str | gzip > w2bFull100$ver$i.s
+#eval $str | gzip > w2bFull100$ver$i.s
+eval $str | gzip > w2bFull$ver$i.s
 
 fi
 
