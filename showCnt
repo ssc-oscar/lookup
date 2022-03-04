@@ -30,13 +30,13 @@ else
     if [[ $t == 'tdiff' || $t == 'tkns' ]]
     then 
       off=0
-      ssh da3 -p443 ~/lookup/showCnt.perl $t $fmt $off
+      ssh da3 ~/lookup/showCnt.perl $t $fmt $off
     else  #commit
       if [[ $h == 'da4.eecs.utk.edu' ]]
       then ~/lookup/showCnt.perl $t $fmt
       else
         off=1
-        ssh da3 -p443 ~/lookup/showCnt.perl $t $fmt $off
+        ssh da3 ~/lookup/showCnt.perl $t $fmt $off
       fi
     fi
    fi
