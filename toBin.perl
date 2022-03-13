@@ -9,8 +9,8 @@ open A, "|gzip > $f.idx";
 open B, "> $f.bin";
 
 my $pk = "";
-my $tmp = "";
 my $ntot = 0;
+my $nc = 0;
 while (<STDIN>){
   chop ();
   my ($k, $v) = split(/;/, $_, -1);
@@ -19,7 +19,8 @@ while (<STDIN>){
   }
   my $vb = pack "H*", $v;
   $pk = $k;
-  $tmp .= $vb;
+  print B $vb;
+  $nc ++;
 }
 out();
 
@@ -27,11 +28,10 @@ out();
 sub out {
   my $kb = pack "H*", $pk;
   my $nt = pack "w", $ntot;
-  my $nv = pack "w", (length($tmp)/$vlen);
-  $ntot += length($tmp)/$vlen;
+  my $nv = pack "w", $nc;
+  $ntot += $nc;
   print A $kb.$nt.$nv;
-  print B $tmp;
-  $tmp = "";
+  $nc = 1;
 }
   
 
