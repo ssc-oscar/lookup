@@ -31,7 +31,7 @@ sub out {
   my $nv = pack "w", $nc;
   $ntot += $nc;
   print A $kb.$nt.$nv;
-  $nc = 1;
+  $nc = 0;
 }
   
 
