@@ -34,7 +34,7 @@ $f1 = "s" if ($t1 =~ /^[aAfpP]$/);
 
 $f2 = "cs" if ($t2 =~ /^[AafpP]$/);
 
-$f1 = "h" if ($t1 =~ /^[cb]$/ || $t1 =~ /^(ob|td)$/);
+$f1 = "h" if ($t1 =~ /^[cbw]$/ || $t1 =~ /^(ob|td)$/);
 $f2 = "h" if ($t2 =~ /^[cb]$/ || $t2 =~ /^(cc|pc|ob|td)$/);
 
 $f2 = "sh" if $types =~ /b2f[aA]/;
@@ -45,6 +45,9 @@ $f2 = "r" if $types =~ /^c2[hr]$/;
 
 $f1 = "s" if ($t1 eq "PS" || $t1 eq "PF" || $t1 eq "PFS"); 
 $f2 = "s" if ($t2 eq "PS" || $t2 eq "PF" || $t2 eq "PFS"); 
+
+$f2 = "hhwww" if ($t2 eq "rhp");
+
 
 $f1 = $ARGV[1] if defined $ARGV[1];
 $f2 = $ARGV[2] if defined $ARGV[2];
@@ -98,7 +101,7 @@ while (<STDIN>){
   my $l = length($ch);
   my $c = $ch;
   my $s = segH ($c, $split);
-  if ($f1 =~ /h/){
+  if ($f1 =~ /[hw]/){
     $c = fromHex($ch);
   }else{
     $s = sHash ($c, $split);
@@ -139,9 +142,16 @@ while (<STDIN>){
     }
   }
   if ($f2 =~ /r/){
-    my $h = toHex (substr($v, 0, 20));
-    my $d = unpack 'w', (substr($v, 20, length($v) - 20));
-    print "$ch\;$h\;$d\n";
+    if ($f2 eq "r"){
+      my $h = toHex (substr($v, 0, 20));
+      my $d = unpack 'w', (substr($v, 20, length($v) - 20));
+      print "$ch\;$h\;$d\n";
+    }else{
+      my $r = toHex (substr($v, 0, 20));
+      my $h = toHex (substr($v, 20, 20));
+      my ($dr, $dh, $part) = unpack 'w*', substr($v, 40, length($v) - 40);
+      print "$ch\;$r\;$dr;$h;$dh;$part\n";
+    }
   }else{
     my $res = ";$v";
     if ($f2 =~ /cs/){

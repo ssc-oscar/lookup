@@ -54,6 +54,10 @@ while (<STDIN>){
     getTkns ($cmt, $type);
     next;
   }
+  if ($type eq "tag"){
+    getTag ($cmt, "");
+    next;
+  }
   my $sec = hex (substr($cmt, 0, 2)) % $sections;
   my $cB = fromHex ($cmt);
   if (! defined $fhosc{$sec}{$cB}){
@@ -70,6 +74,24 @@ while (<STDIN>){
     }
     cleanCmt ($codeC, $cmt, $debug);
   }
+}
+
+sub getTag {
+  my ($ch, $type) = @_;
+  my $sec = hex (substr($ch, 0, 2)) % $sections;
+  my $cB = fromHex ($ch);
+  if (! defined $fhosc{$sec}{$cB}){
+     print STDERR "no content for $type $ch in $sec\n";
+     return "";
+  }
+  my $codeC = $fhosc{$sec}{$cB};
+  return if $codeC eq "";
+  my @code =  split (/\n/, safeDecomp ($codeC, "$sec;$ch"));
+  if ($code[0] =~ m/^object\s+([0-9a-f]{40})$/){
+    print "$ch;$1\n";
+    return;
+  }
+  print "".(join ";",@code)."\n";
 }
 
 sub getTkns {

@@ -42,7 +42,7 @@ then
 else
   if [[ $lastH != "" ]]
   then ssh $lastH "~/lookup/getValues.perl --flat=$flat /fast/${t}Full$lastVer"
-  else no map $t
+  else echo no map $t
   fi
 fi
 
