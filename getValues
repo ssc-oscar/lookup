@@ -40,8 +40,9 @@ if [[ $lastH.eecs.utk.edu == $h ]]
 then 
  ~/lookup/getValues.perl --flat=$flat /fast/${t}Full$lastVer
 else
+  ssh="ssh -p443"
   if [[ $lastH != "" ]]
-  then ssh $lastH "~/lookup/getValues.perl --flat=$flat /fast/${t}Full$lastVer"
+  then [[ $lastH == "da3" ]] && ssh=ssh; $ssh $lastH "~/lookup/getValues.perl --flat=$flat /fast/${t}Full$lastVer"
   else echo no map $t
   fi
 fi
