@@ -24,6 +24,7 @@ my $f2 = "h";
 my $split = 32;
 
 
+my $group=1; #how many field represent a single unit as in b2tac
 
 my $offset = 0;
 my $types = $fname;
@@ -70,6 +71,11 @@ if ($types =~ /^[aA]2fb/ || $types =~ /^[aA]2[bc]/){
 if ($types eq "c2dat"){
   $f1 = "h";
   $f2 = "s";
+}
+if ($types eq "b2tac"){
+  $f1 = "h";
+  $f2 = "cs";
+  $group  = 3;
 }
 $split = $ARGV[3] if defined $ARGV[3];
 
@@ -196,8 +202,14 @@ while (<STDIN>){
           #print STDERR "els=".(($lres+1)/41)." got=".($#vvs+1)." part=$part from=$from to=$to lres=$lres ".(substr(substr($res, $from, $to-$from), 0, 42))."\n";
         }
       }
-      for my $vv (@vvs){
-        print "$ch;$vv\n";
+      if ($group == 1){
+        for my $vv (@vvs){
+          print "$ch;$vv\n";
+        }
+      }else{
+        for my $ii (0..($#vvs/$group)){
+          print "$ch;$vvs[$ii*$group];$vvs[$ii*$group+1];$vvs[$ii*$group+2]\n";
+        }
       }
     }
 	}
