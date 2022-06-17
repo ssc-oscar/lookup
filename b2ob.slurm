@@ -9,7 +9,12 @@
 #SBATCH --output WHAT.FROM.PRT.o%J
 #SBATCH --mail-user=audris@utk.edu
 #SBATCH --mail-type=FAIL
-LD_LIBRARY_PATH=$HOME/lib:$HOME/lib64:$LD_LIBRARY_PATH
+
+module purge
+module load bzip2/1.0.8  intel-compilers/2021.2.0
+
+LD_LIBRARY_PATH=/nfs/home/audris/lib:/nfs/home/audris/lib64:$LD_LIBRARY_PATH
+
 c=/lustre/isaac/scratch/audris/c2fb
 cd $c
 
@@ -978,6 +983,32 @@ i=FROM
 zcat b2tPFullU$i.s| cut -d\; -f1 | uniq | join -t\; -v2 - <(zcat b2P128FullU.$i.gz) | gzip > b2notCopiedPFullU$i.s
 
 fi
+if test 'WHAT' = 'b2notCopiedSplit'; then
+
+c=/lustre/isaac/scratch/audris/c2fb
+cd $c
+j=FROM
+for i in {0..7}
+do k=$((j*8+i)) 
+   zcat b2notCopiedPFullU$k.s
+done | awk -F\; '{print $2";"$1}' | perl -I /nfs/home/audris/lib/perl5 -I /nfs/home/audris/lookup /nfs/home/audris/lookup/splitSecCh.perl P2notCopiedb.$j. 32
+for i in {0..31}
+do zcat P2notCopiedb.$j.$i.gz | lsort ${maxM}M -t\; -k1,2 -u | gzip > P2notCopiedb.$j.$i.s
+done
+
+fi	
+if test 'WHAT' = 'b2notCopiedMerge'; then
+
+c=/lustre/isaac/scratch/audris/c2fb
+cd $c
+j=FROM
+str="$HOME/bin/lsort ${maxM}M -t\; -k1,2 -u --merge"
+for k in {0..15}
+do str="$str <(zcat P2notCopiedb.$k.$j.s)"
+done
+eval $str | gzip > P2notCopiedbFull$ver$j.s
+
+fi	
 if test 'WHAT' = 'P2summ1'; then
 
 c=/lustre/isaac/scratch/audris/gz
