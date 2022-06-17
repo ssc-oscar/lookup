@@ -970,6 +970,14 @@ perl -I ~/lib/perl5/ ~/lookup/prjToMongoJson.perl $ver $i | gzip > P2summFull$ve
 
 
 fi
+if test 'WHAT' = 'b2notCopied'; then
+
+c=/lustre/isaac/scratch/audris/c2fb
+cd $c
+i=FROM
+zcat b2tPFullU$i.s| cut -d\; -f1 | uniq | join -t\; -v2 - <(zcat b2P128FullU.$i.gz) | gzip > b2notCopiedPFullU$i.s
+
+fi
 if test 'WHAT' = 'P2summ1'; then
 
 c=/lustre/isaac/scratch/audris/gz
@@ -1956,6 +1964,423 @@ done
 eval $str | gzip > def2PFull$ver$i.s
 
 fi
+if test 'WHAT' = 'w2bl'; then
+
+cd /lustre/isaac/scratch/audris/All.blobs
+i=FROM
+for j in {0..3}
+do zcat blob_$i.winnow$j | perl ~/lookup/win2bl.perl 25 | uniq | ~/lookup/splitSec.perl w2bl$j.$i. 128 &
+done
+
+wait
+
+fi
+if test 'WHAT' = 'w2bbin'; then
+
+cd /lustre/isaac/scratch/audris/All.blobs
+i=FROM
+zcat w2bFull$ver$i.s0 | perl ~/lookup/toBin.perl w2b0Full$ver$i 4 20
+zcat b2wFull$ver$i.s | perl ~/lookup/toBin.perl b2wFull$ver$i 20 4
+
+fi
+if test 'WHAT' = 'w2bfbin'; then
+
+cd /lustre/isaac/scratch/audris/All.blobs
+i=FROM
+#perl ~/lookup/fromBin.perl w2b0Full$ver$i 4 20 | gzip > w2bFull$ver$i.s0.fromBin
+perl ~/lookup/fromBin.perl b2wFull$ver$i 20 4 | gzip > b2wFull$ver$i.s.fromBin
+
+fi
+if test 'WHAT' = 'blobcheck'; then
+
+cd /lustre/isaac/scratch/audris/All.blobs
+i=FROM
+md5sum blob_$i.bin
+
+fi
+if test 'WHAT' = 'w2bcheck'; then
+
+cd /lustre/isaac/scratch/audris/All.blobs
+i=FROM
+zcat w2bFull$ver$i.s0 | perl -ane 'chop();print "'w2bFull$ver$i.s0';$_\n" if $_ !~ /^[0-9a-f]{8};[0-9a-f]{40}$/;'
+[[ -f b2wFull$ver$i.s ]] && zcat b2wFull$ver$i.s | perl -ane 'chop();print "'b2wFull$ver$i.s';$_\n" if $_ !~ /^[0-9a-f]{40};[0-9a-f]{8}$/;'
+
+
+fi
+if test 'WHAT' = 'w2bls'; then
+
+maxM=$((maxM/8))
+cd /lustre/isaac/scratch/audris/All.blobs
+i=FROM
+for j in {0..3}
+do for k in {0..127}; do zcat w2bl$j.$i.$k.gz | $HOME/bin/lsort ${maxM}M -t\; -k1,2 -u | gzip > w2bl$j.$i.$k.s; done &
+done
+for j in {0..3}
+do for k in {0..127}; do zcat w2bl$j.$i.$k.gz | awk -F\; '{ print $2";"$1}' | $HOME/bin/lsort ${maxM}M -t\; -k1,2 -u | gzip > b2wl$j.$i.$k.s; done &
+done
+wait
+
+fi
+if test 'WHAT' = 'b2wlm'; then
+
+maxM=$((maxM))
+cd /lustre/isaac/scratch/audris/All.blobs
+i=FROM   
+
+for k in {0..127}
+do str="$HOME/bin/lsort ${maxM}M -t\; -k1,2 -u --merge"
+  for j in {0..3}
+  do str="$str <(zcat b2wl$j.$i.$k.s)"
+  done
+  eval $str | gzip >  b2wl.$i.$k.s
+done
+
+str="$HOME/bin/lsort ${maxM}M -t\; -k1,2 -u --merge"
+for k in {0..127}
+do str="$str <(zcat b2wl.$i.$k.s)"
+done
+eval $str | gzip >  b2wlFullU$i.s
+
+fi
+if test 'WHAT' = 'w2blm3'; then
+
+maxM=$((maxM))
+cd /lustre/isaac/scratch/audris/All.blobs
+k=FROM
+
+for i in {96..127}
+do str="$HOME/bin/lsort ${maxM}M -t\; -k1,2 -u --merge"
+   for j in {0..3}
+   do str="$str <(zcat w2bl$j.$i.$k.s)"
+   done
+   eval $str | gzip >  w2bl.$i.$k.s
+done
+
+str="$HOME/bin/lsort ${maxM}M -t\; -k1,2 -u --merge"
+for i in {96..127}
+do str="$str <(zcat w2bl.$i.$k.s)"
+done
+eval $str | gzip >  w2blFullU$k.s3
+
+
+fi
+if test 'WHAT' = 'w2blmm'; then
+
+maxM=$((maxM))
+cd /lustre/isaac/scratch/audris/All.blobs
+k=FROM
+str="$HOME/bin/lsort ${maxM}M -t\; -k1,2 -u --merge"
+for i in {0..3}
+do str="$str <(zcat w2blFullU$k.s$i)"
+done
+eval $str | gzip >  w2blFullU$k.s
+
+fi
+if test 'WHAT' = 'w2nb3'; then
+
+e=3
+cd /lustre/isaac/scratch/audris/All.blobs
+i=FROM
+zcat w2bFullU$i.s$e | cut -d\; -f1 | uniq -c | awk '{print $2";"$1}' | gzip > w2nbFullU$i.s$e
+zcat w2nbFullU$i.s$e | awk -F\; '{if ($2<=5000) print $1";"$2}' | gzip > w2SnbFullU$i.s$e
+zcat w2nbFullU$i.s$e | awk -F\; '{if ($2>5000) print $1";"$2}' | gzip > w2LnbFullU$i.s$e
+##zcat w2bFullU$i.s0 | join -t\; <(zcat w2SnbFullU$i.s0|cut -d\; -f1) - | gzip > w2SbFullU$i.s0
+#zcat w2bFullU$i.s0 |  ~/lookup/grepFieldv.perl w2LnbFullU$i.s0 1 | gzip > w2SbFullU$i.s0
+
+fi
+if test 'WHAT' = 'w2Sb'; then
+
+cd /lustre/isaac/scratch/audris/All.blobs
+i=FROM
+
+#for i in {0..127}; do str="lsort 3G -t\; -k1,2 --merge";for k in {0..3}; do str="$str <(zcat w2nbFullU$i.s$k)"; done; eval $str | perl -e 'while(<STDIN>){chop();($b,$n)=split(/;/);if($pb ne ""&&$pb ne $b){print "$pb;$ns\n";$ns=0};$ns+=$n;$pb=$b};print "$pb;$ns\n"' | gzip > w2nbFullU$i.s; done 
+#for i in {0..127}; do zcat w2nbFullU$i.s | awk -F\; '{if ($2>5000) print $1";"$2}'; done | gzip > w2lnbFullU.s
+#for i in {0..127}; do zcat w2lnbFullU$i.s | awk -F\; '{if ($2>500) print $1";"$2}'; done | gzip > w2mnbFullU.s
+#for i in {0..127}; do zcat w2lnbFullU$i.s | awk -F\; '{if ($2>4000) print $1";"$2}'; done | gzip > w2MnbFullU.s
+
+#this is official w2mnbFullU$i.s/w2mbFullU$i.s
+#(zcat w2nbFullU$i.s | awk -F\; '{if ($2>500) print $1";"$2}' | $HOME/bin/lsort ${maxM}M -t\; -k1,1 | gzip > w2mnbFullU$i.s;zcat w2sbFullU$i.s | ~/lookup/grepFieldv.perl w2mnbFullU$i.s 1 | gzip > w2mbFullU$i.s) &
+#for i in {0..127}; do zcat w2nbFullU$i.s | awk -F\; '{if ($2>9000) print $1";"$2}'; done | lsort 3G -t\; -k1,1 | gzip > w2SnbFullU.s &
+#this is official w2MnbFullU$i.s/w2MbFullU$i.s
+#(zcat w2nbFullU$i.s | awk -F\; '{if ($2>2000) print $1";"$2}' | $HOME/bin/lsort ${maxM}M -t\; -k1,1 | gzip > w2MnbFullU$i.s;zcat w2sbFullU$i.s | ~/lookup/grepFieldv.perl w2MnbFullU$i.s 1 | gzip > w2MbFullU$i.s) &
+#for i in {0..127}; do zcat w2nbFullU$i.s | awk -F\; '{if ($2>9000) print $1";"$2}'; done | lsort 3G -t\; -k1,1 | gzip > w2SnbFullU.s &
+(zcat w2nbFullU$i.s | awk -F\; '{if ($2>9000) print $1";"$2}' | $HOME/bin/lsort ${maxM}M -t\; -k1,1 | gzip > w2SnbFullU$i.s;zcat w2sbFullU$i.s | ~/lookup/grepFieldv.perl w2SnbFullU$i.s 1 | gzip > w2SbFullU$i.s) &
+i=$((i+1))
+(zcat w2nbFullU$i.s | awk -F\; '{if ($2>9000) print $1";"$2}' | $HOME/bin/lsort ${maxM}M -t\; -k1,1 | gzip > w2SnbFullU$i.s;zcat w2sbFullU$i.s | ~/lookup/grepFieldv.perl w2SnbFullU$i.s 1 | gzip > w2SbFullU$i.s) &
+i=$((i+1))
+(zcat w2nbFullU$i.s | awk -F\; '{if ($2>9000) print $1";"$2}' | $HOME/bin/lsort ${maxM}M -t\; -k1,1 | gzip > w2SnbFullU$i.s;zcat w2sbFullU$i.s | ~/lookup/grepFieldv.perl w2SnbFullU$i.s 1 | gzip > w2SbFullU$i.s) &
+i=$((i+1))
+(zcat w2nbFullU$i.s | awk -F\; '{if ($2>9000) print $1";"$2}' | $HOME/bin/lsort ${maxM}M -t\; -k1,1 | gzip > w2SnbFullU$i.s;zcat w2sbFullU$i.s | ~/lookup/grepFieldv.perl w2SnbFullU$i.s 1 | gzip > w2SbFullU$i.s) &
+
+wait
+#zcat w2nbFullU$i.s | awk -F\; '{if ($2>3000) print $1";"$2}' | $HOME/bin/lsort ${maxM}M -t\; -k1,1 | gzip > w2MnbFullU$i.s
+#zcat w2MnbFullU$i.s|join -t\; -v1 - <(zcat w2lnbFullU.s) | gzip > w2MnbFullU$i.ss
+#zcat w2sbFullU$i.s | ~/lookup/grepFieldv.perl w2MnbFullU$i.s 1 | gzip > w2MbFullU$i.s
+
+fi
+if test 'WHAT' = 'b2sw'; then
+
+cd /lustre/isaac/scratch/audris/All.blobs
+i=FROM
+zcat b2wFullU$i.s | ~/lookup/grepFieldv.perl w2lnbFullU.s 2 | gzip > b2swFullU$i.s &
+i=$((i+1))
+zcat b2wFullU$i.s | ~/lookup/grepFieldv.perl w2lnbFullU.s 2 | gzip > b2swFullU$i.s &
+i=$((i+1))
+zcat b2wFullU$i.s | ~/lookup/grepFieldv.perl w2lnbFullU.s 2 | gzip > b2swFullU$i.s &
+i=$((i+1))
+zcat b2wFullU$i.s | ~/lookup/grepFieldv.perl w2lnbFullU.s 2 | gzip > b2swFullU$i.s &
+
+wait
+
+fi
+if test 'WHAT' = 'b2Sw1'; then
+
+cd /lustre/isaac/scratch/audris/All.blobs
+i=FROM
+zcat b2swFullU$i.s | ~/lookup/grepFieldv.perl w2SnbFullU.s 2 | gzip > b2SwFullU$i.s 
+
+
+fi
+if test 'WHAT' = 'b2Mw1'; then
+
+cd /lustre/isaac/scratch/audris/All.blobs
+i=FROM
+zcat b2SwFullU$i.s | ~/lookup/grepFieldv.perl w2MnbFullU.s 2 | gzip > b2MwFullU$i.s
+
+
+fi
+if test 'WHAT' = 'w2cl1'; then
+
+cd /lustre/isaac/scratch/audris/All.blobs
+i=FROM
+zcat b2wFullU$i.s | join -t\; <(zcat b2slfclFullU$i.s|cut -d\; -f1,5|grep ';') - |awk -F\; '{print $3";"$2}' | ~/lookup/splitSec.perl w2cl.$i. 128 
+
+fi
+if test 'WHAT' = 'w2Mbi'; then
+
+cd /lustre/isaac/scratch/audris/All.blobs
+i=FROM
+for k in {0..7}
+do zcat w2MbFullU$i.s| awk -F\; '{print $2";"$1}'| ~/lookup/splitSec.perl b2Mw.$i. 128 &
+   i=$((i+1))
+done
+wait
+
+fi
+if test 'WHAT' = 'b2Mws'; then
+
+cd /lustre/isaac/scratch/audris/All.blobs
+i=FROM
+maxM=$((maxM/5))
+for k in {0..15}
+do
+  for j in {88..127..4}; do zcat b2Mw.$j.$i.gz | lsort ${maxM}M -t\; -k1,2 -u | gzip > b2Mw.$j.$i.s; done &
+  for j in {89..127..4}; do zcat b2Mw.$j.$i.gz | lsort ${maxM}M -t\; -k1,2 -u | gzip > b2Mw.$j.$i.s; done &
+  for j in {90..127..4}; do zcat b2Mw.$j.$i.gz | lsort ${maxM}M -t\; -k1,2 -u | gzip > b2Mw.$j.$i.s; done &
+  for j in {91..127..4}; do zcat b2Mw.$j.$i.gz | lsort ${maxM}M -t\; -k1,2 -u | gzip > b2Mw.$j.$i.s; done &
+  wait
+  i=$((i+1))
+done
+wait
+
+fi
+if test 'WHAT' = 'b2Mwm'; then
+
+cd /lustre/isaac/scratch/audris/All.blobs
+i=FROM
+maxM=$((maxM/5))
+for k in {0..3}
+do str="lsort ${maxM}M -t\; -k1,2 -u --merge";for l in {0..127}; do str="$str <(zcat b2Mw.$l.$i.s)"; done; eval $str | gzip > b2MwFullU$i.s &
+   i=$((i+1))
+done
+wait
+
+fi
+if test 'WHAT' = 'w2cl'; then
+
+cd /lustre/isaac/scratch/audris/All.blobs
+i=FROM
+zcat b2wFullU$i.s | join -t\; <(zcat b2slfclFullU$i.s|cut -d\; -f1,5|grep ';') - |awk -F\; '{print $3";"$2}' | ~/lookup/splitSec.perl w2cl.$i. 128 &
+i=$((i+1))
+zcat b2wFullU$i.s | join -t\; <(zcat b2slfclFullU$i.s|cut -d\; -f1,5|grep ';') - |awk -F\; '{print $3";"$2}' | ~/lookup/splitSec.perl w2cl.$i. 128 &
+i=$((i+1))
+zcat b2wFullU$i.s | join -t\; <(zcat b2slfclFullU$i.s|cut -d\; -f1,5|grep ';') - |awk -F\; '{print $3";"$2}' | ~/lookup/splitSec.perl w2cl.$i. 128 &
+i=$((i+1))
+zcat b2wFullU$i.s | join -t\; <(zcat b2slfclFullU$i.s|cut -d\; -f1,5|grep ';') - |awk -F\; '{print $3";"$2}' | ~/lookup/splitSec.perl w2cl.$i. 128 &
+wait
+
+fi
+if test 'WHAT' = 'cl2w'; then
+
+cd /lustre/isaac/scratch/audris/All.blobs
+i=FROM
+zcat w2clFullU$i.s | awk -F\; '{print $2";"$1}' | ~/lookup/splitSecNum.perl cl2w.$i. 128 &
+i=$((i+1))
+zcat w2clFullU$i.s | awk -F\; '{print $2";"$1}' | ~/lookup/splitSecNum.perl cl2w.$i. 128 &
+i=$((i+1))
+zcat w2clFullU$i.s | awk -F\; '{print $2";"$1}' | ~/lookup/splitSecNum.perl cl2w.$i. 128 &
+i=$((i+1))
+zcat w2clFullU$i.s | awk -F\; '{print $2";"$1}' | ~/lookup/splitSecNum.perl cl2w.$i. 128 &
+
+wait
+
+fi
+if test 'WHAT' = 'w2cls1'; then
+
+cd /lustre/isaac/scratch/audris/All.blobs
+i=FROM
+maxM=$((maxM/5))
+for k in {0..127..4}; do zcat w2cl.$i.$k.gz | $HOME/bin/lsort ${maxM}M -t\; -k1,2 -u | gzip > w2cl.$i.$k.s; done &
+for k in {1..127..4}; do zcat w2cl.$i.$k.gz | $HOME/bin/lsort ${maxM}M -t\; -k1,2 -u | gzip > w2cl.$i.$k.s; done &
+for k in {2..127..4}; do zcat w2cl.$i.$k.gz | $HOME/bin/lsort ${maxM}M -t\; -k1,2 -u | gzip > w2cl.$i.$k.s; done &
+for k in {3..127..4}; do zcat w2cl.$i.$k.gz | $HOME/bin/lsort ${maxM}M -t\; -k1,2 -u | gzip > w2cl.$i.$k.s; done &
+
+wait
+
+
+fi
+if test 'WHAT' = 'cl2ws'; then
+
+cd /lustre/isaac/scratch/audris/All.blobs
+i=FROM
+maxM=$((maxM/5))
+for k in {0..127}; do zcat cl2w.$i.$k.gz | $HOME/bin/lsort ${maxM}M -t\; -k1,2 -u | gzip > cl2w.$i.$k.s; done &
+i=$((i+1))
+for k in {0..127}; do zcat cl2w.$i.$k.gz | $HOME/bin/lsort ${maxM}M -t\; -k1,2 -u | gzip > cl2w.$i.$k.s; done &
+i=$((i+1))
+for k in {0..127}; do zcat cl2w.$i.$k.gz | $HOME/bin/lsort ${maxM}M -t\; -k1,2 -u | gzip > cl2w.$i.$k.s; done &
+i=$((i+1))
+for k in {0..127}; do zcat cl2w.$i.$k.gz | $HOME/bin/lsort ${maxM}M -t\; -k1,2 -u | gzip > cl2w.$i.$k.s; done &
+
+wait
+
+fi
+if test 'WHAT' = 'cl2wm'; then
+
+cd /lustre/isaac/scratch/audris/All.blobs
+i=FROM
+maxM=$((maxM/5))
+for l in {0..3} 
+do str="$HOME/bin/lsort ${maxM}M -t\; -k1,2 -u --merge"
+  for k in {0..127}
+  do str="$str <(zcat cl2w.$k.$i.s)"
+  done
+  eval $str | gzip >  cl2wFullU$i.s &
+  i=$((i+1))
+done
+wait
+
+i=FROM
+for l in {0..3}
+do zcat cl2wFullU$i.s | cut -d\; -f1 | uniq -c | awk '{print $2";"$1}' | gzip > cl2nwFullU$i.s &
+   i=$((i+1))
+done
+wait
+
+fi
+if test 'WHAT' = 'w2cls'; then
+
+cd /lustre/isaac/scratch/audris/All.blobs
+i=FROM
+maxM=$((maxM/5))
+
+for k in {0..127}; do zcat w2cl.$i.$k.gz | $HOME/bin/lsort ${maxM}M -t\; -k1,2 -u | gzip > w2cl.$i.$k.s; done &
+i=$((i+1))
+for k in {0..127}; do zcat w2cl.$i.$k.gz | $HOME/bin/lsort ${maxM}M -t\; -k1,2 -u | gzip > w2cl.$i.$k.s; done &
+i=$((i+1))
+for k in {0..127}; do zcat w2cl.$i.$k.gz | $HOME/bin/lsort ${maxM}M -t\; -k1,2 -u | gzip > w2cl.$i.$k.s; done &
+i=$((i+1))
+for k in {0..127}; do zcat w2cl.$i.$k.gz | $HOME/bin/lsort ${maxM}M -t\; -k1,2 -u | gzip > w2cl.$i.$k.s; done &
+
+
+wait
+
+fi
+if test 'WHAT' = 'w2clm1'; then
+
+cd /lustre/isaac/scratch/audris/All.blobs
+i=FROM
+str="$HOME/bin/lsort ${maxM}M -t\; -k1,2 -u --merge"
+for k in {0..127}
+do str="$str <(zcat w2cl.$k.$i.s)"
+done
+eval $str | gzip >  w2clFullU$i.s
+
+fi
+if test 'WHAT' = 'w2clm'; then
+
+cd /lustre/isaac/scratch/audris/All.blobs
+i=FROM
+maxM=$((maxM/5))
+
+
+for j in {0..3}
+do str="$HOME/bin/lsort ${maxM}M -t\; -k1,2 -u --merge"
+ for k in {0..127}
+ do str="$str <(zcat w2cl.$k.$i.s | perl -ane 'print $_ if m/[0-9a-f]{8};[0-9]+$/')"
+ done
+ eval $str | gzip >  w2clFullU$i.s &
+ i=$((i+1))
+done
+
+wait
+
+
+fi
+if test 'WHAT' = 'w2ncl'; then
+
+cd /lustre/isaac/scratch/audris/All.blobs
+i=FROM
+zcat w2clFullU$i.s | cut -d\; -f1 | uniq -c | awk '{print $2";"$1}' | gzip > w2nclFullU$i.s &
+i=$((i+1))
+zcat w2clFullU$i.s | cut -d\; -f1 | uniq -c | awk '{print $2";"$1}' | gzip > w2nclFullU$i.s &
+i=$((i+1))
+zcat w2clFullU$i.s | cut -d\; -f1 | uniq -c | awk '{print $2";"$1}' | gzip > w2nclFullU$i.s &
+i=$((i+1))
+zcat w2clFullU$i.s | cut -d\; -f1 | uniq -c | awk '{print $2";"$1}' | gzip > w2nclFullU$i.s &
+
+wait
+
+i=FROM
+zcat w2nbFullU$i.s | join -t\; -a2 <(zcat w2nclFullU$i.s) - | awk -F\; '{if (NF==2){print $1";0;"$2} else print $0}' |  gzip > w2nclbFullU$i.s &
+i=$((i+1))
+zcat w2nbFullU$i.s | join -t\; -a2 <(zcat w2nclFullU$i.s) - | awk -F\; '{if (NF==2){print $1";0;"$2} else print $0}' |  gzip > w2nclbFullU$i.s &
+i=$((i+1))
+zcat w2nbFullU$i.s | join -t\; -a2 <(zcat w2nclFullU$i.s) - | awk -F\; '{if (NF==2){print $1";0;"$2} else print $0}' |  gzip > w2nclbFullU$i.s &
+i=$((i+1))
+zcat w2nbFullU$i.s | join -t\; -a2 <(zcat w2nclFullU$i.s) - | awk -F\; '{if (NF==2){print $1";0;"$2} else print $0}' |  gzip > w2nclbFullU$i.s &
+
+wait
+
+fi
+if test 'WHAT' = 'w2sbck0'; then
+
+cd /lustre/isaac/scratch/audris/All.blobs
+i=FROM
+zcat w2bFullU$i.s[0-2] | cut -d\; -f2 | grep ^00 | $HOME/bin/lsort ${maxM}M -u | gzip > b00U$i.s0-2
+zcat w2SbFullU$i.s[0-2] | cut -d\; -f2 | grep ^00 | $HOME/bin/lsort ${maxM}M -u | gzip > Sb00U$i.s0-2
+zcat w2sbFullU$i.s[0-2] | cut -d\; -f2 | grep ^00 | $HOME/bin/lsort ${maxM}M -u | gzip > sb00U$i.s0-2
+
+fi
+if test 'WHAT' = 'w2sb'; then
+
+e=3
+cd /lustre/isaac/scratch/audris/All.blobs
+i=FROM
+
+str="lsort 3G -t\; -k1,2 --merge";
+for e in {0..3} 
+do str="$str <(zcat w2nbFullU$i.s$e)"
+done
+eval $str | perl -e 'while(<STDIN>){chop();($b,$n)=split(/;/);if($pb ne ""&&$pb ne $b){print "$pb;$ns\n";$ns=0};$ns+=$n;$pb=$b};print "$pb;$ns\n"' | gzip > w2nbFullU$i.s 
+zcat w2nbFullU$i.s | awk -F\; '{if ($2>20000) print $1";"$2}' | gzip > w2lnbFullU$i.s
+
+for e in {0..3}
+do zcat w2bFullU$i.s$e | ~/lookup/grepFieldv.perl w2lnbFullU$i.s 1 | gzip > w2sbFullU$i.s$e &
+done 
+wait
+
+fi
 if test 'WHAT' = 'w2b'; then
 
 cd /lustre/isaac/scratch/audris/All.blobs
@@ -1964,7 +2389,6 @@ for j in {0..3}
 do zcat blob_$i.winnow$j | perl ~/lookup/win2b.perl | uniq | ~/lookup/splitSec.perl w2b$j.$i. 128 &
 done
 wait
-
 
 fi
 if test 'WHAT' = 'b2ws'; then
@@ -2027,13 +2451,65 @@ fi
 if test 'WHAT' = 'w2bm'; then
 
 cd /lustre/isaac/scratch/audris/All.blobs
-i=FROM  
+k=FROM  
 maxM=$((maxM/5))
 
-for k in {0..127..4}; do str="$HOME/bin/lsort ${maxM}M -t\; -k1,2 -u --merge"; for j in {0..3}; do str="$str <(zcat w2b$j.$i.$k.s)";done; eval $str | gzip >  w2b.$i.$k.s; done &
-for k in {1..127..4}; do str="$HOME/bin/lsort ${maxM}M -t\; -k1,2 -u --merge"; for j in {0..3}; do str="$str <(zcat w2b$j.$i.$k.s)";done; eval $str | gzip >  w2b.$i.$k.s; done &
-for k in {2..127..4}; do str="$HOME/bin/lsort ${maxM}M -t\; -k1,2 -u --merge"; for j in {0..3}; do str="$str <(zcat w2b$j.$i.$k.s)";done; eval $str | gzip >  w2b.$i.$k.s; done &
-for k in {3..127..4}; do str="$HOME/bin/lsort ${maxM}M -t\; -k1,2 -u --merge"; for j in {0..3}; do str="$str <(zcat w2b$j.$i.$k.s)";done; eval $str | gzip >  w2b.$i.$k.s; done &
+str="$HOME/bin/lsort ${maxM}M -t\; -k1,2 -u --merge"; for j in {0..3}; do str="$str <(zcat w2bFullU$k.s$j)";done
+eval $str | gzip >  w2bFullU$k.s &
+k=$((k+1))
+str="$HOME/bin/lsort ${maxM}M -t\; -k1,2 -u --merge"; for j in {0..3}; do str="$str <(zcat w2bFullU$k.s$j)";done
+eval $str | gzip >  w2bFullU$k.s &
+k=$((k+1))
+str="$HOME/bin/lsort ${maxM}M -t\; -k1,2 -u --merge"; for j in {0..3}; do str="$str <(zcat w2bFullU$k.s$j)";done
+eval $str | gzip >  w2bFullU$k.s &
+k=$((k+1))
+str="$HOME/bin/lsort ${maxM}M -t\; -k1,2 -u --merge"; for j in {0..3}; do str="$str <(zcat w2bFullU$k.s$j)";done
+eval $str | gzip >  w2bFullU$k.s &
+
+
+wait
+
+fi
+if test 'WHAT' = 'w2sbm'; then
+
+cd /lustre/isaac/scratch/audris/All.blobs
+k=FROM  
+maxM=$((maxM/5))
+
+str="$HOME/bin/lsort ${maxM}M -t\; -k1,2 -u --merge"; for j in {0..3}; do str="$str <(zcat w2sbFullU$k.s$j)";done
+eval $str | gzip >  w2sbFullU$k.s &
+k=$((k+1))
+str="$HOME/bin/lsort ${maxM}M -t\; -k1,2 -u --merge"; for j in {0..3}; do str="$str <(zcat w2sbFullU$k.s$j)";done
+eval $str | gzip >  w2sbFullU$k.s &
+k=$((k+1))
+str="$HOME/bin/lsort ${maxM}M -t\; -k1,2 -u --merge"; for j in {0..3}; do str="$str <(zcat w2sbFullU$k.s$j)";done
+eval $str | gzip >  w2sbFullU$k.s &
+k=$((k+1))
+str="$HOME/bin/lsort ${maxM}M -t\; -k1,2 -u --merge"; for j in {0..3}; do str="$str <(zcat w2sbFullU$k.s$j)";done
+eval $str | gzip >  w2sbFullU$k.s &
+
+
+wait
+
+fi
+if test 'WHAT' = 'w2bmm3'; then
+
+cd /lustre/isaac/scratch/audris/All.blobs
+i=FROM
+maxM=$((maxM/5))
+
+str="$HOME/bin/lsort ${maxM}M -t\; -k1,2 -u --merge"; for j in {96..127}; do str="$str <(zcat w2b.$j.$i.s)";done
+eval $str | gzip >  w2bFull$ver$i.s3 &
+i=$((i+1))
+str="$HOME/bin/lsort ${maxM}M -t\; -k1,2 -u --merge"; for j in {96..127}; do str="$str <(zcat w2b.$j.$i.s)";done
+eval $str | gzip >  w2bFull$ver$i.s3 &
+i=$((i+1))
+str="$HOME/bin/lsort ${maxM}M -t\; -k1,2 -u --merge"; for j in {96..127}; do str="$str <(zcat w2b.$j.$i.s)";done
+eval $str | gzip >  w2bFull$ver$i.s3 &
+i=$((i+1))
+str="$HOME/bin/lsort ${maxM}M -t\; -k1,2 -u --merge"; for j in {96..127}; do str="$str <(zcat w2b.$j.$i.s)";done
+eval $str | gzip >  w2bFull$ver$i.s3 &
+
 
 wait
 
@@ -2164,3 +2640,33 @@ zcat blob_$i.idxf | ~/swsc/contentMatch/main blob_$i $((inc*3)) -1 2> blob_$i.wi
 wait
 
 fi
+if test 'WHAT' = 'tree'; then
+
+	
+module purge
+module load bzip2/1.0.8   intel-compilers/2021.2.0
+
+cd /lustre/isaac/scratch/audris/All.blobs
+i=FROM
+inc=25000000
+zcat blob_$i.idxf | head -$inc | gzip > blob_$i.idxf.0 
+python3 prs.py $i 0
+
+fi
+if test 'WHAT' = 'cofc'; then
+
+cd /lustre/isaac/scratch/audris/c2fb
+
+i=FROM
+zcat c2fFullU$i.s | grep -iE 'code\W?(of)?\W?conduct' > $i.c2f1 &
+i=$((i+1))
+zcat c2fFullU$i.s | grep -iE 'code\W?(of)?\W?conduct' > $i.c2f1 &
+i=$((i+1))
+zcat c2fFullU$i.s | grep -iE 'code\W?(of)?\W?conduct' > $i.c2f1 &
+i=$((i+1))
+zcat c2fFullU$i.s | grep -iE 'code\W?(of)?\W?conduct' > $i.c2f1 &
+
+wait
+
+fi
+
