@@ -1,8 +1,8 @@
 #!/bin/bash
 
 h=$(hostname)
-ver=T
-pVer=S
+ver=U
+pVer=T
 flat=n
 pass=""
 while getopts "fv:" option
@@ -14,6 +14,7 @@ done
 shift $((OPTIND-1))
 t=$1
 
+#A2a|P2p|a2A|p2P
 
 
 if [[ $t == "" ]]; then
@@ -21,89 +22,29 @@ if [[ $t == "" ]]; then
  exit 1;
 fi
 
-if [[ $h == 'da5.eecs.utk.edu' ]] 
-then 
-  if [[ -f /fast/${t}Full$ver.31.tch || -f /fast/${t}Full$ver.tch ]]
-  then ~/lookup/getValues.perl --flat=$flat /fast/${t}Full$ver
-  else
-    if [[ -f /fast/${t}Full$pVer.31.tch || -f /fast/${t}Full$pVer.tch ]]
-    then ~/lookup/getValues.perl --flat=$flat /fast/${t}Full$pVer
-    else
-      if [[ -f /da0_data/basemaps/${t}Full$ver.31.tch || -f /da0_data/basemaps/${t}Full$ver.tch ]]
-      then ssh da0 ~/lookup/getValues.perl --flat=$flat /da0_data/basemaps/${t}Full$ver
-      else 
-        if [[ -f /da0_data/basemaps/${t}Full$pVer.31.tch || -f /da0_data/basemaps/${t}Full$pVer.tch ]]
-        then ssh da0 ~/lookup/getValues.perl --flat=$flat /da0_data/basemaps/${t}Full$pVer
-        else 
-          echo "no map" 
-          echo "" > /dev/null
-        fi
-      fi
-    fi
-  fi
-  exit
-else
-  if [[ -f /da5_fast/${t}Full$ver.31.tch || -f /da5_fast/${t}Full$ver.tch ]]
-  then ~/lookup/getValues.perl --flat=$flat /da5_fast/${t}Full$ver
-      exit
-  fi
-#  if [[ $ssh != "" ]] 
-#  then $ssh "~/lookup/getValues.perl --flat=$flat $path"
-#  else ~/lookup/getValues.perl --flat=$flat $path
-#  fi
-fi
+suff=".31.tch"
+[[ $t =~ ^(A2a|P2p|a2A|p2P)$ ]] && suff=".tch"
 
-#determine the fastest database
-ssh=""
-if [[ -f /fast/${t}Full$ver.31.tch || -f /fast/${t}Full$ver.tch ]]
-then path=/fast/${t}Full$ver
-else
-  if [[ -f /data/basemaps/${t}Full$ver.31.tch || -f /data/basemaps/${t}Full$ver.tch ]]
-  then path=/data/basemaps/${t}Full$ver
-  else
-    if [[ -f /data/basemaps/${t}Full$pVer.31.tch || -f /data/basemaps/${t}Full$pVer.tch ]]
-    then ver=$pVer
-      path=/data/basemaps/${t}Full$ver
-    else
-      path=$(ls -f /da?_data/basemaps/${t}Full$ver.31.tch 2> /dev/null | head -1)
-      if [[ -f $path ]]
-      then
-        path=$(ls -f /da?_data/basemaps/${t}Full$ver.31.tch 2> /dev/null | head -1)
-        path=${path%%.31.tch}
-        ssh=${path%%_data*}
-        ssh="ssh -p443 "${ssh##/}
-        #echo "$path;$ssh"
-      else
-        path=$(ls -f /da?_data/basemaps/${t}Full$ver.tch 2> /dev/null | head -1)
-        if [[ -f $path ]]
-        then
-          path=${path%%.tch}
-          ssh=${path%%_data*}
-          ssh="ssh -p443 "${ssh##/}
-          #echo "$path;$ssh"
-        else
-          ver=$pVer
-          path=$(ls -f /da?_data/basemaps/${t}Full$ver.31.tch 2> /dev/null | head -1)
-          if [[ -f $path ]]
-          then
-            path=${path%%.31.tch}
-            ssh=${path%%_data*}
-            ssh="ssh -p443 "${ssh##/}
-          else
-            path=$(ls -f /da?_data/basemaps/${t}Full$ver.tch 2> /dev/null | head -1)
-            path=${path%%.tch}
-            ssh=${path%%_data*}
-            ssh="ssh -p443 "${ssh##/}
-          fi
-        fi
-      fi
-    fi
-  fi
-fi
-if [[ $ssh != "" ]]
+for hh in da5 da3 da4
+do for v in U T S R
+  do #echo /${hh}_fast/${t}Full$v$suff
+     if [[ -f /${hh}_fast/${t}Full$v$suff ]]
+     then lastVer=$v
+          lastH=$hh
+          break
+     fi
+  done
+  [[ $lastVer -ne "" ]] && break
+done
+if [[ $lastH.eecs.utk.edu == $h ]] 
 then 
-  $ssh "~/lookup/getValues.perl --flat=$flat $path"
-else ~/lookup/getValues.perl --flat=$flat $path
+ ~/lookup/getValues.perl --flat=$flat /fast/${t}Full$lastVer
+else
+  ssh="ssh -p443"
+  if [[ $lastH != "" ]]
+  then [[ $lastH == "da3" ]] && ssh=ssh; $ssh $lastH "~/lookup/getValues.perl --flat=$flat /fast/${t}Full$lastVer"
+  else echo no map $t
+  fi
 fi
 
 
