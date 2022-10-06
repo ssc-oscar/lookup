@@ -20,18 +20,22 @@ $ncnt = $ARGV[2] if defined $ARGV[2];
 
 
 my (%fhob, %fhost, %fhosc);
+use Net::Domain qw(hostname);
+my $h = hostname();
+my $pre = "/da5_fast";
+$pre = "/${h}_fast" if $h eq "da4";
+my $dt = "/da4_data";
 
 my $fbasec="All.sha1c/${type}_";
 if ($type eq "blob" || ($type =~ /bdiff|commit|tree/ && $ncnt) ){
   $fbasec="All.sha1o/sha1.${type}_";
 }
 for my $sec (0 .. ($sections-1)){
-  my $pre = "/fast";
   tie %{$fhosc{$sec}}, "TokyoCabinet::HDB", "$pre/${fbasec}$sec.tch", TokyoCabinet::HDB::OREADER | TokyoCabinet::HDB::ONOLCK,  
     16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
     or die "cant open $pre/$fbasec$sec.tch\n";
   if ( $type eq "blob" || ($type =~ /bdiff|commit|tree/ && $ncnt)){
-	  open $fhob{$sec}, "/data/All.blobs/${type}_$sec.bin" or die "$!";
+	  open $fhob{$sec}, "$dt/All.blobs/${type}_$sec.bin" or die "$! $dt/All.blobs/${type}_$sec.bin";
   }
 }
 
@@ -131,6 +135,9 @@ sub getBlob {
     $code = "$blob;$code";
   }
   print "$code\n";
+  if ($code eq ""){
+    print "$codeC\n";
+  }
 }
 
 sub getBdiff {
