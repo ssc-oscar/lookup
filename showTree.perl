@@ -43,9 +43,11 @@ sub safeDecomp {
         }
 }
 
+my $top = "";
 while (<STDIN>){
   chop();
   my $tree = $_;
+  $top = $tree;
   getTree ($tree, "");
 }
 
@@ -82,11 +84,12 @@ sub prtTree {
     if ($treeobj =~ s/^([0-7]+) (.+?)\0(.{20})//s) {
       my ($mode,$name,$bytes) = (oct($1),$2,$3);
       $name =~ s/\n/__NEWLINE__/g;
-      printf "$off%06o;%s;%s\n",
+      print "$top;" if ($debug == 3);
+      printf "%06o;%s;$off/%s\n",
         $mode, #($mode == 040000 ? "tree" : "blob"),
         unpack("H*", $bytes), $name;
       if ($debug == 3 && $mode == 040000){
-        getTree (unpack("H*", $bytes), "$off  ");
+        getTree (unpack("H*", $bytes), "$off/$name");
       }
     }else {
       die "$0: unexpected tree entry";
