@@ -22,9 +22,13 @@ $ncnt = $ARGV[2] if defined $ARGV[2];
 my (%fhob, %fhost, %fhosc);
 use Net::Domain qw(hostname);
 my $h = hostname();
-my $pre = "/da5_fast";
-$pre = "/${h}_fast" if $h eq "da4";
-my $dt = "/da4_data";
+my $pre = "/fast";
+my $dt = "/data";
+if ($type eq "blob"){
+  $pre = "/${h}_fast" if $h eq "da4";
+  $pre = "/da5_fast" if $h ne "da4";
+  $dt = "/da4_data" ;
+}
 
 my $fbasec="All.sha1c/${type}_";
 if ($type eq "blob" || ($type =~ /bdiff|commit|tree/ && $ncnt) ){
@@ -226,6 +230,7 @@ sub getTree {
 
 sub prtTree {
   my ($treeobj, $off) = @_;
+#todo handle one-liner for debug == 1
   while ($treeobj) {
   # /s is important so . matches any byte!
     if ($treeobj =~ s/^([0-7]+) (.+?)\0(.{20})//s) {
