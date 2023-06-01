@@ -8,7 +8,7 @@ use MIME::Base64;
 
 require Exporter;
 our @ISA = qw (Exporter);
-our @EXPORT = qw(toUrl segB segH sHash sHashV toHex fromHex safeDecomp safeComp getFL parseAuthorId
+our @EXPORT = qw(getLang toUrl segB segH sHash sHashV toHex fromHex safeDecomp safeComp getFL parseAuthorId
 		splitSignature signature_error contains_angle_brackets extract_trimmed git_signature_parse extrCmt getTime cleanCmt	
 		addForks %badProjects %badAuthors %badCmt %badBlob %badTree %largeBlobPrj %largeTreePrj);
 use vars qw(@ISA);
@@ -112,18 +112,13 @@ sub getFL {
 sub parseAuthorId{
   my $a = $_[0];
   my $a0 = $a;
-  my $eBare = $a;
-  $eBare =~ s/\s+\<.*//;
-  if ($eBare !~ /@/){
-    $eBare = "";
-  }
+    
  
   my ($f, $l) = split (/ /, getFL($a), -1);
   $f = "" if !defined $f;
   $l = "" if !defined $l;
   my $e = $a;
   $e =~ s/.*\<//;
-  $e = $eBare if ($e !~ /@/);
   $e =~ s|{ID}\+{||;
   $e =~ s|[}{]||g;
   $e =~ s/\>.*//;
@@ -976,7 +971,50 @@ our %badFile = (
   "Makefile" => 2463961
 );
 
+my %grepStr = (
+'JS' => '\.(js|iced|liticed|iced.md|coffee|litcoffee|coffee.md|ls|es6|es|jsx|mjs|sjs|co|eg|json|json.ls|json5)$',
+'PY' =>'\.(py|py3|pyx|pyo|pyw|pyc|whl|wsgi|pxd)$',
+'ipy' => '\.(ipynb|IPYNB)$',
+'C' => '(\.[Cch]|\.cpp|\.hh|\.cc|\.hpp|\.cxx)$', #152902;h;ObjectiveC
+'java' => '(\.java|\.iml|\.class)$',
+'Cs' => '\.cs$',
+'php' => '\.(php|php[345]|phtml)$',
+'rb' => '\.(rb|erb|gem|gemspec)$',
+'Go' => '\.go$',
+'Rust' => '\.(rs|rlib|rst)$',
+'R' => '(\.Rd|\.[Rr]|\.Rprofile|\.RData|\.Rhistory|\.Rproj|^NAMESPACE|^DESCRIPTION|/NAMESPACE|/DESCRIPTION)$',
+'Scala' => '\.scala$',
+'pl' => '\.(pl|PL|pm|pod|perl|pm6|pl6|p6|plx|ph)$',
+'F' => '\.(f[hi]|[fF]|[fF]77|[fF]9[0-9]|fortran|forth|FOR|for|FTN|ftn|[fF]0[378])$',
+'jl' => '\.jl$',
+'Dart' => '\.dart$',
+'Kotlin' => '\.(kt|kts|ktm)$',
+'TypeScript' => '\.(ts|tsx)$',
+'Swift' => '\.swift$', # .swf is flash
+'Sql' => '\.(sql|sqllite|sqllite3|mysql)$',
+'Lisp' => '\.(el|lisp|elc|l|cl|cli|lsp|clisp)$',
+'Ada' => '\.ad[abs]$',
+'Erlang' => '\.(erl|hrl)$',
+'Fml' => '\.(fs|fsi|aug|ml|mli|hs|lhs|sml|v|e)$', #https://en.wikipedia.org/wiki/Proof_assistant
+'Lua' => '\.lua$',
+'Markdown' => '\.(md|markdown)$',
+'CSS' => '\.css$',
+'Clojure' => '\.(cljs|cljc|clj)$',
+'OCaml' => '\.(aug|mli|ml|aug)$',
+'Basic' => '\.(bas|bb|bi|pb)$',
+'ObjectiveC' => '\.(m|mm)$', #also MatLab: 92842;m;MatLab vs 180971;m;ObjectiveC
+'Asp' => '\.(X86|asa|A51|68k|x86|X68|ASM|asp|asm|[sS])$',
+'Cuda' => '\.(cuh|cu)$',
+'Cob' => '\.(COB|cob|CBL|cbl)$',
+'Groovy' => '\.(groovy|gvy|gy|gsh)$' );
 
+sub getLang {
+  my $f = $_[0];
+  for my $k (keys %grepStr){
+   return $k if $f =~ $grepStr{$k};
+  }
+  return 'Unknown';
+}
 
 
 my $badCmtHere =  <<"EOT";
