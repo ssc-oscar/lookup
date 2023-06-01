@@ -6,6 +6,9 @@ t=$1
 off=${3:-0}
 fmt=${2:-0}
 
+
+
+
 if [[ $h == da5.eecs.utk.edu ]] 
 then 
   ~/lookup/showCnt.perl $t $fmt 0
@@ -14,7 +17,7 @@ else
  then
     if [[ $h == 'da4.eecs.utk.edu' ]]
     then ~/lookup/showCnt.perl $t $fmt 1
-    else ssh -p443 da4 ~/lookup/showCnt.perl $t $fmt 1
+    else ~/lookup/showCnt.perl $t $fmt 1
     fi
  else
   if [[ $t == 'tree' ]]
@@ -35,8 +38,8 @@ else
       if [[ $h == 'da4.eecs.utk.edu' ]]
       then ~/lookup/showCnt.perl $t $fmt
       else
-        off=1
-        ssh da3 ~/lookup/showCnt.perl $t $fmt $off
+        off=0
+        ssh da4 ~/lookup/showCnt.perl $t $fmt $off
       fi
     fi
    fi

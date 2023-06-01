@@ -10,20 +10,17 @@ $from = $ARGV[0] if defined $ARGV[0];
 my $n = 0;
 while(<STDIN>){
   $n++;
-  next if $n <= $from;
+  next if $n < $from;
   chop();
   s/;$//;
   s/;$//;
-  my ($n,$s,$o,$siz,$b,$f,$siz1,$w) = split(/;/, $_, -1);
-  my ($l, $wc) = split(/=/, $w, -1);
-  if ($l =~ /^,/){
-    $l =~ s/^,//;
-    my @wci = split(/,/, $l, -1);
-    if ($#wci >=0){
-      $wci[$#wci] = substr($wci[$#wci], 0, 8);
-      for my $ww (@wci){
-        print "$ww\;$b\n";
-      }
+  my ($n,$s,$o,$siz,$b,$f,$siz1,@wa) = split(/;/, $_, -1);
+  for my $w (@wa){
+    next if !defined $w || $w eq "";
+    my ($l, $wc) = split(/=/, $w, -1);
+    my @wci = split(/,/, $wc, -1);
+    for my $ww (@wci){
+      print "$ww\;$b\n";
     }
   }
 }

@@ -1,0 +1,19 @@
+#!/bin/bash
+
+h=$(hostname)
+
+
+if [[ $h == da5.eecs.utk.edu ]] 
+then 
+  ~/lookup/cmputeDiff3.perl
+else
+ if [[ $h == 'da3.eecs.utk.edu' ]]
+ then ~/lookup/cmputeDiff3CT.perl 
+ else     
+  if [[ $h == 'da4.eecs.utk.edu' ]] 
+  then ~/lookup/cmputeDiff3T.perl
+  else
+    ssh -p443 da5 ~/lookup/cmputeDiff3.perl
+  fi
+ fi
+fi

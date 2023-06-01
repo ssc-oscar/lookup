@@ -20,18 +20,26 @@ $ncnt = $ARGV[2] if defined $ARGV[2];
 
 
 my (%fhob, %fhost, %fhosc);
+use Net::Domain qw(hostname);
+my $h = hostname();
+my $pre = "/fast";
+my $dt = "/data";
+if ($type eq "blob"){
+  $pre = "/${h}_fast" if $h eq "da4";
+  $pre = "/da5_fast" if $h ne "da4";
+  $dt = "/da4_data" ;
+}
 
 my $fbasec="All.sha1c/${type}_";
 if ($type eq "blob" || ($type =~ /bdiff|commit|tree/ && $ncnt) ){
   $fbasec="All.sha1o/sha1.${type}_";
 }
 for my $sec (0 .. ($sections-1)){
-  my $pre = "/fast";
   tie %{$fhosc{$sec}}, "TokyoCabinet::HDB", "$pre/${fbasec}$sec.tch", TokyoCabinet::HDB::OREADER | TokyoCabinet::HDB::ONOLCK,  
     16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
     or die "cant open $pre/$fbasec$sec.tch\n";
   if ( $type eq "blob" || ($type =~ /bdiff|commit|tree/ && $ncnt)){
-	  open $fhob{$sec}, "/data/All.blobs/${type}_$sec.bin" or die "$!";
+	  open $fhob{$sec}, "$dt/All.blobs/${type}_$sec.bin" or die "$! $dt/All.blobs/${type}_$sec.bin";
   }
 }
 
@@ -54,6 +62,10 @@ while (<STDIN>){
     getTkns ($cmt, $type);
     next;
   }
+  if ($type eq "tag"){
+    getTag ($cmt, "");
+    next;
+  }
   my $sec = hex (substr($cmt, 0, 2)) % $sections;
   my $cB = fromHex ($cmt);
   if (! defined $fhosc{$sec}{$cB}){
@@ -70,6 +82,24 @@ while (<STDIN>){
     }
     cleanCmt ($codeC, $cmt, $debug);
   }
+}
+
+sub getTag {
+  my ($ch, $type) = @_;
+  my $sec = hex (substr($ch, 0, 2)) % $sections;
+  my $cB = fromHex ($ch);
+  if (! defined $fhosc{$sec}{$cB}){
+     print STDERR "no content for $type $ch in $sec\n";
+     return "";
+  }
+  my $codeC = $fhosc{$sec}{$cB};
+  return if $codeC eq "";
+  my @code =  split (/\n/, safeDecomp ($codeC, "$sec;$ch"));
+  if ($code[0] =~ m/^object\s+([0-9a-f]{40})$/){
+    print "$ch;$1\n";
+    return;
+  }
+  print "".(join ";",@code)."\n";
 }
 
 sub getTkns {
@@ -109,6 +139,9 @@ sub getBlob {
     $code = "$blob;$code";
   }
   print "$code\n";
+  if ($code eq ""){
+    print "$codeC\n";
+  }
 }
 
 sub getBdiff {
@@ -197,6 +230,7 @@ sub getTree {
 
 sub prtTree {
   my ($treeobj, $off) = @_;
+#todo handle one-liner for debug == 1
   while ($treeobj) {
   # /s is important so . matches any byte!
     if ($treeobj =~ s/^([0-7]+) (.+?)\0(.{20})//s) {
