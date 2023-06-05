@@ -1,0 +1,119 @@
+digraph woc {
+
+
+#c
+c2dat -> c2dat_c2ta -> commit_idx
+fl -> Cmt_c2ta -> c2acp_c2ta -> commit_idx
+c2pc ->c2pcmerge_c2ta -> c2pc_c2ta -> c2dat_c2ta
+c2cc ->c2ccmerge_c2ta -> pc2csplit_c2ta -> c2dat_c2ta
+as -> as_c2ta -> a2cmerge_c2ta -> c2tasplit_c2ta -> c2dat_c2ta
+
+#c2p
+c2p -> MERGEc2p_updatePrjT->MRG0_updatePrjT ->SRT0_updatePrjT ->START_updatePrjT;
+p2c -> MERGEp2c_updatePrjT ->IMRG0_updatePrjT ->ISRT0_updatePrjT->invt_updatePrjT ->MRG0_updatePrjT;
+P2c -> deforkPm_fork -> deforkP_fork -> defork_fork ->MERGEM_fork -> MERGE_fork -> p2p_fork -> c2p;
+c2P -> defork_fork 
+
+# a2p
+split_a2p -> c2dat_c2ta;
+p2a->merge_a2p -> split_a2p -> c2p
+a2p->a2pmerge_a2p -> a2psplit_a2p -> c2p
+
+P2tac ->  P2tac_a2p -> mergeCA_a2p -> splitCA_a2p -> c2P;
+P2a -> P2amerge_a2p -> P2asplit_a2p -> c2P;
+
+A2a -> a2A;
+a2A->P2a;
+a2A->fl;
+a2A_a2p ->a2A
+
+P2A -> a2A_a2p ->P2amerge_a2p;
+A2P -> A2Pmerge_a2p -> a2Asrt_a2p -> a2A_a2p;
+coreCA_a2p -> P2tac_a2p
+P2mnc -> cntCA_a2p -> P2tac;
+A2Pmerge_a2p -> P2amerge_a2p;
+P2asplit_a2p -> c2p;
+
+#once diffs are obtained
+b2ob -> b2obm_b2ob -> b2ob_b2ob -> c2fbb -> prep_b2ob;
+ob2b->ob2bm_b2ob -> ob2b_b2ob -> c2fbb;
+b2f->b2fm_b2ob -> b2f_b2ob -> c2fbb;
+c2b->c2b_b2ob -> c2fbb;
+c2f->c2f_b2ob -> c2fbb;
+b2ta->b2tam_b2ob-> b2ta_b2ob -> c2fbb;
+P2b_b2ob -> c2b;
+P2b_b2ob -> c2P;
+P2b->P2bm_b2ob->P2b_b2ob
+
+b2P-> b2Pm_b2ob->b2P_b2ob -> c2b;
+b2P_b2ob -> c2P;
+
+b2fA->b2fA_b2ob -> a2A;
+A2fb -> A2fbm_b2ob -> A2fb_b2ob -> b2fA_b2ob -> b2ta;
+A2f -> A2fmerge_b2ob -> A2f_b2ob -> a2f;
+A2f_b2ob -> a2A;
+
+A2b->A2bm_b2ob -> A2b_b2ob -> b2tA_b2ob -> a2A;
+a2f->a2fm_b2ob -> a2f_b2ob -> c2f_b2ob;
+a2fb->a2fbm_b2ob -> a2fb_b2ob -> b2fa;
+b2fa -> b2fa_b2ob -> b2ta;
+
+obb2cf -> obb2cfMerge_b2ob ->obb2cfSplit_b2ob -> c2fbb;
+bb2cf -> bb2cfMerge_b2ob -> bb2cfSplit_b2ob -> c2fbb;
+
+b2tPsum_b2ob-> b2tP -> b2tPm_b2ob -> b2tP_b2ob -> c2fbb;
+b2tP_b2ob -> c2P;
+b2tP_b2ob -> c2dat;
+Pt2Ptb1_b2ob->Pt2Ptbs_b2ob->Pt2Ptb_b2ob-> b2tP
+ct2BPm2_b2ob->ct2BPm1_b2ob->fc2BP->c2BPm_b2ob->c2BP_b2ob -> b2P128-> splitb2P_b2ob -> b2P;
+c2BP_b2ob ->largeb2P128
+c2BP_b2ob ->b2fa
+c2BP_b2ob ->bSelect
+ct2BPm1_b2ob->CommonBlobs.gz
+ct2BPm1_b2ob->c2dat;
+ct2BPm1_b2ob->c2P;
+fP2btP->ct2BPm3_b2ob->ct2BPm2_b2ob
+
+c2BPm1_b2ob->fc2BP;
+P2fb->P2fb_b2ob ->P2fP_b2ob -> fP2bP->P2fP_b2ob;
+P2nb -> P2Sbm_b2ob -> P2Sb_b2ob -> b2P128;
+fP2nP->P2fPn_b2ob->P2fP_b2ob;
+fPnbnfb2P->P2fPn_b2ob;
+
+
+P2f_b2ob -> p2P;
+P2b_b2ob -> p2P;
+
+P2f->P2fm_b2ob -> P2f_b2ob -> c2f_b2ob;
+P2g->P2g_b2ob -> A2g -> A2g_b2ob -> namesor;
+
+
+A2tspan->A2tspanm_b2ob->A2tspan_b2ob->c2dat;
+A2tspan_b2ob->a2A;
+A2summ->AToFile_b2ob->A2tspan;
+AToFile_b2ob->A2summ_A2a_b2ob -> A2a;
+AToFile_b2ob->A2summ_A2c_b2ob -> A2c;
+AToFile_b2ob->A2summ_A2b_b2ob -> A2b;
+AToFile_b2ob->A2summ_A2P_b2ob -> A2P;
+AToFile_b2ob->A2summ_A2f_b2ob -> A2f;
+AToFile_b2ob->A2summ_A2g_b2ob -> A2g;
+
+bSelect->bSel_b2ob -> b2f;
+P2tspan->P2tspanm_b2ob->P2tspan_b2ob->c2dat;
+P2tspan_b2ob->c2P;
+P2summ->PToFile_b2ob->P2tspan;
+
+PToFile_b2ob->P2summ_P2p_b2ob -> P2p;
+PToFile_b2ob->P2summ_P2c_b2ob -> P2c;
+PToFile_b2ob->P2summ_P2b_b2ob -> P2b;
+PToFile_b2ob->P2summ_P2A_b2ob -> P2A;
+PToFile_b2ob->P2summ_P2f_b2ob -> P2f;
+PToFile_b2ob->P2summ_P2b_b2ob -> P2b;
+
+# nn=$(tail -1 /data/All.blobs/blob_$o.idx|cut -d\; -f1)
+# no=$(head -$((o+1)) /da5_data/home/audris/update/All.blob.T | tail -1 | cut -d\; -f1)
+# ~/lookup/checkBinFix.perl blob /data/All.blobs/blob_$o $((nn-no-1)) blob_TU_$o
+b2lPkg->pkgMergeTU_b2ob->ctagsTU_b2ob->blob_TU -> blob;
+ctagsTU_b2ob->idxf_b2ob;
+
+}

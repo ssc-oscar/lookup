@@ -8,7 +8,7 @@ use MIME::Base64;
 
 require Exporter;
 our @ISA = qw (Exporter);
-our @EXPORT = qw(toUrl segB segH sHash sHashV toHex fromHex safeDecomp safeComp getFL parseAuthorId
+our @EXPORT = qw(getLang toUrl segB segH sHash sHashV toHex fromHex safeDecomp safeComp simpEmail getFL parseAuthorId
 		splitSignature signature_error contains_angle_brackets extract_trimmed git_signature_parse extrCmt getTime cleanCmt	
 		addForks %badProjects %badAuthors %badCmt %badBlob %badTree %largeBlobPrj %largeTreePrj);
 use vars qw(@ISA);
@@ -57,6 +57,7 @@ sub getFL {
     $e0 =~ s/@.*//;
     $e0 =~ s|^["\s\{\}\(\)\r#!%\$'/\&\*\+]*||;
     $e0 =~  s|["\s\{\}\(\)\r#!%\$'/\&\*\+]*$||;
+    $e0 =~ s|([a-z])([A-Z])([A-Z])|$1.$2.$3|g; #Camelback
     $e0 =~ s|([a-z])([A-Z])|$1.$2|g; #Camelback
     my @as1 = split (/[\._\-]/, $e0);
     if ($#as1 > 1){ #use names derived from email
@@ -69,7 +70,9 @@ sub getFL {
   $a =~ s|^["\s\{\}\(\)\r#!%\$'/\&\*\+\.\-@]*||;
   $a =~  s|["\s\{\}\(\)\r#!%\$'/\&\*\+\.\-@]*$||;
   $a =~ s|[\.,\-\s]+| |g;
+  $a =~ s|([a-z])([A-Z])([A-Z])|$1 $2 $3|g; #Camelback
   $a =~ s|([a-z])([A-Z])|$1 $2|g; #Camelback
+  $a =~ s|\bMc ([A-Z])|Mc$1|;
   $a =~ tr/[A-Z]/[a-z]/;
   $a =~ s/^\s*$//;
   $a =~ s/^[0-9]*$//;
@@ -112,18 +115,13 @@ sub getFL {
 sub parseAuthorId{
   my $a = $_[0];
   my $a0 = $a;
-  my $eBare = $a;
-  $eBare =~ s/\s+\<.*//;
-  if ($eBare !~ /@/){
-    $eBare = "";
-  }
+    
  
   my ($f, $l) = split (/ /, getFL($a), -1);
   $f = "" if !defined $f;
   $l = "" if !defined $l;
   my $e = $a;
   $e =~ s/.*\<//;
-  $e = $eBare if ($e !~ /@/);
   $e =~ s|{ID}\+{||;
   $e =~ s|[}{]||g;
   $e =~ s/\>.*//;
@@ -142,8 +140,39 @@ sub parseAuthorId{
   my ($u, $d) = split(/\@/, $e);
   $u = "" if !defined $u;
   $d = "" if !defined $d;
-  return ($f, $l, $u, $d, $e, $ghid);
+  return ($f, $l, $u, $d, $e, $ghid, $a);
 } 
+
+sub simpEmail {
+  my $eO = $_[0];
+  return "" if $eO eq "";
+  my $e = $eO;
+  $e =~ s|git config.*||;
+#$e =~ s|�~@~\||g;#$e =~ s|�~@~\||g;
+  $e =~ s|�~@~]||g;
+  $e =~ s|�~@~X||g;
+  $e =~ s|¨||g;
+  $e =~ s|«||;
+  $e =~ s|»||g;
+  $e =~ s|�~@~Y||g;
+  $e =~ s|�~@~^||g;
+
+  $eO = $e;
+
+  my @z = split(/\@/, $e);
+  my $d = $z[1];
+  if (defined $d && $d ne "" && $d !~ m/^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$/){
+    $d =~ s|^[^\.]*\.noreply\.||;
+    $d =~ s|/.*||;
+    my @y = split(/\./,$d,-1);
+    shift @y if ($y[0] =~ m/[0-9]/ && $#y > 1);
+    pop @y if $d =~ m/\.(local|localdomain)$/;
+    $d = join ".", @y;
+    $eO = "$z[0]\@$d";
+  }
+  return $eO;
+}
+
 
 sub segB {
   my ($s, $n) = @_;
@@ -498,6 +527,7 @@ our %largeBlobPrj = (
 
 #based on update in Version S
 our %largeTreePrj = (
+ "pczh2010_img" => 600000000000,
  "lihkg-backup_thread" => 200000000000,
  "eugenelabzov_mp3lib" => 342866000000,
  "otiny_up" => 221345000000,
@@ -709,6 +739,8 @@ our %badCmt = (
   "45546f17e5801791d4bc5968b91253a2f4b0db72" => 10000000000,
   "6b4ea721e0b9158d26c4f8fc85ab60c6933f73d1" => 10000000000,
   "03cb3eb9c22e21e2475fee4fb6013718a2fa39fb" => 100000000,
+  "20ee59241cda54347832afca4a32d8474bc8c01b" => 33324118926,#and much more
+  "011c51845b624f1f82653f87017be7a4d8ceaa4d" => 4007698, #lots of renames don't do diff
   "0f17bf2e73149f60302a0a2464b3fadf3ea3e6f9" => 16777217,
   "ce1407a59c910ac5dead8cb1b8b4841cabfce000" => 6649016,
   "f905f1dfa705708c4a85b04cc81b5823f1112d1c" => 6356922,
@@ -976,7 +1008,50 @@ our %badFile = (
   "Makefile" => 2463961
 );
 
+my %grepStr = (
+'JS' => '\.(js|iced|liticed|iced.md|coffee|litcoffee|coffee.md|ls|es6|es|jsx|mjs|sjs|co|eg|json|json.ls|json5)$',
+'PY' =>'\.(py|py3|pyx|pyo|pyw|pyc|whl|wsgi|pxd)$',
+'ipy' => '\.(ipynb|IPYNB)$',
+'C' => '(\.[Cch]|\.cpp|\.hh|\.cc|\.hpp|\.cxx)$', #152902;h;ObjectiveC
+'java' => '(\.java|\.iml|\.class)$',
+'Cs' => '\.cs$',
+'php' => '\.(php|php[345]|phtml)$',
+'rb' => '\.(rb|erb|gem|gemspec)$',
+'Go' => '\.go$',
+'Rust' => '\.(rs|rlib|rst)$',
+'R' => '(\.Rd|\.[Rr]|\.Rprofile|\.RData|\.Rhistory|\.Rproj|^NAMESPACE|^DESCRIPTION|/NAMESPACE|/DESCRIPTION)$',
+'Scala' => '\.scala$',
+'pl' => '\.(pl|PL|pm|pod|perl|pm6|pl6|p6|plx|ph)$',
+'F' => '\.(f[hi]|[fF]|[fF]77|[fF]9[0-9]|fortran|forth|FOR|for|FTN|ftn|[fF]0[378])$',
+'jl' => '\.jl$',
+'Dart' => '\.dart$',
+'Kotlin' => '\.(kt|kts|ktm)$',
+'TypeScript' => '\.(ts|tsx)$',
+'Swift' => '\.swift$', # .swf is flash
+'Sql' => '\.(sql|sqllite|sqllite3|mysql)$',
+'Lisp' => '\.(el|lisp|elc|l|cl|cli|lsp|clisp)$',
+'Ada' => '\.ad[abs]$',
+'Erlang' => '\.(erl|hrl)$',
+'Fml' => '\.(fs|fsi|aug|ml|mli|hs|lhs|sml|v|e)$', #https://en.wikipedia.org/wiki/Proof_assistant
+'Lua' => '\.lua$',
+'Markdown' => '\.(md|markdown)$',
+'CSS' => '\.css$',
+'Clojure' => '\.(cljs|cljc|clj)$',
+'OCaml' => '\.(aug|mli|ml|aug)$',
+'Basic' => '\.(bas|bb|bi|pb)$',
+'ObjectiveC' => '\.(m|mm)$', #also MatLab: 92842;m;MatLab vs 180971;m;ObjectiveC
+'Asp' => '\.(X86|asa|A51|68k|x86|X68|ASM|asp|asm|[sS])$',
+'Cuda' => '\.(cuh|cu)$',
+'Cob' => '\.(COB|cob|CBL|cbl)$',
+'Groovy' => '\.(groovy|gvy|gy|gsh)$' );
 
+sub getLang {
+  my $f = $_[0];
+  for my $k (keys %grepStr){
+   return $k if $f =~ $grepStr{$k};
+  }
+  return 'Unknown';
+}
 
 
 my $badCmtHere =  <<"EOT";

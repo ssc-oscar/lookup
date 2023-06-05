@@ -7,6 +7,9 @@ use woc;
 my $v = $ARGV[0];
 my $s = $ARGV[1];
 my $type = $ARGV[2];
+my $start = defined $ARGV[3] ? $ARGV[3] : "";
+my $process = 1;#process input only once after project is encountered
+$process = 0 if ($start ne "");
 my %d = ();
 my $pP = "";
 my %tmp = ();
@@ -42,46 +45,85 @@ if ($type eq "B2b"){
   exit();
 }
 if ($type eq "P2p"){
+  my %ucP;
   open A, "zcat ${type}Full$v.$s.gz |";
   $cnt = 0;
   while (<A>){
-    my ($p, $c) = split (/;/, $_, -1);
-    if ($pP ne "" && $pP ne $p){
-      $d{ff}{$pP}++; for my $a (keys %tmp){ $d{p2P}{$a} = $pP; $d{ff}{$a}++;$d{P2p}{$pP}{$a}++ };
+    chop();
+    my ($P, $p) = split (/;/, $_, -1);
+    $p = lc($p);
+    my $P0 = $P;
+    $P = lc($P);
+    $ucP{$P} = $P0;
+    if ($pP ne "" && $pP ne $P){
+      $d{ff}{$pP}++; 
+      for my $a (keys %tmp){ 
+         $d{p2P}{$a} = $pP; 
+         $d{ff}{$a}++;
+         $d{P2p}{$pP}{$a}++;
+         print STDERR "$a;$pP\n" if $a eq "izio7_ios-messaging-tutorial" || $pP eq "izio7_ios-messaging-tutorial";
+      };
       %tmp = ();
     }
-    $tmp{$c}++;
-    $pP = $p;
+    $tmp{$p}++;
+    $d{ff}{$P}++;
+    $d{ff}{$p}++;
+    $pP = $P;
   }
-  $d{ff}{$pP}++; for my $a (keys %tmp){  $d{p2P}{$a} = $pP;  $d{ff}{$a}++;$d{P2p}{$pP}{$a}++ };
+  $d{ff}{$pP}++; 
+  for my $a (keys %tmp){  $d{p2P}{$a} = $pP;  $d{ff}{$a}++;$d{P2p}{$pP}{$a}++ };
   %tmp = ();  $pP = "";
 
   #get forks/stars
-  open A, "zcat ghForkMapR.gz1|";
+  #open A, "zcat ghForkMapR.gz1|";
+  #zcat ght.p2pfrk.gz | awk -F\; '{print $1";"$2";"$1";"$2}' | perl ~/lookup/mp.perl 2 p2P$ver.s | perl ~/lookup/mp.perl 3 p2P$ver.s | gzip > ght.p2pP2Pfrk$ver.gz
+  open A, "zcat ght.p2pP2Pfrk$v.gz|";
   $cnt = 0;
   while (<A>){
     chop();
-    my ($p, $r, $ps, $rs) = split (/;/, $_, -1);
-    next if !defined $d{ff}{$p} && !defined $d{ff}{$r};
-    if (defined $d{P2p}{$r}){
-      my $star = $rs eq "" ? $ps : $rs;
-      $d{s}{$r} = $star if ($star ne "");
-      $d{f}{$r}{$p}++;
-    }elsif (defined $d{P2p}{$p}){
-      my $star = $rs eq "" ? $ps : $rs;
-      $d{parent}{$p} = $r;
-      $d{s}{$p} = $star if ($star ne "" && (!defined $d{s}{$p} || $d{s}{$p} < $star)); # select the largest star from the group
-    }elsif (defined $d{ff}{$p}){
-      my $star = $rs eq "" ? $ps : $rs;
-      $d{parent}{$d{p2P}{$p}} = $r;
-      $d{s}{$d{p2P}{$p}} = $star if ($star ne "" && (!defined $d{s}{$d{p2P}{$p}} || $d{s}{$d{p2P}{$p}} < $star)); # select the largest star from the group
+    #my ($p, $r, $ps, $rs) = split (/;/, $_, -1);
+    my ($p, $r, $P, $R) = split (/;/, $_, -1);
+    $P = lc ($P);
+    $R = lc ($R);
+    #next if !defined $d{ff}{$p} && !defined $d{ff}{$r};
+    print STDERR "debug;$p;$r;$P;$R;$d{p2P}{$P};$d{p2P}{$R}\n" if $P eq "izio7_ios-messaging-tutorial" || $R eq "izio7_ios-messaging-tutorial";      
+    if (defined $d{p2P}{$P}){
+      $d{parents}{$d{p2P}{$P}}{$r}{$p}++;
+      print STDERR "parents;$p;$r;$P;$R;$d{p2P}{$p}\n";      
+    }
+    if (defined $d{p2P}{$R}){
+      $d{forks}{$d{p2P}{$R}}{$p}++;
+      print STDERR "forks;$p;$r;$P;$R;$d{p2P}{$p}\n";      
     }
   }
+  #  zcat ght.watchers.date.gz | perl ~/lookup/mp.perl 0 p2P$ver.s | gzip > ght.P2w$ver.gz
+  #  zcat ght.P2wU.gz|awk -F\; '{print $1";"$3";"$2}' |lsort 100G -u -t\; -k1,3 | gzip > ght.P2wU.s
+  open A, "zcat ght.P2w$v.s|";
+  while (<A>){
+    chop();
+    my ($p, $u, $dt) = split (/;/, $_, -1);
+    $p = lc ($p);
+    my $P = defined $d{p2P}{$p} ? $d{p2P}{$p} : $p;
+    $d{su}{$P}{$u}++;
+  }
+  for my $P (keys %{$d{su}}){
+    $d{s}{$P} = scalar (keys %{$d{su}{$P}});
+  }
+  for my $P (keys %{$d{parents}}){
+    my @rs = sort { scalar (keys %{$d{parents}{$P}{$b}}) <=> scalar (keys %{$d{parents}{$P}{$a}}) } (keys %{$d{parents}{$P}});
+    $d{parent}{$P} = $rs[0];
+    print STDERR "parent;$P;@rs\n";
+  }
+  for my $P (keys %{$d{forks}}){
+    $d{fork}{$P} = scalar (keys %{$d{forks}{$P}});
+    print STDERR "fork;$P;$d{fork}{$P}\n";
+  }      
   for my $p (keys %{$d{P2p}}){
-    my $stars = defined $d{s}{$p} ? $d{s}{$p} : "";
-    my $forks = defined $d{f}{$p} ? scalar (keys %{$d{f}{$p}}) : 0;
+    my $stars = defined $d{s}{$p} ? $d{s}{$p} : "";    
+    my $forks = defined $d{fork}{$p} ? $d{fork}{$p} : 0;
     my $parent = defined $d{parent}{$p} ? $d{parent}{$p} : "";
     my $cSize = scalar(keys %{$d{P2p}{$p}});
+    $p = $ucP{$p};
     print "$p;par=$parent;star=$stars;frk=$forks;comunity=$cSize\n";
   } 
   print STDERR "done $s Stars\n";
@@ -101,23 +143,26 @@ for my $ty ($type){
   while (<A>){
     chop ();
     my ($p, $c) = split (/;/, $_, -1);
-    if ($ty eq "Pnfb"){
-      print "$p;$ty=$c\n";
-    }else{ 
-      if ($pP ne "" && $pP ne $p){
-        print "$pP;$ty=".(scalar(keys %tmp))."\n";
-        if ($ty eq "P2f"){
-          doExt ($pP, \%tmp);
-        }
-        doG ($pP, \%tmp) if ($ty eq "P2g");
-        %tmp = ();
-        print STDERR "$s $ty $cnt prs\n" if (!($cnt++%1000000));
-        #last if $cnt > 1000;
+    $process = 1 if ($process == 0 && $p eq $start); 
+    next if ! $process;
+    if ($ty ne "Pnfb" && $pP ne "" && $pP ne $p){
+      print "$pP;$ty=".(scalar(keys %tmp))."\n";
+      if ($ty eq "P2f"){
+        doExt ($pP, \%tmp);
       }
-      $tmp{$c}++;
-      $pP = $p;
+      doG ($pP, \%tmp) if ($ty eq "P2g");
+      %tmp = ();
+      print STDERR "$s $ty $cnt prs\n" if (!($cnt++%1000000));
+      #last if $cnt > 1000;
+    }else{
+      if ($ty eq "Pnfb"){
+        print "$p;$ty=$c\n";
+      }
     }
-  }
+    $tmp{$c}++;
+    $pP = $p;
+  } 
+
   #$d{$ty}{$pP} = scalar(keys %tmp);
   print "$pP;$ty=".(scalar(keys %tmp))."\n";
   doExt ($pP, \%tmp) if ($ty eq "P2f");

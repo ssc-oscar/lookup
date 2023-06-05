@@ -1,21 +1,25 @@
-#PBS -N updatePT.WHAT.PRT
-#PBS -A ACF-UTK0011
-#PBS -l feature=MACHINE
-#PBS -l partition=MACHINE
-#PBS -l nodes=1:ppn=1,walltime=23:50:00
-#PBS -j oe
-#PBS -S /bin/bash
-LD_LIBRARY_PATH=$HOME/lib:$HOME/lib64:$LD_LIBRARY_PATH
-c=/lustre/haven/user/audris/gz
+#!/bin/bash
+#SBATCH -J WHAT.PRT
+#SBATCH -A ACF-UTK0011
+#SBATCH --nodes=1 
+#SBATCH --ntasks-per-node=NTASKS
+#SBATCH --partition=campus
+#SBATCH --time=0-23:59:59
+#SBATCH --error WHAT.PRT.o%J
+#SBATCH --output WHAT.PRT.o%J
+#SBATCH --mail-user=audris@utk.edu
+#SBATCH --mail-type=FAIL
+
+module purge
+module load bzip2/1.0.8  intel-compilers/2021.2.0
+
+LD_LIBRARY_PATH=/nfs/home/audris/lib:/nfs/home/audris/lib64:$LD_LIBRARY_PATH
+
+c=/lustre/isaac/scratch/audris/gz
 cd $c
-machine=MACHINE
-maxM=5000
-[[ $machine == monster ]] && maxM=30000
-[[ $machine == rho ]] && maxM=900
-[[ $machine == sigma ]] && maxM=2900
 
-
-ver=VER
+maxM=1000
+ver=V
 prt=PRT
 
 if test 'WHAT' = 'addMoreCs'; then
@@ -32,10 +36,11 @@ lsort 2G --merge -t\; -k1,1 <(zcat p2cFullU$i.s) <(zcat p2cExtraU$i.s) |uniq | g
 fi
 if test 'WHAT' = 'START'; then
 
-for f in $ver/*.${prt}.[0-9].[0-9][0-9].olist.gz
+cd $ver 
+for f in New*.$prt.olist.gz 
 do  zcat $f 
-done | grep ';commit;' | awk -F\; '{ print $3";"$1}' | perl -ane 'print if $_ =~ m/^[0-f]{40};/' | \
-  perl -ane 'chop();s|/$||;s|\.git$||;print "$_\n"' | $HOME/lookup/splitSec.perl c2p$ver.$prt. 128
+done | grep ';commit;' | perl -ane 'chop();s|/;$|;|;s|\.git;||;print "$_\n"' | awk -F\; '{ print $3";"$1}' | perl -ane 'print if $_ =~ m/^[0-f]{40};/' | \
+  perl -ane 'chop();s|/$||;s|\.git$||;print "$_\n"' | $HOME/lookup/splitSec.perl c2p.$prt. 128
 
 #for f in $ver/*.p2c
 #do zcat $f | awk -F\; '{ print $2";"$1}' | perl -ane 'print if $_ =~ m/^[0-f]{40};/'
@@ -44,42 +49,72 @@ done | grep ';commit;' | awk -F\; '{ print $3";"$1}' | perl -ane 'print if $_ =~
 echo c2p$ver.$prt.
 
 fi
+if test 'WHAT' = 'SRT2'; then
+
+cd $ver
+for i in {0..15}
+do k=$((prt*16+i))
+   zcat cmt$k | $HOME/bin/lsort ${maxM}M -t\; -u -k1,1 | gzip > cmt$k.s &
+done
+wait
+echo $prt
+
+fi
 if test 'WHAT' = 'SRT0'; then
 
-for i in {0..127}
-do zcat c2p$ver.$prt.$i.gz | $HOME/bin/lsort ${maxM}M -t\; -u -k1,2 | gzip > c2p$ver.$prt.$i.s
-   echo c2p$ver.$prt.$i.s
+cd $ver
+for k in {0..127..4}
+do i=$k 
+   zcat c2p.$prt.$i.gz | $HOME/bin/lsort ${maxM}M -t\; -u -k1,2 | gzip > c2p.$prt.$i.s &
+   i=$((k+1))
+   zcat c2p.$prt.$i.gz | $HOME/bin/lsort ${maxM}M -t\; -u -k1,2 | gzip > c2p.$prt.$i.s &
+   i=$((k+2))
+   zcat c2p.$prt.$i.gz | $HOME/bin/lsort ${maxM}M -t\; -u -k1,2 | gzip > c2p.$prt.$i.s &
+   i=$((k+3))
+   zcat c2p.$prt.$i.gz | $HOME/bin/lsort ${maxM}M -t\; -u -k1,2 | gzip > c2p.$prt.$i.s &
+   wait
 done 
-
-#for i in {0..3}
-#do j=$(($prt*4+$i))
-#  zcat c2p$ver.$j.gz | $HOME/bin/lsort ${maxM}M -t\; -k1,2 -u | gzip > c2p$ver.$j.s
-#  echo c2p$ver.$j.s
-#done 
+echo $prt
 
 fi
 if test 'WHAT' = 'MRG0'; then
 # add c2pExtraU to c2pFullU and also to p2cFullU
 
+cd $ver
 for k in {0..7}
 do i=$((prt*8+k))
-   str="$HOME/bin/lsort ${maxM}M -t\; -k1,2 --merge -u"
-   #for j in {00..31} #total are 00..99
-   #for j in {32..43} #total are 00..99
-   for j in {00..43} # U
-   #for j in {00..09}  # Otr.U #fix .git/ s|/$||;s|\.git$||'
-   do str="$str <(zcat c2p$ver.$j.$i.s)"
+	str="$HOME/bin/lsort ${maxM}M -t\; -k1,2 -u --merge"
+   for j in {00..19} # V
+   do str="$str <(zcat c2p.$j.$i.s)"
    done
-   eval $str | gzip > c2p${ver}.$i.s
+   eval $str | gzip > ../c2p${ver}.$i.s
    echo c2p${ver}.$i.s
-   #eval $str | gzip > c2p${ver}0.$i.s
-   #echo c2p${ver}0.$i.s
 done
+
+fi
+if test 'WHAT' = 'MISS'; then
+
+cd $ver
+for k in {0..7}
+do i=$((prt*8+k))
+  #zcat ../c2p${ver}.$i.s |join -t\; -v1 - <(zcat cmt$i.s) | cut -d\; -f2 | $HOME/bin/lsort ${maxM}M -t\; -k1,1 | uniq -c | awk '{print $2";"$1}' | gzip > miss$i
+  zcat ../c2p${ver}.$i.s | cut -d\; -f1 | uniq |join -t\; -v1 - <(zcat cmt$i.s) | gzip > missc$i
+  zcat ../c2p${ver}.$i.s |join -t\; -v1 -  <(zcat missc$i) | cut -d\; -f2 | $HOME/bin/lsort ${maxM}M -t\; -k1,1 | uniq -c | awk '{print $2";"$1}' | gzip > missp$i
+done
+
+fi
+if test 'WHAT' = 'MISSM'; then
+
+#missCnt not a great option, need to pick only one of the projects that has a missing commit - how to optimize? 
+cd $ver
+str="$HOME/bin/lsort ${maxM}M -t\; -k1,1 --merge"
+for i in {0..127}; do str="$str <(zcat missp$i)"; done
+eval $str | perl -e 'while(<STDIN>){chop();($a,$n)=split(/;/); if ($p ne "" && $p ne $a){print "$p;$z\n";$z=0}; $z+=$n;$p=$a;}; print "$p;$z\n"' | gzip > missCnt
 
 fi
 if test 'WHAT' = 'CLN'; then
 
-#only for Otr.U
+#only for Otr.V
 for i in {0..127}
 do mv c2p${ver}.$i.s c2p${ver}1.$i.s0
    zcat c2p${ver}1.$i.s0 | perl -ane 'chop();s|/$||;s|\.git$||;print "$_\n"'|uniq | gzip > c2p${ver}.$i.s
@@ -91,11 +126,8 @@ if test 'WHAT' = 'invt'; then
 for i in {0..7}
 do j=$((prt*8+i))
    zcat c2p${ver}.$j.s 
-   #zcat c2p${ver}0.$j.s 
 done | awk -F\; '{print $2";"$1}' | perl -I ~/lib/perl5 -I ~/lookup $HOME/lookup/splitSecCh.perl p2c${ver}.$prt. 128 
-#done | awk -F\; '{print $2";"$1}' | perl -I ~/lib/perl5 -I ~/lookup $HOME/lookup/splitSecCh.perl p2c${ver}0.$prt. 128 
 echo p2c${ver}.$prt.
-#echo p2c${ver}0.$prt.
 
 fi
 if test 'WHAT' = 'ISRT0'; then
@@ -104,8 +136,6 @@ j=$prt
 for i in {0..127}
 do zcat p2c${ver}.$j.$i.gz | $HOME/bin/lsort ${maxM}M -t\; -k1,1 | gzip > p2c${ver}.$j.$i.s 
    echo p2c${ver}.$j.$i.s
-#do zcat p2c${ver}0.$j.$i.gz | $HOME/bin/lsort ${maxM}M -t\; -k1,1 | gzip > p2c${ver}0.$j.$i.s 
-#   echo p2c${ver}0.$j.$i.s
 done
 
 fi
@@ -115,13 +145,10 @@ for i in {0..7}
 do j=$((prt*8+i))
   str="$HOME/bin/lsort ${maxM}M -t\; -k1,1 --merge"
   for k in {0..15}
-  #do str="$str <(zcat p2c${ver}0.$k.$j.s)"
   do str="$str <(zcat p2c${ver}.$k.$j.s)"
   done
   eval $str | uniq | gzip > p2c${ver}.$j.s 
   echo p2c${ver}.$j.s
-  #eval $str | uniq | gzip > p2c${ver}0.$j.s 
-  #echo p2c${ver}0.$j.s
 done
 
 fi
@@ -130,8 +157,8 @@ if test 'WHAT' = 'MERGEc2p'; then
 
 for i in {0..7}
 do j=$(($prt*8+$i))
-   $HOME/bin/lsort ${maxM}M -t\; -k1,2 --merge -u <(zcat c2pU.$j.s) <(zcat c2pOtr.U.$j.s) <(zcat c2pTT0.$j.s) <(zcat c2pTT1.$j.s) <(zcat c2pFullT$j.s) | perl -ane 'print if $_ =~ m/^[0-f]{40};/' | uniq | gzip > c2pFullU$j.s 
-   echo c2pFullU$j.s
+   $HOME/bin/lsort ${maxM}M -t\; -k1,2 --merge -u <(zcat c2p${ver}.$j.s) <(zcat V0/c2pFullV$j.s) | perl -ane 'print if $_ =~ m/^[0-f]{40};/' | uniq | gzip > c2pFull${ver}$j.s 
+   echo c2pFull${ver}$j.s
 done
 
 fi
@@ -139,10 +166,9 @@ if test 'WHAT' = 'MERGEp2c'; then
 
 for i in {0..1}
 do j=$(($prt*2+$i))
-   #$HOME/bin/lsort ${maxM}M -t\; -k1,2 --merge -u <(zcat p2c${ver}0.$j.s) <(zcat p2cFullT$j.s) | perl -ane 'print if $_ =~ m/.+;[0-9a-f]{40}$/' | uniq | gzip > p2cFullU$j.s
-   $HOME/bin/lsort ${maxM}M -t\; -k1,2 --merge -u <(zcat p2cU.$j.s) <(zcat p2cOtr.U.$j.s) <(zcat p2cTT0.$j.s) <(zcat p2cTT1.$j.s) <(zcat p2cFullT$j.s) | perl -ane 'print if $_ =~ m/;[0-f]{40}$/' | uniq | gzip > p2cFullU$j.s 
-   echo p2cFullU$j.s
-   zcat p2cFullU$j.s|cut -d\; -f1|uniq | gzip > pU$j.s
+   $HOME/bin/lsort ${maxM}M -t\; -k1,2 --merge -u <(zcat p2c${ver}.$j.s) <(zcat p2cFullU$j.s) | perl -ane 'print if $_ =~ m/;[0-9a-f]{40}$/' | uniq | gzip > p2cFull${ver}$j.s 
+   echo p2cFull${ver}$j.s
+   zcat p2cFull${ver}$j.s|cut -d\; -f1|uniq | gzip > p${ver}$j.s
 done
 
 fi
@@ -189,7 +215,7 @@ if test 'WHAT' = 'MPS'; then
 
 str="$HOME/bin/lsort ${maxM}M -t\; -k1,1 --merge"
 for k in {0..127}
-do str="$str <(zcat p$ver.$k.s)"
+do str="$str <(zcat p$ver$k.s)"
 done
 eval $str | uniq | gzip > p$ver.s
 echo p$ver.s

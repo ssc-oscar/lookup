@@ -328,6 +328,7 @@ for my $k (split(/\n/, $types, -1)){
 my $sec = $ARGV[0];
 
 open CNT, "blob_$sec.bin" or die "$!";
+
 open RESULTST, ">$ARGV[1].idx";
 open RESULTSB, ">$ARGV[1].bin";
 my ($from, $to) = (0, -1);

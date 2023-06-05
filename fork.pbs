@@ -37,7 +37,7 @@ if test 'WHAT' = 'MERGE'; then
 
 str="lsort $(($maxM))M -t\| --merge"
 for i in {0..7}
-do j=$(($prt*8+$i))
+do j=$((prt*8+i))
    str="$str <(zcat c2pFull$ver$j.p2p.s)"
 done
 eval $str | perl -e '$pstr="";$nn=0;while(<STDIN>){chop;(@x)=split(/;/);$n=pop @x;$str=join ";", @x; if ($pstr ne $str && $pstr ne ""){ print "$pstr;$nn\n";$pstr=$str;$nn=$n }else{ $pstr=$str;$nn+=$n}};print "$pstr;$nn\n";' | \

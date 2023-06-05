@@ -38,12 +38,13 @@ if ( -f "$fbasei$sec.idx"){
     my $len = $x[2];
     my $hash = $x[3];
     my $h = fromHex ($hash);
-    if (defined $fhoso{$sec}{$h}){
-#print "done/updated $nn\n";
-       next;
+    my $off = pack ("w w", $of, $len);      
+    if (defined $fhoso{$sec}{$h} && $fhoso{$sec}{$h} ne $off){
+      print "done/updated $nn\n";
+      #next;
     }
     $nn ++;
-    $fhoso{$sec}{$h} = pack ("w w", $of, $len);      
+    $fhoso{$sec}{$h} = $off;      
   }
 }else{
   die "no $fbasei$sec.idx\n";

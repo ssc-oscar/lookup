@@ -24,6 +24,7 @@ my $f2 = "h";
 my $split = 32;
 
 
+my $group=1; #how many field represent a single unit as in b2tac
 
 my $offset = 0;
 my $types = $fname;
@@ -34,7 +35,7 @@ $f1 = "s" if ($t1 =~ /^[aAfpP]$/);
 
 $f2 = "cs" if ($t2 =~ /^[AafpP]$/);
 
-$f1 = "h" if ($t1 =~ /^[cb]$/ || $t1 =~ /^(ob|td)$/);
+$f1 = "h" if ($t1 =~ /^[cbw]$/ || $t1 =~ /^(ob|td)$/);
 $f2 = "h" if ($t2 =~ /^[cb]$/ || $t2 =~ /^(cc|pc|ob|td)$/);
 
 $f2 = "sh" if $types =~ /b2f[aA]/;
@@ -45,6 +46,9 @@ $f2 = "r" if $types =~ /^c2[hr]$/;
 
 $f1 = "s" if ($t1 eq "PS" || $t1 eq "PF" || $t1 eq "PFS"); 
 $f2 = "s" if ($t2 eq "PS" || $t2 eq "PF" || $t2 eq "PFS"); 
+
+$f2 = "hhwww" if ($t2 eq "rhp");
+
 
 $f1 = $ARGV[1] if defined $ARGV[1];
 $f2 = $ARGV[2] if defined $ARGV[2];
@@ -67,6 +71,11 @@ if ($types =~ /^[aA]2fb/ || $types =~ /^[aA]2[bc]/){
 if ($types eq "c2dat"){
   $f1 = "h";
   $f2 = "s";
+}
+if ($types eq "b2tac"){
+  $f1 = "h";
+  $f2 = "cs";
+  $group  = 3;
 }
 $split = $ARGV[3] if defined $ARGV[3];
 
@@ -98,7 +107,7 @@ while (<STDIN>){
   my $l = length($ch);
   my $c = $ch;
   my $s = segH ($c, $split);
-  if ($f1 =~ /h/){
+  if ($f1 =~ /[hw]/){
     $c = fromHex($ch);
   }else{
     $s = sHash ($c, $split);
@@ -129,8 +138,13 @@ while (<STDIN>){
       #print STDERR "big file\n";
       #print "$ch\n";
     }else{
+      # Previously left, I suppose debug.
+      # I propose to remove (lgonzal6 6/1/23)
       #print "$ch\n";
       #print STDERR "no $ch in $fname $f1 $f2\n";
+      
+      # Error message when not found
+      print STDERR "No $ch in $fname\n";
       if ($f1 eq "s" && $f2 eq "cs"){
         $v = safeComp ($c);
       }else{
@@ -139,9 +153,16 @@ while (<STDIN>){
     }
   }
   if ($f2 =~ /r/){
-    my $h = toHex (substr($v, 0, 20));
-    my $d = unpack 'w', (substr($v, 20, length($v) - 20));
-    print "$ch\;$h\;$d\n";
+    if ($f2 eq "r"){
+      my $h = toHex (substr($v, 0, 20));
+      my $d = unpack 'w', (substr($v, 20, length($v) - 20));
+      print "$ch\;$h\;$d\n";
+    }else{
+      my $r = toHex (substr($v, 0, 20));
+      my $h = toHex (substr($v, 20, 20));
+      my ($dr, $dh, $part) = unpack 'w*', substr($v, 40, length($v) - 40);
+      print "$ch\;$r\;$dr;$h;$dh;$part\n";
+    }
   }else{
     my $res = ";$v";
     if ($f2 =~ /cs/){
@@ -186,8 +207,14 @@ while (<STDIN>){
           #print STDERR "els=".(($lres+1)/41)." got=".($#vvs+1)." part=$part from=$from to=$to lres=$lres ".(substr(substr($res, $from, $to-$from), 0, 42))."\n";
         }
       }
-      for my $vv (@vvs){
-        print "$ch;$vv\n";
+      if ($group == 1){
+        for my $vv (@vvs){
+          print "$ch;$vv\n";
+        }
+      }else{
+        for my $ii (0..($#vvs/$group)){
+          print "$ch;$vvs[$ii*$group];$vvs[$ii*$group+1];$vvs[$ii*$group+2]\n";
+        }
       }
     }
 	}

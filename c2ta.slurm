@@ -1,21 +1,25 @@
-#PBS -N WHAT.FROM.VER.PRT
-#PBS -A ACF-UTK0011
-#PBS -l feature=MACHINE
-#PBS -l partition=MACHINE
-#PBS -l nodes=1:ppn=1,walltime=23:50:00
-#PBS -j oe
-#PBS -S /bin/bash
-LD_LIBRARY_PATH=$HOME/lib:$HOME/lib64:$LD_LIBRARY_PATH
-c=/lustre/haven/user/audris/All.blobs/
+#!/bin/bash
+#SBATCH -J WHAT.FROM
+#SBATCH -A ACF-UTK0011
+#SBATCH --nodes=1 
+#SBATCH --ntasks-per-node=NTASKS
+#SBATCH --partition=campus
+#SBATCH --time=0-23:59:59
+#SBATCH --error WHAT.FROM.o%J
+#SBATCH --output WHAT.FROM.o%J
+#SBATCH --mail-user=audris@utk.edu
+#SBATCH --mail-type=FAIL
+
+module purge
+module load bzip2/1.0.8  intel-compilers/2021.2.0
+
+LD_LIBRARY_PATH=/nfs/home/audris/lib:/nfs/home/audris/lib64:$LD_LIBRARY_PATH
+
+c=/lustre/isaac/scratch/audris/All.blobs
 cd $c
 
 ver=VER
-machine=MACHINE
-maxM=10000
-
-[[ $machine == monster ]] && maxM=30000
-[[ $machine == rho ]] && maxM=900
-[[ $machine == sigma ]] && maxM=2900
+maxM=1000
 maxA=$(($maxM*32))
 
 if test 'WHAT' == 'c2dat'; then
@@ -79,9 +83,9 @@ eval $str | perl -I ~/lookup/ -I ~/lib/perl5/ -ane 'use woc;chop($_);print "$_;"
 zcat ../gz/Cmt$ver.split|cut -d\; -f2,3 | grep -v '^;'|grep -v ';$' |lsort ${maxM}M -t\; -u -k1,2 |gzip > ../gz/fl$ver.s & 
 
 
-zcat flU.s|perl -ane 's|[0-9_@"\#!\!\%\$\(\)&*\+\}\{\?\<\>\=\[\`\^\~\]/:\\]||g;print'|sed "s|['0-9]||g" | \
+zcat fl$ver.s|perl -ane 's|[0-9_@"\#!\!\%\$\(\)&*\+\}\{\?\<\>\=\[\`\^\~\]/:\\]||g;print'|sed "s|['0-9]||g" | \
   perl -ane 'chop();($a,$b)=split(/;/);print "$a;$b\n" if(length($a)>1||length($b)>1)'| \
-  lsort 1G -u > flU.s1
+  lsort 1G -u > fl$ver.s1
 
 fi
 if test 'WHAT' == 'checkTime'; then
