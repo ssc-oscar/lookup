@@ -141,7 +141,7 @@ while (<STDIN>){
       #print "$ch\n";
       #print STDERR "no $ch in $fname $f1 $f2\n";
       if ($f1 eq "s" && $f2 eq "cs"){
-        $v = safeComp ($c);
+        $v = ""; #not sure why it was $v = safeComp ($c);
       }else{
         next;
       }
