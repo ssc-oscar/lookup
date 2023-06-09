@@ -138,8 +138,13 @@ while (<STDIN>){
       #print STDERR "big file\n";
       #print "$ch\n";
     }else{
+      # Previously left, I suppose debug.
+      # I propose to remove (lgonzal6 6/1/23)
       #print "$ch\n";
       #print STDERR "no $ch in $fname $f1 $f2\n";
+      
+      # Error message when not found
+      print STDERR "No $ch in $fname\n";
       if ($f1 eq "s" && $f2 eq "cs"){
         $v = ""; #not sure why it was $v = safeComp ($c);
       }else{
