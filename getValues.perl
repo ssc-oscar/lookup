@@ -146,7 +146,8 @@ while (<STDIN>){
       # Error message when not found
       print STDERR "No $ch in $fname\n";
       if ($f1 eq "s" && $f2 eq "cs"){
-        $v = ""; #not sure why it was $v = safeComp ($c);
+        # not sure why it was $v = safeComp ($c);
+        next;
       }else{
         next;
       }
