@@ -20,13 +20,13 @@ cd $c
 
 
 machine=MACHINE
-maxM=$((3200*NTASKS))
+maxM=$((1000*NTASKS))
 [[ $machine == monster ]] && maxM=30000
 [[ $machine == rho ]] && maxM=900
 [[ $machine == sigma ]] && maxM=2900
 
-ver=U
-pVer=T
+ver=V
+pVer=U
 i=FROM
 what=WHAT
 sel=PRT
@@ -43,8 +43,8 @@ if test 'WHAT' = 'prep'; then
 l=FROM
 for k in {0..1}
 do i=$(($k+$l*2)) 
- zcat $pVer${ver}[0-4].$i.gz |\
- perl -I $HOME/lib/perl5 -I $HOME/lookup -e 'use cmt; while(<STDIN>){ chop (); s|;/|;|g; @r = split(/;/); $r[$#r] = "long" if $r[$#r] =~ / /&& length($r[$#r]) > 300; print "".(join ";", @r)."\n" if ! defined $badCmt{$r[0]};}' | \
+ zcat $pVer${pVer}1.$i.gz $pVer${ver}.$i.gz |\
+ perl -I ~/lib -I ~/lib64/perl5 -I $HOME/lib/perl5 -I $HOME/lookup -e 'use cmt; while(<STDIN>){ chop (); s|;/|;|g; @r = split(/;/); $r[$#r] = "long" if $r[$#r] =~ / /&& length($r[$#r]) > 300; print "".(join ";", @r)."\n" if ! defined $badCmt{$r[0]};}' | \
  $HOME/bin/lsort ${maxM}M -t\; -k1,4 -u | gzip > $pVer$ver$i.s
  echo $pVer$ver$i.s
  #zcat cUndef$pVer$ver$i.gz |\

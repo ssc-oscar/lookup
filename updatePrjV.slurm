@@ -157,7 +157,7 @@ if test 'WHAT' = 'MERGEc2p'; then
 
 for i in {0..7}
 do j=$(($prt*8+$i))
-   $HOME/bin/lsort ${maxM}M -t\; -k1,2 --merge -u <(zcat c2p${ver}.$j.s) <(zcat V0/c2pFullV$j.s) | perl -ane 'print if $_ =~ m/^[0-f]{40};/' | uniq | gzip > c2pFull${ver}$j.s 
+   $HOME/bin/lsort ${maxM}M -t\; -k1,2 --merge -u <(zcat c2p${ver}.$j.s) <(zcat V/V0/c2pFullV$j.s) | perl -ane 'print if $_ =~ m/^[0-f]{40};/' | uniq | gzip > c2pFull${ver}$j.s 
    echo c2pFull${ver}$j.s
 done
 
@@ -166,7 +166,7 @@ if test 'WHAT' = 'MERGEp2c'; then
 
 for i in {0..1}
 do j=$(($prt*2+$i))
-   $HOME/bin/lsort ${maxM}M -t\; -k1,2 --merge -u <(zcat p2c${ver}.$j.s) <(zcat p2cFullU$j.s) | perl -ane 'print if $_ =~ m/;[0-9a-f]{40}$/' | uniq | gzip > p2cFull${ver}$j.s 
+   $HOME/bin/lsort ${maxM}M -t\; -k1,2 --merge -u <(zcat p2c${ver}.$j.s) <(zcat V/V0/p2cFullV$j.s) | perl -ane 'print if $_ =~ m/;[0-9a-f]{40}$/' | uniq | gzip > p2cFull${ver}$j.s 
    echo p2cFull${ver}$j.s
    zcat p2cFull${ver}$j.s|cut -d\; -f1|uniq | gzip > p${ver}$j.s
 done
