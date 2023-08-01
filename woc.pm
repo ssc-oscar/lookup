@@ -127,7 +127,7 @@ sub parseAuthorId{
   my $e = $a;
   $e =~ s/.*\<//;
   $e = $eBare if ($e !~ /@/);
-  $e =~ s|{ID}\+{||;
+  $e =~ s|\{ID\}\+\{||;
   $e =~ s|[}{]||g;
   $e =~ s/\>.*//;
   $e =~ s|^[\s\{\}\(\)\r#!%\$"'/\&\*\+,\.\-]*||;
@@ -740,6 +740,8 @@ our %badAuthors = ( 'one-million-repo <mikigal.acc@gmail.com>' => "1M commits",
 
 
 our %badCmt = (
+  "3bc43eae112a4593c59893a5df59742e2ff16a34" => 10000000000,
+  "da51fb693d64c202b1782648266e6e12a3f269e0" => 10000000000,
   "c89423063a78259e6a7d13d9b00278a0c5e637b0" => 10000000005,
   "45546f17e5801791d4bc5968b91253a2f4b0db72" => 10000000000,
   "6b4ea721e0b9158d26c4f8fc85ab60c6933f73d1" => 10000000000,
