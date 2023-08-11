@@ -38,8 +38,8 @@ else
       if [[ $h == 'da4.eecs.utk.edu' ]]
       then ~/lookup/showCnt.perl $t $fmt
       else
-        off=1
-        ssh da3 ~/lookup/showCnt.perl $t $fmt $off
+        off=0
+        ssh da4 ~/lookup/showCnt.perl $t $fmt $off
       fi
     fi
    fi
