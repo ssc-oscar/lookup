@@ -13,6 +13,8 @@ my $lines = 0;
 my $trees = 0;
 my $fbasei ="tree_";
 my $sec = $ARGV[0];
+my $start = defined $ARGV[1] ? $ARGV[1] : 0;
+my $end = defined $ARGV[2] ? $ARGV[2] : -1;
 {
   open (FD, "$fbasei$sec.bin") or die "$!";
   binmode(FD);
@@ -21,6 +23,9 @@ my $sec = $ARGV[0];
     while (<A>){
       chop ();
       my ($nn, $of, $len, $hash) = split (/\;/, $_, -1);
+      next if $start > $nn;
+      exit if $end < $nn && $end >= 0;
+      seek (FD, $of, 0);
       my $h = pack 'H*', $hash;
       my $codeC = "";
       my $rl = read (FD, $codeC, $len);
@@ -29,7 +34,7 @@ my $sec = $ARGV[0];
         my $to = safeDecomp ($codeC);
         while ($to =~ s/^([0-7]+) (.+?)\0(.{20})//s) {
           $lines ++;
-          if (!($lines%100000000)){
+          if (!($lines%10000000)){
             print STDERR "$lines lines and $trees trees done\n";
             #goto DONE;
           }
