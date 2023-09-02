@@ -599,6 +599,8 @@ our %largeTreePrj = (
 );
 
 our %badProjects = (
+  "libpoetry_title" => "e0f11a95c63597493328fa46f2205412d6b6f07d gas over 21M files",
+  "jleedev_gitbomb" => "03cb3eb9c22e21e2475fee4fb6013718a2fa39fb has 100000000 files",
   "bitzhoumy_helloworld" => "damaged trees",
   "bb_fusiontestaccount_fuse-2944" => "32400A",
   "bb_fusiontestaccount_fuse1999v2" => "34007A", 
@@ -741,6 +743,7 @@ our %badCmt = (
   "45546f17e5801791d4bc5968b91253a2f4b0db72" => 10000000000,
   "6b4ea721e0b9158d26c4f8fc85ab60c6933f73d1" => 10000000000,
   "03cb3eb9c22e21e2475fee4fb6013718a2fa39fb" => 100000000,
+  "e0f11a95c63597493328fa46f2205412d6b6f07d" => 21155694, # files
   "20ee59241cda54347832afca4a32d8474bc8c01b" => 33324118926,#and much more
   "011c51845b624f1f82653f87017be7a4d8ceaa4d" => 4007698, #lots of renames don't do diff
   "0f17bf2e73149f60302a0a2464b3fadf3ea3e6f9" => 16777217,
