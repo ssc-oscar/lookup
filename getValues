@@ -26,7 +26,7 @@ suff=".31.tch"
 [[ $t =~ ^(A2a|P2p|a2A|p2P)$ ]] && suff=".tch"
 
 for hh in da5 da3 da4
-do for v in U T S R
+do for v in V U T S R
   do #echo /${hh}_fast/${t}Full$v$suff
      if [[ -f /${hh}_fast/${t}Full$v$suff ]]
      then lastVer=$v
