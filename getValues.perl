@@ -68,7 +68,7 @@ if ($types =~ /^[aA]2fb/ || $types =~ /^[aA]2[bc]/){
   $f1 = "s";
   $f2 = "h";
 }
-if ($types eq "c2dat"){
+if ($types eq "c2dat" || $types eq "c2fbb"){
   $f1 = "h";
   $f2 = "s";
 }
@@ -146,7 +146,8 @@ while (<STDIN>){
       # Error message when not found
       print STDERR "No $ch in $fname\n";
       if ($f1 eq "s" && $f2 eq "cs"){
-        $v = safeComp ($c);
+        # not sure why it was $v = safeComp ($c);
+        next;
       }else{
         next;
       }
