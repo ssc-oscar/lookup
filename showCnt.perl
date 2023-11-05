@@ -25,8 +25,9 @@ my $h = hostname();
 my $pre = "/fast";
 my $dt = "/data";
 if ($type eq "blob"){
-  $pre = "/${h}_fast" if $h eq "da4";
-  $pre = "/da5_fast" if $h ne "da4";
+# too complicated: need to remember to copy offset files to da4
+#  $pre = "/${h}_fast" if $h eq "da4";
+  $pre = "/da5_fast";# if $h ne "da4";
   $dt = "/da4_data" ;
 }
 
