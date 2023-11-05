@@ -34,8 +34,20 @@ do for v in V U T S R
           break
      fi
   done
-  [[ $lastVer -ne "" ]] && break
+  [[ $lastVer != "" ]] && break
 done
+
+if [[ $lastH == "" ]]; then
+for v in V U T S R
+do if [[ -f /da0_data/basemaps/${t}Full$v$suff ]]
+  then 
+    lastVer=$v
+    lastH=da0
+    break
+  fi
+done
+fi
+
 if [[ $lastH.eecs.utk.edu == $h ]] 
 then 
  ~/lookup/getValues.perl --flat=$flat /fast/${t}Full$lastVer

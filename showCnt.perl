@@ -231,12 +231,13 @@ sub getTree {
 sub prtTree {
   my ($treeobj, $off) = @_;
 #todo handle one-liner for debug == 1
+  my $newline = ($debug == 1 ? ";" : "\n"); 
   while ($treeobj) {
   # /s is important so . matches any byte!
     if ($treeobj =~ s/^([0-7]+) (.+?)\0(.{20})//s) {
       my ($mode, $name, $bytes) = (oct($1), $2, $3);
       $name =~ s/\n/__NEWLINE__/g;
-      printf "$off%06o;%s;%s\n",
+      printf "$off%06o;%s;%s$newline",
         $mode, #($mode == 040000 ? "tree" : "blob"),
         unpack ("H*", $bytes), $name;
       if ($debug == 3 && $mode == 040000){
@@ -246,6 +247,7 @@ sub prtTree {
       die "$0: unexpected tree entry";
     }
   }
+  print "\n" if $debug == 1;
 }
 
 

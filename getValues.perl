@@ -68,9 +68,9 @@ if ($types =~ /^[aA]2fb/ || $types =~ /^[aA]2[bc]/){
   $f1 = "s";
   $f2 = "h";
 }
-if ($types eq "c2dat" || $types eq "c2fbb"){
+if ($types eq "c2dat" || $types eq "c2fbb" || $types eq "obb2cf" || $types eq "bb2cf"){
   $f1 = "h";
-  $f2 = "s";
+  $f2 = "cs";
 }
 if ($types eq "b2tac"){
   $f1 = "h";
