@@ -122,7 +122,7 @@ sub parseAuthorId{
   $l = "" if !defined $l;
   my $e = $a;
   $e =~ s/.*\<//;
-  $e =~ s|{ID}\+{||;
+  $e =~ s|\{ID\}\+\{||;
   $e =~ s|[}{]||g;
   $e =~ s/\>.*//;
   $e =~ s|^[\s\{\}\(\)\r#!%\$"'/\&\*\+,\.\-]*||;
@@ -599,6 +599,11 @@ our %largeTreePrj = (
 );
 
 our %badProjects = (
+  "rphsoftware_github-moment-v4" => 'NumCoe=729921', 
+  "blacktop_configs" => "1279f0a24e05464b67c5ebb8adc2a8eac5983a51",
+  "tocisz_git_bomb-repo" => "4b825dc642cb6eb9a060e54bf8d69288fbee4904",
+  "libpoetry_title" => "e0f11a95c63597493328fa46f2205412d6b6f07d gas over 21M files",
+  "jleedev_gitbomb" => "03cb3eb9c22e21e2475fee4fb6013718a2fa39fb has 100000000 files",
   "bitzhoumy_helloworld" => "damaged trees",
   "bb_fusiontestaccount_fuse-2944" => "32400A",
   "bb_fusiontestaccount_fuse1999v2" => "34007A", 
@@ -735,10 +740,13 @@ our %badAuthors = ( 'one-million-repo <mikigal.acc@gmail.com>' => "1M commits",
 
 
 our %badCmt = (
+  "3bc43eae112a4593c59893a5df59742e2ff16a34" => 10000000000,
+  "da51fb693d64c202b1782648266e6e12a3f269e0" => 10000000000,
   "c89423063a78259e6a7d13d9b00278a0c5e637b0" => 10000000005,
   "45546f17e5801791d4bc5968b91253a2f4b0db72" => 10000000000,
   "6b4ea721e0b9158d26c4f8fc85ab60c6933f73d1" => 10000000000,
   "03cb3eb9c22e21e2475fee4fb6013718a2fa39fb" => 100000000,
+  "e0f11a95c63597493328fa46f2205412d6b6f07d" => 21155694, # files
   "20ee59241cda54347832afca4a32d8474bc8c01b" => 33324118926,#and much more
   "011c51845b624f1f82653f87017be7a4d8ceaa4d" => 4007698, #lots of renames don't do diff
   "0f17bf2e73149f60302a0a2464b3fadf3ea3e6f9" => 16777217,

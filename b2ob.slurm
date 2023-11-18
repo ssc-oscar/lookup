@@ -20,13 +20,13 @@ cd $c
 
 
 machine=MACHINE
-maxM=$((3200*NTASKS))
+maxM=$((1000*NTASKS))
 [[ $machine == monster ]] && maxM=30000
 [[ $machine == rho ]] && maxM=900
 [[ $machine == sigma ]] && maxM=2900
 
-ver=U
-pVer=T
+ver=V
+pVer=U
 i=FROM
 what=WHAT
 sel=PRT
@@ -43,8 +43,8 @@ if test 'WHAT' = 'prep'; then
 l=FROM
 for k in {0..1}
 do i=$(($k+$l*2)) 
- zcat $pVer${ver}[0-4].$i.gz |\
- perl -I $HOME/lib/perl5 -I $HOME/lookup -e 'use cmt; while(<STDIN>){ chop (); s|;/|;|g; @r = split(/;/); $r[$#r] = "long" if $r[$#r] =~ / /&& length($r[$#r]) > 300; print "".(join ";", @r)."\n" if ! defined $badCmt{$r[0]};}' | \
+ zcat $pVer${pVer}1.$i.gz $pVer${ver}.$i.gz |\
+ perl -I ~/lib -I ~/lib64/perl5 -I $HOME/lib/perl5 -I $HOME/lookup -e 'use cmt; while(<STDIN>){ chop (); s|;/|;|g; @r = split(/;/); $r[$#r] = "long" if $r[$#r] =~ / /&& length($r[$#r]) > 300; print "".(join ";", @r)."\n" if ! defined $badCmt{$r[0]};}' | \
  $HOME/bin/lsort ${maxM}M -t\; -k1,4 -u | gzip > $pVer$ver$i.s
  echo $pVer$ver$i.s
  #zcat cUndef$pVer$ver$i.gz |\
@@ -80,6 +80,31 @@ if test 'WHAT' = 'check'; then
 
 l=FROM
 zcat $pVer$ver$l.0.gz $pVer$ver$l.1.gz | grep -F dc8f32860044f93c7cf898655d71d3c999248465 > dc8f32860044f93c7cf898655d71d3c999248465.$l 
+
+fi
+if test 'WHAT' = 'b2idx'; then
+
+l=FROM
+for k in {0..1}
+do i=$(($k+$l*2))
+# print middle file: perhaps pick shortest without . prefix?
+cat ../All.blobs/blob_$i.idx | perl -ane 'chop();@x=split(/;/);$x[3]=$x[4] if $#x>5;printf ("%s;%.9u;%s;%s\n",$x[3],$x[0],$x[1],$x[2]);' | $HOME/bin/lsort ${maxM}M -t\; -k1,2 | gzip > b2idx$i.s
+zcat b2idx$i.s | join -t\; - <(zcat b2fFull$ver$i.s) | \
+ perl -ane 'chop();@x=split(/;/);print "$x[1];$x[2];$x[3];$x[0];$x[4]\n"' | \
+ perl -e '$pb="";while(<STDIN>){@x=split(/;/);if ($x[3] ne $pb && $pb ne ""){ print "$pre;$pb;".($tmp[$#tmp/2]); @tmp=(); } $pb=$x[3]; $pre="$x[0];$x[1];$x[2]";push @tmp, $x[4]; } print "$pre;$pb;".($tmp[$#tmp/2]);' | \
+ $HOME/bin/lsort ${maxM}M -t\; -k1,1 | sed 's|^0+||' | gzip > ../All.blobs/blob_$i.idxf
+ cat ../All.blobs/blob_$i.idx | perl -ane 'chop();@x=split(/;/);$x[3]=$x[4] if $#x>5; $i=shift @x; printf ("%.9d;%s\n",$i, ($x[0].";".$x[1].";".$x[2].";"));'  | join -t\; -v1 - <(zcat ../All.blobs/blob_$i.idxf) | gzip > ../All.blobs/blob_$i.idxNof
+ echo blob_$i.idxNof
+ $HOME/bin/lsort ${maxM}M -t\; -k1,1 --merge <(zcat ../All.blobs/blob_$i.idxNof) <(zcat ../All.blobs/blob_$i.idxf) | gzip > ../All.blobs/blob_$i.idxf2
+done
+
+fi
+if test 'WHAT' = 'tst1'; then
+
+i=103
+cat ../All.blobs/blob_$i.idx | perl -ane 'chop();@x=split(/;/);$x[3]=$x[4] if $#x>5; $i=shift @x; printf ("%.9d;%s\n",$i, ($x[0].";".$x[1].";".$x[2].";"));'  | join -t\; -v1 - <(zcat ../All.blobs/blob_$i.idxf) | gzip > ../All.blobs/blob_$i.idxNof
+echo blob_$i.idxNof
+$HOME/bin/lsort ${maxM}M -t\; -k1,1 --merge <(zcat ../All.blobs/blob_$i.idxNof) <(zcat ../All.blobs/blob_$i.idxf) | gzip > ../All.blobs/blob_$i.idxf2
 
 fi
 if test 'WHAT' = 'addf'; then
@@ -213,6 +238,15 @@ do i=$((FROM*2+$k))
   fi
 done
 
+fi
+if [[ 'WHAT' == 'largeb2P128' ]]; then
+
+l=FROM
+for k in {0..1}
+do i=$((FROM*2+$k))
+pre=b2P128	
+zcat ${pre}Full$ver.$i.gz | cut -d\; -f1 | uniq -c | awk '{ if ($1 > 100) print $2";"$1}' | gzip > large$pre$ver$i.s
+done
 
 fi
 if [[ 'WHAT' == 'b2tam' ]]; then
@@ -282,8 +316,8 @@ fi
 if test 'WHAT' = 'bSel'; then
 
 l=FROM
-for i in {0..1}
-do j=$(($i+$l*2))
+for i in {0..7}
+do j=$(($i+$l*8))
   zcat b2fFull$ver$j.s| perl ~/lookup/selBlobsByExt.perl | gzip > bSelect$ver$j.s
   echo bSelect$ver$j.s
 done
@@ -292,9 +326,10 @@ fi
 if test 'WHAT' = 'bSelS'; then
 
 l=FROM
-for i in {0..1}
-do j=$(($i+$l*2))
-   zcat ../All.blobs/blob_$j.idxf| awk -F\; '{if ($3>450) print $4";"$3}' | $HOME/bin/lsort ${maxM}M -t\; -k1,1 | join -t\; - <(zcat bSelect$ver$j.s) |gzip > bSelectSz$ver$j.s
+for i in {0..7}
+do j=$(($i+$l*8))
+   #zcat ../All.blobs/blob_$j.idxf2| awk -F\; '{if ($3>450) print $4";"$3}' | $HOME/bin/lsort ${maxM}M -t\; -k1,1 | join -t\; - <(zcat bSelect$ver$j.s) |gzip > bSelectSz$ver$j.s
+   zcat b2idx$j.s | cut -d\; -f1,4 | join -t\; - <(zcat bSelect$ver$j.s) |gzip > bSelectSz$ver$j.s
    echo bSelectSz$ver$j.s
 done
 
@@ -452,7 +487,7 @@ l=FROM
 for i in {0..3}
 do j=$(($i+$l*4))
   zcat b2tAFull$ver$j.s 
-done | perl -ane 'chop();@x=split(/;/, $_, -1); print "$x[3];$x[0]\n";' | uniq | perl -I $HOME/lib/perl5 -I $HOME/lookup $HOME/lookup/splitSecCh.perl A2bFull$ver.$l. 32
+done | perl -ane 'chop();@x=split(/;/, $_, -1); print "$x[2];$x[0]\n";' | uniq | perl -I $HOME/lib/perl5 -I $HOME/lookup $HOME/lookup/splitSecCh.perl A2bFull$ver.$l. 32
 echo A2bFull$ver.$l.
 
 for i in {0..31}
@@ -572,13 +607,13 @@ do zcat  Pt2Ptb.$j.$k.gz |tail -2|head -1 |cut -d\; -f5
 done > Pt2Ptb.$j.lastblob
 nn=$(zcat b2tPFull${ver}$j.s | grep -nFf Pt2Ptb.$j.lastblob | cut -d: -f1 | head -1)
 n=$(zcat b2tPFull${ver}$j.s | wc -l)
-zcat b2tPFull${ver}$j.s |tail -$(($n-$nn+1)) | \
+zcat b2tPFull${ver}$j.s |tail -n +$((nn+1)) | \
 perl -e '$pb="";while(<STDIN>){chop();($b,$t,$p)=split(/;/);if ($pb ne $b && $pb ne ""){ if ($#ps > 0){for $pp (@ps){print "$ps[0];$pt{$ps[0]};$pp;$pt{$pp};$pb\n" if $pp ne $ps[0];}}; @ps=();%pt=();} $pb=$b; if (! defined $pt{$p}){push @ps, $p; $pt{$p}=$t};}' |\
 perl -I $HOME/lib/perl5 -I $HOME/lookup $HOME/lookup/splitSecCh.perl Pt2Ptb1.$j. 32
 
 fi
 if test 'WHAT' = 'Pt2PtbO2'; then
-# after Pt2PtbO1 do this
+	# after (if it was run) Pt2PtbO1 do this to clean up
 j=FROM
 if [[ -f Pt2Ptb1.$j.0.gz ]]
 then
@@ -924,6 +959,22 @@ t=PRT
 perl $HOME/lookup/AuthSummary.perl $ver $l $t | gzip > A2summFull.$t.$ver$l.gz
 
 fi
+if test 'WHAT' = 'A2summ1'; then
+
+
+
+c=$HOME/work/gz
+cd $c
+l=FROM
+t=PRT
+
+a=$(zcat A2summFull.$t.$ver$l.gz | tail -2 | head -1 | cut -d\; -f1)
+n=$(zcat A2summFull.$t.$ver$l.gz |grep -n "$a"|cut -d: -f1)
+zcat A2summFull.$t.$ver$l.gz | head -$n | gzip > A2summFull.$t.$ver$l.gz0
+
+perl $HOME/lookup/AuthSummary.perl $ver $l $t $n | gzip > A2summFull.$t.$ver$l.gz1
+
+fi
 if test 'WHAT' = 'AToFile'; then
 
 c=/lustre/isaac/scratch/audris/gz
@@ -1028,7 +1079,7 @@ if test 'WHAT' = 'P2summ'; then
 #P2tAlPkg
 #(t=P2summ; for j in P2b P2p P2c P2f P2A P2nfb; do for i in 0; do sed "s|WHAT|$t|g;s|FROM|$i|g;s|PRT|$j|g;s|VER|S|;s|MACHINE|beacon|" ~/lookup/b2ob.pbs | qsub; sleep 1; done; done)
 # for P2p need zcat P2p$ver.s | ~/lookup/splitSecCh.perl P2pFull$ver. 32 
-# these are used in ToJson directly P2mnc, P2core (see p2a) 
+# these are used in ToJson directly P2mnc, P2core (see a2p.slurm) 
 # need gender for P2g
 # How to produce B2b?
 # /da5_data/play/forks zcat fP2PStatsT.StrongReuseLinks011-1.crank.map|awk -F\; '{print $2";"$1}' |lsort 100G | gzip > B2bFullT.s

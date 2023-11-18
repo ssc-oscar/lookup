@@ -151,10 +151,6 @@ done
 eval $str | gzip > b2ptfVFullV$k.s
 
 fi
-if test 'WHAT' == 'diffVFix1'; then
-
-j=PRT
-i=FROM
 ./fix2.sh $i $j
 
 fi
@@ -223,7 +219,7 @@ then zcat t2ptfV.$i.$j.gz &> /dev/null;
      l1=$(zcat t2ptfV.$i.$((j+1)).gz|head -1|cut -d\; -f2)
      n=$(grep $l tree_$i.idx|cut -d\; -f1)
      n1=$(grep $l1 tree_$i.idx|cut -d\; -f1)
-     perl $HOME/lookup/t2ptf.perl $i $n $n1 | gzip > t2ptfV.$i.$j.gz1
+     echo perl $HOME/lookup/t2ptf.perl $j $n $n1 t2ptfV.$i.$j.gz1
   fi
 fi
 

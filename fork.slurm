@@ -111,7 +111,7 @@ echo P2cFull$ver$j.s
 
 for j in {0..127}
 do zcat P2cFull$ver.FROM.$j.gz | lsort ${maxM}M -t\; -k1,2 -u | gzip > P2cFull$ver.FROM.$j.s
-   echo P2cFull$ver.FROM.$j.s
+>>>>>>> 5216a1205464d0ca892b0ded28b28b0d004ee752
 done
 
 fi

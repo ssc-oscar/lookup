@@ -10,8 +10,9 @@ for my $str (@ARGV){
   open A, "gunzip -c $str|";
   while(<A>){
     chop();
-    next if $_ eq "";
-    $match{$_}++;
+    my @x = split(/;/);
+    next if $x[0] eq "";
+    $match{$x[0]}++;
   }
 }
 

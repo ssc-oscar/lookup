@@ -6,8 +6,9 @@ use strict;
 use File::Temp qw/ :POSIX /;
 use woc;
 
+my $ver = $ARGV[0];
 my %fix;
-open A, "eMap.fix";
+open A, "eMap$ver.fix";
 while (<A>){
   chop ();
   my ($a, $b) = split (/\;/);
@@ -1812,6 +1813,525 @@ michelle@Michelles-MacBook-Pro.local
 kbuffardi@csuchico.edu
 marmalade@unrulygroup.com
 kapil@Apples-MacBook-Pro.local
+kevin@
+autologin@noc.geidai.ac.jp
+scott@
+your email
+openshiftio@redhat.com
+sample@sample.com
+r
+david@davids-macbook-air
+jonathan@jonathans-macbook-pro
+test@example.com
+12345@qq.com
+alex@alexs-macbook-air
+contato@com.br
+x
+some@email.com
+hoge@example.com
+h
+sebastian@sebastians-macbook-pro
+f
+train@dmztrn.amdocs.trn
+test@test
+westroads@gmail.com
+fake@email.com
+tom@toms-macbook-pro
+no-reply
+gitea@fake
+mike@
+student3@d214.org
+l
+address
+ram@gmail.com
+test@qq.com
+mark@marks-macbook-pro
+laboratorio@ulatina.net
+matthew@matthews-macbook-pro
+colin@
+sbx_user1061@eu-west-2.compute.internal
+core.editor
+ian@
+example@example.com
+email_id
+hoge@hoge
+test@163.com
+noah@
+abc
+cloud_user@mylabserver.com
+alumnos@upc.edu.pe
+steve@stephens-macbook-pro
+james@jamess-macbook-pro
+[email]
+e
+your_email@whatever.com
+you@domain.com
+private
+mail@gmail.com
+myemail
+insert github email here
+chris@
+myqq@qq.com
+1731343@itp
+dell@dell-pc
+censored
+rz-dev@rznet.com
+retengr@eu-west-1.compute.internal
+reidal@corp.espn.pvt
+students@stu.com
+nope
+joe@
+c:\users\user\appdata\roaming\the bat
+alexander@
+git-sync@trilby.media
+w205@ec2.internal
+test@gmail.com
+dummy@example.com
+dan@daniels-macbook-pro
+mof@vpn.gatech.edu
+your.email@example.com
+oscar@oscars-macbook-pro
+sean@seans-macbook-pro
+=
+a
+github.com
+nick@nicks-macbook-pro
+greg@gregs-macbook-pro
+cisco@centos-vm.dcloud-cisco.com
+you@example
+matt@matthews-macbook-pro
+sean@
+no email
+your_email@example.com
+none@example.com
+teste@teste.com
+email@gmail.com
+noreply@example.com
+michael@
+dave@daves-macbook-pro
+you@gmail.com
+0
+alice@example.com
+na
+email@example.ru
+test@test.de
+reset@cwinet
+dan@
+andre@andres-macbook-pro
+unset
+1234@qq.com
+sam@sams-macbook-pro
+1234
+no@no.no
+no
+mac@macbook-pro-de-mac
+net@igalvani
+your_email
+jason@jasons-macbook-pro
+chris@christophers-macbook-pro
+ec007@tamuct.edu
+scott@scotts-macbook-pro
+justin@
+local@wmii
+noreply
+matt@matts-macbook-pro
+adam@adams-macbook-air
+undefined
+marc@marcs-macbook-pro
+your-email-address
+local
+test@email.com
+brian@
+hidden
+brendan@
+noemail
+aaa
+d
+andrew@andrews-macbook-air
+martin@martins-macbook-pro
+sam@example.com
+nate@
+jake@jakes-macbook-pro
+dan@dans-macbook-pro
+karthik@karthiks-macbook-pro
+your
+ail
+abcd@gmail.com
+github
+exqudens@ec2.internal
+mike@michaels-macbook-pro
+rob@robs-macbook-pro
+joel@
+maria@
+asus@mshome.net
+steve@steves-macbook-pro
+1234qwer
+a123456
+luke@lukes-macbook-pro
+yourgithub@email.com
+none
+nathan@nathans-macbook-pro
+adam@
+myemail@email.com
+11111111
+youremail@example.com
+nomail
+kyle@
+_
+you@email.com
+patrick@
+john@
+you@yourdomain.com
+123456789
+1
+ss
+daniel@daniels-macbook-pro
+ben@
+andrew@andrews-macbook-pro
+none@none
+kyle@kyles-macbook-pro
+email_not_provided
+mac@macbook-pro
+j
+my email address used on my git repo
+you@example.com
+training_m2b.00.86@gdnindia.com
+19026111@sunwayedu
+local@local.com
+test
+bob@example.com
+amnesia@localhost
+d:\the bat
+john@doe.org
+nathan@
+dummy@dummy.com
+your_email@youremail.com
+t
+sbx_user1060@eu-west-2.compute.internal
+bitnami@ap-south-1.compute.internal
+aluno@expert
+student7@wzr
+email@example.com
+noreply@github.com
+test@runoob.com
+hoge
+1831089@itp
+none@none.none
+training_b6b.01.09@dir.svc.accenture.com
+matthew@
+ll
+[your
+your_email_address@example.com
+aa
+bill@eduroam.rwth-aachen.de
+youremail
+joe@joes-macbook-pro
+josh@
+[omitted]
+anyu@cn-north-1.compute.internal
+email@address.com
+johndoe@example.com
+david@davids-macbook-pro
+mac@macdemacbook-pro
+josh@joshs-macbook-pro
+12345678@qq.com
+pi@raspberrypi.(none
+    admin
+    anon@anon.com
+    test@test.ru
+    one@oldmainlab
+    dd
+    david@davids-imac
+    patrick@patricks-macbook-pro
+    asdf
+    someone@nowhere.com
+    my@email.com
+    noemail@noemail.com
+    exit
+    123123
+    anonymous
+    n/a
+    treehouse@ec2.internal
+    unknown
+    root
+    user.email
+    you@examle.com
+list
+yourgitemail@example.com
+xx@xx.com
+g
+james@
+no-reply@zend.com
+you@yourdomain
+<E4><BD><A0><E7><9A><84><E9><82><AE><E7><AE><B1>
+private@github.com
+mac@macs-macbook-air
+adam@adams-macbook-pro
+justin@justins-macbook-pro
+tyler@tylers-macbook-pro
+christian@christians-macbook-pro
+jeff@jeffs-macbook-pro
+sarah@sarahs-macbook-pro
+roman@romans-macbook-pro
+jack@jacks-macbook-pro
+alex@alexanders-macbook-pro
+simon@simons-macbook-pro
+max@maxs-macbook-pro
+vincent@vincents-macbook-pro
+peter@peters-macbook-pro
+thomas@thomass-macbook-pro
+ben@bens-macbook-pro
+josh@joshuas-macbook-pro
+ivan@ivans-macbook-pro
+anthony@anthonys-macbook-pro
+paul@pauls-macbook-pro
+alex@alexs-macbook-pro
+brian@brians-macbook-pro
+mark@marks-macbook-air
+marco@macbook-pro-di-marco
+sam@samuels-macbook-pro
+jay@jays-macbook-pro
+amir@amirs-macbook-pro
+chris@chriss-macbook-pro
+nikita@macbook-pro-nikita
+stephen@stephens-macbook-pro
+jamie@jamies-macbook-pro
+neil@neils-macbook-pro
+mac@macdemacbook-air
+will@williams-macbook-pro
+pablo@macbook-pro-de-pablo
+kevin@kevins-macbook-pro
+john@johns-macbook-pro
+katie@katies-macbook-pro
+mac@macs-macbook-pro
+jordan@jordans-macbook-pro
+jacob@jacobs-macbook-pro
+john@johns-macbook-air
+global
+email
+gcloud config get-value core/account
+1111
+qwer1234
+user.name
+111111
+<E9><82><AE><E7><AE><B1>
+2
+sss
+xxx
+help
+git
+get
+11
+123
+s
+your email address
+pass1234
+1qaz!qaz
+111
+qq.com
+m
+core.safecrlf
+1qaz2wsx
+000000
+daniel
+empty
+color.ui
+password
+aa123456
+asd
+users.noreply.github.com
+il
+null
+b
+https://github.com
+q
+name
+replace-all
+gmail.com
+d:\mail
+abcd1234
+1234567890
+example.com
+12345678
+mail
+123456
+<EC><9D><B4><EB><A9><94><EC><9D><BC>
+add
+000@000-pc
+1111@qq.com
+11@qq.com
+1231321@qq.com
+123456789@qq.com
+123456@163.com
+1831119@itp
+1831402@itp
+2016@sliitstd
+8692474@qq.com
+aa@aa.com
+aa@gmail.com
+aa@qq.com
+aaa@aaa.com
+aaa@bbb.com
+alex@
+alex@localhost
+andrew@
+anna@
+austin@
+author@example.com
+blah@blah.com
+blake@
+cameron@
+christine@
+daniel@
+david@
+dummy@gmail.com
+email@email.com
+emily@
+erik@
+estudiante@unal.loc
+example@gmail.com
+example@mail.com
+fake@fake.com
+fake@mail.com
+fic@info
+jake@
+jared@
+jason@
+john@localhost
+john@sample.com
+joshua@
+kira@
+kromanow@cs
+null
+b
+https://github.com
+q
+name
+replace-all
+gmail.com
+d:\mail
+abcd1234
+1234567890
+example.com
+12345678
+mail
+123456
+이메일
+add
+000@000-pc
+1111@qq.com
+11@qq.com
+1231321@qq.com
+123456789@qq.com
+123456@163.com
+1831119@itp
+1831402@itp
+2016@sliitstd
+8692474@qq.com
+aa@aa.com
+aa@gmail.com
+aa@qq.com
+aaa@aaa.com
+aaa@bbb.com
+alex@
+alex@localhost
+andrew@
+anna@
+austin@
+author@example.com
+blah@blah.com
+blake@
+cameron@
+christine@
+daniel@
+david@
+dummy@gmail.com
+email@email.com
+emily@
+erik@
+estudiante@unal.loc
+example@gmail.com
+example@mail.com
+fake@fake.com
+fake@mail.com
+fic@info
+jake@
+jared@
+jason@
+john@localhost
+john@sample.com
+joshua@
+kira@
+kromanow@cs
+liam@
+mac@macdeimac
+mail@example.com
+mail@foxmail.com
+mail@mail.com
+matt@
+mi-macpro@dyn6.twc.com
+moi@email.com
+my@example.com
+my@mail.com
+my_name@example.com
+myemail@example.com
+myemail@gmail.com
+namestudent94@gmail.com
+nick@
+no@email.com
+no@mail.com
+no@no.com
+none@gmail.com
+none@none.com
+nope@nope.com
+nospam@gmail.com
+ryan@
+sam@
+sam@google.com
+sample@example.com
+sample@gmail.com
+shane@
+test@fakemail.com
+test@localhost
+test@mail.com
+test@test.test
+test@youremail.com
+trainee@cts.com
+training.python@pnp
+training_b8c.07.19@dir.svc.accenture.com
+training_h2a.09.22@dir.svc.accenture.com
+treinamento@dir.svc.accenture.com
+trejimmy5562@tamulink.tamu.edu
+util@botframework.com
+you@qq.com
+your@email.com
+your@example.com
+youremail@domain.com
+yourname@example.com
+zach@
+zachary@
+ghost@gitbook.com
+unconfigured@null.spigotmc.org
+osu@lab
+anonymous@gitbook.com
+learning@corp.capgemini.com
+boolatoon@startupcampus.com
+unconfigured@null.spigotmc.org
+benjamin@
+push.default
+1qaz@wsx
+kai@
+kat@
+megan@
+evan@
+brooke@
+victoria@
+cory@
+tyler@
+eric@
+robert@
+steve@
+benjamin@
 EOT
 
 
@@ -1830,7 +2350,7 @@ for my $e (split(/\n/, $badEmailHere)){
   $RealBadE{lc($e)} = 1;
 }
 
-open BE, "bad.e";
+open BE, "bad$ver.e";
 while (<BE>){
   chop();
   my ($e, $n) = split(/;/, $_);
@@ -1838,7 +2358,7 @@ while (<BE>){
 }
 $badE{""}++;
 my %badFN;
-open BE, "bad.fn";
+open BE, "bad$ver.fn";
 while (<BE>){
   chop();
   my ($fn, $ln, $c) = split(/;/, $_);
@@ -1856,7 +2376,7 @@ while (<BE>){
 }
 $badFN{""}++;
 my %badGH;
-open BE, "bad.gh";
+open BE, "bad$ver.gh";
 while (<BE>){
   chop();
   my ($gh, $n) = split(/;/, $_);
@@ -1951,7 +2471,11 @@ while(<STDIN>){
 # my ($nn, $nnr) = split(/\;/, $_, -1);
   my ($nn, $nnr) = split(/\;/, $_, -1);
   $nnr = $fix{$nnr} if defined $fix{$nnr};
-  my $bb = isBad ($nn);
-  my $bb1 = isBad ($nnr);
+  my $bb =1; 
+  my $bb1 = 1;
+  if (length ($nn)<1000){
+    $bb = isBad ($nn);
+    $bb1 = isBad ($nnr);
+  }
   print "$nn;$nnr;$bb;$bb1\n";
 }

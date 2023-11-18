@@ -15,6 +15,7 @@ module load bzip2/1.0.8  intel-compilers/2021.2.0
 
 LD_LIBRARY_PATH=/nfs/home/audris/lib:/nfs/home/audris/lib64:$LD_LIBRARY_PATH
 
+
 c=/lustre/isaac/scratch/audris/All.blobs
 cd $c
 
@@ -65,6 +66,27 @@ do j=$((FROM*8+$i))
 done
 
 fi
+if test 'WHAT' == 'Cmt1'; then
+
+str="$HOME/bin/lsort ${maxM}M -t\; -k1,1 -u --merge"
+for k in {0..31}
+do str="$str <(zcat Cmt$ver$k.s)"
+done 
+eval $str | perl -I ~/lookup/ -I ~/lib64/perl5/ -I ~/lib/perl5/ -ane 'use woc;chop($_);print "$_;".(join ";", parseAuthorId($_))."\n";'|gzip > ../gz/Cmt$ver.split
+
+zcat ../gz/Cmt$ver.split|cut -d\; -f2,3 | grep -v '^;'|grep -v ';$' |lsort ${maxM}M -t\; -u -k1,2 |gzip > ../gz/fl$ver.s  
+
+fi
+
+if test 'WHAT' == 'Cmt2'; then
+
+zcat ../gz/Cmt$ver.split|cut -d\; -f2,3 | grep -v '^;'|grep -v ';$' |lsort ${maxM}M -t\; -u -k1,2 |gzip > ../gz/fl$ver.s  
+
+zcat ../gz/fl$ver.s|perl -ane 's|[0-9_@"\#!\!\%\$\(\)&*\+\}\{\?\<\>\=\[\`\^\~\]/:\\]||g;print'|sed "s|['0-9]||g" | \
+  perl -ane 'chop();($a,$b)=split(/;/);print "$a;$b\n" if(length($a)>1||length($b)>1)'| \
+  lsort ${maxM}M -u > ../fl$ver.s1
+
+fi
 if test 'WHAT' == 'Cmt'; then
 
 for k in {0..31}
@@ -78,10 +100,9 @@ str="$HOME/bin/lsort ${maxM}M -t\; -k1,1 -u --merge"
 for k in {0..31}
 do str="$str <(zcat Cmt$ver$k.s)"
 done 
-eval $str | perl -I ~/lookup/ -I ~/lib/perl5/ -ane 'use woc;chop($_);print "$_;".(join ";", parseAuthorId($_))."\n";'|gzip > ../gz/Cmt$ver.split
+eval $str | perl -I ~/lookup/ -I ~/lib64/perl5/ -I ~/lib/perl5/ -ane 'use woc;chop($_);print "$_;".(join ";", parseAuthorId($_))."\n";'|gzip > ../gz/Cmt$ver.split
 
-zcat ../gz/Cmt$ver.split|cut -d\; -f2,3 | grep -v '^;'|grep -v ';$' |lsort ${maxM}M -t\; -u -k1,2 |gzip > ../gz/fl$ver.s & 
-
+zcat ../gz/Cmt$ver.split|cut -d\; -f2,3 | grep -v '^;'|grep -v ';$' |lsort ${maxM}M -t\; -u -k1,2 |gzip > ../gz/fl$ver.s  
 
 zcat fl$ver.s|perl -ane 's|[0-9_@"\#!\!\%\$\(\)&*\+\}\{\?\<\>\=\[\`\^\~\]/:\\]||g;print'|sed "s|['0-9]||g" | \
   perl -ane 'chop();($a,$b)=split(/;/);print "$a;$b\n" if(length($a)>1||length($b)>1)'| \

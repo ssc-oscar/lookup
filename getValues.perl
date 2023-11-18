@@ -68,9 +68,10 @@ if ($types =~ /^[aA]2fb/ || $types =~ /^[aA]2[bc]/){
   $f1 = "s";
   $f2 = "h";
 }
-if ($types eq "c2dat"){
+if ($types eq "c2dat" || $types eq "c2fbb" || $types eq "obb2cf" || $types eq "bb2cf"){
   $f1 = "h";
-  $f2 = "s";
+  $f2 = "cs";
+  $f2 = "s" if $types eq "c2dat";
 }
 if ($types eq "b2tac"){
   $f1 = "h";
@@ -138,10 +139,16 @@ while (<STDIN>){
       #print STDERR "big file\n";
       #print "$ch\n";
     }else{
+      # Previously left, I suppose debug.
+      # I propose to remove (lgonzal6 6/1/23)
       #print "$ch\n";
       #print STDERR "no $ch in $fname $f1 $f2\n";
+      
+      # Error message when not found
+      print STDERR "No $ch in $fname\n";
       if ($f1 eq "s" && $f2 eq "cs"){
-        $v = safeComp ($c);
+        # not sure why it was $v = safeComp ($c);
+        next;
       }else{
         next;
       }

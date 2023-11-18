@@ -12,14 +12,14 @@ use cmt;
 my $lines = 0;
 my $trees = 0;
 my $fbasei ="tree_";
-my $sec = $ARGV[0];
+<<<<<<< HEAD
 my $from = 0;
 my $to = -1;
 my $start = defined $ARGV[1] ? $ARGV[1] : 0;
 my $end = defined $ARGV[2] ? $ARGV[2] : -1;
 
 #$to = $ARGV[2] if defined $ARGV[2];
-#$from = $ARGV[1] if defined $ARGV[1];
+>>>>>>> 5216a1205464d0ca892b0ded28b28b0d004ee752
 {
   open (FD, "$fbasei$sec.bin") or die "$! $fbasei$sec.bin";
   binmode(FD);
@@ -28,12 +28,7 @@ my $end = defined $ARGV[2] ? $ARGV[2] : -1;
     while (<A>){
       chop ();
       my ($nn, $of, $len, $hash) = split (/\;/, $_, -1);
-      next if $start > $nn;
       exit if $end < $nn && $end >= 0;
-      #print "$nn, $of, $len, $hash\n";
-      #next if $trees < $from;
-      #next if $to >= 0 && $trees > $to;
-      #my ($nn, $of, $len, $hash) = split (/\;/, $_, -1);
       my $h = pack 'H*', $hash;
       my $codeC = "";
       seek (FD, $of, 0);
@@ -43,7 +38,7 @@ my $end = defined $ARGV[2] ? $ARGV[2] : -1;
         my $to = safeDecomp ($codeC);
         while ($to =~ s/^([0-7]+) (.+?)\0(.{20})//s) {
           $lines ++;
-          if (!($lines%100000000)){
+          if (!($lines%10000000)){
             print STDERR "$lines lines and $trees trees done\n";
             #goto DONE;
           }
