@@ -1,22 +1,22 @@
 #!/bin/bash
-#SBATCH -J WHAT.PRT
+#SBATCH -J updateVER.PRT.WHAT
 #SBATCH -A ACF-UTK0011
+#SBATCH -p campus-beacon-long
+##SBATCH -p campus-skylake
+#SBATCH -q campus
 #SBATCH --nodes=1 
 #SBATCH --ntasks-per-node=NTASKS
-#SBATCH --partition=campus
 #SBATCH --time=0-23:59:59
-#SBATCH --error WHAT.PRT.o%J
-#SBATCH --output WHAT.PRT.o%J
+#SBATCH --error updtPT.WHAT.PRT.o%J
+#SBATCH --output updtPT.WHAT.PRT.o%J
 #SBATCH --mail-user=audris@utk.edu
 #SBATCH --mail-type=FAIL
+LD_LIBRARY_PATH=$HOME/lib:$HOME/lib64:$LD_LIBRARY_PATH
 
-module purge
-module load bzip2/1.0.8  intel-compilers/2021.2.0
-
-LD_LIBRARY_PATH=/nfs/home/audris/lib:/nfs/home/audris/lib64:$LD_LIBRARY_PATH
-
-c=/lustre/isaac/scratch/audris/gz
+c=/lustre/haven/user/audris/gz
 cd $c
+
+
 
 maxM=1000
 ver=V
@@ -157,8 +157,8 @@ if test 'WHAT' = 'MERGEc2p'; then
 
 for i in {0..7}
 do j=$(($prt*8+$i))
-   $HOME/bin/lsort ${maxM}M -t\; -k1,2 --merge -u <(zcat c2p${ver}.$j.s) <(zcat V0/c2pFullV$j.s) | perl -ane 'print if $_ =~ m/^[0-f]{40};/' | uniq | gzip > c2pFull${ver}$j.s 
-   echo c2pFull${ver}$j.s
+   $HOME/bin/lsort ${maxM}M -t\; -k1,2 --merge -u <(zcat c2p${ver}.$j.s) <(zcat c2pFullV$j.s) | perl -ane 'print if $_ =~ m/^[0-f]{40};/' | uniq | gzip > c2pFull${ver}.$j.s 
+   echo c2pFull${ver}.$j.s
 done
 
 fi
@@ -166,7 +166,7 @@ if test 'WHAT' = 'MERGEp2c'; then
 
 for i in {0..1}
 do j=$(($prt*2+$i))
-   $HOME/bin/lsort ${maxM}M -t\; -k1,2 --merge -u <(zcat p2c${ver}.$j.s) <(zcat p2cFullU$j.s) | perl -ane 'print if $_ =~ m/;[0-9a-f]{40}$/' | uniq | gzip > p2cFull${ver}$j.s 
+   $HOME/bin/lsort ${maxM}M -t\; -k1,2 --merge -u <(zcat p2c${ver}.$j.s) <(zcat p2cFullV$j.s) | perl -ane 'print if $_ =~ m/;[0-9a-f]{40}$/' | uniq | gzip > p2cFull${ver}.$j.s 
    echo p2cFull${ver}$j.s
    zcat p2cFull${ver}$j.s|cut -d\; -f1|uniq | gzip > p${ver}$j.s
 done
