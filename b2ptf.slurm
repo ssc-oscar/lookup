@@ -1,32 +1,28 @@
 #!/bin/bash
 #SBATCH -J WHAT.FROM.PRT
 #SBATCH -A ACF-UTK0011
+#SBATCH -p campus-beacon-long
+##SBATCH -p campus-skylake
+#SBATCH -q campus
 #SBATCH --nodes=1 
 #SBATCH --ntasks-per-node=NTASKS
-#SBATCH --partition=campus
 #SBATCH --time=0-23:59:59
 #SBATCH --error WHAT.FROM.PRT.o%J
 #SBATCH --output WHAT.FROM.PRT.o%J
 #SBATCH --mail-user=audris@utk.edu
 #SBATCH --mail-type=FAIL
 
-module purge
-module load bzip2/1.0.8  intel-compilers/2021.2.0
+#module purge
+#module load bzip2/1.0.8  intel-compilers/2021.2.0
 
-LD_LIBRARY_PATH=/nfs/home/audris/lib:/nfs/home/audris/lib64:$LD_LIBRARY_PATH
+LD_LIBRARY_PATH=$HOME/lib:$HOME/lib64:$LD_LIBRARY_PATH
 
-c=/lustre/isaac/scratch/audris/All.blobs
+c=/lustre/haven/user/audris/All.blobs
+c=/nics/b/home/audris/work/All.blobs
 cd $c
 
+
 ver=V
-if test 'WHAT' == 't2ptf'; then
-
-
-k=$((PRT*3766268))
-j=FROM
-perl $HOME/lookup/t2ptf.perl $j $k $((k+3766268)) | gzip > t2ptfV.$j.PRT.gz
-	
-fi
 if test 'WHAT' == 'diff'; then
 
 j=PRT
@@ -37,7 +33,7 @@ echo "UU1.$i.cs |head -$k |tail -$inc"
 nl=$(zcat UU1.$i.cs | wc -l)
 if [[ $j -eq 9 ]];
 then zcat UU1.$i.cs | tail -$((nl-9*inc))
-else zcat UU1.$i.cs |head -$k |tail -$inc 
+else zcat UU1.$i.cs |head -$k |tail -$inc
 fi | perl -I ~/lib -I ~/lib64/perl5 ~/lookup/cmputeDiff3CT.perl All.sha1o 2> UU1.$i.$j.err | \
 gzip > UU1.$i.$j.gz
 
@@ -45,17 +41,17 @@ gzip > UU1.$i.$j.gz
 fi
 if test 'WHAT' == 'diffV'; then
 
-	j=PRT
-	inc=55500
-	k=$(((j+1)*inc))
-	i=FROM
-	echo "UV.$i.cs |head -$k |tail -$inc"
-	nl=$(zcat UV.$i.cs | wc -l)
-	if [[ $j -eq 99 ]];
-	then zcat UV.$i.cs | tail -$((nl-99*inc))
-	else zcat UV.$i.cs |head -$k |tail -$inc
-	fi | perl -I ~/lib -I ~/lib64/perl5 ~/lookup/cmputeDiff3CT.perl All.sha1o 2> UV.$i.$j.err | \
-		gzip > UV.$i.$j.gz
+j=PRT
+inc=55500
+k=$(((j+1)*inc))
+i=FROM
+echo "UV.$i.cs |head -$k |tail -$inc"
+nl=$(zcat UV.$i.cs | wc -l)
+if [[ $j -eq 99 ]];
+then zcat UV.$i.cs | tail -$((nl-99*inc))
+else zcat UV.$i.cs |head -$k |tail -$inc
+fi | perl -I ~/lib -I ~/lib64/perl5 ~/lookup/cmputeDiff3CT.perl All.sha1o 2> UV.$i.$j.err | \
+gzip > UV.$i.$j.gz
 
 
 fi
@@ -66,18 +62,103 @@ i=FROM
 ./fix1.sh $i $j
 
 fi
-if test 'WHAT' == 'diffVFix1'; then
+if test 'WHAT' == 't2ptf'; then
+
+inc=$((3776568/2))
+k=$((PRT*inc))
+i=FROM
+perl $HOME/lookup/t2ptf.perl $i $k $((k+inc)) | gzip > t2ptfV.$i.PRT.gz
+
+fi
+if test 'WHAT' == 'b2ptf'; then
+inc=$((3776568/2))
+k=$((PRT*inc))
+i=FROM
+perl $HOME/lookup/b2ptf.perl $i $k $((k+inc)) | gzip > b2ptfV.$i.PRT.gz
+
+fi
+
+if test 'WHAT' == 'b2ptf1'; then
+j=PRT
+i=FROM
+./fixbpt.sh $i $j
+fi
+if test 'WHAT' == 'b2ptf2'; then
+j=PRT
+i=FROM
+./fixbpt2.sh $i $j
+fi
+if test 'WHAT' == 'b2ptf3'; then
+j=PRT
+i=FROM
+./fixbpt3.sh $i $j
+fi
+if test 'WHAT' == 'b2ptf4'; then
+j=PRT
+i=FROM
+./fixbpt4.sh $i $j
+fi
+if test 'WHAT' == 'b2ptf5'; then
+j=PRT
+i=FROM
+./fixbpt5.sh $i $j
+fi
+
+if test 'WHAT' == 'b2ptfSplit'; then
 
 j=PRT
 i=FROM
-./fix4.sh $i $j 1
+for k in {0..7}
+do l=$((i*8+k))
+for m in {0..3}
+do o=$((j*4+m))
+   zcat b2ptfV.$l.$o.gz
+done
+done | perl -I $HOME/lib/perl5 -I $HOME/lookup  $HOME/lookup/splitSec.perl b2ptfV.$i.$j. 128 
+
+
+fi
+if test 'WHAT' == 'b2ptfSplSrt'; then
+
+j=PRT
+i=FROM
+for k in {0..127}
+do zcat b2ptfV.$i.$j.$k.gz | $HOME/bin/lsort ${maxM}M -t\; -k1,2 | gzip > b2ptfV.$i.$j.$k.s
+done
+
+fi
+if test 'WHAT' == 'b2ptfMrgJ'; then
+
+
+k=PRT
+i=FROM
+str="$HOME/bin/lsort ${maxM}M -t\; -k1,2 --merge "
+for j in {0..15}
+do str="$str <(zcat b2ptfV.$i.$j.$k.s)"
+done
+eval $str | gzip > b2ptfV.$i.$k.s
+echo b2ptfV.$i.$k.s
+
+
+fi
+if test 'WHAT' == 'b2ptfMrg'; then
+
+k=FROM
+str="$HOME/bin/lsort ${maxM}M -t\; -k1,2 --merge "
+for j in {0..15}
+do str="$str <(zcat b2ptfV.$j.$k.s)"
+done
+eval $str | gzip > b2ptfVFullV$k.s
+
+fi
+./fix2.sh $i $j
 
 fi
 if test 'WHAT' == 'diffVFix2'; then
 
 j=PRT
 i=FROM
-./fix4.sh $i $j 2
+./fix3.sh $i $j
 
 fi
 if test 'WHAT' == 'diffVFix3'; then
@@ -108,39 +189,37 @@ i=FROM
 ./fix4.sh $i $j 6
 
 fi
+if test 'WHAT' == 'diffVFix7'; then
 
-
-
-
-if test "WHAT" = 'b2ptfsplit'; then
-
-for i in {0..3}
-do j=$((FROM*4+i))
-   zcat b2ptf$j.gz 
-done | grep ^b | cut -d\; -f2- | perl -I $HOME/lib/perl5 -I $HOME/lookup  $HOME/lookup/splitSec.perl b2ptf.FROM. 128
+j=PRT
+i=FROM
+./fix4.sh $i $j 7
 
 fi
 
+if test 'WHAT' == 't2ptf'; then
+inc=$((3766268/2))
+k=$((PRT*inc))
+i=FROM
+perl $HOME/lookup/t2ptf.perl $i $k $((k+inc)) | gzip > t2ptfV.$i.PRT.gz
+
+fi
 if test 'WHAT' == 't2ptfFix'; then
 
-
-i=PRT
-j=FROM
+j=PRT
+i=FROM
 if [[ -f t2ptfV.$i.$j.gz ]]
-then zcat t2ptfV.$i.$j.gz &> /dev/null;
+then zcat t2ptfV.$i.$j.gz &> /dev/null; 
   if [[ $? -ne 0 ]]
-  then 
-     nl=$(zcat t2ptfV.$i.$j.gz|wc -l)
-     nl=$((nl-1));
+  then nl=$(zcat t2ptfV.$i.$j.gz|wc -l)
+     nl=$((nl-1)); 
      mv t2ptfV.$i.$j.gz t2ptfV.$i.$j.gz.old
-     echo mv t2ptfV.$i.$j.gz t2ptfV.$i.$j.gz.old
      zcat t2ptfV.$i.$j.gz.old | head -$nl | gzip > t2ptfV.$i.$j.gz0
      l=$(zcat t2ptfV.$i.$j.gz0|tail -1 | cut -d\; -f2)
      l1=$(zcat t2ptfV.$i.$((j+1)).gz|head -1|cut -d\; -f2)
      n=$(grep $l tree_$i.idx|cut -d\; -f1)
      n1=$(grep $l1 tree_$i.idx|cut -d\; -f1)
      echo perl $HOME/lookup/t2ptf.perl $j $n $n1 t2ptfV.$i.$j.gz1
-     perl $HOME/lookup/t2ptf.perl $i $n $n1 | gzip > t2ptfV.$i.$j.gz1
   fi
 fi
 
@@ -151,12 +230,15 @@ j=PRT
 i=FROM
 if [[ -f t2ptfV.$i.$j.gz.old && ! -s t2ptfV.$i.$j.gz1 ]]
 then
-    l=$(zcat t2ptfV.$i.$j.gz0|tail -1 | cut -d\; -f2)
-    l1=$(zcat t2ptfV.$i.$((j+1)).gz|head -1|cut -d\; -f2)
-    n=$(grep $l tree_$i.idx|cut -d\; -f1)
-    n1=$(grep $l1 tree_$i.idx|cut -d\; -f1)
-    inc=$(echo "($n1-$n)/4" | bc)
-    perl $HOME/lookup/t2ptf.perl $i $((n+inc*2)) $n1 | gzip > t2ptfV.$i.$j.gz1d
+  l=$(zcat t2ptfV.$i.$j.gz0|tail -1 | cut -d\; -f2)
+  if [[ -f t2ptfV.$i.$((j+1)).gz ]]
+  then l1=$(zcat t2ptfV.$i.$((j+1)).gz|head -1|cut -d\; -f2)
+  else l1=$(zcat t2ptfV.$i.$((j+1)).gz.old|head -1|cut -d\; -f2)
+  fi
+  n=$(grep $l tree_$i.idx|cut -d\; -f1)
+  n1=$(grep $l1 tree_$i.idx|cut -d\; -f1)
+  inc=$(echo "($n1-$n)/4" | bc)
+  perl $HOME/lookup/t2ptf.perl $i $((n+inc*2)) $n1 | gzip > t2ptfV.$i.$j.gz1d
 fi
 
 fi
@@ -166,12 +248,12 @@ j=PRT
 i=FROM
 if [[ -f t2ptfV.$i.$j.gz.old && ! -s t2ptfV.$i.$j.gz1 ]]
 then
-    l=$(zcat t2ptfV.$i.$j.gz0|tail -1 | cut -d\; -f2)
-    l1=$(zcat t2ptfV.$i.$((j+1)).gz|head -1|cut -d\; -f2)
-    n=$(grep $l tree_$i.idx|cut -d\; -f1)
-    n1=$(grep $l1 tree_$i.idx|cut -d\; -f1)
-    inc=$(echo "($n1-$n)/4" | bc)
-    perl $HOME/lookup/t2ptf.perl $i $((n+inc)) $((n+inc*2)) | gzip > t2ptfV.$i.$j.gz1c
+  l=$(zcat t2ptfV.$i.$j.gz0|tail -1 | cut -d\; -f2)
+  l1=$(zcat t2ptfV.$i.$((j+1)).gz|head -1|cut -d\; -f2)
+  n=$(grep $l tree_$i.idx|cut -d\; -f1)
+  n1=$(grep $l1 tree_$i.idx|cut -d\; -f1)
+  inc=$(echo "($n1-$n)/4" | bc)
+  perl $HOME/lookup/t2ptf.perl $i $((n+inc)) $((n+inc*2)) | gzip > t2ptfV.$i.$j.gz1c
 fi
 
 fi
@@ -181,31 +263,31 @@ j=PRT
 i=FROM
 if [[ -f t2ptfV.$i.$j.gz.old && ! -s t2ptfV.$i.$j.gz1 ]]
 then
-    l=$(zcat t2ptfV.$i.$j.gz0|tail -1 | cut -d\; -f2)
-    l1=$(zcat t2ptfV.$i.$((j+1)).gz|head -1|cut -d\; -f2)
-    n=$(grep $l tree_$i.idx|cut -d\; -f1)
-    n1=$(grep $l1 tree_$i.idx|cut -d\; -f1)
-    inc=$(echo "($n1-$n)/4" | bc)
-    perl $HOME/lookup/t2ptf.perl $i $n $((n+inc)) | gzip > t2ptfV.$i.$j.gz1b
+  l=$(zcat t2ptfV.$i.$j.gz0|tail -1 | cut -d\; -f2)
+  l1=$(zcat t2ptfV.$i.$((j+1)).gz|head -1|cut -d\; -f2)
+  n=$(grep $l tree_$i.idx|cut -d\; -f1)
+  n1=$(grep $l1 tree_$i.idx|cut -d\; -f1)
+  inc=$(echo "($n1-$n)/4" | bc)
+  perl $HOME/lookup/t2ptf.perl $i $n $((n+inc)) | gzip > t2ptfV.$i.$j.gz1b
 fi
 
 fi
 if test 'WHAT' == 't2ptfFix2'; then
 
-i=PRT
-j=FROM
+j=PRT
+i=FROM
 if [[ -f t2ptfV.$i.$j.gz3 ]]
-then zcat t2ptfV.$i.$j.gz3 &> /dev/null;
+then zcat t2ptfV.$i.$j.gz3 &> /dev/null; 
   if [[ $? -ne 0 ]]
   then nl=$(zcat t2ptfV.$i.$j.gz3|wc -l)
-     nl=$((nl-1));
+     nl=$((nl-1)); 
      mv t2ptfV.$i.$j.gz3 t2ptfV.$i.$j.gz3.old
      zcat t2ptfV.$i.$j.gz3.old | head -$nl | gzip > t2ptfV.$i.$j.gz4
      l=$(zcat t2ptfV.$i.$j.gz4|tail -1 | cut -d\; -f2)
      l1=$(zcat t2ptfV.$i.$((j+1)).gz|head -1|cut -d\; -f2)
      n=$(grep $l tree_$i.idx|cut -d\; -f1)
      n1=$(grep $l1 tree_$i.idx|cut -d\; -f1)
-     perl $HOME/lookup/t2ptf.perl $j $n $n1 | gzip > t2ptfV.$j.PRT.gz5
+     perl $HOME/lookup/t2ptf.perl $i $n $n1 | gzip > t2ptfV.$i.$j.gz5
    fi
 fi
 
@@ -213,26 +295,33 @@ fi
 if test 'WHAT' == 't2ptfFix1'; then
 
 
-i=PRT
-j=FROM
+j=PRT
+i=FROM
 
 if [[ -f t2ptfV.$i.$j.gz1 ]]
-then zcat t2ptfV.$i.$j.gz1 &> /dev/null;
+then zcat t2ptfV.$i.$j.gz1 &> /dev/null; 
   if [[ $? -ne 0 ]]
   then nl=$(zcat t2ptfV.$i.$j.gz1|wc -l)
-     nl=$((nl-1));
+     nl=$((nl-1)); 
      mv t2ptfV.$i.$j.gz1 t2ptfV.$i.$j.gz1.old
      zcat t2ptfV.$i.$j.gz1.old | head -$nl | gzip > t2ptfV.$i.$j.gz2
      l=$(zcat t2ptfV.$i.$j.gz2|tail -1 | cut -d\; -f2)
      l1=$(zcat t2ptfV.$i.$((j+1)).gz|head -1|cut -d\; -f2)
      n=$(grep $l tree_$i.idx|cut -d\; -f1)
      n1=$(grep $l1 tree_$i.idx|cut -d\; -f1)
-     perl $HOME/lookup/t2ptf.perl $j $n $n1 | gzip > t2ptfV.$j.PRT.gz3
+     perl $HOME/lookup/t2ptf.perl $i $n $n1 | gzip > t2ptfV.$i.$j.gz3
    fi
 fi
 
 fi
+if test "WHAT" = 'b2ptfsplit'; then
 
+for i in {0..3}
+do j=$((FROM*4+i))
+   zcat b2ptf$j.gz 
+done | grep ^b | cut -d\; -f2- | perl -I $HOME/lib/perl5 -I $HOME/lookup  $HOME/lookup/splitSec.perl b2ptf.FROM. 128
+
+fi
 if test "WHAT" = 'b2ptfsrt'; then
 #to complet b2f
 

@@ -61,7 +61,7 @@ if ($type eq "P2p"){
          $d{p2P}{$a} = $pP; 
          $d{ff}{$a}++;
          $d{P2p}{$pP}{$a}++;
-         print STDERR "$a;$pP\n" if $a eq "izio7_ios-messaging-tutorial" || $pP eq "izio7_ios-messaging-tutorial";
+         # print STDERR "$a;$pP\n" if $a eq "izio7_ios-messaging-tutorial" || $pP eq "izio7_ios-messaging-tutorial";
       };
       %tmp = ();
     }
@@ -86,14 +86,14 @@ if ($type eq "P2p"){
     $P = lc ($P);
     $R = lc ($R);
     #next if !defined $d{ff}{$p} && !defined $d{ff}{$r};
-    print STDERR "debug;$p;$r;$P;$R;$d{p2P}{$P};$d{p2P}{$R}\n" if $P eq "izio7_ios-messaging-tutorial" || $R eq "izio7_ios-messaging-tutorial";      
+    #print STDERR "debug;$p;$r;$P;$R;$d{p2P}{$P};$d{p2P}{$R}\n" if $P eq "izio7_ios-messaging-tutorial" || $R eq "izio7_ios-messaging-tutorial";      
     if (defined $d{p2P}{$P}){
       $d{parents}{$d{p2P}{$P}}{$r}{$p}++;
-      print STDERR "parents;$p;$r;$P;$R;$d{p2P}{$p}\n";      
+      #print STDERR "parents;$p;$r;$P;$R;$d{p2P}{$p}\n";      
     }
     if (defined $d{p2P}{$R}){
       $d{forks}{$d{p2P}{$R}}{$p}++;
-      print STDERR "forks;$p;$r;$P;$R;$d{p2P}{$p}\n";      
+      #print STDERR "forks;$p;$r;$P;$R;$d{p2P}{$p}\n";      
     }
   }
   #  zcat ght.watchers.date.gz | perl ~/lookup/mp.perl 0 p2P$ver.s | gzip > ght.P2w$ver.gz
@@ -135,31 +135,39 @@ for my $ty ($type){
   $cnt = 0;
   %tmp = ();
   $pP = "";
-  my $pre ="";
-  $pre = "../c2fb/" if $ty =~ /P2[bf]|Pnfb/;
+  my $pre ="";#P2tAllPkg?
+  $pre = "../c2fb/" if $ty =~ /P2[bf]|P2nfb/;
+  $pre = "../c2fb/" if $ty =~/P2tAlPkg/;
   my $str = "zcat $pre${ty}Full$v$s.s |";
   $str = 'zcat P2cFull'.$v.'{'.$s.",".($s+32).",".($s+64).",".($s+96).'}'.'.s|' if $ty eq "P2c"; 
   open A, $str;
   while (<A>){
     chop ();
-    my ($p, $c) = split (/;/, $_, -1);
+    my ($p, $c, @rest) = split (/;/, $_, -1);
     $process = 1 if ($process == 0 && $p eq $start); 
     next if ! $process;
-    if ($ty ne "Pnfb" && $pP ne "" && $pP ne $p){
+    if ($ty ne "P2nfb" && $pP ne "" && $pP ne $p){
       print "$pP;$ty=".(scalar(keys %tmp))."\n";
       if ($ty eq "P2f"){
         doExt ($pP, \%tmp);
+      }
+      if ($ty eq "P2tAlPkg"){
+        doAPI ($pP, \%tmp);
       }
       doG ($pP, \%tmp) if ($ty eq "P2g");
       %tmp = ();
       print STDERR "$s $ty $cnt prs\n" if (!($cnt++%1000000));
       #last if $cnt > 1000;
     }else{
-      if ($ty eq "Pnfb"){
+      if ($ty eq "P2nfb"){
         print "$p;$ty=$c\n";
       }
     }
-    $tmp{$c}++;
+    if ($ty eq "P2tAlPkg"){
+      $tmp{$c}{join ";", @rest}++;
+    }else{
+      $tmp{$c}++;
+    }
     $pP = $p;
   } 
 
@@ -179,6 +187,29 @@ sub doG {
   }
   print "\n";
 }
+
+sub doAPI {
+  my ($p, $tmp) = @_;
+  my %api;
+  for my $t (keys %$tmp){
+    for my $v (keys %{$tmp->{$t}}){
+      my ($p, $l, @pkg) = split (/;/, $v);
+      for my $pk (@pkg){
+        $api{$l}{$pk}++;
+      }
+    }
+  }
+  for my $i (keys %api){
+    print "$p;api;$i";
+    for my $v (keys %{$api{$i}}){
+      my $v1 = $v;
+      $v1 =~ s/=/EQ/g;
+      print ";$v1=$api{$i}{$v}";
+    }
+    print "\n";
+  }
+}
+
 
 sub doExt {
   my ($p, $tmp) = @_;

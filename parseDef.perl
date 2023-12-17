@@ -146,11 +146,12 @@ my $s = $ARGV[0];
 my $from = defined $ARGV[1] ? $ARGV[1] : -1;
 my $to = defined $ARGV[2] ? $ARGV[2] : -1;
 open A, "zcat /da5_data/All.blobs/blob_$s.idxf|";
-open Z, "blob_TU_$s.idx";
-my @x = split (/;/, <Z>);
-$from = $x[0];
-while (<Z>){@x=split (/;/, $_);}
-$to = $x[0];
+##open Z, "blob_TU_$s.idx";
+#open Z, "blob_UV_$s.idx";
+#my @x = split (/;/, <Z>);
+#$from = $x[0];
+#while (<Z>){@x=split (/;/, $_);}
+#$to = $x[0];
 print STDERR "from=$from to=$to\n";
 
 open B, "/data/All.blobs/blob_$s.bin";

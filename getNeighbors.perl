@@ -46,8 +46,8 @@ my $split = 32;
 my %dat; 
 sub myOpen {
   my ($k, $s) = @_;
-  my $ver = "T";
-  my $pVer= "S";
+  my $ver = "V";
+  my $pVer= "U";
   $ver = $pVer if (! -f "/da5_fast/${k}Full$ver.$s.tch");
   # print STDERR "${k}Full$ver.$s.tch\n";
   if (!defined $dat{$k}{$s}){

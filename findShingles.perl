@@ -5,9 +5,9 @@ use warnings;
 use strict;
 use File::Temp qw/ :POSIX /;
 use woc;
-
+my $ver = $ARGV[0];
 my %fix;
-open A, "eMap.fix";
+open A, "eMap$ver.fix";
 while (<A>){
   chop ();
   my ($a, $b) = split (/\;/);
@@ -15,7 +15,7 @@ while (<A>){
 }
 
 my (%badE, %badU);
-open BE, "bad.e";
+open BE, "bad$ver.e";
 while (<BE>){
   chop();
   my ($e, $n) = split(/;/, $_);
@@ -29,7 +29,7 @@ $badU{""}=1000;
 my %badN;
 my %badFN;
 my %badLN;
-open BE, "bad.fl";
+open BE, "bad$ver.fl";
 while (<BE>){
   chop();
   my ($fn, $ln, $c) = split(/;/, $_);
@@ -55,7 +55,7 @@ while (<BE>){
 $badLN{""}=1000;
 $badFN{""}=1000;
 my %badGH;
-open BE, "bad.gh";
+open BE, "bad$ver.gh";
 while (<BE>){
   chop();
   my ($gh, $n) = split(/;/, $_);
@@ -63,7 +63,7 @@ while (<BE>){
 }
 $badGH{""}=1000;
 
-open A, "zcat CmtT.split|";
+open A, "zcat Cmt$ver.split|";
 my %bin;
 while(<A>){
   chop();
@@ -81,7 +81,9 @@ while(<A>){
   $bin{u}{$u}{$id}++ if defined $badU{$u} && $badU{$u} < 100;
 }
 for my $t ("fn", "ln", "n", "e", "gh", "u"){
-  my @ks = sort { scalar ($bin{$t}{$a}) <=> scalar ($bin{$t}{$b}) }  (keys %{$bin{$t}});
+  my @kall = keys %{$bin{$t}};
+  print STDERR "$t;$#kall\n";
+  my @ks = sort { scalar (keys %{$bin{$t}{$a}}) <=> scalar (keys %{$bin{$t}{$b}}) }  (@kall);
   for my $a (@ks){
     my @vs = keys %{$bin{$t}{$a}};
     my $nn = scalar (@vs);

@@ -26,7 +26,7 @@ suff=".31.tch"
 [[ $t =~ ^(A2a|P2p|a2A|p2P)$ ]] && suff=".tch"
 
 for hh in da5 da3 da4
-do for v in U T S R
+do for v in V U T S R
   do #echo /${hh}_fast/${t}Full$v$suff
      if [[ -f /${hh}_fast/${t}Full$v$suff ]]
      then lastVer=$v
@@ -34,8 +34,20 @@ do for v in U T S R
           break
      fi
   done
-  [[ $lastVer -ne "" ]] && break
+  [[ $lastVer != "" ]] && break
 done
+
+if [[ $lastH == "" ]]; then
+for v in V U T S R
+do if [[ -f /da0_data/basemaps/${t}Full$v$suff ]]
+  then 
+    lastVer=$v
+    lastH=da0
+    break
+  fi
+done
+fi
+
 if [[ $lastH.eecs.utk.edu == $h ]] 
 then 
  ~/lookup/getValues.perl --flat=$flat /fast/${t}Full$lastVer
