@@ -262,7 +262,8 @@ ctagsUV_b2ob -> idxf_b2ob;
 PlPkg -> invPkgm_b2ob -> invPkg_b2ob -> b2lPkg;
 invPkg_b2ob -> b2P128
 
-b2tk_b2ob -> tkRefile1_b2ob -> tkRefile_b2ob -> ctagsUV_b2ob;
+b2tk -> b2tk_b2ob -> tkRefile1_b2ob -> tkRefile_b2ob -> ctagsUV_b2ob;
+tk2b -> b2tk_b2ob
 Pkg2lP -> Pkg2lPmm_b2ob -> Pkg2lP-> Pkg2lPm_b2ob -> Pkg2lP_b2ob -> b2lPkg
 Pkg2lP_b2ob -> b2P128
 
