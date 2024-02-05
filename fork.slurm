@@ -1,32 +1,36 @@
 #!/bin/bash
-#SBATCH -J WHAT.PRT
+#SBATCH -J fFROM.WHAT.PRT
 #SBATCH -A ACF-UTK0011
+#SBATCH -p campus-beacon-long
+##SBATCH -p campus-skylake
+#SBATCH -q campus
 #SBATCH --nodes=1 
 #SBATCH --ntasks-per-node=NTASKS
-#SBATCH --partition=campus
 #SBATCH --time=0-23:59:59
-#SBATCH --error WHAT.PRT.o%J
-#SBATCH --output WHAT.PRT.o%J
+#SBATCH --error frk.WHAT.FROM.PRT.o%J
+#SBATCH --output frk.WHAT.FROM.PRT.o%J
 #SBATCH --mail-user=audris@utk.edu
 #SBATCH --mail-type=FAIL
+LD_LIBRARY_PATH=$HOME/lib:$HOME/lib64:$LD_LIBRARY_PATH
 
-module purge
-module load bzip2/1.0.8  intel-compilers/2021.2.0
-
-LD_LIBRARY_PATH=/nfs/home/audris/lib:/nfs/home/audris/lib64:$LD_LIBRARY_PATH
-
-c=/lustre/isaac/scratch/audris/gz
+c=/lustre/haven/user/audris/gz
 cd $c
 
-maxM=1000
-ver=V
-prt=PRT
+
+machine=MACHINE
+maxM=4000
+[[ $machine == monster ]] && maxM=30000
+[[ $machine == rho ]] && maxM=900
+[[ $machine == sigma ]] && maxM=2900
+
+prt=FROM
+ver=VER
 
 if test 'WHAT' = 'p2p'; then
 
 #for i in {0..3}
 #do j=$(($prt*4+$i))
-j=PRT
+j=FROM
 zcat c2pFull${ver}$j.s | perl $HOME/lookup/connectExportPreNoExclude.perl | gzip > c2pFull$ver$j.p2p
 echo c2pFull$ver$j.p2p
 zcat c2pFull$ver$j.p2p | perl -ane 'chop();($c,@x) = split(/;/); print "".(join ";", (sort @x))."\n";' | gzip > c2pFull$ver$j.p2p.gz 
@@ -60,22 +64,13 @@ echo c2pFull$ver.np2p.s
 
 fi
 if test 'WHAT' = 'defork'; then
-
-	# use community detection on c2pFull$ver.np2p to get
+# use community detection on c2pFull$ver.np2p to get
 # c2pFullS.np2p.PLMmap.forks and c2pFullS.np2pw.PLMmap.forks
 #zcat p$ver.s | awk -F\; '{print $1";"$1}' | perl ~/lookup/mp.perl 1 c2pFull$ver.np2pu.PLMmap.forks | gzip > p2P$ver.s
 #zcat p2P$ver.s | awk -F\; '{print $2";"$1}' | lsort 3G -t\; -k1,2 | gzip > P2p$ver.s 
 
-#zcat c2pFull$ver.np2p.s | perl connectExportVw.perl c2pFull$ver.np2p
-#zcat /data/c2pFull$ver.np2p.versions | /home/audris/src/networkit/cluster $(zcat /data/c2pFull$ver.np2p.names|wc -l)  | gzip > /data/c2pFull$ver.np2pu.PLM
-#n=c2pFullV5.np2pu
-#zcat ${n}.PLM | perl rankNew.perl c2pFull$ver.np2p 1 | gzip >  ${n}.crank.map
-#perl reRank.perl 2> err3 | gzip > p2PV.s
-
-
-
 for i in {0..1}
-do j=$((PRT*2+$i))
+do j=$((FROM*2+$i))
   #zcat c2pFull$ver$j.s | perl ~/lookup/mp.perl 1 c2pFull$ver.np2pu.PLMmap.forks | uniq | lsort ${maxM}M -t\; -k1,2 -u | gzip > c2PFull$ver$j.s
   zcat c2pFull$ver$j.s | perl ~/lookup/mp.perl 1 p2P$ver.s | uniq | lsort ${maxM}M -t\; -k1,2 -u | gzip > c2PFull$ver$j.s
   echo c2PFull$ver$j.s
@@ -90,7 +85,7 @@ fi
 if test 'WHAT' = 'deforkT'; then
 
 for i in 0
-do j=$((PRT+$i))
+do j=$((FROM+$i))
   zcat ../c2fb/b2P128Full$ver.$j.gz | perl ~/lookup/mp.perl 1 t2PFull$ver.np2pw.crank.map | uniq | lsort ${maxM}M -t\; -k1,2 -u | gzip > ../c2fb/b2TFull$ver$j.s
   echo ../c2fb/b2TFull$ver$j.s
 done
@@ -100,7 +95,7 @@ fi
 if test 'WHAT' = 'deforklw'; then
 
 for i in {0..3}
-do j=$((PRT*4+$i))
+do j=$((FROM*4+$i))
   zcat c2pFull$ver$j.s | perl ~/lookup/mp.perl 1 c2pFull$ver.np2plw.PLMmap.forks | uniq | lsort ${maxM}M -t\; -k1,2 -u | gzip > c2PuFull$ver$j.s
   echo c2PuFull$ver$j.s
 done
@@ -109,21 +104,21 @@ fi
 if test 'WHAT' = 'deforkP'; then
 
 for i in {0..7}
-do j=$((PRT*8+$i))
+do j=$((FROM*8+$i))
    zcat c2PFull$ver$j.s
-done |perl -ane 'chop();@x=split(/;/, $_, -1); print "$x[1];$x[0]\n";' | perl $HOME/lookup/splitSecCh.perl P2cFull$ver.PRT. 128
+done |perl -ane 'chop();@x=split(/;/, $_, -1); print "$x[1];$x[0]\n";' | perl $HOME/lookup/splitSecCh.perl P2cFull$ver.FROM. 128
 echo P2cFull$ver$j.s
 
 for j in {0..127}
-do zcat P2cFull$ver.PRT.$j.gz | lsort ${maxM}M -t\; -k1,2 -u | gzip > P2cFull$ver.PRT.$j.s
-   echo P2cFull$ver.PRT.$j.s
+do zcat P2cFull$ver.FROM.$j.gz | lsort ${maxM}M -t\; -k1,2 -u | gzip > P2cFull$ver.FROM.$j.s
+>>>>>>> 5216a1205464d0ca892b0ded28b28b0d004ee752
 done
 
 fi
 if test 'WHAT' = 'deforkPm'; then
 
 for i in {0..7}
-do j=$((PRT*8+$i))
+do j=$((FROM*8+$i))
   str="$HOME/bin/lsort ${maxM}M -t\; -k1b,2 --merge -u"
   for k in {0..15}; do str="$str <(zcat P2cFull$ver.$k.$j.s)"; done
   eval $str | gzip > P2cFull$ver$j.s
