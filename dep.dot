@@ -91,7 +91,9 @@ p2a [ shape=diamond style=filled fillcolor=yellow ];
 p2c [ shape=diamond style=filled fillcolor=yellow ];
 
 
+b2ptf -> b2ptfMrgJ_b2ptf-> b2ptfSplSrt_b2ptf -> b2ptfSplit_b2ptf -> b2ptf_b2ptf -> tree
 
+t2ptf -> t2ptfMrgJ_b2ptf-> t2ptfSplSrt_b2ptf -> t2ptfSplit_b2ptf -> t2ptf_b2ptf -> tree
 
 #c
 c2dat -> c2dat_c2ta -> commit_idx
@@ -138,6 +140,7 @@ b2f->b2fm_b2ob -> b2f_b2ob -> c2fbb;
 c2b->c2b_b2ob -> c2fbb;
 c2f->c2f_b2ob -> c2fbb;
 b2ta->b2tam_b2ob-> b2ta_b2ob -> c2fbb;
+b2ta_b2ob -> c2dat;
 P2b_b2ob -> c2b;
 P2b_b2ob -> c2P;
 P2b->P2bm_b2ob->P2b_b2ob
