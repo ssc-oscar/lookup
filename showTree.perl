@@ -85,9 +85,9 @@ sub prtTree {
       my ($mode,$name,$bytes) = (oct($1),$2,$3);
       $name =~ s/\n/__NEWLINE__/g;
       print "$top;" if ($debug == 3);
-      printf "%06o;%s;$off/%s\n",
+      printf "%06o;%s;%s/%s\n",
         $mode, #($mode == 040000 ? "tree" : "blob"),
-        unpack("H*", $bytes), $name;
+        unpack("H*", $bytes), $off, $name;
       if ($debug == 3 && $mode == 040000){
         getTree (unpack("H*", $bytes), "$off/$name");
       }

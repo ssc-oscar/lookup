@@ -599,6 +599,9 @@ our %largeTreePrj = (
 );
 
 our %badProjects = (
+  "rphsoftware_github-moment-v4" => 'NumCoe=729921', 
+  "blacktop_configs" => "1279f0a24e05464b67c5ebb8adc2a8eac5983a51",
+  "tocisz_git_bomb-repo" => "4b825dc642cb6eb9a060e54bf8d69288fbee4904",
   "libpoetry_title" => "e0f11a95c63597493328fa46f2205412d6b6f07d gas over 21M files",
   "jleedev_gitbomb" => "03cb3eb9c22e21e2475fee4fb6013718a2fa39fb has 100000000 files",
   "bitzhoumy_helloworld" => "damaged trees",

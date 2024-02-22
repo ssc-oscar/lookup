@@ -7,7 +7,10 @@ off=${3:-0}
 fmt=${2:-0}
 
 
-
+if [[ $t != 'blob' && $t != 'tree' && $t != 'commit' && $t != 'tag' ]]
+then echo "no type $t"
+   exit
+fi
 
 if [[ $h == da5.eecs.utk.edu ]] 
 then 
@@ -32,7 +35,7 @@ else
   else # commit/'tdiff'/'tkns'  
     if [[ $t == 'tdiff' || $t == 'tkns' ]]
     then 
-      off=0
+      off=1
       ssh da3 ~/lookup/showCnt.perl $t $fmt $off
     else  #commit
       if [[ $h == 'da4.eecs.utk.edu' ]]
