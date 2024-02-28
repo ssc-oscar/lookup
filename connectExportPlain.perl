@@ -19,6 +19,7 @@ while(<STDIN>){
   my ($a, $b) = split(/\;/, $_, -1);
   if ($pa ne "" && $pa ne $a){
     out ();
+    %tmp=();
   }
   $tmp{$b}++;
   $pa = $a;

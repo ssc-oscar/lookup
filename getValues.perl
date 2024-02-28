@@ -186,9 +186,32 @@ while (<STDIN>){
       my ($t, $a) = split(/;/, substr($v, 0, length($v)-20));
       $res = ";$t;$a;$c"; 
     }
+    if ($f2 eq "2sh"){
+      $res = "";
+      my $tlen = length($v);
+      while ($tlen > 20){
+        my $ns = index($v, ';');
+        #print ("$ns;$tlen\n");
+        my $t = substr($v, 0, $ns); 
+        $tlen -= $ns;
+        $v = substr($v, $ns+1, $tlen);
+        
+        $ns = index($v, ';');
+        #print ("$ns;$tlen\n");
+        my $a = substr($v, 0, $ns);
+        $tlen -= $ns;
+        $v = substr($v, $ns+1, $tlen);
+        
+        my $c = substr($v, 0, 20);
+        $c = toHex($c);
+        $tlen -= 20;
+        $v = substr($v, 20+1, $tlen) if $tlen > 20;
+        $res .= ";$t;$a;$c";
+      }
+    }
 	  if ($flat eq "n"){
       if ($extra eq  ""){
-		    print "$ch$res\n";
+        print "$ch$res\n";
 	    }else{ 
         print "$ch;$extra$res\n";
       }
@@ -215,7 +238,8 @@ while (<STDIN>){
         }
       }else{
         for my $ii (0..($#vvs/$group)){
-          print "$ch;$vvs[$ii*$group];$vvs[$ii*$group+1];$vvs[$ii*$group+2]\n";
+            print "$ch;$vvs[$ii*$group];$vvs[$ii*$group+1];$vvs[$ii*$group+2]\n";
+#          }
         }
       }
     }

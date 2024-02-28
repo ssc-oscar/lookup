@@ -44,7 +44,7 @@ my $sections = 128;
     my @x = split(/\;/, $str);
     my ($l, $s, $sec0, $hsha, @rest) = @x;
     $l += $lfix;
-    if ($l + $s > $lmax){
+    if ($l + $s > $lmax || $hsha !~ /^[0-9a-f]{40}$/){
       print STDERR "exceeds size $. l=$l lmax=$lmax lfix=$lfix s=$s hsha=$hsha\n";
       exit();
     }
