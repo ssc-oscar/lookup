@@ -209,6 +209,33 @@ fi | perl -I ~/lib -I ~/lib64/perl5 ~/lookup/cmputeDiff3CT.perl All.sha1o 2> UV.
 
 
 fi
+if test 'WHAT' == 'diffV1miss'; then
+
+i=FROM
+cat VV1.$i.cs.miss | perl -I ~/lib -I ~/lib64/perl5 ~/lookup/cmputeDiff3CT.perl All.sha1o 2> VV1.$i.65.err |  $HOME/lookup/compactDiff.perl | gzip > VV1.$i.65.gz
+
+fi
+if test 'WHAT' == 'diffV2'; then
+
+base=V1_1V2
+j=PRT
+i=FROM
+./V2.sh $i $j $base
+
+fi
+if test 'WHAT' == 'diffV2Fix'; then
+
+j=PRT
+i=FROM
+./fixV2.1.sh $i $j
+
+fi
+if test 'WHAT' == 'diffV1_1'; then
+
+i=FROM
+zcat V1V1_1.$i.cs | perl -I ~/lib -I ~/lib64/perl5 ~/lookup/cmputeDiff3CT.perl All.sha1o 2> V1V1_1.$i.err | perl $HOME/lookup/compactDiff.perl | gzip > V1V1_1.$i.gz
+
+fi
 if test 'WHAT' == 'diffV1'; then
 j=PRT
 inc=38000
@@ -234,6 +261,13 @@ if test 'WHAT' == 'diffV1Fix2'; then
 j=PRT
 i=FROM
 ./fixV1.2.sh $i $j
+
+fi
+if test 'WHAT' == 'diffV1Fix3'; then
+
+j=PRT
+i=FROM
+./fixV2.2.sh $i $j
 
 fi
 
@@ -287,8 +321,27 @@ i=FROM
 
 fi
 
+if test 'WHAT' == 'diffV1Merge'; then
+
+i=FROM
+for j in {0..64}
+do zcat VV1.$i.$j.gz | perl $HOME/lookup/compactDiff.perl | lsort 1G -t\; -k1,1 | gzip > VV1.$i.$j.s
+done
+str="lsort 1G -t\; -k1 --merge"
+for j in {0..64}
+do str="$str <(zcat VV1.$i.$j.s)"
+done
+eval $str | gzip > VV1.$i.s
 
 
+fi
+
+if test 'WHAT' == 'diffV1Compact'; then
+
+i=FROM
+zcat VV1.$i.s | perl $HOME/lookup/compactDiff.perl | gzip > VV1.$i.s1
+
+fi
 
 if test "WHAT" = 'b2ptfsplit'; then
 

@@ -17,7 +17,7 @@ my $cnt = 0;
 
 if ($type eq "B2b"){
   my %Ps;
-  open A, "zcat b2BFull$v.s |";
+  open A, "zcat b2BFull.$v.s |";
   while (<A>){
     chop();
     my ($p0, $P) = split (/;/, $_, -1);
@@ -26,7 +26,7 @@ if ($type eq "B2b"){
     $d{P}{$p0} = $P;
     $Ps{$P}{$p0}++;
   }
-  open A, "zcat b2BFull$v.s |";
+  open A, "zcat b2BFull.$v.s |";
   while (<A>){
     chop();
     my ($P, $p0) = split (/;/, $_, -1);
@@ -46,7 +46,7 @@ if ($type eq "B2b"){
 }
 if ($type eq "P2p"){
   my %ucP;
-  open A, "zcat ${type}Full$v.$s.gz |";
+  open A, "zcat ${type}Full.$v.$s.gz |";
   $cnt = 0;
   while (<A>){
     chop();
@@ -139,7 +139,7 @@ for my $ty ($type){
   $pre = "../c2fb/" if $ty =~ /P2[bf]|P2nfb/;
   $pre = "../c2fb/" if $ty =~/P2tAlPkg/;
   my $str = "zcat $pre${ty}Full$v$s.s |";
-  $str = 'zcat P2cFull'.$v.'{'.$s.",".($s+32).",".($s+64).",".($s+96).'}'.'.s|' if $ty eq "P2c"; 
+  $str = 'zcat P2cFull.'.$v.'.{'.$s.",".($s+32).",".($s+64).",".($s+96).'}'.'.s|' if $ty eq "P2c"; 
   open A, $str;
   while (<A>){
     chop ();
