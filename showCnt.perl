@@ -35,6 +35,7 @@ my $fbasec="All.sha1c/${type}_";
 if ($type eq "blob" || ($type =~ /bdiff|commit|tree/ && $ncnt) ){
   $fbasec="All.sha1o/sha1.${type}_";
 }
+#print STDERR "$fbasec\n";
 for my $sec (0 .. ($sections-1)){
   tie %{$fhosc{$sec}}, "TokyoCabinet::HDB", "$pre/${fbasec}$sec.tch", TokyoCabinet::HDB::OREADER | TokyoCabinet::HDB::ONOLCK,  
     16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000

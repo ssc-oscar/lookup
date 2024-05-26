@@ -44,8 +44,7 @@ while(<STDIN>){
   %cmd = ();
  }
  if ($type eq "blob"){
-		#$cmd{$type}{$sha}{$file}++;
-		$cmd{$type}{$sha}++;
+    $cmd{$type}{$sha} = $file;
  }else{
   $cmd{$type}{$sha}++;
  }
@@ -54,37 +53,37 @@ output ();
 
 sub output {
  for my $type ("tag", "tree", "commit", "blob"){
-                my $dir1 = $dir; $dir1 =~ s|/|_|g;
-  my $fnam = "${fbase}.$type.$dir1";
-  open A, ">$fnam";
-  while (my ($k, $v) = each %{$cmd{$type}}){
-   if ($type eq "blob"){
+   my $dir1 = $dir; $dir1 =~ s|/|_|g;
+   my $fnam = "${fbase}.$type.$dir1";
+   open A, ">$fnam";
+   while (my ($k, $v) = each %{$cmd{$type}}){
+     if ($type eq "blob"){
 				#for my $h (keys %{$v}){
 				#	print A "$k;$h\n";
 				#}
+        print A "$k;$cmd{$type}{$k}\n";
+     }else{
         print A "$k\n";
-   }else{
-    print A "$k\n";
-   }
+     }
   } 
-    close A;
+  close A;
 
   if ($type eq "tree"){
-   open A, "cat $fnam | $ENV{HOME}/bin/grabft $dir |";
-   my $state = 0;
-     my ($rem, $line) = ("", "");
-     while (<A>){
-        if ($state == 0){
-     $rem = $_;
-           $state = 1;
-        } else {
-          if ($state == 1){
-            if ($rem eq "$_"){
-               $state = 0;
-               chop ($rem);
-       chop ($line);
-               my ($cnst,$hsha1, $entries, $cnst1) = split(/\;/, $rem, -1);
-       my $sec = hex (substr($hsha1, 0, 2)) % $sections;
+    open A, "cat $fnam | $ENV{HOME}/bin/grabft $dir |";
+    my $state = 0;
+    my ($rem, $line) = ("", "");
+    while (<A>){
+      if ($state == 0){
+        $rem = $_;
+        $state = 1;
+      } else {
+        if ($state == 1){
+          if ($rem eq "$_"){
+            $state = 0;
+            chop ($rem);
+            chop ($line);
+            my ($cnst,$hsha1, $entries, $cnst1) = split(/\;/, $rem, -1);
+            my $sec = hex (substr($hsha1, 0, 2)) % $sections;
        if (length ($line) == 0){
         #print STDERR "Empty:$hsha1;$dir/$f/$cmt\n";
         next;
