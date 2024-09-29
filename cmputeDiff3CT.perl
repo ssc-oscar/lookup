@@ -45,8 +45,8 @@ for my $sec (0 .. ($sections-1)){
   tie %{$fhoc{$sec}}, "TokyoCabinet::HDB", "$preO/sha1.commit_$sec.tch", TokyoCabinet::HDB::OREADER,  
         16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
      or die "can't open $pre/commit_$sec.tch\n";
-  open $fhob{$sec}, "tree_$sec.bin" or die "$!";
-  open $fhocb{$sec}, "commit_$sec.bin" or die "$!";
+  open $fhob{$sec}, "/data/All.blobs/tree_$sec.bin" or die "$!";
+  open $fhocb{$sec}, "/data/All.blobs/commit_$sec.bin" or die "$!";
 }
 
 
@@ -110,6 +110,7 @@ while(<STDIN>){
         next;
       }
     }
+    #print STDERR "$tree, $treeP\n";
     separate2T ($rev, $parent, "", $tree, $treeP);
   }else{
     #commit with no parents; added missing created parameter to put blobs in the right column
@@ -322,7 +323,7 @@ sub getTO {
   #my $curpos = tell($f);
   my $codeC = "";
   my $rl = read ($f, $codeC, $len);
-  #  print STDERR "tree $t1 $sec $off $len $rl\n";
+  #print STDERR "tree $t1 $sec $off $len $rl\n";
   if (defined $codeC && length ($codeC) > 0){
     return safeDecomp ($codeC, "tree $t1 $sec $off $len $rl\n");
   }else{
