@@ -29,7 +29,7 @@ my (%c2p, %p2c, %b2c, %c2f);
 #my $prj = "";
 my $pre = "/fast/All.sha1c";
 my $preO = "/fast/All.sha1o";
-$pre = $ARGV[0] if defined $ARGV[0];
+$preO = $ARGV[0] if defined $ARGV[0];
 
 my $sections = 128;
 # need to update the tree_$sec.tch first ... for new data. like update0 and update1...
@@ -45,8 +45,8 @@ for my $sec (0 .. ($sections-1)){
   tie %{$fhoc{$sec}}, "TokyoCabinet::HDB", "$preO/sha1.commit_$sec.tch", TokyoCabinet::HDB::OREADER,  
         16777213, -1, -1, TokyoCabinet::TDB::TLARGE, 100000
      or die "can't open $pre/commit_$sec.tch\n";
-  open $fhob{$sec}, "/data/All.blobs/tree_$sec.bin" or die "$!";
-  open $fhocb{$sec}, "/data/All.blobs/commit_$sec.bin" or die "$!";
+  open $fhob{$sec}, "tree_$sec.bin" or die "$!";
+  open $fhocb{$sec}, "commit_$sec.bin" or die "$!";
 }
 
 

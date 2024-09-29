@@ -3,6 +3,8 @@ use warnings;
 
 my $v = $ARGV[0];
 my $s = $ARGV[1];
+my $fr = 0;
+$fr = $ARGV[3] if defined $ARGV[3];
 
 my %d = ();
 my $pP = "";
@@ -15,28 +17,37 @@ for my $ty ($ARGV[2]){
   $pP = "";
   my $pre = "";
   $pre = "../c2fb/" if $ty =~/A2[bf]/;
-  $pre = "../tkns/" if $ty =~/A2tPllPkg/;
+  $pre = "../c2fb/" if $ty =~/A2tPlPkg/;
   open A, "zcat $pre${ty}Full$v$s.s |";
   while (<A>){
     chop ();
     my ($p, $c, @rest) = split (/;/, $_, -1);
-    if ($pP ne "" && $pP ne $p){
-      print "$pP;$ty=".(scalar(keys %tmp))."\n";
-      #$d{$ty}{$pP} = scalar(keys %tmp);
-      if ($ty eq "A2f"){
-        doExt ($pP, \%tmp);
-      }
-      if ($ty eq "A2tPllPkg"){
-        doAPI ($pP, \%tmp);
-      }
-      %tmp = ();
-      print STDERR "$s $ty $cnt\n" if (!($cnt++%500000));
-      #last if $cnt > 10000;
+    if ($fr > 0){
+      $fr --;
+      next;
     }
-    if ($ty eq "A2tPllPkg"){
-      $tmp{$c}{join ";", @rest}++; 
-    }else{
-      $tmp{$c}++;
+    my ($p, $c, @rest) = split (/;/, $_, -1);
+    if ($pP ne "" && $pP ne $p){
+      if ($fr > 0){
+        $fr --;
+      }else{
+        print "$pP;$ty=".(scalar(keys %tmp))."\n";
+        #$d{$ty}{$pP} = scalar(keys %tmp);
+        if ($ty eq "A2f"){
+          doExt ($pP, \%tmp);
+        }
+        if ($ty eq "A2tPlPkg"){
+          doAPI ($pP, \%tmp);
+        }
+        %tmp = ();
+        print STDERR "$s $ty $cnt\n" if (!($cnt++%500000));
+        #last if $cnt > 10000;
+      }
+      if ($ty eq "A2tPlPkg"){
+        $tmp{$c}{join ";", @rest}++; 
+      }else{
+        $tmp{$c}++;
+      }  
     }
     $pP = $p;
   }
@@ -53,7 +64,7 @@ sub doAPI {
   my %api;
   for my $t (keys %$tmp){
     for my $v (keys %{$tmp->{$t}}){
-      my ($p, $l, $l1, @pkg) = split (/;/, $v);
+      my ($p, $l, @pkg) = split (/;/, $v);
       for my $pk (@pkg){
         $api{$l}{$pk}++;
       }
