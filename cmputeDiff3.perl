@@ -352,6 +352,7 @@ sub compare {
    
 for my $sec (0 .. ($sections-1)){
         untie %{$fhos{$sec}};
+        untie %{$fhoc{$sec}};
 }
 
 

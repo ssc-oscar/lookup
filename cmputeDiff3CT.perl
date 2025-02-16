@@ -96,6 +96,8 @@ while(<STDIN>){
     my ($treeP, $parentP) = getCT ($parent);
     if ($treeP eq ""){
       print STDERR "no parent commit: $parent for $rev\n";
+      # what to do with missing parent commit?
+      #printTR ($rev, getTO ($tree), "", 1);
       next;
     }
     if ($treeP eq $tree){
@@ -110,11 +112,14 @@ while(<STDIN>){
         next;
       }
     }
-    #print STDERR "$tree, $treeP\n";
     separate2T ($rev, $parent, "", $tree, $treeP);
   }else{
+    my $msg = "no parent for $rev tree $tree";
     #commit with no parents; added missing created parameter to put blobs in the right column
-    printTR ($rev, getTO ($tree), "", 1);
+    my $str = getTO ($tree);
+    $msg .=  " no tree $tree" if $str eq "";
+    print STDERR "$msg\n";
+    printTR ($rev, $str, "", 1);
   }
 }
 
@@ -209,6 +214,12 @@ sub separate2T {
       }
     }else{
       #potential rename, no need to catch these
+#     my @ns = keys %{$v};
+#     my @ns1 = keys %{$mapP{$v0}};
+#     if ($ns1[0] ne $ns[0]){
+#       print STDERR "rename $pre;@ns;@ns1;$v0H\n";
+#     }
+
     }
   }
   # handle deleted trees
@@ -219,6 +230,7 @@ sub separate2T {
       for my $n (@ns){
         if (!defined $mapI{$n}){
           printTR ($c, getTO ($v0H), "$pre/$n", 0);
+          #print STDERR "del tree :$pre/$n:$v0H\n";
         }
       }
     }
