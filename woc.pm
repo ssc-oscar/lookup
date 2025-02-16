@@ -307,12 +307,19 @@ sub extrCmt {
   my $code = safeDecomp ($codeC, $str);
   my ($tree, $parent, $auth, $cmtr, $ta, $tc, $taz, $tcz) = ("","","","","","");
   my ($pre, @rest) = split(/\n\n/, $code, -1);
+  my $lstFld = "";
   for my $l (split(/\n/, $pre, -1)){
      #print "$l\n";
+     if ($lstFld eq "committer"){
+       push @rest, $l;
+     }
      $tree = $1 if ($l =~ m/^tree (.*)$/);
      $parent .= ":$1" if ($l =~ m/^parent (.*)$/);
      ($auth) = ($1) if ($l =~ m/^author (.*)$/);
-     ($cmtr) = ($1) if ($l =~ m/^committer (.*)$/);
+     if ($l =~ m/^committer (.*)$/){
+       ($cmtr) = ($1);
+       $lstFld = "committer";
+     }
   }
   ($auth, $ta, $taz) = ($1, $2, $3) if ($auth =~ m/^(.*)\s(-?[0-9]+)\s+([\+\-]*\d+)$/);
   ($cmtr, $tc, $tcz) = ($1, $2, $3) if ($cmtr =~ m/^(.*)\s(-?[0-9]+)\s+([\+\-]*\d+)$/);
@@ -387,7 +394,7 @@ sub cleanCmt {
     $cmtr =~ s/;/ /g;
     $taz =~ s/;/ /g;
     $tcz =~ s/;/ /g;
-    my $cm = join '\n', @rest;
+    my $cm = join "\n", @rest;
     $cm =~ s/^\n*//;
     $cm =~ s/\n*$//;
     $cm =~ s/\r//g;
@@ -717,7 +724,13 @@ sub addForks {
 }
 
 
-our %badAuthors = ( 'one-million-repo <mikigal.acc@gmail.com>' => "1M commits", 
+our %badAuthors = ( 
+     'subgit <support@subgit.com>'       => '404022927 A2f',
+    'DANDI Meta-user <dandi@mit.edu>'    => '300876865 A2b',
+    'DANDI Team <help@dandiarchive.org>' => '579046540 A2fb', 
+    'Bot <41898282+github-actions[bot]@users.noreply.github.com>' => '709960003 A2f',
+    'Adam Oswald <adamoswald69420@gmail.com>' => '671534228 A2f',
+    'one-million-repo <mikigal.acc@gmail.com>' => "1M commits", 
    'scraped_page_archive gem 0.5.0 <scraped_page_archive-0.5.0@scrapers.everypolitician.org>' => "4243985C", 
    'Your Name <you@example.com>' => "1829654C",
    'Auto Pilot <noreply@localhost>' => "2063212C",
@@ -775,12 +788,20 @@ our %manypCmt = (
 );
 
 our %badCmt = (
+  "6b4ea721e0b9158d26c4f8fc85ab60c6933f73d1" => 2525848390, # more than that
+  "20ee59241cda54347832afca4a32d8474bc8c01b" => 26332842050,
+  #"20ee829963aeac39eeeb988c921daf4621171210" => 20103, 
+  #"2057885c88327420cfbf2312279f2a5994c7353d" => 625029,
+  "5997f0dd842cc47ae21d55a5089a007c2953194f" => 4000000,
+  "0f5ed20e84dda9684be3b5f7452fc74b53c10029" => 21026665, #diff
+  "a11d34bb5d1c8e0d615361bfa1cfbf34cda8304f" => 10236558, #diff
   "3bc43eae112a4593c59893a5df59742e2ff16a34" => 10000000000,
   "da51fb693d64c202b1782648266e6e12a3f269e0" => 10000000000,
   "c89423063a78259e6a7d13d9b00278a0c5e637b0" => 10000000005,
   "45546f17e5801791d4bc5968b91253a2f4b0db72" => 10000000000,
   "6b4ea721e0b9158d26c4f8fc85ab60c6933f73d1" => 10000000000,
   "03cb3eb9c22e21e2475fee4fb6013718a2fa39fb" => 100000000,
+  #"d97c98db61797184a3773994d09d25f3d3292d11" =>
   "e0f11a95c63597493328fa46f2205412d6b6f07d" => 21155694, # files
   "20ee59241cda54347832afca4a32d8474bc8c01b" => 33324118926,#and much more
   "011c51845b624f1f82653f87017be7a4d8ceaa4d" => 4007698, #lots of renames don't do diff

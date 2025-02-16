@@ -29,7 +29,7 @@ my $group=1; #how many field represent a single unit as in b2tac
 my $offset = 0;
 my $types = $fname;
 $types =~ s|.*/||;
-$types =~ s|Full[A-Z]$||;
+$types =~ s|Full[A-Z][0-9]?$||;
 my ($t1, $t2) = split(/2/, $types);
 $f1 = "s" if ($t1 =~ /^[aAfpP]$/);
 
@@ -79,7 +79,6 @@ if ($types eq "b2tac"){
   $group  = 3;
 }
 $split = $ARGV[3] if defined $ARGV[3];
-
 sub get {
   my ($c, $s) = @_;
   if (!defined $clones{$s}){

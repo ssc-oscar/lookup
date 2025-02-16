@@ -13,9 +13,9 @@ my $v = $ARGV[0];
 my $s = $ARGV[1];
 my %d;
 for my $ty ("P2tAlPkg", "B2b", "P2A", "P2b", "P2c", "P2f", "P2g", "P2nfb", "P2p", "P2tspan","P2core","P2mnc"){
-  my $str = "zcat ../gz/P2summFull.$ty.$v$s.gz|";
-  $str = "zcat ../c2fb/${ty}Full$v$s.s|" if $ty =~ /P2tspan/;
-  $str = "zcat ../gz/${ty}Full$v$s.s|" if $ty =~ /P2(core|mnc)/;
+  my $str = "zcat ../gz/P2summFull.$ty.$v.$s.gz|";
+  $str = "zcat ../c2fb/${ty}Full.$v.$s.s|" if $ty =~ /P2tspan/;
+  $str = "zcat ../gz/${ty}Full.$v.$s.s|" if $ty =~ /P2(core|mnc)/;
   open A, $str;
   while (<A>){
     chop(); 

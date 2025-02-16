@@ -1,13 +1,18 @@
+#!/usr/bin/perl
+use lib ("$ENV{HOME}/lookup", "$ENV{HOME}/lib64/perl5", "/home/audris/lib64/perl5","$ENV{HOME}/lib/perl5", "$ENV{HOME}/lib/x86_64-linux-gnu/perl", "$ENV{HOME}/share/perl5");
 use strict;
 use warnings;
+use woc;
 
 my $v = $ARGV[0];
 my $s = $ARGV[1];
 my $fr = 0;
 $fr = $ARGV[3] if defined $ARGV[3];
+$fr = $fr/2 if $ARGV[2] eq "A2f";
 
 my %d = ();
 my $pP = "";
+my $pP1 = "";
 my %tmp = ();
 my $cnt = 0;
 
@@ -15,18 +20,21 @@ for my $ty ($ARGV[2]){
   $cnt = 0;
   %tmp = ();
   $pP = "";
+  $pP1 = "";
   my $pre = "";
   $pre = "../c2fb/" if $ty =~/A2[bf]/;
   $pre = "../c2fb/" if $ty =~/A2tPlPkg/;
-  open A, "zcat $pre${ty}Full$v$s.s |";
+  open A, "zcat $pre${ty}Full.$v.$s.s |";
   while (<A>){
     chop ();
     my ($p, $c, @rest) = split (/;/, $_, -1);
     if ($fr > 0){
-      $fr --;
+      if ($pP1 ne $p){
+        $fr --;
+        $p=$pP1;
+      }
       next;
     }
-    my ($p, $c, @rest) = split (/;/, $_, -1);
     if ($pP ne "" && $pP ne $p){
       if ($fr > 0){
         $fr --;
@@ -43,11 +51,13 @@ for my $ty ($ARGV[2]){
         print STDERR "$s $ty $cnt\n" if (!($cnt++%500000));
         #last if $cnt > 10000;
       }
+    }
+    if (! defined $badAuthors{$p}){
       if ($ty eq "A2tPlPkg"){
         $tmp{$c}{join ";", @rest}++; 
       }else{
         $tmp{$c}++;
-      }  
+      }
     }
     $pP = $p;
   }

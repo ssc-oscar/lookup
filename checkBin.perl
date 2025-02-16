@@ -5,7 +5,6 @@ use warnings;
 use Error qw(:try);
 
 use Digest::SHA qw (sha1_hex sha1);
-use TokyoCabinet;
 use Compress::LZF;
 
 my $type = $ARGV[0];
