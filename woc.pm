@@ -307,12 +307,19 @@ sub extrCmt {
   my $code = safeDecomp ($codeC, $str);
   my ($tree, $parent, $auth, $cmtr, $ta, $tc, $taz, $tcz) = ("","","","","","");
   my ($pre, @rest) = split(/\n\n/, $code, -1);
+  my $lstFld = "";
   for my $l (split(/\n/, $pre, -1)){
      #print "$l\n";
+     if ($lstFld eq "committer"){
+       push @rest, $l;
+     }
      $tree = $1 if ($l =~ m/^tree (.*)$/);
      $parent .= ":$1" if ($l =~ m/^parent (.*)$/);
      ($auth) = ($1) if ($l =~ m/^author (.*)$/);
-     ($cmtr) = ($1) if ($l =~ m/^committer (.*)$/);
+     if ($l =~ m/^committer (.*)$/){
+       ($cmtr) = ($1);
+       $lstFld = "committer";
+     }
   }
   ($auth, $ta, $taz) = ($1, $2, $3) if ($auth =~ m/^(.*)\s(-?[0-9]+)\s+([\+\-]*\d+)$/);
   ($cmtr, $tc, $tcz) = ($1, $2, $3) if ($cmtr =~ m/^(.*)\s(-?[0-9]+)\s+([\+\-]*\d+)$/);
@@ -389,7 +396,7 @@ sub cleanCmt {
     $cmtr =~ s/;/ /g;
     $taz =~ s/;/ /g;
     $tcz =~ s/;/ /g;
-    my $cm = join '\n', @rest;
+    my $cm = join "\n", @rest;
     $cm =~ s/^\n*//;
     $cm =~ s/\n*$//;
     $cm =~ s/\r//g;
@@ -721,12 +728,12 @@ sub addForks {
 
 
 our %badAuthors = ( 
-                              'subgit <support@subgit.com>'       => '404022927 A2f',
-                             'DANDI Meta-user <dandi@mit.edu>'    => '300876865 A2b',
-                             'DANDI Team <help@dandiarchive.org>' => '579046540 A2fb', 
+     'subgit <support@subgit.com>'       => '404022927 A2f',
+    'DANDI Meta-user <dandi@mit.edu>'    => '300876865 A2b',
+    'DANDI Team <help@dandiarchive.org>' => '579046540 A2fb', 
     'Bot <41898282+github-actions[bot]@users.noreply.github.com>' => '709960003 A2f',
-                        'Adam Oswald <adamoswald69420@gmail.com>' => '671534228 A2f',
-                       'one-million-repo <mikigal.acc@gmail.com>' => "1M commits", 
+    'Adam Oswald <adamoswald69420@gmail.com>' => '671534228 A2f',
+    'one-million-repo <mikigal.acc@gmail.com>' => "1M commits", 
    'scraped_page_archive gem 0.5.0 <scraped_page_archive-0.5.0@scrapers.everypolitician.org>' => "4243985C", 
    'Your Name <you@example.com>' => "1829654C",
    'Auto Pilot <noreply@localhost>' => "2063212C",
@@ -784,12 +791,66 @@ our %manypCmt = (
 );
 
 our %badCmt = (
+#this block counts c2fbb
+"e804342df6546c3e3b02e8882961935a28b161a4" => 201457262,
+"e0c83f7139855a49dded91f365e35ad0dd7faa37" => 201457262,
+"cf2af7bf6cca8ccb05f846d52678c917bbc6eaa5" => 201457262,
+"ccf06ae8cc07ab7cdb2c1afe0c79f0e02ae94f12" => 201457262,
+"b43c9fc8aac2f621b478208aaa2a5176d09b0be5" => 201457262,
+"94f2fed847d9af5667b84c11a31599c080971566" => 201457262,
+"6b1865476d78649b0e74072b3c0376c97fe311ab" => 201457262,
+"209dca7a8a5e79502d0e014dcaf4412b9256660b" => 201457262,
+"64ba7c1a8c6a6147afc4d1a04a80658db84519a4" => 201456687,
+"2cc6da33854e9a74de5a6906b019d6a203317e33" => 201456687,
+"f494d8eb0db024e15e35ae86ece1730d87eb7a08" => 201456624,
+"e852e4ad43888698ccd6ce717ac1461e19b34949" => 201456624,
+"e6ad0b967aa584e85fb5bb0de38afae4b6b2132c" => 201456624,
+"dec3d7d25d59ca0250f23ccf55d0f19ee8fb9212" => 201456624,
+"d29e8f4495550a343b1667d74742a74ef53bfe4d" => 201456624,
+"ce9f26a544de3b077c0f34fd07916806f468bbd5" => 201456624,
+"c69469ffc0ba594306c7247ef8b17b0df9023442" => 201456624,
+"c2da1848600e6920ff387efba84af552a1e19655" => 201456624,
+"bf4d457f9e739fd730305c2b65860eda0a20598e" => 201456624,
+"b891dc000616640de8f8b906cac1e512469c4200" => 201456624,
+"9d491cb0fc092ac543b58db5cb86fc420086a0a9" => 201456624,
+"9aca8aadfe283b227aab5c2b08a1d6b02d92b1e2" => 201456624,
+"88e2c54f2d0d01063c109c0d4f24e0300da4a495" => 201456624,
+"65bd734429c083b2c7bee8858c3350bff567c2d4" => 201456624,
+"53d2b0b724db55142d0c82a6ed4e5438a5124f62" => 201456624,
+"507357649fec802c660f8b16645365522a2f4132" => 201456624,
+"498b6368167e5f9f6aeaf98878eac1cf02ee7702" => 201456624,
+"4822b10054a4ff2460ae2b36af1e0d6bbc4b00b3" => 201456624,
+"05c4252ff6fe79bc1f6c3c042998e16ea12930f4" => 201456624,
+"034f002b704f7c556f76c95991c283ce6d99e57f" => 201456624,
+"00050e2b4353dcae9fd34f92aa30a1757fcf537a" => 201456624,
+"aa31c1d07c496260c43c0235aa302cc82bf31a62" => 201456623,
+"521ec122ce6844c66679b7112db0191dc2f5bc44" => 201456623,
+"64b5a4fda71260d70ce346c23af07bf06b192395" => 201148297,
+"398d33dc1b0345e362be40232a3c0d7fce0d628f" => 201148297,
+"c7f94ecf588129b4d74c9d9343534a6634f9758b" => 134301352,
+"74fbde81f462b28b0802c109a85aedce136c9765" => 134301352,
+"e366420bc2b0979a4e09f3c28cfde30a5c19a5e1" => 124815006,
+"e101976e3cf7451490b177aa108b7d334d12971d" => 124815006,
+"dca294bba797bbf40787876ad63d8a8c618505db" => 124815006,
+"aff07cf28fc7f0e390fb777cf7769288c2b85ac2" => 124815006,
+"a24c769e7f0795a8fb542972cb8b267bb17e5c22" => 124815006,
+"5f341d8aa81c0192aff46898d2bdd94f043eb44b" => 124815006,
+"03cb3eb9c22e21e2475fee4fb6013718a2fa39fb" => 100000000,
+
+  "6b4ea721e0b9158d26c4f8fc85ab60c6933f73d1" => 2525848390, # more than that
+  "20ee59241cda54347832afca4a32d8474bc8c01b" => 26332842050,
+  #"20ee829963aeac39eeeb988c921daf4621171210" => 20103, 
+  #"2057885c88327420cfbf2312279f2a5994c7353d" => 625029,
+  "5997f0dd842cc47ae21d55a5089a007c2953194f" => 4000000,
+  "0f5ed20e84dda9684be3b5f7452fc74b53c10029" => 21026665, #diff
+  "a11d34bb5d1c8e0d615361bfa1cfbf34cda8304f" => 10236558, #diff
   "3bc43eae112a4593c59893a5df59742e2ff16a34" => 10000000000,
   "da51fb693d64c202b1782648266e6e12a3f269e0" => 10000000000,
   "c89423063a78259e6a7d13d9b00278a0c5e637b0" => 10000000005,
   "45546f17e5801791d4bc5968b91253a2f4b0db72" => 10000000000,
   "6b4ea721e0b9158d26c4f8fc85ab60c6933f73d1" => 10000000000,
   "03cb3eb9c22e21e2475fee4fb6013718a2fa39fb" => 100000000,
+  #"d97c98db61797184a3773994d09d25f3d3292d11" =>
   "e0f11a95c63597493328fa46f2205412d6b6f07d" => 21155694, # files
   "20ee59241cda54347832afca4a32d8474bc8c01b" => 33324118926,#and much more
   "011c51845b624f1f82653f87017be7a4d8ceaa4d" => 4007698, #lots of renames don't do diff

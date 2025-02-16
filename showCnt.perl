@@ -47,17 +47,19 @@ for my $sec (0 .. ($sections-1)){
 
 while (<STDIN>){
   chop();
-  my ($cmt, $rest) = split(/;/, $_, -1);
+  my ($cmt, @rst) = split(/;/, $_, -1);
+  my $rest = "";
+  $rest = join ';', @rst if $#rst >= 0;
   if ($type eq "bdiff"){
     getBdiff ($cmt);
     next;
   }
   if ($type eq "blob"){
-    getBlob ($cmt);
+    getBlob ($cmt, $rest);
     next;
   }
   if ($type eq "tree"){
-    getTree ($cmt, "");
+    getTree ($cmt, $rest);
     next;
   }
   if ($type eq "tkns" || $type eq "tdiff"){
@@ -65,7 +67,7 @@ while (<STDIN>){
     next;
   }
   if ($type eq "tag"){
-    getTag ($cmt, "");
+    getTag ($cmt, $rest);
     next;
   }
   my $sec = hex (substr($cmt, 0, 2)) % $sections;
@@ -118,7 +120,8 @@ sub getTkns {
   
 
 sub getBlob {
-  my ($blob) = $_[0];
+  my ($blob, $rest) = @_;
+
   my $sec = hex (substr($blob, 0, 2)) % $sections;
   my $bB = fromHex ($blob);
   if (! defined $fhosc{$sec}{$bB}){
@@ -138,10 +141,16 @@ sub getBlob {
     $code = encode_base64($code);
     #$code =~ s/\r/\\r/g;
     $code =~ s/\n//g;
-    $code = "$blob;$code";
+    $code = "$blob;$code;$rest";
+  }else{
+    if ($debug == 2){
+      $code =~ s/;/_SEMICOLON_/g;
+      $code =~ s/\n/;$blob;$rest\n/g;
+    }
   }
-  print "$code\n";
-  if ($code eq ""){
+  if ($code ne ""){
+     print "$code\n";
+  }else{
     print "$codeC\n";
   }
 }

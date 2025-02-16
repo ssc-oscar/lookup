@@ -17,6 +17,8 @@ sub fromHex {
 } 
 
 my $sections = 128;
+my $check = defined $ARGV[1] ? $ARGV[1] : 0;
+my $fast = defined $ARGV[2] ? $ARGV[2] : 1;
 
 my $fbaseo="All.sha1o/sha1.blob_";
 my $fbasei ="/data/All.blobs/blob_";
@@ -30,8 +32,11 @@ tie %{$fhoso{$sec}}, "TokyoCabinet::HDB", "$pre/${fbaseo}$sec.tch", TokyoCabinet
    or die "cant open $pre/$fbaseo$sec.tch\n";
 my $nn = 0;
 if ( -f "$fbasei$sec.idx"){
-  #open A, "tac $fbasei$sec.idx|" or die ($!);
-  open A, "cat $fbasei$sec.idx|" or die ($!);
+  if ($fast){
+    open A, "tac $fbasei$sec.idx|" or die ($!);
+  }else{
+    open A, "cat $fbasei$sec.idx|" or die ($!);
+  }
   while (<A>){
     chop ();
     my @x = split (/\;/, $_, -1);
@@ -43,20 +48,22 @@ if ( -f "$fbasei$sec.idx"){
     }
     my $h = fromHex ($hash);
     if (defined $fhoso{$sec}{$h}){
-      my ($ofO, $lenO) = unpack "w w", $fhoso{$sec}{$h};
-      if ($ofO != $of || $lenO != $len){
-        print STDERR "mismatch: @x, $ofO, $lenO\n";
-        last;
+      if ($check){
+        my ($ofO, $lenO) = unpack "w w", $fhoso{$sec}{$h};
+        if ($ofO != $of || $lenO != $len){
+          print STDERR "mismatch: @x, $ofO, $lenO\n";
+          last;
+        }
       }
-#     print "done/updated $nn\n";
-#     last;
+      last if $fast;
+    }else{
+      $nn ++;
+      $fhoso{$sec}{$h} = pack ("w w", $of, $len);    
     }
-    $nn ++;
-    $fhoso{$sec}{$h} = pack ("w w", $of, $len);      
   }
 }else{
   die "no $fbasei$sec.idx\n";
 }
-untie %{$fhoso{$sec}} 
-
+untie %{$fhoso{$sec}};
+print "updated $nn blob offsets\n";
 

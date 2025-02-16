@@ -760,6 +760,12 @@ do for i in {0..31};do sed "s|WHAT|A2summ|g;s|PRT|$sm|g;s|FROM|$i|g;s|VER|U|;s|M
 done
 for i in {0..31};do sed "s|WHAT|AToFile|g;s|PRT||g;s|FROM|$i|g;s|VER|U|;s|MACHINE|beacon|;s|ppn=1|ppn=1|" ~/lookup/b2ob.pbs| qsub; sleep 1; done
 
+
+sh.enableSharding("WoC")
+sh.shardCollection("WoC.P_metadata.U", { "ProjectID" : "hashed" } )
+sh.shardCollection("WoC.A_metadata.U", { "AuthorID" : "hashed" } )
+sh.shardCollection("WoC.API_metadata.U", { "API" : "hashed" } )
+
 for i in {0..31}; do zcat  P2summFull$ver$i.json; done | perl -ane 'use Encode;chop();$u=decode("UTF-8",$_);$u1=encode("UTF-8",$u);print "$u1\n" > b
 time mongoimport --host da1 --db WoC --collection P_metadata.$ver --file b --type json  --numInsertionWorkers=32
 for i in {0..31}; do zcat  A2summFull$ver$i.json; done | perl -ane 'use Encode;chop();$u=decode("UTF-8",$_);$u1=encode("UTF-8",$u);print "$u1\n" > b
@@ -768,14 +774,21 @@ for i in {0..31}; do perl ~/lookup/APIToFile.perl $i; done | perl -ane 'use Enco
 time mongoimport --host da1 --db WoC --collection API_metadata.$ver --file b --type json  --numInsertionWorkers=32
 
 
-db.P_metadata.U.createIndex({"ProjectID": 1})
+db.P_metadata.U.createIndex({"ProjectID": "hashed"})
+db.P_metadata.U.createIndex({Core:"text", ApiInfo:"text"})
+or (does not work on sharded)
 db.P_metadata.U.createIndex( { "$**": "text", }, { name: "Projecttext", collation: {locale: "simple"} } )
 
-db.A_metadata.U.createIndex({"AuthorID": 1})
-db.A_metadata.U.createIndex( { "$**": "text", }, { name: "Auhortext", collation: {locale: "simple"} } )
+db.A_metadata.U.createIndex({"AuthorID": "hashed"})
+db.A_metadata.U.createIndex({Alias:"text", ApiInfo:"text"})
+or (does not work on sharded)
+db.A_metadata.U.createIndex( { "$**": "text", }, { name:"Auhortext", collation: {locale: "simple"} } )
 
-db.API_metadata.U.createIndex({"API": 1})
-db.API_metadata.U.createIndex( { "API": "text", }, { name: "APItext", collation: {locale: "simple"} } )
+db.P_metadata.U.createIndex({Core:"text", ApiInfo:"text"})
+
+db.API_metadata.U.createIndex({"API": "hashed" })
+db.API_metadata.U.createIndex( { "API" : "text" } )
+
 
 db.profile.findOne()
 friends: [
@@ -837,7 +850,7 @@ cvt=b2fac
 for w in b2fA b2fa 
 cvt=Cmt2Fields
 for w in c2dat
-for o in {0..3};  do for i in $(eval echo "{$o..31..4}"); do zcat /da?_data/basemaps/gz/${w}Full${ver}{$i,$(($i+32)),$(($i+64)),$(($i+96))}.s | ~/lookup/${cvt}BinSorted.perl /fast/${w}Full${ver}.$i.tch 1; done 
+for o in {0..3};  do for i in $(eval echo "{$o..31..4}"); do zcat /da?_data/basemaps/gz/${w}Full${ver}{$i,$(($i+32)),$(($i+64)),$(($i+96))}.s | ~/lookup/${cvt}BinSorted.perl /fast/${w}Full${ver}.$i.tch 1; done &done
 
 
 cvt=h2h
@@ -852,7 +865,7 @@ for o in {0..3}; do for i in $(eval echo "{$o..31..4}"); do
 zcat b2taFull${ver}{$i,$(($i+32)),$(($i+64)),$(($i+96))}.s|cut -d\; -f1,4 | ~/lookup/${cvt}BinSorted.perl /fast/${w}Full${ver}.$i.tch; done &done
 
 
-zcat a2AFullH$ver.s| perl -ane 'chop();($a,$r,$b0,$b1)=split(/;/);if ($b0+$b1==0){print "$r;$a\n"}' | lsort 5G -t\; -k1,1 | gzip > A2aFullH$ver.s
+zcat a2AFullH$ver.s| perl -ane 'chop();($a,$r,$b0,$b1)=split(/;/);if ($b0+$b1==0){print "$r;$a\n"}' | lsort 50G -t\; -k1,1 | gzip > A2aFullH$ver.s
 zcat a2AFullH$ver.s | perl -ane '@x=split(/;/); next if $x[0] eq ""; $bad=$x[2]+$x[3]; if ($bad){print "$x[0];$x[0]\n"}else{print "$x[0];$x[1]\n"}' | ~/lookup/s2sBinSorted.perl ../a2AFull$ver.tch 1
 zcat A2aFullH$ver.s | ~/lookup/s2sBinSorted.perl /fast/A2aFull$ver.tch 1
 zcat p2P$ver.s | ~/lookup/s2sBinSorted.perl /fast/p2PFull$ver.tch 1 &
@@ -1721,7 +1734,6 @@ ver=P
 zcat /da0_data/basemaps/gz/b2cFull$ver$i.s | join -t\; -v1 - <(zcat /da0_data/basemaps/gz/b2cFull$pVer$i.s) | gzip > b2cFull$ver$pVerO$i.s
 zcat b2cFull$ver$pVer$i.s| ~/lookup/Blob2Author.perl P 2> b2aFull$ver$pVer$i.err | gzip > b2aFull$ver$Pver$i.s
 ~/lookup/Blob2AuthorJoin.perl  /da0_data/basemaps/gz/b2aFull$pVer$i.s b2aFull$ver$pVer$i.s | gzip > /da0_data/basemaps/gz/b2aFull$ver$i.s
-
 
 
 

@@ -65,6 +65,14 @@ my $bad = <<"EOT";
     117 __plugin_name__
     117 __appname__
     114 release_package
+  25426 headers.dist
+  25423 complex-dist
+  25420 simple.dist
+ 146942 gyp
+  18844 Forge
+   4581 extension.dist
+   1549 YourAppName
+   1368 cfg[
 EOT
 my %genPkg;
 for my $i (split (/\n/, $bad, -1)){

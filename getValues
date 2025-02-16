@@ -26,7 +26,7 @@ fi
 suff=".31.tch"
 [[ $t =~ ^(A2a|P2p|a2A|p2P)$ ]] && suff=".tch"
 
-for v in V U T S R
+for v in V3 V U T S R
 do
   pre="_fast"
   for hh in da5 da3 da4

@@ -114,9 +114,12 @@ while(<STDIN>){
     }
     separate2T ($rev, $parent, "", $tree, $treeP);
   }else{
-    print STDERR "no parent for $rev\n";
+    my $msg = "no parent for $rev tree $tree";
     #commit with no parents; added missing created parameter to put blobs in the right column
-    printTR ($rev, getTO ($tree), "", 1);
+    my $str = getTO ($tree);
+    $msg .=  " no tree $tree" if $str eq "";
+    print STDERR "$msg\n";
+    printTR ($rev, $str, "", 1);
   }
 }
 
@@ -349,6 +352,7 @@ sub compare {
    
 for my $sec (0 .. ($sections-1)){
         untie %{$fhos{$sec}};
+        untie %{$fhoc{$sec}};
 }
 
 

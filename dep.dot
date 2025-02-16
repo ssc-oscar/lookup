@@ -1,25 +1,124 @@
 digraph woc {
 
 
+ght [ shape=box style=filled fillcolor=red ];
+
+# ls ../{gz,c2fb,All.blobs}/*Full{V0,V}.s ../gz/*{FullHV,V}.s ../{gz,c2fb,All.blobs}/*Full.*.V0.{s,gz} | cut -d/ -f3- |sed 's|Full\.|Full_|;s|Full[HV].*||;s|V.*||;s|\.$||' | sort | awk '{ print $1" [ shape=diamond style=filled fillcolor=green ];"}'
+
+obb2cf [ shape=diamond style=filled fillcolor=yellow ];
+
+# ls ../{gz,c2fb,All.blobs}/*Full{V0,V}.s ../gz/*{FullHV,V}.s ../{gz,c2fb,All.blobs}/*Full.*.V0.{s,gz} | cut -d/ -f3- |sed 's|Full[HV].*||;s|Full\.|Full_|;s|V.*||;s|\.$||' | sort | awk '{ print $1" [ shape=diamond style=filled fillcolor=yellow ];"}'
+
+b2def [ shape=diamond style=filled fillcolor=yellow ];
+Pkg2lP [ shape=diamond style=filled fillcolor=yellow ];
+b2lPkg [ shape=diamond style=filled fillcolor=yellow ];
+c2PtAbflPkg [ shape=diamond style=filled fillcolor=yellow ];
+A2P [ shape=diamond style=filled fillcolor=yellow ];
+A2a [ shape=diamond style=filled fillcolor=yellow ];
+A2b [ shape=diamond style=filled fillcolor=yellow ];
+A2c [ shape=diamond style=filled fillcolor=yellow ];
+A2f [ shape=diamond style=filled fillcolor=yellow ];
+A2g [ shape=diamond style=filled fillcolor=yellow ];
+A2fb [ shape=diamond style=filled fillcolor=yellow ];
+A2summFull_A2P [ shape=diamond style=filled fillcolor=yellow ];
+A2summFull_A2b [ shape=diamond style=filled fillcolor=yellow ];
+A2summFull_A2c [ shape=diamond style=filled fillcolor=yellow ];
+A2summFull_A2f [ shape=diamond style=filled fillcolor=yellow ];
+A2summFull_A2g [ shape=diamond style=filled fillcolor=yellow ];
+A2mnc [ shape=diamond style=filled fillcolor=yellow ];
+A2tspan [ shape=diamond style=filled fillcolor=yellow ];
+P2A [ shape=diamond style=filled fillcolor=yellow ];
+P2a [ shape=diamond style=filled fillcolor=yellow ];
+P2b [ shape=diamond style=filled fillcolor=yellow ];
+P2binf [ shape=diamond style=filled fillcolor=yellow ];
+P2c [ shape=diamond style=filled fillcolor=yellow ];
+P2core [ shape=diamond style=filled fillcolor=yellow ];
+P2f [ shape=diamond style=filled fillcolor=yellow ];
+P2fb [ shape=diamond style=filled fillcolor=yellow ];
+P2g [ shape=diamond style=filled fillcolor=yellow ];
+P2mnc [ shape=diamond style=filled fillcolor=yellow ];
+P2nfb [ shape=diamond style=filled fillcolor=yellow ];
+P2p [ shape=diamond style=filled fillcolor=yellow ];
+ght_p2pP2Pfrk [ shape=diamond style=filled fillcolor=yellow ];
+ght_P2w [ shape=diamond style=filled fillcolor=yellow ];
+P2summFull_P2A [ shape=diamond style=filled fillcolor=yellow ];
+P2summFull_P2b [ shape=diamond style=filled fillcolor=yellow ];
+P2summFull_P2c [ shape=diamond style=filled fillcolor=yellow ];
+P2summFull_P2f [ shape=diamond style=filled fillcolor=yellow ];
+P2summFull_P2g [ shape=diamond style=filled fillcolor=yellow ];
+P2summFull_P2nfb [ shape=diamond style=filled fillcolor=yellow ];
+P2summFull_P2p [ shape=diamond style=filled fillcolor=yellow ];
+P2tac [ shape=diamond style=filled fillcolor=yellow ];
+P2tspan [ shape=diamond style=filled fillcolor=yellow ];
+Pt2Ptb  [ shape=diamond style=filled fillcolor=yellow ];
+a [ shape=diamond style=filled fillcolor=yellow ];
+a2A [ shape=diamond style=filled fillcolor=yellow ];
+a2A [ shape=diamond style=filled fillcolor=yellow ];
+a2P [ shape=diamond style=filled fillcolor=yellow ];
+a2c [ shape=diamond style=filled fillcolor=yellow ];
+a2f [ shape=diamond style=filled fillcolor=yellow ];
+a2fb [ shape=diamond style=filled fillcolor=yellow ];
+a2p [ shape=diamond style=filled fillcolor=yellow ];
+b2P [ shape=diamond style=filled fillcolor=yellow ];
+b2P128 [ shape=diamond style=filled fillcolor=yellow ];
+bSelect [ shape=diamond style=filled fillcolor=yellow ];
+bSelectSz [ shape=diamond style=filled fillcolor=yellow ];
+b2f [ shape=diamond style=filled fillcolor=yellow ];
+b2fA [ shape=diamond style=filled fillcolor=yellow ];
+b2fa [ shape=diamond style=filled fillcolor=yellow ];
+b2idx  [ shape=diamond style=filled fillcolor=yellow ];
+b2ob [ shape=diamond style=filled fillcolor=yellow ];
+b2tA [ shape=diamond style=filled fillcolor=yellow ];
+b2tP [ shape=diamond style=filled fillcolor=yellow ];
+b2ta [ shape=diamond style=filled fillcolor=yellow ];
+bb2cf [ shape=diamond style=filled fillcolor=yellow ];
+blob_idxf2 [ shape=diamond style=filled fillcolor=yellow ];
+c2P [ shape=diamond style=filled fillcolor=yellow ];
+c2acp [ shape=diamond style=filled fillcolor=yellow ];
+c2b [ shape=diamond style=filled fillcolor=yellow ];
+c2cc [ shape=diamond style=filled fillcolor=yellow ];
+c2dat [ shape=diamond style=filled fillcolor=yellow ];
+c2f [ shape=diamond style=filled fillcolor=yellow ];
+c2fbb [ shape=diamond style=filled fillcolor=yellow ];
+c2p [ shape=diamond style=filled fillcolor=yellow ];
+c2pc [ shape=diamond style=filled fillcolor=yellow ];
+fl [ shape=diamond style=filled fillcolor=yellow ];
+largeb2P128  [ shape=diamond style=filled fillcolor=yellow ];
+ob2b [ shape=diamond style=filled fillcolor=yellow ];
+p [ shape=diamond style=filled fillcolor=yellow ];
+p2P [ shape=diamond style=filled fillcolor=yellow ];
+p2a [ shape=diamond style=filled fillcolor=yellow ];
+p2c [ shape=diamond style=filled fillcolor=yellow ];
+
+
+b2ptf -> b2ptfMrgJ_b2ptf-> b2ptfSplSrt_b2ptf -> b2ptfSplit_b2ptf -> b2ptf_b2ptf -> tree
+
+t2ptf -> t2ptfMrgJ_b2ptf-> t2ptfSplSrt_b2ptf -> t2ptfSplit_b2ptf -> t2ptf_b2ptf -> tree
+
 #c
 c2dat -> c2dat_c2ta -> commit_idx
-fl -> Cmt_c2ta -> c2acp_c2ta -> commit_idx
+fl -> Cmt_c2ta -> c2acp -> c2acp_c2ta -> commit_idx
 c2pc ->c2pcmerge_c2ta -> c2pc_c2ta -> c2dat_c2ta
 c2cc ->c2ccmerge_c2ta -> pc2csplit_c2ta -> c2dat_c2ta
-as -> as_c2ta -> a2cmerge_c2ta -> c2tasplit_c2ta -> c2dat_c2ta
+a -> as_c2ta -> a2c -> a2cmerge_c2ta -> c2tasplit_c2ta -> c2dat_c2ta
 
+p -> updatePrjV_MPS -> updatePrjV_PS -> p2c
 #c2p
 c2p -> MERGEc2p_updatePrjT->MRG0_updatePrjT ->SRT0_updatePrjT ->START_updatePrjT;
 p2c -> MERGEp2c_updatePrjT ->IMRG0_updatePrjT ->ISRT0_updatePrjT->invt_updatePrjT ->MRG0_updatePrjT;
-P2c -> deforkPm_fork -> deforkP_fork -> defork_fork ->MERGEM_fork -> MERGE_fork -> p2p_fork -> c2p;
+P2c -> deforkPm_fork -> deforkP_fork -> defork_fork -> p2P -> MERGEM_fork -> MERGE_fork -> p2p_fork -> c2p;
 c2P -> defork_fork 
+P2p -> p2P
 
 # a2p
 split_a2p -> c2dat_c2ta;
 p2a->merge_a2p -> split_a2p -> c2p
-a2p->a2pmerge_a2p -> a2psplit_a2p -> c2p
+a2P->a2Pmerge_a2p -> P2asplit_a2p -> c2p
+P2asplit_a2p -> c2dat
+a2p -> a2pmerge_a2p -> a2psplit_a2p -> p2a
 
-P2tac ->  P2tac_a2p -> mergeCA_a2p -> splitCA_a2p -> c2P;
+
+P2tac -> mergeCA_a2p -> splitCA_a2p -> c2P;
 P2a -> P2amerge_a2p -> P2asplit_a2p -> c2P;
 
 A2a -> a2A;
@@ -29,7 +128,7 @@ a2A_a2p ->a2A
 
 P2A -> a2A_a2p ->P2amerge_a2p;
 A2P -> A2Pmerge_a2p -> a2Asrt_a2p -> a2A_a2p;
-coreCA_a2p -> P2tac_a2p
+P2core -> coreCA_a2p -> P2tac
 P2mnc -> cntCA_a2p -> P2tac;
 A2Pmerge_a2p -> P2amerge_a2p;
 P2asplit_a2p -> c2p;
@@ -41,6 +140,7 @@ b2f->b2fm_b2ob -> b2f_b2ob -> c2fbb;
 c2b->c2b_b2ob -> c2fbb;
 c2f->c2f_b2ob -> c2fbb;
 b2ta->b2tam_b2ob-> b2ta_b2ob -> c2fbb;
+b2ta_b2ob -> c2dat;
 P2b_b2ob -> c2b;
 P2b_b2ob -> c2P;
 P2b->P2bm_b2ob->P2b_b2ob
@@ -52,9 +152,11 @@ b2fA->b2fA_b2ob -> a2A;
 A2fb -> A2fbm_b2ob -> A2fb_b2ob -> b2fA_b2ob -> b2ta;
 A2f -> A2fmerge_b2ob -> A2f_b2ob -> a2f;
 A2f_b2ob -> a2A;
+A2f_b2ob -> c2dat;
 
-A2b->A2bm_b2ob -> A2b_b2ob -> b2tA_b2ob -> a2A;
-a2f->a2fm_b2ob -> a2f_b2ob -> c2f_b2ob;
+A2b->A2bm_b2ob -> A2b_b2ob -> b2tA -> b2tA_b2ob -> a2A;
+b2tA_b2ob ->  b2ta
+a2f-> a2fm_b2ob -> a2f_b2ob -> c2f;
 a2fb->a2fbm_b2ob -> a2fb_b2ob -> b2fa;
 b2fa -> b2fa_b2ob -> b2ta;
 
@@ -64,19 +166,29 @@ bb2cf -> bb2cfMerge_b2ob -> bb2cfSplit_b2ob -> c2fbb;
 b2tPsum_b2ob-> b2tP -> b2tPm_b2ob -> b2tP_b2ob -> c2fbb;
 b2tP_b2ob -> c2P;
 b2tP_b2ob -> c2dat;
-Pt2Ptb1_b2ob->Pt2Ptbs_b2ob->Pt2Ptb_b2ob-> b2tP
+Pt2Ptbsum_b2ob-> Pt2Ptb -> Pt2Ptbm_b2ob->Pt2Ptbs_b2ob->Pt2Ptb_b2ob-> b2tP
+P2binf -> Pbinf_b2ob-> Pt2Ptb 
+
+# below not needed can do everythhing via Pt2Ptb??
 ct2BPm2_b2ob->ct2BPm1_b2ob->fc2BP->c2BPm_b2ob->c2BP_b2ob -> b2P128-> splitb2P_b2ob -> b2P;
-c2BP_b2ob ->largeb2P128
-c2BP_b2ob ->b2fa
-c2BP_b2ob ->bSelect
-ct2BPm1_b2ob->CommonBlobs.gz
+c2BP_b2ob ->largeb2P128 -> largeb2P128_b2ob -> b2P128;
+c2BP_b2ob ->b2fa;
+c2BP_b2ob ->bSelect;
+ct2BPm1_b2ob->CommonBlobs;
 ct2BPm1_b2ob->c2dat;
 ct2BPm1_b2ob->c2P;
 fP2btP->ct2BPm3_b2ob->ct2BPm2_b2ob
-
 c2BPm1_b2ob->fc2BP;
-P2fb->P2fb_b2ob ->P2fP_b2ob -> fP2bP->P2fP_b2ob;
-P2nb -> P2Sbm_b2ob -> P2Sb_b2ob -> b2P128;
+
+
+# too slow, functionality removed, alternate calculation?
+# last in 104cc612b00749260e30927057708b6029bcc333 b2ob.pbs
+# P2fP_b2ob -> fP2bP->P2fP_b2ob;
+P2fb->P2fb_b2ob ->  Pt2Ptb
+Pt2Ptbsum_b2ob ->  Pt2Ptb
+
+
+P2nb -> P2Lbm_b2ob -> P2Lb_b2ob -> b2P128;
 fP2nP->P2fPn_b2ob->P2fP_b2ob;
 fPnbnfb2P->P2fPn_b2ob;
 
@@ -84,36 +196,98 @@ fPnbnfb2P->P2fPn_b2ob;
 P2f_b2ob -> p2P;
 P2b_b2ob -> p2P;
 
-P2f->P2fm_b2ob -> P2f_b2ob -> c2f_b2ob;
-P2g->P2g_b2ob -> A2g -> A2g_b2ob -> namesor;
+P2f->P2fm_b2ob -> P2f_b2ob -> c2f;
+P2g->P2g_b2ob -> A2g -> namesor;
 
+blob_idxf2 ->  b2idx_b2ob -> blob_idx
+b2idx -> b2idx_b2ob
+bSelectSz -> bSelS_b2ob -> b2idx
+
+A2mnc -> A2mncm_b2ob -> A2tPc
+A2mnc_b2ob -> a2A
+A2mnc_b2ob -> c2P
+A2mnc_b2ob -> c2dat
+A2tPc -> A2mnc_b2ob
 
 A2tspan->A2tspanm_b2ob->A2tspan_b2ob->c2dat;
 A2tspan_b2ob->a2A;
 A2summ->AToFile_b2ob->A2tspan;
-AToFile_b2ob->A2summ_A2a_b2ob -> A2a;
-AToFile_b2ob->A2summ_A2c_b2ob -> A2c;
-AToFile_b2ob->A2summ_A2b_b2ob -> A2b;
-AToFile_b2ob->A2summ_A2P_b2ob -> A2P;
-AToFile_b2ob->A2summ_A2f_b2ob -> A2f;
-AToFile_b2ob->A2summ_A2g_b2ob -> A2g;
-
+AToFile_b2ob-> A2a;
+AToFile_b2ob-> A2mnc;
+AToFile_b2ob-> A2summFull_A2c ->A2summ_A2c_b2ob -> A2c;
+AToFile_b2ob-> A2summFull_A2b ->A2summ_A2b_b2ob -> A2b;
+AToFile_b2ob-> A2summFull_A2P ->A2summ_A2P_b2ob -> A2P;
+AToFile_b2ob-> A2summFull_A2f ->A2summ_A2f_b2ob -> A2f;
+AToFile_b2ob-> A2summFull_A2g -> A2g;
+AToFile_b2ob-> A2summFull_A2tPlPkg ->A2summ_A2tPlPkg_b2ob -> A2tPlPkg;
+A2c-> A2cmerge_c2ta -> c2tAsplit_c2ta -> a2A
+c2tAsplit_c2ta -> c2dat
 bSelect->bSel_b2ob -> b2f;
+
 P2tspan->P2tspanm_b2ob->P2tspan_b2ob->c2dat;
 P2tspan_b2ob->c2P;
 P2summ->PToFile_b2ob->P2tspan;
 
-PToFile_b2ob->P2summ_P2p_b2ob -> P2p;
-PToFile_b2ob->P2summ_P2c_b2ob -> P2c;
-PToFile_b2ob->P2summ_P2b_b2ob -> P2b;
-PToFile_b2ob->P2summ_P2A_b2ob -> P2A;
-PToFile_b2ob->P2summ_P2f_b2ob -> P2f;
-PToFile_b2ob->P2summ_P2b_b2ob -> P2b;
+PToFile_b2ob-> P2g
+P2g_b2ob -> P2A
+PToFile_b2ob-> P2summ_P2nfb -> P2summ_P2nfb_b2ob ->  P2nfb -> Pt2Ptbsum_b2ob 
+PToFile_b2ob-> P2core 
+PToFile_b2ob-> P2mnc 
+
+PToFile_b2ob-> P2summFull_B2b ->P2summ_B2b_b2ob -> B2b
+PToFile_b2ob-> P2summFull_P2A->P2summ_P2A_b2ob -> P2A;
+PToFile_b2ob-> P2summFull_P2b->P2summ_P2b_b2ob -> P2b;
+PToFile_b2ob-> P2summFull_P2c->P2summ_P2c_b2ob -> P2c;
+PToFile_b2ob-> P2summFull_P2f->P2summ_P2f_b2ob -> P2f;
+PToFile_b2ob-> P2summFull_P2p -> P2summ_P2p_b2ob -> P2p;
+PToFile_b2ob-> P2summFull_P2tAlPkg ->P2summ_P2tAlPkg_b2ob -> P2tAlPkg;
+P2summ_P2p_b2ob -> ght_p2pP2Pfrk -> ght
+P2summ_P2p_b2ob -> ght_P2w  -> ght
 
 # nn=$(tail -1 /data/All.blobs/blob_$o.idx|cut -d\; -f1)
 # no=$(head -$((o+1)) /da5_data/home/audris/update/All.blob.T | tail -1 | cut -d\; -f1)
 # ~/lookup/checkBinFix.perl blob /data/All.blobs/blob_$o $((nn-no-1)) blob_TU_$o
-b2lPkg->pkgMergeTU_b2ob->ctagsTU_b2ob->blob_TU -> blob;
-ctagsTU_b2ob->idxf_b2ob;
+# for o in {97..99}; do nn=$(tail -1 /da5_data/All.blobs/blob_$o.idx|cut -d\; -f1); no=$(head -$((o+1)) /da5_data/home/audris/update/All.blob.U| tail -1 | cut -d\; -f1); time ~/lookup/checkBinFix.perl blob /da5_data/All.blobs/blob_$o $((nn-no-1)) blob_UV_$o; done
 
+
+c2PtAbflPkg -> c2pkgA_b2ob -> a2A
+c2pkgA_b2ob -> c2PtabflPkg -> c2pkgm_b2ob -> c2P
+c2pkgm_b2ob -> c2dat
+c2pkgm_b2ob -> c2pkg_b2ob -> b2lPkg
+c2pkg_b2ob -> bb2cf
+
+c2PtabflDef -> c2defm_b2ob -> c2def_b2ob -> b2def -> b2def_b2ob
+c2def_b2ob -> bb2cf 
+
+
+b2lPkg -> pkgMergeUV_b2ob -> ctagsUV_b2ob-> blob_UV -> blob_bin;
+ctagsUV_b2ob -> idxf_b2ob;
+PlPkg -> invPkgm_b2ob -> invPkg_b2ob -> b2lPkg;
+invPkg_b2ob -> b2P128
+
+b2tk -> b2tk_b2ob -> tkRefile1_b2ob -> tkRefile_b2ob -> ctagsUV_b2ob;
+tk2b -> b2tk_b2ob
+Pkg2lP -> Pkg2lPmm_b2ob -> Pkg2lP-> Pkg2lPm_b2ob -> Pkg2lP_b2ob -> b2lPkg
+Pkg2lP_b2ob -> b2P128
+
+cjoinTU_b2ob -> b2c
+
+A2tPllPkg-> APIbyAm_b2ob->APIbyA_b2ob-> c2PtabllfPkg -> cenrich_b2ob-> c2blfPkg
+# -> cmerge_b2ob -> cjoinTU_b2ob->ctagsTU_b2ob;
+
+Pkg2stat -> APIstat_b2ob -> Pkg2tPA -> APIsummm_b2ob -> APIsumm_b2ob -> c2PtAbflPkg 
+
+P2tAlPkg -> APIbyPm_b2ob -> APIbyP_b2ob -> c2PtAbflPkg
+
+A2tPlPkg -> APIbyAm_b2ob -> APIbyA_b2ob -> c2PtAbflPkg
+
+
+
+# def2P -> def2Pm_b2ob -> def2P_b2ob -> b2def
+
+def2P_b2ob -> b2def
+
+#get full last-commit set of blobs
+
+t2all_b2ob -> lc2Pdat -> lc2Pdat_b2ob -> lastcPm_b2ob -> lastcP_b2ob
 }
