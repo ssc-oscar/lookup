@@ -10,7 +10,7 @@ require Exporter;
 our @ISA = qw (Exporter);
 our @EXPORT = qw(getLang toUrl segB segH sHash sHashV toHex fromHex safeDecomp safeComp simpEmail getFL parseAuthorId
 		splitSignature signature_error contains_angle_brackets extract_trimmed git_signature_parse extrCmt getTime cleanCmt	
-		addForks %badProjects %badAuthors %badCmt %badBlob %badTree %largeBlobPrj %largeTreePrj);
+		addForks %badProjects %badAuthors %badCmt %manypCmt %badBlob %badTree %largeBlobPrj %largeTreePrj);
 use vars qw(@ISA);
 
 # basic utilities
@@ -307,12 +307,19 @@ sub extrCmt {
   my $code = safeDecomp ($codeC, $str);
   my ($tree, $parent, $auth, $cmtr, $ta, $tc, $taz, $tcz) = ("","","","","","");
   my ($pre, @rest) = split(/\n\n/, $code, -1);
+  my $lstFld = "";
   for my $l (split(/\n/, $pre, -1)){
      #print "$l\n";
+     if ($lstFld eq "committer"){
+       push @rest, $l;
+     }
      $tree = $1 if ($l =~ m/^tree (.*)$/);
      $parent .= ":$1" if ($l =~ m/^parent (.*)$/);
      ($auth) = ($1) if ($l =~ m/^author (.*)$/);
-     ($cmtr) = ($1) if ($l =~ m/^committer (.*)$/);
+     if ($l =~ m/^committer (.*)$/){
+       ($cmtr) = ($1);
+       $lstFld = "committer";
+     }
   }
   ($auth, $ta, $taz) = ($1, $2, $3) if ($auth =~ m/^(.*)\s(-?[0-9]+)\s+([\+\-]*\d+)$/);
   ($cmtr, $tc, $tcz) = ($1, $2, $3) if ($cmtr =~ m/^(.*)\s(-?[0-9]+)\s+([\+\-]*\d+)$/);
@@ -387,7 +394,7 @@ sub cleanCmt {
     $cmtr =~ s/;/ /g;
     $taz =~ s/;/ /g;
     $tcz =~ s/;/ /g;
-    my $cm = join '\n', @rest;
+    my $cm = join "\n", @rest;
     $cm =~ s/^\n*//;
     $cm =~ s/\n*$//;
     $cm =~ s/\r//g;
@@ -717,7 +724,13 @@ sub addForks {
 }
 
 
-our %badAuthors = ( 'one-million-repo <mikigal.acc@gmail.com>' => "1M commits", 
+our %badAuthors = ( 
+     'subgit <support@subgit.com>'       => '404022927 A2f',
+    'DANDI Meta-user <dandi@mit.edu>'    => '300876865 A2b',
+    'DANDI Team <help@dandiarchive.org>' => '579046540 A2fb', 
+    'Bot <41898282+github-actions[bot]@users.noreply.github.com>' => '709960003 A2f',
+    'Adam Oswald <adamoswald69420@gmail.com>' => '671534228 A2f',
+    'one-million-repo <mikigal.acc@gmail.com>' => "1M commits", 
    'scraped_page_archive gem 0.5.0 <scraped_page_archive-0.5.0@scrapers.everypolitician.org>' => "4243985C", 
    'Your Name <you@example.com>' => "1829654C",
    'Auto Pilot <noreply@localhost>' => "2063212C",
@@ -738,14 +751,57 @@ our %badAuthors = ( 'one-million-repo <mikigal.acc@gmail.com>' => "1M commits",
    'root <root@ubuntu.(none)>' => '');
 
 
+our %manypCmt = (
+"c06403ff4035df3fe2bd5f16600eab2fbff0e35c" => 511021,
+"ee5d9d532806965d1a06190ce253576f38190846" => 509580,
+"d5edbbc5222e267c824e02ad2b90a66f71499a80" => 509580,
+"ca64ee27e4711b33c8679005050e321fa8145007" => 509580,
+"bde6bbfb35c8953aad20a584d78a88881085b3ee" => 509580,
+"bb2879462742e2b5062ccd24e561d9f460ab5cec" => 509580,
+"abd82b81d10a21533b7b93eef335324ad8cb94db" => 509580,
+"a90eb3a22286ebff9d7981f7d707758c172c6305" => 509580,
+"864b78624ae3f27c1c131290bf425f1b063df4fa" => 509580,
+"78deb92b5bb80db160bfb691ebf3d424750c60d1" => 509580,
+"546cac38aba10eeb4cea0378c55f4bed6741b9bd" => 509580,
+"1fc33da1a9ff486abc5503c5b14eb19dc3472fb1" => 509580,
+"139e863474cab9c2412ce59f6a14782c830cc283" => 509580,
+"137eed70d4f20c66f036082647b84fb7b5394425" => 509580,
+"099075d6e4a9db375d9c814edf75c5749b02f0ed" => 509580,
+"dd0aae90b722f7421660ed187a5d774a22d968f6" => 497417,
+"da0efb4533b54b611a1e15a2502686fe8c24807a" => 497216,
+"82855993e0295471a20a2f4efdf72c28089b332d" => 497189,
+"049a9c772afd25d445fb960e8309f69d71625b81" => 491913,
+"b487edb26f2175ee99e4ed396c8ae139893e3ef1" => 490715,
+"40194c70174235c60c1b0998c25e40c564eb2f32" => 489289,
+"26ead3963099abe2ae32643d8acae11315f07c30" => 487092,
+"b38108e7c7a4cd04d6273111f8696dc56108aaa6" => 486705,
+"b0384edc468dc357b7d508c596971b25f79ca2ac" => 472975,
+"ca02c304541e31f546546dc2836a638bdd30a780" => 472482,
+"960d9eb839d430edaf4a3d2fe4c11bea67c1aa79" => 466289,
+"78e8155e1514e475fdc03a71d7e6a6ad38f39306" => 466289,
+"749192b3e6e2af4a49c1231e065e420f77e50b3d" => 466289,
+"64285746c008efb5915b455691bfdfc894eea93e" => 466289,
+"158c33ac1331a5363e80546cb0bc0556f7e66f96" => 466289,
+"70411855679ad6d73c638735eed1119118169b3b" => 466288,
+"f3d6e95fc45c7d8b031e9c89aa931fd57ca6575d" => 424596,
+"5431165ee7d727f3d4580cbdaa1ebf04aff97e98" => 424595,
+);
 
 our %badCmt = (
+  "6b4ea721e0b9158d26c4f8fc85ab60c6933f73d1" => 2525848390, # more than that
+  "20ee59241cda54347832afca4a32d8474bc8c01b" => 26332842050,
+  #"20ee829963aeac39eeeb988c921daf4621171210" => 20103, 
+  #"2057885c88327420cfbf2312279f2a5994c7353d" => 625029,
+  "5997f0dd842cc47ae21d55a5089a007c2953194f" => 4000000,
+  "0f5ed20e84dda9684be3b5f7452fc74b53c10029" => 21026665, #diff
+  "a11d34bb5d1c8e0d615361bfa1cfbf34cda8304f" => 10236558, #diff
   "3bc43eae112a4593c59893a5df59742e2ff16a34" => 10000000000,
   "da51fb693d64c202b1782648266e6e12a3f269e0" => 10000000000,
   "c89423063a78259e6a7d13d9b00278a0c5e637b0" => 10000000005,
   "45546f17e5801791d4bc5968b91253a2f4b0db72" => 10000000000,
   "6b4ea721e0b9158d26c4f8fc85ab60c6933f73d1" => 10000000000,
   "03cb3eb9c22e21e2475fee4fb6013718a2fa39fb" => 100000000,
+  #"d97c98db61797184a3773994d09d25f3d3292d11" =>
   "e0f11a95c63597493328fa46f2205412d6b6f07d" => 21155694, # files
   "20ee59241cda54347832afca4a32d8474bc8c01b" => 33324118926,#and much more
   "011c51845b624f1f82653f87017be7a4d8ceaa4d" => 4007698, #lots of renames don't do diff
@@ -753,6 +809,7 @@ our %badCmt = (
   "ce1407a59c910ac5dead8cb1b8b4841cabfce000" => 6649016,
   "f905f1dfa705708c4a85b04cc81b5823f1112d1c" => 6356922,
   "1f27d2f1525eb869adb8b3e2eaca949ed0e1324d" => 4007698, #2003849 blobs
+  "029aad01abe478c2f3e844de698231f7dc2f7cf3" => 3793324,
   "565ff603ec3e94d69ac62bb1e785cb96c56f58af" => 3574908,
   "c564a0194505a4a9bf32785d1b24fe4f39e6d850" => 3574908,
   "1bde687e7cb3610a85b87f4ddfc01d1744e47948" => 3574908,
@@ -908,6 +965,10 @@ our %badBlob  = (
   "3c3629e647f5ddf82548912e337bea9826b434af" => 1000000, #node_modules
   "9ce06a81ea45b2883a6faf07a0d2136bb2a4e647" => 1000000, ## dummy
   "5e9587e658c3c3c18ab62ebc908568efd1226aed" => 1000000, #K 13\nsvn:mime-type\nV 24\napplication/octet-stream\nEND
+  "2022a007ff7ac97ce51167903d116eec42bffd9a" => 1959599,
+  "20a7068581791335487166ddc5001a2ca3a3b060" => 1982438,
+  "001c22d0fdf62b007d00e37f12a990c02655d21f" => 1222189,
+  "002ba9ba6c0892ff4f3bd5d1bd39cb44b48e3b75" => 1655120,
 
   "8b137891791fe96927ad78e64b0aad7bded08bdc" => 957235, #\n\n
   "de6be7945c6a59798eb0ace177df38b05e98c2f0" => 650111,   #"module ApplicationHelpe\nend\n"
@@ -991,8 +1052,39 @@ our %badBlob  = (
   "f9e12117cbb3abbc8665f2d4d8b00eaf23c0686e" => 100000, # more than that "{"closed": [0, 0, 0, 0, 0, 0, 0, 0, 0], "date": ["Oct 2015", "Oct 2015", "Oct 2015", "Nov 2015", "Nov 2015", "Nov 2015", "Nov 2015", "Nov 2015", "Dec 2015"], "id": [0, 1, 2, 3, 4, 5, 6, 7, 8], "unixtime": ["1444608000", "1445212800", "1445817600", "1446422400", "1447027200", "1447632000", "1448236800", "1448841600", "1449446400"], "week": [201542, 201543, 201544, 201545, 201546, 201547, 201548, 201549, 201550]}"
 );
 
-our %badTree = (
-  "4b825dc642cb6eb9a060e54bf8d69288fbee4904" => 1  #empty tree with no files
+our %badTree = ( #number of repos with the tree
+  "4b825dc642cb6eb9a060e54bf8d69288fbee4904" => 5610239, #empty 
+  "6f9509c88bed7080d496fc5e1d87a9315e30549d" => 1413287, #100644;dfe0770424b2a19faf507a501ebfc23be8f54e7b;.gitattributes
+  "f93e3a1a1525fb5b91020da86e44810c87a2d7bc" => 1195117, #100644;e69de29bb2d1d6434b8b29ae775ad8c2e48c5391;README.md
+  "543b9bebdc6bd5c4b22136034a95dd097a57d3dd" => 1129224, #100644;e69de29bb2d1d6434b8b29ae775ad8c2e48c5391;README
+  "047efdc4ee3201a2f1fd6fa3b82af6a1a730928b" => 531021,
+  "f8eb3bf79af6f3afeb41bd69cf7d9d75f3b9ecf3" => 530705,
+  "d5958db6f4e5927fb30e6e6877b3251cc0499003" => 530694,
+  "750419283d2113f4e0acbf0934dadb79dff1300e" => 530691,
+  "e31e618fef92296ea4cf369b0535d6c9410f4841" => 530653,
+  "24556163eb03ce358e73f7a3aa36f60df2bf7197" => 530653,
+  "ea2d9f8970e6d4f4b191814c5bc1fb6d78cddd3d" => 524837,
+  "79c7bc43004db8ffffebdb25444d4fd048bfc36b" => 522078,
+  "f0d3a70ceaa69fb70811f58254dc738e0f939eac" => 522045,
+  "15dcdd3aab782356058094530b62ef2df67a5e15" => 513962,
+  "ca3311bb10b640f5a44b6ddcda89dc776fc6db28" => 512239,
+  "1cb30ae1472b304936f0e7ae86044eed431368e7" => 497417,
+  "b0143b3c2d2883f1a04c79fa6a560bf8067d32ce" => 497216,
+  "4e007610d905bd04d2779c5eed42baf4882da8d9" => 496408,
+  "fd1a9540b3b1251dfaf747da0304a994662c4ea5" => 491919,
+  "81b3142a61990cc61eacebf5a9d028d1d39ccacf" => 489289,
+  "a9b95de5564b8d646301818bccd06535dd6948ed" => 487093,
+  "31d13f74c006f3573125e75d404879b1e683c064" => 482246,
+  "4d8affb47a8d3e9fe942bdf8c405d699e677746e" => 466322,
+  "f8fb45697609474a3244674ef8825de634ee1eae" => 466289,
+  "f163cb5e9ae3cf56ab1253a3ebb062451e10df87" => 466289,
+  "ca9ca0fefffd198b03acd3eb21532018be53f95f" => 466289,
+  "63ee4664df1e7b532483551010196f5f77e3015b" => 466289,
+  "38af71c97532c29160c2e154963c53204f69a625" => 466289,
+  "4385e95a373fef3f8afe07d47f5ae56059b1df24" => 424725,
+  "8b60838835ecd7c3584ca8698bac0bcfd2361838" => 415846,
+  "91e3470e1645e6e8d0de6fe9f6b242f366e9a393" => 402527,
+  "19ce9d8ff1fccf510df82d99a65f48c649b7becd" => 381813,
 );
 
 our %badFile = (

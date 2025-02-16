@@ -19,6 +19,7 @@ while(<STDIN>){
   my ($a, $b) = split(/\;/, $_, -1);
   if ($pa ne "" && $pa ne $a){
     out ();
+    %tmp=();
   }
   $tmp{$b}++;
   $pa = $a;
@@ -27,7 +28,7 @@ out();
 
 sub out {
   my @vs = keys %tmp;
-  return if $#vs < 1;
+  return if $#vs < 0;
   if (!defined $f2num{$pa}){
     $f2num{$pa} = $i+0;
     print A "$pa\n";

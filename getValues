@@ -22,11 +22,14 @@ if [[ $t == "" ]]; then
  exit 1;
 fi
 
+
 suff=".31.tch"
 [[ $t =~ ^(A2a|P2p|a2A|p2P)$ ]] && suff=".tch"
 
-for hh in da5 da3 da4
-do for v in V U T S R
+for v in V3 V U T S R
+do
+  pre="_fast"
+  for hh in da5 da3 da4
   do #echo /${hh}_fast/${t}Full$v$suff
      if [[ -f /${hh}_fast/${t}Full$v$suff ]]
      then lastVer=$v
@@ -34,29 +37,34 @@ do for v in V U T S R
           break
      fi
   done
-  [[ $lastVer != "" ]] && break
+  if [[ $lastH != "" ]]; then break; fi
+  for i in 8 7 0 3
+  do if [[ -f /da${i}_data/basemaps/${t}Full$v$suff ]]
+    then
+      pre="_data/basemaps"
+      lastVer=$v
+      lastH=da$i
+      echo $lastH
+      break
+    fi
+  done
+  if [[ $lastH != "" ]]; then break; fi
 done
 
-if [[ $lastH == "" ]]; then
-for v in V U T S R
-do if [[ -f /da0_data/basemaps/${t}Full$v$suff ]]
-  then 
-    lastVer=$v
-    lastH=da0
-    break
-  fi
-done
-fi
-
-if [[ $lastH.eecs.utk.edu == $h ]] 
-then 
- ~/lookup/getValues.perl --flat=$flat /fast/${t}Full$lastVer
+if [[ $lastH == "" ]]
+then echo no map $t
 else
-  ssh="ssh -p443"
-  if [[ $lastH != "" ]]
-  then [[ $lastH == "da3" ]] && ssh=ssh; $ssh $lastH "~/lookup/getValues.perl --flat=$flat /fast/${t}Full$lastVer"
-  else echo no map $t
-  fi
+#if [[ $lastH.eecs.utk.edu == $h ]] 
+#then 
+~/lookup/getValues.perl --flat=$flat /$lastH$pre/${t}Full$lastVer
 fi
+
+#else
+#  ssh="ssh -p443"
+#  if [[ $lastH != "" ]]
+#  then [[ $lastH == "da3" ]] && ssh=ssh; $ssh $lastH "~/lookup/getValues.perl --flat=$flat /fast/${t}Full$lastVer"
+#  else echo no map $t
+#  fi
+#fi
 
 

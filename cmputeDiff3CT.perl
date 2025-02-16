@@ -29,7 +29,7 @@ my (%c2p, %p2c, %b2c, %c2f);
 #my $prj = "";
 my $pre = "/fast/All.sha1c";
 my $preO = "/fast/All.sha1o";
-$pre = $ARGV[0] if defined $ARGV[0];
+$preO = $ARGV[0] if defined $ARGV[0];
 
 my $sections = 128;
 # need to update the tree_$sec.tch first ... for new data. like update0 and update1...
@@ -110,6 +110,7 @@ while(<STDIN>){
         next;
       }
     }
+    #print STDERR "$tree, $treeP\n";
     separate2T ($rev, $parent, "", $tree, $treeP);
   }else{
     #commit with no parents; added missing created parameter to put blobs in the right column
@@ -322,7 +323,7 @@ sub getTO {
   #my $curpos = tell($f);
   my $codeC = "";
   my $rl = read ($f, $codeC, $len);
-  #  print STDERR "tree $t1 $sec $off $len $rl\n";
+  #print STDERR "tree $t1 $sec $off $len $rl\n";
   if (defined $codeC && length ($codeC) > 0){
     return safeDecomp ($codeC, "tree $t1 $sec $off $len $rl\n");
   }else{

@@ -3,9 +3,8 @@
 h=$(hostname)
 t=$1
 
-off=${3:-0}
+off=${3:-1}
 fmt=${2:-0}
-
 
 if [[ $t != 'blob' && $t != 'tree' && $t != 'commit' && $t != 'tag' ]]
 then echo "no type $t"
@@ -25,7 +24,6 @@ else
  else
   if [[ $t == 'tree' ]]
   then
-    off=1
     if [[ $h == 'da3.eecs.utk.edu' || $h == 'da4.eecs.utk.edu' ]] 
     then 
       ~/lookup/showCnt.perl $t $fmt $off
@@ -35,13 +33,11 @@ else
   else # commit/'tdiff'/'tkns'  
     if [[ $t == 'tdiff' || $t == 'tkns' ]]
     then 
-      off=0
       ssh da3 ~/lookup/showCnt.perl $t $fmt $off
     else  #commit
       if [[ $h == 'da4.eecs.utk.edu' ]]
-      then ~/lookup/showCnt.perl $t $fmt
+      then ~/lookup/showCnt.perl $t $fmt $off
       else
-        off=0
         ssh da4 ~/lookup/showCnt.perl $t $fmt $off
       fi
     fi

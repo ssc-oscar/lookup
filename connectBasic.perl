@@ -11,18 +11,20 @@ open B, "| gzip >$tmp.versions";
 my (%f2num);
 my $i = 0;
 while(<STDIN>){
-	chop();
-	my ($b0, $b1) = split(/\;/, $_, -1);
+  chop();
+  my ($b0, $b1) = split(/\;/, $_, -1);
   for my $a ($b0, $b1){
-	  if (!defined $f2num{$a}){
-		  $f2num{$a} = $i+0;
-		  print A "$a\n";
-		  $i++;
-	  }
+    if (!defined $f2num{$a}){
+      $f2num{$a} = $i+0;
+      print A "$a\n";
+      $i++;
+    }
   }
-	print B "$f2num{$b0} $f2num{$b1}\n";
+  print B "$f2num{$b0} $f2num{$b1}\n";
 }
 undef %f2num;
+close B;
+close A;
 system ("zcat $tmp.versions | $ENV{HOME}/bin/connect | gzip > $tmp.clones");
 my @num2f;
 open A, "zcat $tmp.names|";

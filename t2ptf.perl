@@ -39,7 +39,7 @@ my $end = defined $ARGV[2] ? $ARGV[2] : -1;
       seek (FD, $of, 0);
       my $rl = read (FD, $codeC, $len);
       $trees ++;
-      if ($rl == $len){
+      if ($rl == $len && $len < 13000000){
         my $to = safeDecomp ($codeC);
         while ($to =~ s/^([0-7]+) (.+?)\0(.{20})//s) {
           $lines ++;
@@ -57,7 +57,7 @@ my $end = defined $ARGV[2] ? $ARGV[2] : -1;
           }
         }
       }else{
-        exit (-1);
+        print STDERR "$hash;$len;TOO LONG\n";
       }
     }
   }

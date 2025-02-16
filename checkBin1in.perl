@@ -1,11 +1,11 @@
 #!/usr/bin/perl
-use lib ("$ENV{HOME}/lookup", "$ENV{HOME}/lib64/perl5", "/home/audris/lib64/perl5","$ENV{HOME}/lib/perl5", "$ENV{HOME}/lib/x86_64-linux-gnu/perl", "$ENV{HOME}/share/perl5");
+#use lib ("$ENV{HOME}/lookup", "$ENV{HOME}/lib64/perl5", "/home/audris/lib64/perl5","$ENV{HOME}/lib/perl5", "$ENV{HOME}/lib/x86_64-linux-gnu/perl", "$ENV{HOME}/share/perl5");
 use strict;
 use warnings;
 use Error qw(:try);
 
 use Digest::SHA qw (sha1_hex sha1);
-use TokyoCabinet;
+#use TokyoCabinet;
 use Compress::LZF;
 
 my $type = $ARGV[0];
@@ -44,7 +44,7 @@ my $sections = 128;
     my @x = split(/\;/, $str);
     my ($l, $s, $sec0, $hsha, @rest) = @x;
     $l += $lfix;
-    if ($l + $s > $lmax){
+    if ($l + $s > $lmax || $hsha !~ /^[0-9a-f]{40}$/){
       print STDERR "exceeds size $. l=$l lmax=$lmax lfix=$lfix s=$s hsha=$hsha\n";
       exit();
     }
