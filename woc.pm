@@ -361,6 +361,7 @@ sub cleanCmt {
     $ta = sprintf "%.10d", $ta;
     $taz =~ s/;/ /g;
     $auth =~ s/;/ /g;
+    # for c2dat
     print "$cmt;$ta;$taz;$auth;$tree;$parents\n";
     return;
   }
@@ -373,6 +374,7 @@ sub cleanCmt {
     $tc = sprintf "%.10d", $tc;
     $auth =~ s/;/ /g;
     $cmtr =~ s/;/ /g;
+    # for c2acp: $c;$ta;$tc;$a;$cm;$s
     print "$cmt;$ta;$tc;$auth;$cmtr;$parents\n";
     return;
   }
@@ -394,6 +396,7 @@ sub cleanCmt {
     $cm =~ s/\n+/\n/g;
     $cm =~ s/\n/__NEWLINE__/g;
     $cm =~ s/;/__SEMICOLON__/g;
+    # for c2ch
     print "$cmt;$tree;$parents;$auth;$cmtr;$ta;$tc;$taz;$tcz;$cm\n";
     return;
   }
@@ -717,7 +720,13 @@ sub addForks {
 }
 
 
-our %badAuthors = ( 'one-million-repo <mikigal.acc@gmail.com>' => "1M commits", 
+our %badAuthors = ( 
+                              'subgit <support@subgit.com>'       => '404022927 A2f',
+                             'DANDI Meta-user <dandi@mit.edu>'    => '300876865 A2b',
+                             'DANDI Team <help@dandiarchive.org>' => '579046540 A2fb', 
+    'Bot <41898282+github-actions[bot]@users.noreply.github.com>' => '709960003 A2f',
+                        'Adam Oswald <adamoswald69420@gmail.com>' => '671534228 A2f',
+                       'one-million-repo <mikigal.acc@gmail.com>' => "1M commits", 
    'scraped_page_archive gem 0.5.0 <scraped_page_archive-0.5.0@scrapers.everypolitician.org>' => "4243985C", 
    'Your Name <you@example.com>' => "1829654C",
    'Auto Pilot <noreply@localhost>' => "2063212C",

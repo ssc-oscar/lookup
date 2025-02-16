@@ -19,8 +19,10 @@ c=/lustre/isaac/scratch/audris/gz
 cd $c
 
 maxM=1000
-ver=V3
-pVer=V2
+ver=V2409
+#ver=V4
+pVer0=V4
+pVer=V3
 prt=PRT
 
 if test 'WHAT' = 'START'; then
@@ -55,9 +57,13 @@ if test 'WHAT' = 'MRG0'; then
 cd $ver
 for k in {0..3}
 do i=$((prt*4+k))
-$HOME/bin/lsort ${maxM}M -t\; -k1,2 -u --merge <(zcat ../c2pFull.$pVer.$i.s) <(zcat c2p.$i.s) | gzip > ../c2pFull.${ver}.$i.s
-$HOME/bin/lsort ${maxM}M -t\; -k1,2 -u --merge <(zcat ../p2cFull.$pVer.$i.s) <(zcat p2c.$i.s) | gzip > ../p2cFull.${ver}.$i.s
+
+
+#collect both V4 and V2409
+#$HOME/bin/lsort ${maxM}M -t\; -k1,2 -u --merge <(zcat ../c2pFull.$pVer.$i.s) <(zcat ../$pVer0/c2p.$i.s) | gzip > ../c2pFull.${ver}.$i.s
 echo c2p${ver}.$i.s
+$HOME/bin/lsort ${maxM}M -t\; -k1,2 -u --merge <(zcat ../p2cFull.$pVer.$i.s) <(zcat p2c.$i.s) <(zcat ../$pVer0/p2c.$i.s) | gzip > ../p2cFull.${ver}.$i.s
+echo p2c${ver}.$i.s
 done
 
 fi
@@ -111,7 +117,7 @@ if test 'WHAT' = 'invt'; then
 # from c2p to p2c on the new
 cd $ver
 for i in {0..127}
-do zcat c2p.$i.gz
+do zcat c2p.$i.s
 done | awk -F\; '{print $2";"$1}' | perl -I ~/lib/perl5 -I ~/lookup $HOME/lookup/splitSecCh.perl p2c. 128 
 echo p2c.
 

@@ -2,8 +2,12 @@ use strict;
 use warnings;
 
 my $f = $ARGV[0];
+my $klen = 4;
 my $vlen = 20;
-$vlen = $ARGV[1] if defined $ARGV[1];
+$klen = $ARGV[1] if defined $ARGV[1];
+$vlen = $ARGV[2] if defined $ARGV[2];
+my $nkl = $klen*2;
+my $nvl = $vlen*2;
 
 open A, "|gzip > $f.idx";
 open B, "> $f.bin";
@@ -19,12 +23,12 @@ while (<STDIN>){
   if ($pk ne "" && $k ne $pk){
     out ();
   }
-  if (length($v) == $vlen*2){
+  if ($_ =~ m/^[0-9a-f]{$nkl};[0-9a-f]{$nvl}$/){
     my $vb = pack "H*", $v;
     $pk = $k;
     print B $vb;
   }else{
-    die "wrong value length: $v\n";
+    die "wrong length $klen;$vlen for $k;$v\n";
   }
   $pk = $k;
   $nc ++;

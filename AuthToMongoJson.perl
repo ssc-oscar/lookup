@@ -14,10 +14,10 @@ my $s = $ARGV[1];
 my %d;
 my $cnt = 0;
 for my $ty ("A2tPlPkg", "A2tspan", "A2c","A2a","A2f","A2fb","A2g","A2P","A2mnc"){
-  my $str = "zcat ../gz/A2summFull.$ty.$v$s.gz|";
-  $str = "zcat ../gz/${ty}FullH$v.$s.gz|" if $ty eq "A2a";
-  $str = "zcat ../c2fb/${ty}Full$v$s.s|" if $ty eq "A2tspan";
-  $str = "zcat ../gz/${ty}Full$v$s.s|" if $ty eq "A2mnc";
+  my $str = "zcat ../gz/A2summFull.$ty.$v.$s.gz|";
+  $str = "zcat ../gz/${ty}FullH.$v.$s.gz|" if $ty eq "A2a";
+  $str = "zcat ../c2fb/${ty}Full.$v.$s.s|" if $ty eq "A2tspan";
+  $str = "zcat ../gz/${ty}Full.$v.$s.s|" if $ty eq "A2mnc";
   open A, $str;
   while (<A>){
     chop(); 

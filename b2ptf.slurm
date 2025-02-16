@@ -230,6 +230,14 @@ i=FROM
 ./fixV2.1.sh $i $j
 
 fi
+if test 'WHAT' == 'diffV2Fix1'; then
+
+j=PRT
+i=FROM
+./fixV2.2.sh $i $j
+
+fi
+
 if test 'WHAT' == 'diffV1_1'; then
 
 i=FROM

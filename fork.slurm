@@ -17,6 +17,7 @@ LD_LIBRARY_PATH=/nfs/home/audris/lib:/nfs/home/audris/lib64:$LD_LIBRARY_PATH
 
 c=/lustre/haven/user/audris/gz
 c=/lustre/isaac/scratch/audris/gz
+c=/nfs/home/audris/work/gz
 cd $c
 
 
@@ -122,11 +123,17 @@ echo c2pFull.$ver.np2p.s
 
 fi
 if test 'WHAT' = 'defork'; then
-# use community detection on c2pFull$ver.np2p to get
-# c2pFull.$ver.np2p.PLMmap.forks and c2pFull.$ver.np2pw.PLMmap.forks
-#zcat pFull.$ver.s | awk -F\; '{print $1";"$1}' | perl ~/lookup/mp.perl 1 c2pFull.$ver.np2pu.PLMmap.forks | gzip > p2PFull.$ver.s
-#zcat p2PFull.$ver.s | awk -F\; '{print $2";"$1}' | lsort 3G -t\; -k1,2 | gzip > P2pFull.$ver.s 
-#perl reRank.perl |gzip > p2PFull.V.s
+#scp -p c2pFull.V2409.np2p.s da5:/data/play/forks
+#ver=V2409
+#zcat c2pFull.$ver.np2p.s | perl connectExportVw.perl c2pFull.$ver.np2p
+#export LD_LIBRARY_PATH=/home/audris/lib64:/home/audris/lib:/home/audris/src/nk/build
+#nnodes=$(zcat c2pFull.$ver.np2p.names|wc -l)
+#zcat c2pFull.$ver.np2p.versions | /home/audris/src/networkit/cluster $nnodes  | gzip > c2pFull.$ver.np2pu.PLM
+#n=c2pFull.$ver.np2p
+#zcat ${n}u.PLM | perl rankNew.perl ${n} 1 | gzip >  ${n}.crank.map
+#perl reRankV2409.perl ${n}.crank.map 2> p2PFull.$ver.err |gzip > p2PFull.$ver.s
+#scp -p da5:/data/play/forks/p2PFull.V2409.s .
+#
 
 for i in {0..1}
 do j=$((FROM*2+$i))

@@ -26,9 +26,9 @@ while(<STDIN>){
   my @x=split(/;/);
   my $pr = 0;
   for my $col (@cols){
-    if (defined $x[$col] && !defined $bad{$x[$col]}){
+    if (defined $x[$col]){
       $pr ++;
-      $x[$col] = $p2P{$x[$col]} if defined $p2P{$x[$col]};
+      $x[$col] = $p2P{$x[$col]} if defined $p2P{$x[$col]} && !defined $bad{$x[$col]};
     }
   }
   print "".(join ';', @x)."\n" if $pr == $#cols+1;
