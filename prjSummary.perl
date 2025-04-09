@@ -138,7 +138,7 @@ for my $ty ($type){
   my $pre ="";#P2tAllPkg?
   $pre = "../c2fb/" if $ty =~ /P2[bf]|P2nfb/;
   $pre = "../c2fb/" if $ty =~/P2tAlPkg/;
-  my $str = "zcat $pre${ty}Full$v$s.s |";
+  my $str = "zcat $pre${ty}Full.$v.$s.s |";
   $str = 'zcat P2cFull.'.$v.'.{'.$s.",".($s+32).",".($s+64).",".($s+96).'}'.'.s|' if $ty eq "P2c"; 
   open A, $str;
   while (<A>){

@@ -368,6 +368,7 @@ sub cleanCmt {
     $ta = sprintf "%.10d", $ta;
     $taz =~ s/;/ /g;
     $auth =~ s/;/ /g;
+    # for c2dat
     print "$cmt;$ta;$taz;$auth;$tree;$parents\n";
     return;
   }
@@ -380,6 +381,7 @@ sub cleanCmt {
     $tc = sprintf "%.10d", $tc;
     $auth =~ s/;/ /g;
     $cmtr =~ s/;/ /g;
+    # for c2acp: $c;$ta;$tc;$a;$cm;$s
     print "$cmt;$ta;$tc;$auth;$cmtr;$parents\n";
     return;
   }
@@ -401,6 +403,7 @@ sub cleanCmt {
     $cm =~ s/\n+/\n/g;
     $cm =~ s/\n/__NEWLINE__/g;
     $cm =~ s/;/__SEMICOLON__/g;
+    # for c2ch
     print "$cmt;$tree;$parents;$auth;$cmtr;$ta;$tc;$taz;$tcz;$cm\n";
     return;
   }
