@@ -1,5 +1,26 @@
 #!/usr/bin/perl
-use lib ("$ENV{HOME}/lookup", "$ENV{HOME}/lib64/perl5", "/home/audris/lib64/perl5","$ENV{HOME}/lib/perl5", "$ENV{HOME}/lib/x86_64-linux-gnu/perl", "$ENV{HOME}/share/perl5");
+BEGIN{
+  
+use Sys::Hostname;
+my @inco = ("$ENV{HOME}/lookup", 
+    "$ENV{HOME}/lib64/perl5", 
+    "$ENV{HOME}/lib/perl5", 
+    "$ENV{HOME}/lib/x86_64-linux-gnu/perl", 
+    "$ENV{HOME}/share/perl5");
+
+my @incn = ("$ENV{HOME}/lookup",
+        "$ENV{HOME}/lib64/perl5/5.32"
+);
+
+my $h = hostname();
+my @lib1 = @inco;
+@lib1 = @incn if $h =~/^da[430]/;
+
+push @INC, @lib1;
+}
+
+
+
 use strict;
 use warnings;
 use Error qw(:try);
