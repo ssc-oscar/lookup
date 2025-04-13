@@ -14,7 +14,7 @@ BEGIN{
 
   my $h = hostname();
   my @lib1 = @inco;
-  @lib1 = @incn if $h =~/^da[430]/;
+  @lib1 = @incn if $h =~/^da[4320]/;
 
   push @INC, @lib1;
 }
