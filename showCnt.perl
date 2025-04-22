@@ -28,7 +28,6 @@ use woc;
 
 
 my $type = $ARGV [0];
-
 # this is to handle different output formats
 my $debug = 0;
 $debug = $ARGV[1]+0 if defined $ARGV[1]; #select output format based on the cleantCmt function in cmt.pm
@@ -40,16 +39,10 @@ $ncnt = $ARGV[2] if defined $ARGV[2];
 
 
 my (%fhob, %fhost, %fhosc);
-use Net::Domain qw(hostname);
-my $h = hostname();
-my $pre = "/fast";
-my $dt = "/data";
-if ($type eq "blob"){
-# too complicated: need to remember to copy offset files to da4
-#  $pre = "/${h}_fast" if $h eq "da4";
-  $pre = "/da5_fast";# if $h ne "da4";
-  $dt = "/da5_data" ;
-}
+#use Net::Domain qw(hostname);
+#my $h = hostname();
+my $pre = defined $ARGV[3] ? $ARGV[3] : "/da5_fast";
+my $dt = defined $ARGV[4] ? $ARGV[4] : "/da5_fast";
 
 my $fbasec="All.sha1c/${type}_";
 if ($type eq "blob" || ($type =~ /bdiff|commit|tree/ && $ncnt) ){

@@ -6,41 +6,7 @@ t=$1
 off=${3:-1}
 fmt=${2:-0}
 
-if [[ $t != 'blob' && $t != 'tree' && $t != 'commit' && $t != 'tag' ]]
-then echo "no type $t"
-   exit
-fi
-
-if [[ $h == da5.eecs.utk.edu ]] 
-then 
-  ~/lookup/showCnt.perl $t $fmt 0
-else
- if [[ $t == 'blob' ]]
- then
-    if [[ $h == 'da4.eecs.utk.edu' ]]
-    then ~/lookup/showCnt.perl $t $fmt 1
-    else ssh -p443 da4 ~/lookup/showCnt.perl $t $fmt 1
-    fi
- else
-  if [[ $t == 'tree' ]]
-  then
-    if [[ $h == 'da3.eecs.utk.edu' || $h == 'da4.eecs.utk.edu' ]] 
-    then 
-      ~/lookup/showCnt.perl $t $fmt $off
-    else
-      ssh -p443 da4 ~/lookup/showCnt.perl $t $fmt $off
-    fi
-  else # commit/'tdiff'/'tkns'  
-    if [[ $t == 'tdiff' || $t == 'tkns' ]]
-    then 
-      ssh da3 ~/lookup/showCnt.perl $t $fmt $off
-    else  #commit
-      if [[ $h == 'da4.eecs.utk.edu' ]]
-      then ~/lookup/showCnt.perl $t $fmt $off
-      else
-        ssh da4 ~/lookup/showCnt.perl $t $fmt $off
-      fi
-    fi
-   fi
-  fi
+if [[ $h == da4.eecs.utk.edu && ($t == tree || $t == commit) ]]
+then ~/lookup/showCnt.perl $t $fmt 1 /fast /da4_data
+else ~/lookup/showCnt.perl $t $fmt 0 /da5_fast /da5_data # 0 is converted to 1 for blobs in showCnt.perl
 fi
