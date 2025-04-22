@@ -8,8 +8,7 @@ my @inco = ("$ENV{HOME}/lookup",
     "$ENV{HOME}/lib/x86_64-linux-gnu/perl", 
     "$ENV{HOME}/share/perl5");
 
-my @incn = ("$ENV{HOME}/lookup",
-        "$ENV{HOME}/lib64/perl5/5.32"
+my @incn = ("$ENV{HOME}/lookup"
 );
 
 my $h = hostname();
@@ -49,7 +48,7 @@ if ($type eq "blob"){
 # too complicated: need to remember to copy offset files to da4
 #  $pre = "/${h}_fast" if $h eq "da4";
   $pre = "/da5_fast";# if $h ne "da4";
-  $dt = "/da4_data" ;
+  $dt = "/da5_data" ;
 }
 
 my $fbasec="All.sha1c/${type}_";
